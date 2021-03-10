@@ -4,7 +4,7 @@
     <v-row>
       <v-col v-for="project in projectList" :key="project.id" cols="4">
         <v-card rounded :to="{name: 'project-detail', params: {id: project.id}}">
-          <v-card-title>{{ project.name }}</v-card-title>
+          <v-card-title>{{ project.title }}</v-card-title>
           <v-card-text>{{ project.description }}</v-card-text>
         </v-card>
       </v-col>

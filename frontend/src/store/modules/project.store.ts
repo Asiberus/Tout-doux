@@ -20,9 +20,9 @@ export default class ProjectModule extends VuexModule {
     @Action({commit: 'updateProjectList'})
     retrieveProjectList(): ProjectModel[] {
         return [
-            {id: '1', name: 'Project 1', description: 'Project Description', priority: PriorityEnum.NORMAL, tasks: []},
-            {id: '2', name: 'Project 2', description: 'Second Project Description', priority: PriorityEnum.IMPORTANT, tasks: []},
-            {id: '3', name: 'Project 3', description: 'Third Project Description', priority: PriorityEnum.VERY_IMPORTANT, tasks: []},
+            {id: '1', title: 'Project 1', description: 'Project Description', priority: PriorityEnum.NORMAL, tasks: []},
+            {id: '2', title: 'Project 2', description: 'Second Project Description', priority: PriorityEnum.IMPORTANT, tasks: []},
+            {id: '3', title: 'Project 3', description: 'Third Project Description', priority: PriorityEnum.VERY_IMPORTANT, tasks: []},
         ]
     }
 }

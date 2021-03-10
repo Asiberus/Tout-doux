@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Project : {{ project.name }}</h1>
+    <h1>Project : {{ project.title }}</h1>
     <v-divider class="my-3"></v-divider>
     <p>{{project.description}}</p>
   </v-container>
