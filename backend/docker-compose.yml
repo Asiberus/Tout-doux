@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: postgres:11
+    container_name: tout_doux_postgres
+    environment:
+      POSTGRES_DB: tout_doux
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # DEV
+      - ../db:/var/lib/postgresql/data

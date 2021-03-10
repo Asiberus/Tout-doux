@@ -1,23 +1,18 @@
 <template>
   <div id="app">
-    <v-app>
-      <v-navigation-drawer app><TheNavbar></TheNavbar></v-navigation-drawer>
-      <v-app-bar app dense></v-app-bar>
-      <v-main>
-        <v-container fluid>APP</v-container>
-      </v-main>
-    </v-app>
+    <AppMain></AppMain>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import TheNavbar from "@/core/components/the-navbar.vue";
+import AppMain from "@/layout/AppMain.vue";
+
 
 export default Vue.extend({
   name: 'App',
   components: {
-    TheNavbar
+    AppMain
   }
 });
 </script>
