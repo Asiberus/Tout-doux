@@ -4,7 +4,7 @@
     <v-row>
       <v-col v-for="project in projectList" :key="project.id" cols="4">
         <v-card rounded :to="{name: 'project-detail', params: {id: project.id}}">
-          <v-card-title>{{ project.title }}</v-card-title>
+          <v-card-title>{{ project.name }}</v-card-title>
           <v-card-text>{{ project.description }}</v-card-text>
         </v-card>
       </v-col>
@@ -15,19 +15,28 @@
 <script lang="ts">
 import {Component, Vue} from "vue-property-decorator";
 import ProjectModel from "@/models/project/project.model";
+import {projectService} from "@/api/project.api";
 
 @Component
 export default class ProjectList extends Vue {
 
-  get projectList(): ProjectModel[] {
-    return this.$store.state.project.projectList;
+  private projectList: ProjectModel[] = [];
+
+  created(): void {
+    this.retrieveProjectList();
   }
 
-  beforeMount(): void {
-    this.$store.dispatch('retrieveProjectList');
+  private retrieveProjectList(): void {
+    console.log('retrieve project list');
+    projectService.getProjectList().then(
+        response => {
+          this.projectList = response.body.content;
+        },
+        error => {
+          console.error(error);
+        }
+    )
   }
-
-
 
 }
 </script>

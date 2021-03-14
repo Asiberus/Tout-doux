@@ -121,6 +121,9 @@ REST_FRAMEWORK = {
   'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
+EXTENDED_PAGINATION_DEFAULT_SIZE = 20
+EXTENDED_PAGINATION_DEFAULT_SIZE_QUERY_PARAM = 'size'
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
