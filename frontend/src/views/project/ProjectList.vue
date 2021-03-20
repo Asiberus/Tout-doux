@@ -29,10 +29,10 @@ export default class ProjectList extends Vue {
   private retrieveProjectList(): void {
     console.log('retrieve project list');
     projectService.getProjectList().then(
-        response => {
+        (response: any) => {
           this.projectList = response.body.content;
         },
-        error => {
+        (error: any) => {
           console.error(error);
         }
     )

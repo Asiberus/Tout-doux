@@ -1,15 +1,18 @@
-import ProjectModel from "@/models/project/project.model";
 import {PriorityEnum} from "@/models/project/priority.enum";
-import ListModel from "@/models/project/list.model";
 
-export default interface TaskModel {
-    id: string;
+// Todo : change id to number
+export interface TaskModel {
+    id: number;
     name: string;
     description?: string;
     completed: boolean;
     priority: PriorityEnum;
-    project?: ProjectModel;
-    list?: ListModel;
+    projectId?: number;
+    listId?: number;
     deadline?: string;
     event: boolean;
+}
+
+export interface TaskDisplayModel extends TaskModel {
+    editMode: boolean;
 }
