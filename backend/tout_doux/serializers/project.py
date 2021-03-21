@@ -10,3 +10,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'name', 'description', 'priority', 'archived', 'tasks')
+
+    def validate(self, data):
+        if self.instance and self.instance.archived:
+            if 'name' in data or 'description' in data or 'priority' in data:
+                raise serializers.ValidationError('You can\'t edit a archived project')
+        return data

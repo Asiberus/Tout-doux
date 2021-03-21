@@ -1,6 +1,5 @@
 import {PriorityEnum} from "@/models/project/priority.enum";
 
-// Todo : change id to number
 export interface TaskModel {
     id: number;
     name: string;

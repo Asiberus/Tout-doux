@@ -12,9 +12,9 @@
         </v-chip>
       </h1>
       <div>
-        <v-dialog v-model="projectEditDialog" width="60%">
+        <v-dialog v-model="projectEditDialog" width="60%" :disabled="project.archived">
           <template #activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
+            <v-btn icon v-bind="attrs" v-on="on" :disabled="project.archived">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
           </template>
@@ -25,7 +25,7 @@
 
         <v-dialog v-model="projectArchiveDialog" width="50%">
           <template #activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on" class="ml-1">
+            <v-btn icon v-bind="attrs" v-on="on" class="ml-1" :color="project.archived ? 'accent' : null">
               <v-icon>mdi-archive</v-icon>
             </v-btn>
           </template>
@@ -35,16 +35,16 @@
           </ConfirmDialog>
         </v-dialog>
 
-        <v-dialog v-model="projectDeleteDialog" width="50%">
+        <v-dialog v-model="projectDeleteDialog" width="50%" v-if="project.archived">
           <template #activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on" class="ml-1">
+            <v-btn icon v-bind="attrs" v-on="on" class="ml-1" color="error">
               <v-icon>mdi-trash-can</v-icon>
             </v-btn>
           </template>
-          <ConfirmDialog color="error" @cancel="projectDeleteDialog = false">
+          <ConfirmDialog color="error" @confirm="deleteProject" @cancel="projectDeleteDialog = false">
             <template #icon><v-icon x-large>mdi-trash-can</v-icon></template>
-            <p class="mb-1">Are you sure to delete this project ?</p>
-<!--            <span class="font-italic">All related tasks will be deleted</span>-->
+            <p>Are you sure to delete this project ?</p>
+            <p class="mb-0 font-italic" style="font-size: 1.1rem;">All related tasks will be deleted</p>
           </ConfirmDialog>
         </v-dialog>
       </div>
@@ -55,29 +55,51 @@
         <div class="d-flex align-center mb-1">
           <h3 class="flex-grow-1 mb-3 ml-2">Tasks</h3>
           <div>
-            <v-btn icon :color="createTaskCardDisplayed ? 'accent': null"
+            <v-btn icon :color="createTaskCardDisplayed ? 'accent': null" :disabled="project.archived"
                    @click="toggleCreateTaskCardDisplay">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
-            <v-btn icon :color="editTasksDisplay ? 'purple': null" @click="editTasksDisplay = !editTasksDisplay"
+            <v-btn icon :color="editTasksDisplay ? 'purple': null" :disabled="project.archived"
+                   @click="editTasksDisplay = !editTasksDisplay"
                    v-click-outside="{handler: () => editTasksDisplay = false, include: includedEditTaskDisplayHtmlElements}">
               <v-icon>mdi-playlist-edit</v-icon>
             </v-btn>
           </div>
         </div>
+        <template v-if="tasksUncompleted.length > 0">
+          <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="index" :task="task"
+                        :displayEditBtn="editTasksDisplay" :disabled="project.archived"
+                        @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
+                        @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
+                        class="edit-task-included">
+          </TaskItemCard>
+        </template>
+        <template v-else>
+          <div class="img-wrapper">
+            <img src="../../assets/no_tasks.svg" alt="">
+            <p class="mt-5" v-if="tasksCompleted.length > 0">You completed all the tasks of this project!</p>
+            <p class="mt-5" v-else>No task are related to this project</p>
+          </div>
+        </template>
+        
+        <template v-if="project.tasks.length > 0">
+          <h3 class="mt-7 mb-3 ml-2">Tasks completed</h3>
+          <template v-if="tasksCompleted.length > 0">
+            <TaskItemCard v-for="task in tasksCompleted" :key="task.id" :task="task"
+                          :displayEditBtn="editTasksDisplay" :disabled="project.archived"
+                          @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
+                          @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
+                          class="edit-task-included">
+            </TaskItemCard>
+          </template>
+          <template v-else>
+            <div class="img-wrapper">
+              <img src="../../assets/no-task-completed.svg" alt="">
+              <p class="mt-5">You don't have any completed tasks for this project</p>
+            </div>
+          </template>
+        </template>
 
-        <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="index" :task="task"
-                      :displayEditBtn="editTasksDisplay"
-                      @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
-                      @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
-                      class="edit-task-included"></TaskItemCard>
-
-        <h3 class="mt-7 mb-3 ml-2">Tasks completed</h3>
-
-        <TaskItemCard v-for="task in tasksCompleted" :key="task.id" :task="task" :displayEditBtn="editTasksDisplay"
-                      @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
-                      @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
-                      class="edit-task-included"></TaskItemCard>
       </v-col>
       <v-col cols="4">
         <div class="d-flex justify-center mt-3">
@@ -204,6 +226,17 @@ export default class ProjectDetail extends Vue {
     )
   }
 
+  private deleteProject(): void {
+    this.projectDeleteDialog = false;
+    projectService.deleteProject(this.project.id).then(
+        (response: any) => {
+          this.$router.push({name: 'project-list'});
+        }, (error: any) => {
+          console.error(error);
+        }
+    )
+  }
+
   private toggleTaskState(taskId: number): void {
     const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === taskId);
     taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
@@ -283,5 +316,21 @@ export default class ProjectDetail extends Vue {
 </script>
 
 <style scoped lang="scss">
+.img-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
 
+  img {
+    max-width: 350px;
+  }
+
+  .img-description {
+    margin-top: 1rem;
+
+  }
+
+}
 </style>

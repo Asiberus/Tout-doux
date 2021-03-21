@@ -5,7 +5,10 @@ export default [
     {
         path: '/project',
         name: 'project-list',
-        component: ProjectList
+        component: ProjectList,
+        props: (route: any) => ({
+            archived: route.query.archived == 'true'
+        })
     },
     {
         path: '/project/:id',

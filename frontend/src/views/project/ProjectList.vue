@@ -2,8 +2,8 @@
   <v-container>
     <h1 class="mb-6">Project List</h1>
     <div class="d-flex justify-end align-center mb-3">
-      <v-chip class="mr-3" :color="archivedProjects ? 'accent' : null" @click="archivedProjects = !archivedProjects">
-        <v-icon v-if="archivedProjects" small class="mr-1">
+      <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
+        <v-icon v-if="archived" small class="mr-1">
           mdi-archive
         </v-icon>
         <v-icon v-else small class="mr-1">
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue, Watch} from "vue-property-decorator";
+import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import ProjectModel from "@/models/project/project.model";
 import {projectService} from "@/api/project.api";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
@@ -46,15 +46,16 @@ import ProjectItemCard from "@/views/project/components/ProjectItemCard.vue";
   }
 })
 export default class ProjectList extends Vue {
+  @Prop() archived!: boolean;
+
   private projectList: ProjectModel[] = [];
   private projectDialog = false;
-  private archivedProjects = true;
 
   created(): void {
-    this.retrieveProjectList({archived: this.archivedProjects});
+    this.retrieveProjectList({archived: this.archived});
   }
 
-  @Watch('archivedProjects')
+  @Watch('archived')
   private onArchivedProjectsChanges(value: boolean): void {
     this.retrieveProjectList({archived: value});
   }
@@ -79,6 +80,10 @@ export default class ProjectList extends Vue {
           console.error(error);
         }
     )
+  }
+
+  private toggleArchivedProject(): void {
+    this.$router.replace({query: {archived: !this.archived}});
   }
 
 }

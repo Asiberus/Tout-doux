@@ -30,36 +30,36 @@
     <template v-else>
       <v-card-text>
         <v-row align-content="center">
+
           <v-col cols="1" class="d-flex justify-center">
             <v-icon color="error" v-show="task.priority === priorityEnum.IMPORTANT">mdi-alert-decagram</v-icon>
           </v-col>
+
           <v-col cols="10">
             <h3>{{ task.name }}</h3>
           </v-col>
+
           <v-col cols="1" v-if="!displayEditBtn || task.completed">
-            <v-checkbox color="success" hide-details :input-value="task.completed" @click="emitToggleTaskStateEvent" class="mt-0"></v-checkbox>
+            <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
+                        @click="emitToggleTaskStateEvent"
+                        class="mt-0"></v-checkbox>
           </v-col>
+
           <v-col cols="1" class="d-flex justify-center" v-else>
             <v-btn icon color="accent" small @click.stop="emitToggleEditModeEvent(true)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-dialog width="40%" v-model="deleteDialog">
+
+            <v-dialog v-model="deleteDialog" width="50%">
               <template #activator="{ on, attrs }">
                 <v-btn icon color="error" small v-bind="attrs" v-on="on" class="ml-3">
                   <v-icon>mdi-trash-can</v-icon>
                 </v-btn>
               </template>
-              <v-card class="grey darken-1">
-                <v-card-title class="headline">
-                  Are you sure to delete this task ?
-                </v-card-title>
-                <v-card-text>
-                  <div class="d-flex justify-center">
-                    <v-btn color="success" large class="mr-2" @click="emitDeleteTaskEvent">Yes</v-btn>
-                    <v-btn color="error" large @click="deleteDialog = false">No</v-btn>
-                  </div>
-                </v-card-text>
-              </v-card>
+              <ConfirmDialog color="error" @confirm="emitDeleteTaskEvent" @cancel="deleteDialog = false">
+                <template #icon><v-icon x-large>mdi-trash-can</v-icon></template>
+                <p>Are you sure to delete this task ?</p>
+              </ConfirmDialog>
             </v-dialog>
           </v-col>
         </v-row>
@@ -73,11 +73,17 @@
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {PriorityEnum} from "@/models/project/priority.enum";
 import {TaskDisplayModel} from "@/models/task/task.model";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
-@Component
+@Component({
+  components: {
+    ConfirmDialog
+  }
+})
 export default class TaskItemCard extends Vue {
   @Prop() private task!: TaskDisplayModel;
   @Prop() private displayEditBtn!: boolean;
+  @Prop() private disabled!: boolean;
 
   private deleteDialog = false;
   private priorityEnum = PriorityEnum;

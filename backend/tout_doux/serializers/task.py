@@ -13,6 +13,16 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'completed', 'priority', 'projectId', 'event', 'deadline')
 
     def create(self, validated_data):
-        project = get_or_none(Project, id=validated_data.pop('projectId', None))
-        task = Task.objects.create(project=project, **validated_data)
+        task = Task.objects.create(project=validated_data.pop('projectId', None), **validated_data)
         return task
+
+    def validate(self, data):
+        if self.instance and self.instance.project and self.instance.project.archived:
+            raise serializers.ValidationError('You can\'t edit a task related to an archived project')
+        return data
+
+    def validate_projectId(self, value):
+        project = get_or_none(Project, id=value)
+        if project and project.archived:
+            raise serializers.ValidationError('You can\'t add a task to an archived project')
+        return project

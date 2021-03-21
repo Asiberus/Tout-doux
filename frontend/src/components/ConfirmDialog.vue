@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-text>
-      <div class="d-flex flex-column align-center">
+      <div class="d-flex flex-column justify-center align-center">
         <div class="icon-wrapper" :class="``">
           <span class="icon-content">
             <slot name="icon">!</slot>
@@ -63,6 +63,7 @@ export default class ConfirmDialog extends Vue {
 .dialog-message {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .icon-wrapper {

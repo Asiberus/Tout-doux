@@ -18,9 +18,14 @@ const updateProject = (projectId: number, project: Partial<ProjectModel>) => {
     return Vue.http.patch(environment.projectById.replace(':projectId', projectId.toString()), project);
 };
 
+const deleteProject = (projectId: number) => {
+    return Vue.http.delete(environment.projectById.replace(':projectId', projectId.toString()));
+}
+
 export const projectService = {
     getProjectList,
     getProjectById,
     createProject,
-    updateProject
+    updateProject,
+    deleteProject
 };
