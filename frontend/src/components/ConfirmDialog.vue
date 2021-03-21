@@ -1,36 +1,39 @@
 <template>
-  <v-dialog v-model="dialog">
-    <template #activator="{ on, attrs }">
-      <slot name="activator" v-bind="attrs" v-on="on"></slot>
-    </template>
-    <template #default>
-      <v-card>
-        <v-card-text>
-          <div class="d-flex flex-column align-center">
-            <div class="icon-wrapper">
-              <span class="icon-content">!</span>
-            </div>
-            <div class="dialog-message">
-              <slot></slot>
-            </div>
-            <div class="d-flex justify-center">
-              <v-btn color="success" large class="mr-2">Confirm</v-btn>
-              <v-btn color="error" large>Cancel</v-btn>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
-    </template>
-  </v-dialog>
+  <v-card>
+    <v-card-text>
+      <div class="d-flex flex-column align-center">
+        <div class="icon-wrapper" :class="``">
+          <span class="icon-content">
+            <slot name="icon">!</slot>
+          </span>
+        </div>
+        <div class="dialog-message">
+          <slot></slot>
+        </div>
+        <div class="d-flex justify-center mb-3">
+          <v-btn color="success"  class="mr-2" @click="confirm">Confirm</v-btn>
+          <v-btn color="error" @click="cancel">Cancel</v-btn>
+        </div>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 
+
 @Component
 export default class ConfirmDialog extends Vue {
-  @Prop() private dialog!: boolean;
   @Prop() private color!: string;
+
+  private confirm(): void {
+    this.$emit('confirm');
+  }
+
+  private cancel(): void {
+    this.$emit('cancel');
+  }
 }
 </script>
 
@@ -69,7 +72,7 @@ export default class ConfirmDialog extends Vue {
   height: 10rem;
   width: 10rem;
   border-radius: 50%;
-  border: .5rem solid red;
+  border: .4rem solid;
   line-height: 7em;
   margin: 2rem auto 2rem;
   user-select: none;

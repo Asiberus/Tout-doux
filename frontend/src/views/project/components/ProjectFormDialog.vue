@@ -42,6 +42,7 @@ import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {PriorityEnum} from "@/models/project/priority.enum";
 import ProjectModel from "@/models/project/project.model";
 
+// Todo : add handler of ctrl + enter to submit form in textearea
 @Component
 export default class ProjectFormDialog extends Vue {
   @Prop() private isDialogOpen!: boolean;

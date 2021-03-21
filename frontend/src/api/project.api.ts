@@ -2,8 +2,8 @@ import {environment} from "@/environments/environment.dev";
 import Vue from "vue";
 import ProjectModel from "@/models/project/project.model";
 
-const getProjectList = () => {
-    return Vue.http.get(environment.project);
+const getProjectList = (params = {}) => {
+    return Vue.http.get(environment.project, {params});
 };
 
 const getProjectById = (projectId: number) => {

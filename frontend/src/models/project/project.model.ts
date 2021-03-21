@@ -5,6 +5,7 @@ export default interface ProjectModel {
     id: number;
     name: string;
     description: string;
-    tasks: TaskDisplayModel[];
     priority: PriorityEnum;
+    archived: boolean;
+    tasks: TaskDisplayModel[];
 }

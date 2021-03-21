@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from tout_doux.models.project import Project
@@ -9,3 +10,5 @@ class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     pagination_class = ExtendedPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ('archived',)

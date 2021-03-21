@@ -4,6 +4,12 @@
       <h1>
         Project : {{ project.name }}
         <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error">mdi-alert-decagram</v-icon>
+        <v-chip v-if="project.archived" color="accent" class="ml-3">
+          <v-icon small class="mr-1">
+            mdi-archive
+          </v-icon>
+          Archived
+        </v-chip>
       </h1>
       <div>
         <v-dialog v-model="projectEditDialog" width="60%">
@@ -13,22 +19,34 @@
             </v-btn>
           </template>
           <ProjectFormDialog :isDialogOpen="projectEditDialog" :project="project" @submit="updateProject"
-                             @close="projectDialog = false">
+                             @close="projectEditDialog = false">
           </ProjectFormDialog>
         </v-dialog>
 
-        <ConfirmDialog :dialog="projectArchiveDialog" width="50%">
+        <v-dialog v-model="projectArchiveDialog" width="50%">
           <template #activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on" class="ml-1">
               <v-icon>mdi-archive</v-icon>
             </v-btn>
           </template>
-          Are you sure to archive this project
-        </ConfirmDialog>
+          <ConfirmDialog color="error" @confirm="toggleProjectArchive" @cancel="projectArchiveDialog = false">
+            <template #icon><v-icon x-large>mdi-archive</v-icon></template>
+            Are you sure to {{ project.archived ? 'restore' : 'archive' }} this project ?
+          </ConfirmDialog>
+        </v-dialog>
 
-        <v-btn icon class="ml-1">
-          <v-icon>mdi-trash-can</v-icon>
-        </v-btn>
+        <v-dialog v-model="projectDeleteDialog" width="50%">
+          <template #activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" class="ml-1">
+              <v-icon>mdi-trash-can</v-icon>
+            </v-btn>
+          </template>
+          <ConfirmDialog color="error" @cancel="projectDeleteDialog = false">
+            <template #icon><v-icon x-large>mdi-trash-can</v-icon></template>
+            <p class="mb-1">Are you sure to delete this project ?</p>
+<!--            <span class="font-italic">All related tasks will be deleted</span>-->
+          </ConfirmDialog>
+        </v-dialog>
       </div>
     </div>
     <v-divider class="my-3"></v-divider>
@@ -109,6 +127,7 @@ export default class ProjectDetail extends Vue {
   private project!: ProjectModel = null;
   private projectEditDialog = false;
   private projectArchiveDialog = false;
+  private projectDeleteDialog = false;
   // Todo: see if multiple card can be in edit mode
   private editTasksDisplay = false;
   private priorityEnum = PriorityEnum;
@@ -162,12 +181,23 @@ export default class ProjectDetail extends Vue {
   }
 
   private updateProject(projectForm: Partial<ProjectModel>): void {
+    this.projectEditDialog = false;
     projectService.updateProject(this.project.id, projectForm).then(
         (response: any) => {
           this.project.name = response.body.name;
           this.project.description = response.body.description;
           this.project.priority = response.body.priority;
-          this.projectEditDialog = false;
+        }, (error: any) => {
+          console.error(error);
+        }
+    )
+  }
+
+  private toggleProjectArchive(): void {
+    this.projectArchiveDialog = false;
+    projectService.updateProject(this.project.id, {archived: !this.project.archived}).then(
+        (response: any) => {
+          this.project.archived = response.body.archived;
         }, (error: any) => {
           console.error(error);
         }
