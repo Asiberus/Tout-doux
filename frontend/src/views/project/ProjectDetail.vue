@@ -1,6 +1,36 @@
 <template>
   <v-container v-if="project">
-    <h1>Project : {{ project.name }}</h1>
+    <div class="d-flex justify-space-between align-center">
+      <h1>
+        Project : {{ project.name }}
+        <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error">mdi-alert-decagram</v-icon>
+      </h1>
+      <div>
+        <v-dialog v-model="projectEditDialog" width="60%">
+          <template #activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-cog</v-icon>
+            </v-btn>
+          </template>
+          <ProjectFormDialog :isDialogOpen="projectEditDialog" :project="project" @submit="updateProject"
+                             @close="projectDialog = false">
+          </ProjectFormDialog>
+        </v-dialog>
+
+        <ConfirmDialog :dialog="projectArchiveDialog" width="50%">
+          <template #activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" class="ml-1">
+              <v-icon>mdi-archive</v-icon>
+            </v-btn>
+          </template>
+          Are you sure to archive this project
+        </ConfirmDialog>
+
+        <v-btn icon class="ml-1">
+          <v-icon>mdi-trash-can</v-icon>
+        </v-btn>
+      </div>
+    </div>
     <v-divider class="my-3"></v-divider>
     <v-row>
       <v-col cols="8">
@@ -18,7 +48,8 @@
           </div>
         </div>
 
-        <TaskItemCard v-for="task in tasksUncompleted" :key="task.id" :task="task" :displayEditBtn="editTasksDisplay"
+        <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="index" :task="task"
+                      :displayEditBtn="editTasksDisplay"
                       @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
                       @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
                       class="edit-task-included"></TaskItemCard>
@@ -31,12 +62,19 @@
                       class="edit-task-included"></TaskItemCard>
       </v-col>
       <v-col cols="4">
-        <v-card class="mb-3">
-          <v-card-title>
-            <h3>{{ tasksCompleted.length }}/{{ project.tasks.length }}</h3>
-          </v-card-title>
-        </v-card>
-        <v-card>
+        <div class="d-flex justify-center mt-3">
+          <v-progress-circular :value="percentageOfTaskCompleted" :color="colorOfProgressTaskCompleted"
+                               :rotate="-90" :size="200" :width="20">
+            <p>
+              <span style="font-size: 2.5em;">{{ tasksCompleted.length }}</span>
+              /
+              <span style="font-size: 1em; transform: translateY(0.3em); display: inline-block">
+                {{ totalTask }}
+              </span>
+            </p>
+          </v-progress-circular>
+        </div>
+        <v-card class="mt-5">
           <v-card-title>Description</v-card-title>
           <v-card-text>
             {{ project.description }}
@@ -54,17 +92,27 @@ import {projectService} from "@/api/project.api";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import {TaskDisplayModel} from "@/models/task/task.model";
+import {PriorityEnum} from "@/models/project/priority.enum";
+import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 @Component({
   components: {
+    ProjectFormDialog,
     TaskItemCard,
+    ConfirmDialog
   }
 })
 export default class ProjectDetail extends Vue {
   @Prop() private projectId!: string;
-  private project: ProjectModel = null;
+
+  private project!: ProjectModel = null;
+  private projectEditDialog = false;
+  private projectArchiveDialog = false;
   // Todo: see if multiple card can be in edit mode
   private editTasksDisplay = false;
+  private priorityEnum = PriorityEnum;
+
 
   get tasksUncompleted(): TaskDisplayModel[] {
     return this.project.tasks.filter((task: TaskDisplayModel) => !task.completed);
@@ -74,8 +122,26 @@ export default class ProjectDetail extends Vue {
     return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
   }
 
+  // Todo: resolve problem of reactivity
+  get totalTask(): number {
+    return this.project.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
+  }
+
+  get percentageOfTaskCompleted(): number {
+    return (this.tasksCompleted.length / this.totalTask) * 100;
+  }
+
+  get colorOfProgressTaskCompleted(): string {
+    const colorArray = ['green lighten-4', 'green lighten-3', 'green lighten-2', 'green lighten-1', 'green'];
+    const index = Math.trunc(this.percentageOfTaskCompleted * colorArray.length / 100) - 1;
+    return colorArray[index];
+  }
+
   get createTaskCardDisplayed(): boolean {
-    return !this.project.tasks[0].id;
+    if (this.project.tasks.length) {
+      return !this.project.tasks[0].id;
+    }
+    return false;
   }
 
   created(): void {
@@ -93,6 +159,19 @@ export default class ProjectDetail extends Vue {
           console.log(error);
         }
     );
+  }
+
+  private updateProject(projectForm: Partial<ProjectModel>): void {
+    projectService.updateProject(this.project.id, projectForm).then(
+        (response: any) => {
+          this.project.name = response.body.name;
+          this.project.description = response.body.description;
+          this.project.priority = response.body.priority;
+          this.projectEditDialog = false;
+        }, (error: any) => {
+          console.error(error);
+        }
+    )
   }
 
   private toggleTaskState(taskId: number): void {
@@ -116,7 +195,7 @@ export default class ProjectDetail extends Vue {
 
   private toggleCreateTaskCardDisplay(): void {
     // Test if create task card is already shown
-    if (this.project.tasks[0].id) {
+    if (!this.project.tasks.length || this.project.tasks[0].id) {
       this.project.tasks.unshift({editMode: true} as TaskDisplayModel);
     } else {
       this.project.tasks.shift();

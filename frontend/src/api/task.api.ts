@@ -12,7 +12,7 @@ const updateTaskById = (taskId: number, task: Partial<TaskModel>) => {
 
 const deleteTaskById = (taskId: number) => {
     return Vue.http.delete(environment.taskById.replace(':taskId', taskId.toString()));
-}
+};
 
 export const taskService = {
     createTask,

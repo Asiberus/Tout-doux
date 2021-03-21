@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mb-4">
+  <v-card class="mb-4" :color="task.completed ? 'taskCompleted' : null">
     <template v-if="task.editMode">
       <v-card-text>
         <v-form v-model="taskForm.valid" @submit.prevent="emitTaskFormSubmitEvent">
@@ -11,14 +11,15 @@
             <v-col cols="2" class="d-flex align-center">
               <v-checkbox v-model="taskForm.data.priority" :true-value="priorityEnum.IMPORTANT"
                           :false-value="priorityEnum.NORMAL" label="Important"
-                          hide-details class="mt-0"></v-checkbox>
+                          hide-details class="mt-0">
+              </v-checkbox>
             </v-col>
           </v-row>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="success" small :disabled="!taskForm.valid" @click="emitTaskFormSubmitEvent">
               <v-icon>mdi-check</v-icon>
             </v-btn>
-            <v-btn color="error" small class="ml-1" @click.stop="emitToggleEditModeEvent(false)">
+            <v-btn color="error" small class="ml-1" @click="emitToggleEditModeEvent(false)">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-actions>
@@ -98,8 +99,8 @@ export default class TaskItemCard extends Vue {
   @Watch('task.editMode', {deep: true})
   onEditModeChanged(value: boolean) {
     if (value) {
-      this.taskForm.data.name = this.task.name;
-      this.taskForm.data.priority = this.task.priority;
+      this.taskForm.data.name = this.task.name || '';
+      this.taskForm.data.priority = this.task.priority || 0;
     }
   }
 

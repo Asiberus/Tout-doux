@@ -7,7 +7,7 @@ export default class ProjectModule extends VuexModule {
     projectList: ProjectModel[] = [];
 
     get projectDetail() {
-        return (projectId: string) => {
+        return (projectId: number) => {
             this.projectList.find(project => project.id === projectId)
         }
     }
@@ -20,8 +20,8 @@ export default class ProjectModule extends VuexModule {
     @Action({commit: 'updateProjectList'})
     retrieveProjectList(): ProjectModel[] {
         return [
-            {id: '1', name: 'Project 1', description: 'Project Description', priority: PriorityEnum.NORMAL, tasks: []},
-            {id: '2', name: 'Project 2', description: 'Second Project Description', priority: PriorityEnum.IMPORTANT, tasks: []},
+            {id: 1, name: 'Project 1', description: 'Project Description', priority: PriorityEnum.NORMAL, tasks: []},
+            {id: 2, name: 'Project 2', description: 'Second Project Description', priority: PriorityEnum.IMPORTANT, tasks: []},
         ]
     }
 }
