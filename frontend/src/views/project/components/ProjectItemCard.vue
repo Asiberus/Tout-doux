@@ -8,7 +8,7 @@
         <h1 class="white--text mt-1">{{ project.name }}
           <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error" dense>mdi-alert-decagram</v-icon>
         </h1>
-        <p class="mb-0 mt-3 ml-2">{{ project.description }}</p>
+        <p class="mb-0 mt-3 ml-2">{{ ellipsis(project.description, 50) }}</p>
       </div>
       <div class="pr-7">
         <span style="font-size: 2.5em;" class="white--text">{{ projectTasksCompleted }}</span>
@@ -26,6 +26,7 @@ import {Component, Prop, Vue} from "vue-property-decorator";
 import ProjectModel from "../../../models/project/project.model";
 import {TaskDisplayModel} from "@/models/task/task.model";
 import {PriorityEnum} from "@/models/project/priority.enum";
+import ellipsis from "@/filters/ellipsis";
 
 @Component
 export default class ProjectItemCard extends Vue {
@@ -38,6 +39,10 @@ export default class ProjectItemCard extends Vue {
 
   get projectPercentageOfTaskCompleted(): number {
     return (this.projectTasksCompleted / this.project.tasks.length) * 100;
+  }
+
+  private ellipsis(value: string, numberOfCharacter: number): string {
+    return ellipsis(value, numberOfCharacter);
   }
 }
 </script>

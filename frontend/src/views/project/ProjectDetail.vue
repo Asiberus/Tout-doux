@@ -30,7 +30,9 @@
             </v-btn>
           </template>
           <ConfirmDialog color="error" @confirm="toggleProjectArchive" @cancel="projectArchiveDialog = false">
-            <template #icon><v-icon x-large>mdi-archive</v-icon></template>
+            <template #icon>
+              <v-icon x-large>mdi-archive</v-icon>
+            </template>
             Are you sure to {{ project.archived ? 'restore' : 'archive' }} this project ?
           </ConfirmDialog>
         </v-dialog>
@@ -42,7 +44,9 @@
             </v-btn>
           </template>
           <ConfirmDialog color="error" @confirm="deleteProject" @cancel="projectDeleteDialog = false">
-            <template #icon><v-icon x-large>mdi-trash-can</v-icon></template>
+            <template #icon>
+              <v-icon x-large>mdi-trash-can</v-icon>
+            </template>
             <p>Are you sure to delete this project ?</p>
             <p class="mb-0 font-italic" style="font-size: 1.1rem;">All related tasks will be deleted</p>
           </ConfirmDialog>
@@ -67,7 +71,7 @@
           </div>
         </div>
         <template v-if="tasksUncompleted.length > 0">
-          <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="index" :task="task"
+          <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="'task-uncompleted-' + index" :task="task"
                         :displayEditBtn="editTasksDisplay" :disabled="project.archived"
                         @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
                         @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
@@ -77,25 +81,26 @@
         <template v-else>
           <div class="img-wrapper">
             <img src="../../assets/no_tasks.svg" alt="">
-            <p class="mt-5" v-if="tasksCompleted.length > 0">You completed all the tasks of this project!</p>
-            <p class="mt-5" v-else>No task are related to this project</p>
+            <div class="img-description">
+              <p class="mt-5" v-if="tasksCompleted.length > 0">You completed all the tasks of this project!</p>
+              <p class="mt-5" v-else>No task are related to this project</p>
+            </div>
           </div>
         </template>
-        
+
         <template v-if="project.tasks.length > 0">
           <h3 class="mt-7 mb-3 ml-2">Tasks completed</h3>
           <template v-if="tasksCompleted.length > 0">
-            <TaskItemCard v-for="task in tasksCompleted" :key="task.id" :task="task"
-                          :displayEditBtn="editTasksDisplay" :disabled="project.archived"
-                          @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
-                          @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
-                          class="edit-task-included">
+            <TaskItemCard v-for="(task, index) in tasksCompleted" :key="'task-completed-' + index" :task="task"
+                          :disabled="project.archived" @toggleTaskState="toggleTaskState"
+                          @toggleEditMode="toggleTaskEditMode" @taskFormSubmit="handleTaskFormSubmit"
+                          @deleteTask="deleteTask" class="edit-task-included">
             </TaskItemCard>
           </template>
           <template v-else>
             <div class="img-wrapper">
               <img src="../../assets/no-task-completed.svg" alt="">
-              <p class="mt-5">You don't have any completed tasks for this project</p>
+              <p class="mt-5">You didn't complete any task for this project yet</p>
             </div>
           </template>
         </template>
@@ -144,7 +149,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
   }
 })
 export default class ProjectDetail extends Vue {
-  @Prop() private projectId!: string;
+  @Prop() private projectId!: number;
 
   private project!: ProjectModel = null;
   private projectEditDialog = false;
@@ -163,7 +168,6 @@ export default class ProjectDetail extends Vue {
     return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
   }
 
-  // Todo: resolve problem of reactivity
   get totalTask(): number {
     return this.project.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
   }
@@ -190,7 +194,7 @@ export default class ProjectDetail extends Vue {
   }
 
   private retrieveProject(): void {
-    projectService.getProjectById(parseInt(this.projectId)).then(
+    projectService.getProjectById(this.projectId).then(
         (response: any) => {
           this.project = response.body;
           this.project.tasks.forEach((task: TaskDisplayModel) => {
@@ -241,7 +245,7 @@ export default class ProjectDetail extends Vue {
     const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === taskId);
     taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
         (response: any) => {
-          task.completed = response.body.completed;
+          task.completed = response.body.completed
         }, (error: any) => {
           console.error(error);
         }
@@ -250,6 +254,13 @@ export default class ProjectDetail extends Vue {
 
   private toggleTaskEditMode(task: TaskDisplayModel, value: boolean, isTaskCreated: boolean): void {
     if (isTaskCreated) {
+      this.project.tasks.forEach((t: TaskDisplayModel) => {
+        if (task.id === t.id) {
+          t.editMode = value;
+        } else {
+          t.editMode = false
+        }
+      });
       task.editMode = value;
     } else if (!isTaskCreated && !value) {
       this.project.tasks.shift();
@@ -277,7 +288,7 @@ export default class ProjectDetail extends Vue {
     taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
         (response: any) => {
-          Object.assign(this.project.tasks[0], response.body, {editMode: false});
+          this.$set(this.project.tasks, 0, Object.assign({}, response.body, {editMode: false}));
         }, (error: any) => {
           console.error(error);
         }
@@ -316,20 +327,52 @@ export default class ProjectDetail extends Vue {
 </script>
 
 <style scoped lang="scss">
+@keyframes max-height {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 1000px;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .img-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 1.5rem;
+  animation: max-height .2s ease-in;
 
   img {
     max-width: 350px;
+
+    animation: scale-in .2s ease-in;
+
   }
 
   .img-description {
-    margin-top: 1rem;
+    opacity: 0;
 
+    animation: fade-in .2s ease-in .2s forwards;
   }
 
 }

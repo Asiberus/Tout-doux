@@ -13,6 +13,14 @@ class Task(models.Model):
                                 related_name='tasks', null=True, blank=True)
     event = models.BooleanField(default=False)
     deadline = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, editable=False)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return 'project : {0} - task : {1} - completed : {2}'.format(self.project, self.name, self.completed)
+
+
+

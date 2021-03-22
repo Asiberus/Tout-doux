@@ -5,7 +5,7 @@
         <v-form v-model="taskForm.valid" @submit.prevent="emitTaskFormSubmitEvent">
           <v-row align-content="center">
             <v-col cols="10">
-              <v-text-field v-model="taskForm.data.name" label="Name" counter="50" maxlength="50" required
+              <v-text-field v-model="taskForm.data.name" label="Name" counter="50" maxlength="50" required autofocus
                             :rules="taskForm.rules.name"></v-text-field>
             </v-col>
             <v-col cols="2" class="d-flex align-center">
@@ -39,9 +39,9 @@
             <h3>{{ task.name }}</h3>
           </v-col>
 
-          <v-col cols="1" v-if="!displayEditBtn || task.completed">
+          <v-col cols="1" v-if="!displayEditBtn">
             <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
-                        @click="emitToggleTaskStateEvent"
+                        @click.native.prevent.stop.capture="emitToggleTaskStateEvent"
                         class="mt-0"></v-checkbox>
           </v-col>
 
@@ -56,8 +56,11 @@
                   <v-icon>mdi-trash-can</v-icon>
                 </v-btn>
               </template>
-              <ConfirmDialog color="error" @confirm="emitDeleteTaskEvent" @cancel="deleteDialog = false">
-                <template #icon><v-icon x-large>mdi-trash-can</v-icon></template>
+              <ConfirmDialog color="error" @confirm="emitDeleteTaskEvent" @cancel="deleteDialog = false"
+                             class="edit-task-included">
+                <template #icon>
+                  <v-icon x-large>mdi-trash-can</v-icon>
+                </template>
                 <p>Are you sure to delete this task ?</p>
               </ConfirmDialog>
             </v-dialog>
@@ -98,16 +101,23 @@ export default class TaskItemCard extends Vue {
     }
   };
 
-  private emitToggleTaskStateEvent(): void {
-    this.$emit('toggleTaskState', this.task.id);
-  }
-
   @Watch('task.editMode', {deep: true})
-  onEditModeChanged(value: boolean) {
+  private onEditModeChanged(value: boolean): void {
     if (value) {
       this.taskForm.data.name = this.task.name || '';
       this.taskForm.data.priority = this.task.priority || 0;
     }
+  }
+
+  // @Watch('displayEditBtn')
+  // private onDisplayEditBtn(value: boolean): void {
+  //   if (!value) {
+  //     // this.emitToggleEditModeEvent(false);
+  //   }
+  // }
+
+  private emitToggleTaskStateEvent(): void {
+    this.$emit('toggleTaskState', this.task.id);
   }
 
   private emitTaskFormSubmitEvent(): void {

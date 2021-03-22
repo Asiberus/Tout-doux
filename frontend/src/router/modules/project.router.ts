@@ -7,7 +7,7 @@ export default [
         name: 'project-list',
         component: ProjectList,
         props: (route: any) => ({
-            archived: route.query.archived == 'true'
+            archived: route.query.archived === 'true'
         })
     },
     {
@@ -15,7 +15,7 @@ export default [
         name: 'project-detail',
         component: ProjectDetail,
         props: (route: any) => ({
-            projectId: route.params.id
+            projectId: parseInt(route.params.id)
         })
     }
 ]

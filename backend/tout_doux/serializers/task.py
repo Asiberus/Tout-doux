@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.utils import timezone
 from tout_doux.models.project import Project
 from tout_doux.models.task import Task
 from tout_doux.utils import get_or_none
@@ -10,11 +10,17 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'description', 'completed', 'priority', 'projectId', 'event', 'deadline')
+        fields = ('id', 'name', 'description', 'completed', 'priority', 'projectId', 'event', 'deadline', 'created_at',
+                  'completed_at')
 
     def create(self, validated_data):
         task = Task.objects.create(project=validated_data.pop('projectId', None), **validated_data)
         return task
+
+    def update(self, instance, validated_data):
+        if validated_data.get('completed', None):
+            validated_data['completed_at'] = timezone.now()
+        return super().update(instance, validated_data)
 
     def validate(self, data):
         if self.instance and self.instance.project and self.instance.project.archived:

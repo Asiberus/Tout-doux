@@ -10,6 +10,8 @@ export interface TaskModel {
     listId?: number;
     deadline?: string;
     event: boolean;
+    created_at: string;
+    completed_at: string;
 }
 
 export interface TaskDisplayModel extends TaskModel {
