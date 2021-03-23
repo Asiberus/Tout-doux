@@ -91,6 +91,9 @@ export default class ProjectFormDialog extends Vue {
   }
 
   private emitSubmitEvent(): void {
+    if (!this.projectForm.valid) {
+      return;
+    }
     this.$emit('submit', this.projectForm.data);
   }
 

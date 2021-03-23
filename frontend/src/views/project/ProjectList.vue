@@ -24,11 +24,36 @@
 
     </div>
 
-    <v-row>
-      <v-col v-for="project in projectList" :key="project.id" cols="4">
-        <ProjectItemCard :project="project"></ProjectItemCard>
-      </v-col>
-    </v-row>
+    <template v-if="projectList.length > 0">
+      <v-row>
+        <v-col v-for="project in projectList" :key="project.id" cols="4">
+          <ProjectItemCard :project="project"></ProjectItemCard>
+        </v-col>
+      </v-row>
+    </template>
+    <template v-else>
+      <EmptyListDisplay class="mt-10">
+        <template #img>
+          <img src="../../assets/project.svg" alt="No project" style="max-width: 450px;" v-if="!archived">
+          <img src="../../assets/project_archived.svg" alt="No archived project" style="max-width: 450px;" v-else>
+        </template>
+        <template #message>
+          <div class="d-flex align-center" v-if="!archived">
+            <span>You don't have any project yet !</span>
+            <v-btn @click="projectDialog = true" small class="ml-2">
+              <v-icon left>mdi-plus</v-icon>
+              add a project
+            </v-btn>
+          </div>
+          <div v-else>
+            You don't have any archived project
+          </div>
+
+        </template>
+      </EmptyListDisplay>
+    </template>
+
+
   </v-container>
 </template>
 
@@ -38,11 +63,13 @@ import ProjectModel from "@/models/project/project.model";
 import {projectService} from "@/api/project.api";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ProjectItemCard from "@/views/project/components/ProjectItemCard.vue";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     ProjectItemCard,
-    ProjectFormDialog
+    ProjectFormDialog,
+    EmptyListDisplay
   }
 })
 export default class ProjectList extends Vue {

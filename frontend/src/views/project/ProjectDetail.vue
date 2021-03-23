@@ -79,24 +79,22 @@
           </TaskItemCard>
         </template>
         <template v-else-if="project.tasks.length > 0 && project.tasks.length === tasksCompleted.length">
-          <div class="img-wrapper">
-            <img src="../../assets/all_task_completed.svg" alt="">
-            <div class="img-description">
-              <p class="mt-5">You completed all the tasks for this project!</p>
-            </div>
-          </div>
+          <EmptyListDisplay message="You completed all the tasks for this project!">
+            <template #img>
+              <img src="../../assets/all_task_completed.svg" alt="All tasks completed">
+            </template>
+          </EmptyListDisplay>
         </template>
         <template v-else>
-          <div class="img-wrapper">
-            <img src="../../assets/no_tasks.svg" alt="">
-            <div class="img-description">
-              <p class="mt-5">No task are related to this project</p>
-            </div>
-          </div>
+          <EmptyListDisplay message="No task are related to this project">
+            <template #img>
+              <img src="../../assets/no_tasks.svg" alt="No tasks">
+            </template>
+          </EmptyListDisplay>
         </template>
 
 
-        <template v-if="project.tasks.length > 0 && !(project.tasks.length === 1 && createTaskCardDisplayed)">
+        <template v-if="project.tasks.length > 0 && !(project.tasks.length === 1 && createTaskDisplayed)">
           <h3 class="mt-7 mb-3 ml-2">Tasks completed</h3>
           <template v-if="tasksCompleted.length > 0">
             <TaskItemCard v-for="task in tasksCompleted" :key="'task-completed-' + task.id" :task="task"
@@ -106,10 +104,11 @@
             </TaskItemCard>
           </template>
           <template v-else>
-            <div class="img-wrapper">
-              <img src="../../assets/no-task-completed.svg" alt="">
-              <p class="mt-5">You didn't complete any task for this project yet</p>
-            </div>
+            <EmptyListDisplay message="You didn't complete any task for this project yet">
+              <template #img>
+                <img src="../../assets/no-task-completed.svg" alt="No tasks completed">
+              </template>
+            </EmptyListDisplay>
           </template>
         </template>
 
@@ -148,12 +147,14 @@ import {TaskDisplayModel} from "@/models/task/task.model";
 import {PriorityEnum} from "@/models/project/priority.enum";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     ProjectFormDialog,
     TaskItemCard,
-    ConfirmDialog
+    ConfirmDialog,
+    EmptyListDisplay
   }
 })
 export default class ProjectDetail extends Vue {
@@ -243,7 +244,8 @@ export default class ProjectDetail extends Vue {
             this.$set(task, 'editMode', false);
           });
         }, (error: any) => {
-          console.log(error);
+          console.error(error);
+          this.$router.push({name: 'project-list'});
         }
     );
   }
@@ -276,7 +278,7 @@ export default class ProjectDetail extends Vue {
     this.projectDeleteDialog = false;
     projectService.deleteProject(this.project.id).then(
         () => {
-          this.$router.push({name: 'project-list'});
+          this.$router.push({name: 'project-list', query: {archived: 'true'}});
         }, (error: any) => {
           console.error(error);
         }
@@ -345,54 +347,5 @@ export default class ProjectDetail extends Vue {
 </script>
 
 <style scoped lang="scss">
-@keyframes max-height {
-  from {
-    max-height: 0;
-  }
-  to {
-    max-height: 1000px;
-  }
-}
 
-@keyframes scale-in {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.img-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1.5rem;
-
-  //animation: max-height .2s ease-in;
-
-  img {
-    max-width: 350px;
-
-    //animation: scale-in .2s ease-in;
-
-  }
-
-  .img-description {
-    //opacity: 0;
-
-    //animation: fade-in .2s ease-in .2s forwards;
-  }
-
-}
 </style>
