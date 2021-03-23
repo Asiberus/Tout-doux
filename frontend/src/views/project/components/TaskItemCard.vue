@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mb-4" :color="task.completed ? 'taskCompleted' : null">
+  <v-card class="mb-4" :color="backgroundColor">
     <template v-if="task.editMode">
       <v-card-text>
         <v-form v-model="taskForm.valid" @submit.prevent="emitTaskFormSubmitEvent">
@@ -56,8 +56,7 @@
                   <v-icon>mdi-trash-can</v-icon>
                 </v-btn>
               </template>
-              <ConfirmDialog color="error" @confirm="emitDeleteTaskEvent" @cancel="deleteDialog = false"
-                             class="edit-task-included">
+              <ConfirmDialog color="error" @confirm="emitDeleteTaskEvent" @cancel="deleteDialog = false">
                 <template #icon>
                   <v-icon x-large>mdi-trash-can</v-icon>
                 </template>
@@ -101,6 +100,15 @@ export default class TaskItemCard extends Vue {
     }
   };
 
+  get backgroundColor(): string | null {
+    if (this.task.completed) {
+      return 'taskCompleted';
+    } else if (!this.task.id) {
+      return 'taskInCreation';
+    }
+    return null;
+  }
+
   @Watch('task.editMode', {deep: true})
   private onEditModeChanged(value: boolean): void {
     if (value) {
@@ -108,13 +116,6 @@ export default class TaskItemCard extends Vue {
       this.taskForm.data.priority = this.task.priority || 0;
     }
   }
-
-  // @Watch('displayEditBtn')
-  // private onDisplayEditBtn(value: boolean): void {
-  //   if (!value) {
-  //     // this.emitToggleEditModeEvent(false);
-  //   }
-  // }
 
   private emitToggleTaskStateEvent(): void {
     this.$emit('toggleTaskState', this.task.id);
@@ -130,7 +131,7 @@ export default class TaskItemCard extends Vue {
   }
 
   private emitToggleEditModeEvent(value: boolean): void {
-    this.$emit('toggleEditMode', this.task, value, !!this.task.id);
+    this.$emit('toggleEditMode', this.task, value);
   }
 }
 </script>

@@ -59,42 +59,50 @@
         <div class="d-flex align-center mb-1">
           <h3 class="flex-grow-1 mb-3 ml-2">Tasks</h3>
           <div>
-            <v-btn icon :color="createTaskCardDisplayed ? 'accent': null" :disabled="project.archived"
-                   @click="toggleCreateTaskCardDisplay">
+            <v-btn @click="createTaskDisplayed = !createTaskDisplayed" :disabled="project.archived"
+                   icon :color="createTaskDisplayed ? 'accent': null">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
-            <v-btn icon :color="editTasksDisplay ? 'purple': null" :disabled="project.archived"
-                   @click="editTasksDisplay = !editTasksDisplay"
-                   v-click-outside="{handler: () => editTasksDisplay = false, include: includedEditTaskDisplayHtmlElements}">
+            <v-btn @click="editTasksDisplay = !editTasksDisplay"
+                   :disabled="project.archived || tasksUncompleted.length === 0"
+                   icon :color="editTasksDisplay ? 'purple': null">
               <v-icon>mdi-playlist-edit</v-icon>
             </v-btn>
           </div>
         </div>
+
         <template v-if="tasksUncompleted.length > 0">
-          <TaskItemCard v-for="(task, index) in tasksUncompleted" :key="'task-uncompleted-' + index" :task="task"
+          <TaskItemCard v-for="task in tasksUncompleted" :key="'task-uncompleted-' + task.id" :task="task"
                         :displayEditBtn="editTasksDisplay" :disabled="project.archived"
                         @toggleTaskState="toggleTaskState" @toggleEditMode="toggleTaskEditMode"
-                        @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask"
-                        class="edit-task-included">
+                        @taskFormSubmit="handleTaskFormSubmit" @deleteTask="deleteTask">
           </TaskItemCard>
+        </template>
+        <template v-else-if="project.tasks.length > 0 && project.tasks.length === tasksCompleted.length">
+          <div class="img-wrapper">
+            <img src="../../assets/all_task_completed.svg" alt="">
+            <div class="img-description">
+              <p class="mt-5">You completed all the tasks for this project!</p>
+            </div>
+          </div>
         </template>
         <template v-else>
           <div class="img-wrapper">
             <img src="../../assets/no_tasks.svg" alt="">
             <div class="img-description">
-              <p class="mt-5" v-if="tasksCompleted.length > 0">You completed all the tasks of this project!</p>
-              <p class="mt-5" v-else>No task are related to this project</p>
+              <p class="mt-5">No task are related to this project</p>
             </div>
           </div>
         </template>
 
-        <template v-if="project.tasks.length > 0">
+
+        <template v-if="project.tasks.length > 0 && !(project.tasks.length === 1 && createTaskCardDisplayed)">
           <h3 class="mt-7 mb-3 ml-2">Tasks completed</h3>
           <template v-if="tasksCompleted.length > 0">
-            <TaskItemCard v-for="(task, index) in tasksCompleted" :key="'task-completed-' + index" :task="task"
+            <TaskItemCard v-for="task in tasksCompleted" :key="'task-completed-' + task.id" :task="task"
                           :disabled="project.archived" @toggleTaskState="toggleTaskState"
                           @toggleEditMode="toggleTaskEditMode" @taskFormSubmit="handleTaskFormSubmit"
-                          @deleteTask="deleteTask" class="edit-task-included">
+                          @deleteTask="deleteTask">
             </TaskItemCard>
           </template>
           <template v-else>
@@ -131,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import ProjectModel from "@/models/project/project.model";
 import {projectService} from "@/api/project.api";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
@@ -152,11 +160,14 @@ export default class ProjectDetail extends Vue {
   @Prop() private projectId!: number;
 
   private project!: ProjectModel = null;
+
   private projectEditDialog = false;
   private projectArchiveDialog = false;
   private projectDeleteDialog = false;
-  // Todo: see if multiple card can be in edit mode
+
+  private createTaskDisplayed = false;
   private editTasksDisplay = false;
+
   private priorityEnum = PriorityEnum;
 
 
@@ -182,15 +193,45 @@ export default class ProjectDetail extends Vue {
     return colorArray[index];
   }
 
-  get createTaskCardDisplayed(): boolean {
-    if (this.project.tasks.length) {
-      return !this.project.tasks[0].id;
-    }
-    return false;
-  }
-
   created(): void {
     this.retrieveProject();
+  }
+
+  @Watch('createTaskDisplayed')
+  private onCreateTaskDisplayedChanges(value: boolean): void {
+    if (value) {
+      this.project.tasks.unshift({editMode: true} as TaskDisplayModel);
+    } else {
+      // Delete first task if it has no id
+      if (!this.project.tasks[0].id) {
+        this.project.tasks.shift();
+      }
+    }
+  }
+
+  @Watch('editTasksDisplay')
+  private onEditTasksDisplay(value: boolean): void {
+    if (!value) {
+      this.disableAllCreatedTasksEditMode();
+    }
+  }
+
+  private disableAllCreatedTasksEditMode(): void {
+    this.project.tasks.filter((task: TaskDisplayModel) => task.id && task.editMode).forEach((task: TaskDisplayModel) => {
+      task.editMode = false;
+    });
+  }
+
+  private toggleTaskEditMode(task: TaskDisplayModel, value: boolean): void {
+    // handle close create task card
+    if (!task.id && !value) {
+      this.createTaskDisplayed = false;
+      return;
+    }
+
+    // Only one card can be in editMode
+    this.disableAllCreatedTasksEditMode();
+    task.editMode = value;
   }
 
   private retrieveProject(): void {
@@ -198,6 +239,7 @@ export default class ProjectDetail extends Vue {
         (response: any) => {
           this.project = response.body;
           this.project.tasks.forEach((task: TaskDisplayModel) => {
+            // Set all task to editMode false with the Vue reactivity $set function
             this.$set(task, 'editMode', false);
           });
         }, (error: any) => {
@@ -233,47 +275,12 @@ export default class ProjectDetail extends Vue {
   private deleteProject(): void {
     this.projectDeleteDialog = false;
     projectService.deleteProject(this.project.id).then(
-        (response: any) => {
+        () => {
           this.$router.push({name: 'project-list'});
         }, (error: any) => {
           console.error(error);
         }
     )
-  }
-
-  private toggleTaskState(taskId: number): void {
-    const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === taskId);
-    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
-        (response: any) => {
-          task.completed = response.body.completed
-        }, (error: any) => {
-          console.error(error);
-        }
-    )
-  }
-
-  private toggleTaskEditMode(task: TaskDisplayModel, value: boolean, isTaskCreated: boolean): void {
-    if (isTaskCreated) {
-      this.project.tasks.forEach((t: TaskDisplayModel) => {
-        if (task.id === t.id) {
-          t.editMode = value;
-        } else {
-          t.editMode = false
-        }
-      });
-      task.editMode = value;
-    } else if (!isTaskCreated && !value) {
-      this.project.tasks.shift();
-    }
-  }
-
-  private toggleCreateTaskCardDisplay(): void {
-    // Test if create task card is already shown
-    if (!this.project.tasks.length || this.project.tasks[0].id) {
-      this.project.tasks.unshift({editMode: true} as TaskDisplayModel);
-    } else {
-      this.project.tasks.shift();
-    }
   }
 
   private handleTaskFormSubmit(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
@@ -284,11 +291,27 @@ export default class ProjectDetail extends Vue {
     }
   }
 
+  private toggleTaskState(taskId: number): void {
+    const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === taskId);
+    if (!task) {
+      return;
+    }
+
+    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
+        (response: any) => {
+          task.completed = response.body.completed
+        }, (error: any) => {
+          console.error(error);
+        }
+    )
+  }
+
   private createTask(taskForm: Partial<TaskDisplayModel>): void {
     taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
         (response: any) => {
-          this.$set(this.project.tasks, 0, Object.assign({}, response.body, {editMode: false}));
+          this.$set(this.project.tasks, 0, Object.assign({editMode: false}, response.body));
+          this.createTaskDisplayed = false;
         }, (error: any) => {
           console.error(error);
         }
@@ -308,7 +331,7 @@ export default class ProjectDetail extends Vue {
 
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
-        (response: any) => {
+        () => {
           const taskIndex = this.project.tasks.findIndex((task: TaskDisplayModel) => task.id === taskId);
           if (taskIndex !== -1) {
             this.project.tasks.splice(taskIndex, 1);
@@ -318,11 +341,6 @@ export default class ProjectDetail extends Vue {
         }
     )
   }
-
-  private includedEditTaskDisplayHtmlElements(): Element[] {
-    return [...document.querySelectorAll('.edit-task-included')];
-  }
-
 }
 </script>
 
@@ -360,19 +378,20 @@ export default class ProjectDetail extends Vue {
   justify-content: center;
   align-items: center;
   margin-top: 1.5rem;
-  animation: max-height .2s ease-in;
+
+  //animation: max-height .2s ease-in;
 
   img {
     max-width: 350px;
 
-    animation: scale-in .2s ease-in;
+    //animation: scale-in .2s ease-in;
 
   }
 
   .img-description {
-    opacity: 0;
+    //opacity: 0;
 
-    animation: fade-in .2s ease-in .2s forwards;
+    //animation: fade-in .2s ease-in .2s forwards;
   }
 
 }
