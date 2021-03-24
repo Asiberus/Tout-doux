@@ -30,13 +30,12 @@
     <template v-else>
       <v-card-text>
         <v-row align-content="center">
-
-          <v-col cols="1" class="d-flex justify-center">
-            <v-icon color="error" v-show="task.priority === priorityEnum.IMPORTANT">mdi-alert-decagram</v-icon>
-          </v-col>
-
-          <v-col cols="10">
-            <h3>{{ task.name }}</h3>
+          <v-col cols="11" class="d-flex align-center">
+            <h3 class="ml-2 white--text font-weight-regular">
+              {{ task.name }}
+            </h3>
+            <v-icon v-if="task.priority === priorityEnum.IMPORTANT" color="error" class="ml-2">mdi-alert-decagram
+            </v-icon>
           </v-col>
 
           <v-col cols="1" v-if="!displayEditBtn">
@@ -117,6 +116,10 @@ export default class TaskItemCard extends Vue {
     }
   }
 
+  private emitToggleEditModeEvent(value: boolean): void {
+    this.$emit('toggleEditMode', this.task, value);
+  }
+
   private emitToggleTaskStateEvent(): void {
     this.$emit('toggleTaskState', this.task.id);
   }
@@ -128,10 +131,6 @@ export default class TaskItemCard extends Vue {
   private emitDeleteTaskEvent(): void {
     this.deleteDialog = false;
     this.$emit('deleteTask', this.task.id);
-  }
-
-  private emitToggleEditModeEvent(value: boolean): void {
-    this.$emit('toggleEditMode', this.task, value);
   }
 }
 </script>

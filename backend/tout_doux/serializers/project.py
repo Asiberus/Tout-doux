@@ -9,7 +9,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'priority', 'archived', 'tasks')
+        fields = ('id', 'name', 'description', 'priority', 'archived', 'tasks', 'created_at')
 
     def validate(self, data):
         if self.instance and self.instance.archived:

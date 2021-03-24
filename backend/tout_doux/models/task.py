@@ -1,16 +1,18 @@
 from django.db import models
 
+from tout_doux.models.list import List
 from tout_doux.models.priority import Priority
+from tout_doux.models.project import Project
 
 
-# Todo : Add created and completed date (with signal for completed)
 class Task(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=100, null=True, blank=True)
     completed = models.BooleanField(default=False)
     priority = models.IntegerField(choices=Priority.choices, default=Priority.NORMAL)
-    project = models.ForeignKey('Project', on_delete=models.CASCADE, limit_choices_to={'archived': False},
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, limit_choices_to={'archived': False},
                                 related_name='tasks', null=True, blank=True)
+    list = models.ForeignKey(List, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     event = models.BooleanField(default=False)
     deadline = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -20,7 +22,5 @@ class Task(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return 'project : {0} - task : {1} - completed : {2}'.format(self.project, self.name, self.completed)
-
-
-
+        return 'project : {0} - task : {1} - completed : {2}'.format(self.project, self.name,
+                                                                     self.completed)

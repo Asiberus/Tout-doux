@@ -2,11 +2,13 @@ from django.conf.urls import url
 from django.urls import include
 from rest_framework import routers
 
+from tout_doux.views.list import ListViewSet
 from tout_doux.views.project import ProjectViewSet
 from tout_doux.views.task import TaskViewSet
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
+router.register(r'list', ListViewSet, basename='list')
 router.register(r'task', TaskViewSet, basename='task')
 
 urlpatterns = [

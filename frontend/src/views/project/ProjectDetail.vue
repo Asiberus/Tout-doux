@@ -117,13 +117,13 @@
         <div class="d-flex justify-center mt-3">
           <v-progress-circular :value="percentageOfTaskCompleted" :color="colorOfProgressTaskCompleted"
                                :rotate="-90" :size="200" :width="20">
-            <p>
+            <div>
               <span style="font-size: 2.5em;">{{ tasksCompleted.length }}</span>
               /
               <span style="font-size: 1em; transform: translateY(0.3em); display: inline-block">
                 {{ totalTask }}
               </span>
-            </p>
+            </div>
           </v-progress-circular>
         </div>
         <v-card class="mt-5">

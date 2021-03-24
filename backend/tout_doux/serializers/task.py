@@ -5,6 +5,7 @@ from tout_doux.models.task import Task
 from tout_doux.utils import get_or_none
 
 
+# Todo : Map snake_case to camelCase in serializer fields
 class TaskSerializer(serializers.ModelSerializer):
     projectId = serializers.ModelField(model_field=Task()._meta.get_field('project'), required=False)
 

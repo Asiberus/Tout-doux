@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="mb-6">Project List</h1>
+    <h1 class="mb-6">Projects</h1>
     <div class="d-flex justify-end align-center mb-3">
       <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
         <v-icon v-if="archived" small class="mr-1">

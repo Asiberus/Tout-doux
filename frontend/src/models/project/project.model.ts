@@ -8,4 +8,5 @@ export default interface ProjectModel {
     priority: PriorityEnum;
     archived: boolean;
     tasks: TaskDisplayModel[];
+    created_at: string;
 }
