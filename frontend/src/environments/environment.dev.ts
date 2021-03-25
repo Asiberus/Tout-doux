@@ -5,6 +5,6 @@ export const environment = {
     projectById: 'project/:projectId/',
     task: 'task/',
     taskById: 'task/:taskId/',
-    list: 'list/',
-    listById: 'list/:listId/',
+    collection: 'collection/',
+    collectionById: 'collection/:collectionId/',
 };

@@ -1,6 +1,6 @@
 from django.db import models
 
-from tout_doux.models.list import List
+from tout_doux.models.collection import Collection
 from tout_doux.models.priority import Priority
 from tout_doux.models.project import Project
 
@@ -12,7 +12,7 @@ class Task(models.Model):
     priority = models.IntegerField(choices=Priority.choices, default=Priority.NORMAL)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, limit_choices_to={'archived': False},
                                 related_name='tasks', null=True, blank=True)
-    list = models.ForeignKey(List, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     event = models.BooleanField(default=False)
     deadline = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

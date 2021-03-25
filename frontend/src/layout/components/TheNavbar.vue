@@ -23,7 +23,7 @@ export default class TheNavbar extends Vue {
     {name: 'Dashboard', link: '/'},
     {name: 'Daily', link: ''},
     {name: 'Projects', link: {name: 'project-list'}},
-    {name: 'Lists', link: {name: 'lists'}},
+    {name: 'Collections', link: {name: 'collection-list'}},
   ];
 
 }

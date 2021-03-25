@@ -1,6 +1,6 @@
 import {TaskModel} from "@/models/task.model";
 
-export default interface ListModel {
+export default interface CollectionModel {
     id: number;
     name: string;
     description: string;

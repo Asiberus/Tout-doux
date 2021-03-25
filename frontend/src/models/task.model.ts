@@ -7,7 +7,7 @@ export interface TaskModel {
     completed: boolean;
     priority: PriorityEnum;
     projectId?: number;
-    listId?: number;
+    collectionId?: number;
     deadline?: string;
     event: boolean;
     created_at: string;
