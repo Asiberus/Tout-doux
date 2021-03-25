@@ -9,5 +9,3 @@ class ListViewSet(viewsets.ModelViewSet):
     queryset = List.objects.all()
     serializer_class = ListSerializer
     pagination_class = ExtendedPageNumberPagination
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ('archived',)

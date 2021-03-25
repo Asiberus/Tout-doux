@@ -22,8 +22,8 @@ export default class TheNavbar extends Vue {
   private menu = [
     {name: 'Dashboard', link: '/'},
     {name: 'Daily', link: ''},
-    {name: 'Projects', link: '/project'},
-    {name: 'Lists', link: ''},
+    {name: 'Projects', link: {name: 'project-list'}},
+    {name: 'Lists', link: {name: 'lists'}},
   ];
 
 }

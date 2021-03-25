@@ -1,5 +1,5 @@
-import {PriorityEnum} from "@/models/project/priority.enum";
-import {TaskDisplayModel} from "@/models/task/task.model";
+import {PriorityEnum} from "@/models/priority.enum";
+import {TaskDisplayModel} from "@/models/task.model";
 
 export default interface ProjectModel {
     id: number;

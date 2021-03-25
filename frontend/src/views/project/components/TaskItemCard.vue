@@ -72,8 +72,8 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {PriorityEnum} from "@/models/project/priority.enum";
-import {TaskDisplayModel} from "@/models/task/task.model";
+import {PriorityEnum} from "@/models/priority.enum";
+import {TaskDisplayModel} from "@/models/task.model";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 @Component({

@@ -1,4 +1,4 @@
-import {PriorityEnum} from "@/models/project/priority.enum";
+import {PriorityEnum} from "@/models/priority.enum";
 
 export interface TaskModel {
     id: number;

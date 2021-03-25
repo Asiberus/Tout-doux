@@ -1,6 +1,6 @@
 import Vue from "vue";
 import {environment} from "@/environments/environment.dev";
-import {TaskModel} from "@/models/task/task.model";
+import {TaskModel} from "@/models/task.model";
 
 const createTask = (task: Partial<TaskModel>) => {
     return Vue.http.post(environment.task, task);

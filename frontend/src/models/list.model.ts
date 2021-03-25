@@ -1,8 +1,9 @@
-import {TaskModel} from "@/models/task/task.model";
+import {TaskModel} from "@/models/task.model";
 
 export default interface ListModel {
     id: number;
     name: string;
-    description?: string;
+    description: string;
     tasks: TaskModel[];
+    created_at: string;
 }

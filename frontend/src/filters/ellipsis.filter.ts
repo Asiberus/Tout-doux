@@ -1,4 +1,4 @@
-const ellipsis = (value: string, numberOfCharacter: number) => {
+const ellipsisFilter = (value: string, numberOfCharacter: number) => {
     if (numberOfCharacter <= 0) {
         console.warn('You have to specify a number of characters strictly greater than 0');
         return value;
@@ -11,4 +11,4 @@ const ellipsis = (value: string, numberOfCharacter: number) => {
     return value.slice(0, numberOfCharacter) + '...';
 }
 
-export default ellipsis;
+export default ellipsisFilter

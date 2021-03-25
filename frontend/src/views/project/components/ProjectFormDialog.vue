@@ -39,8 +39,8 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {PriorityEnum} from "@/models/project/priority.enum";
-import ProjectModel from "@/models/project/project.model";
+import {PriorityEnum} from "@/models/priority.enum";
+import ProjectModel from "@/models/project.model";
 
 // Todo : add handler of ctrl + enter to submit form in textearea
 @Component

@@ -18,10 +18,10 @@
             Add a project
           </v-btn>
         </template>
-        <ProjectFormDialog :isDialogOpen="projectDialog" @submit="createProject"
-                           @close="projectDialog = false"></ProjectFormDialog>
+        <ProjectFormDialog :isDialogOpen="projectDialog"
+                           @submit="createProject" @close="projectDialog = false">
+        </ProjectFormDialog>
       </v-dialog>
-
     </div>
 
     <template v-if="projectList.length > 0">
@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import ProjectModel from "@/models/project/project.model";
+import ProjectModel from "@/models/project.model";
 import {projectService} from "@/api/project.api";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ProjectItemCard from "@/views/project/components/ProjectItemCard.vue";
