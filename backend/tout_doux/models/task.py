@@ -10,7 +10,7 @@ class Task(models.Model):
     description = models.CharField(max_length=100, null=True, blank=True)
     completed = models.BooleanField(default=False)
     priority = models.IntegerField(choices=Priority.choices, default=Priority.NORMAL)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, limit_choices_to={'archived': False},
+    project = models.ForeignKey(Project, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
                                 related_name='tasks', null=True, blank=True)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     event = models.BooleanField(default=False)
