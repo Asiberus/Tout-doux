@@ -26,8 +26,6 @@ class TaskSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        print('validate :', data)
-
         # Map collectionId to collection
         if 'collectionId' in data:
             collection_id = data.pop('collectionId')
