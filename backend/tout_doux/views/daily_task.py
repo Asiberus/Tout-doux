@@ -28,12 +28,11 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     @action(detail=False)
     def overview(self, request):
         data = list()
-        size = int(request.query_params.get('size', 50))
+        size = int(request.query_params.get('size', 20))
         page = int(request.query_params.get('page', 1))
-        print(size, page)
         start_date = datetime.date.today() - datetime.timedelta(size) * page
         end_date = datetime.date.today() - datetime.timedelta(size) * (page - 1)
-        for date in daterange(start_date, end_date, reverse=True, inclusive=False):
+        for date in daterange(start_date, end_date, reverse=True):
             daily_overview = {
                 'date': date,
                 'totalTask': DailyTask.objects.filter(date=date).count(),
@@ -41,8 +40,8 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             }
             data.append(daily_overview)
 
-        page = self.paginate_queryset(data)
-        if page is not None:
-            return self.get_paginated_response(page)
+        data_paginated = self.paginate_queryset(data)
+        if data_paginated is not None:
+            return self.get_paginated_response(data_paginated)
 
         return Response(data)

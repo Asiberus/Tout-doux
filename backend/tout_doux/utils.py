@@ -1,5 +1,6 @@
 import datetime
 
+
 def get_or_none(model, **kwargs):
     try:
         return model.objects.get(**kwargs)
@@ -17,7 +18,7 @@ def get_or_raise_error(model, error, **kwargs):
 # Return a iterator though the start_date and end_date
 # Inclusive mode is set by adding one day to the end_date
 def daterange(start_date, end_date, inclusive=True, reverse=False):
-    if inclusive:
+    if inclusive and not reverse:
         end_date += datetime.timedelta(1)
 
     for n in range(int((end_date - start_date).days)):
