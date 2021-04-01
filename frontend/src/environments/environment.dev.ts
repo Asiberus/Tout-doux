@@ -7,4 +7,7 @@ export const environment = {
     taskById: 'task/:taskId/',
     collection: 'collection/',
     collectionById: 'collection/:collectionId/',
+    dailyTask : 'daily-task/',
+    dailyTaskOverview: 'daily-task/overview/',
+    dailyTaskById: 'daily-task/:dailyTaskId/'
 };

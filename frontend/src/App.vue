@@ -23,4 +23,9 @@ export default Vue.extend({
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+// Todo : move to a generic scss file
+.cursor-pointer {
+  cursor: pointer;
+}
 </style>

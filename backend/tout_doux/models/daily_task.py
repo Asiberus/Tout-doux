@@ -11,7 +11,7 @@ class DailyTask(models.Model):
     ACTION_CHOICES = (
         (THINK, 'Réfléchir'),
         (WORK, 'Travailler'),
-        (FINISH, 'Terminer'),
+        (FINISH, 'Finir'),
     )
 
     date = models.DateField(auto_now_add=True)

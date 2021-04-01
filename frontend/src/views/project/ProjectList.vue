@@ -59,11 +59,11 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import ProjectModel from "@/models/project.model";
 import {projectService} from "@/api/project.api";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ProjectItemCard from "@/views/project/components/ProjectItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
+import {ProjectModel} from "@/models/project.model";
 
 @Component({
   components: {

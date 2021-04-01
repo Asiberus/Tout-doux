@@ -139,7 +139,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import ProjectModel from "@/models/project.model";
 import {projectService} from "@/api/project.api";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
@@ -148,6 +147,7 @@ import {PriorityEnum} from "@/models/priority.enum";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
+import {ProjectModel} from "@/models/project.model";
 
 @Component({
   components: {

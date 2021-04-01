@@ -7,6 +7,7 @@ import vuetify from './plugins/vuetify';
 import VueResource from 'vue-resource';
 import {BASE_URL} from "@/environments/environment.dev";
 
+// Todo : add interceptor for response body
 Vue.use(VueResource)
 
 Vue.http.options.root = BASE_URL;

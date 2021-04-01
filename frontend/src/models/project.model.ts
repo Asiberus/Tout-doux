@@ -1,7 +1,7 @@
 import {PriorityEnum} from "@/models/priority.enum";
 import {TaskDisplayModel} from "@/models/task.model";
 
-export default interface ProjectModel {
+export interface ProjectModel {
     id: number;
     name: string;
     description: string;
@@ -9,4 +9,8 @@ export default interface ProjectModel {
     archived: boolean;
     tasks: TaskDisplayModel[];
     created_at: string;
+}
+
+export interface DailyTaskProjectDisplayModel extends ProjectModel{
+    selected: boolean;
 }

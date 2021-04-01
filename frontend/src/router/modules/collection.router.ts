@@ -1,7 +1,7 @@
-import CollectionList from "@/views/list/CollectionList.vue";
-import CollectionDetail from "@/views/list/CollectionDetail.vue";
+import CollectionList from "@/views/collection/CollectionList.vue";
+import CollectionDetail from "@/views/collection/CollectionDetail.vue";
 
-export const collectionRoute = [
+export const collectionRoutes = [
     {
         path: '/collection',
         name: 'collection-list',

@@ -1,7 +1,7 @@
 import ProjectList from "@/views/project/ProjectList.vue";
 import ProjectDetail from "@/views/project/ProjectDetail.vue";
 
-export const projectRoute = [
+export const projectRoutes = [
     {
         path: '/project',
         name: 'project-list',

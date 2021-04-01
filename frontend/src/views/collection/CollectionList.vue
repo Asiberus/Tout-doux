@@ -45,8 +45,8 @@
 import {Component, Vue} from "vue-property-decorator";
 import CollectionModel from "@/models/collection.model";
 import {collectionService} from "@/api/collection.api";
-import CollectionFormDialog from "@/views/list/components/CollectionFormDialog.vue";
-import CollectionItemCard from "@/views/list/components/CollectionItemCard.vue";
+import CollectionFormDialog from "@/views/collection/components/CollectionFormDialog.vue";
+import CollectionItemCard from "@/views/collection/components/CollectionItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
@@ -78,7 +78,7 @@ export default class CollectionList extends Vue {
     this.collectionDialog = false;
     collectionService.createCollection(collectionForm).then(
         (response: any) => {
-          // Add router push to list detail
+          // Add router push to collection detail
           this.$router.push({name: 'collection-detail', params: {id: response.body.id}});
         }, (error: any) => {
           console.error(error);

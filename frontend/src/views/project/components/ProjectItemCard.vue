@@ -23,10 +23,10 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
-import ProjectModel from "../../../models/project.model";
 import {TaskDisplayModel} from "@/models/task.model";
 import {PriorityEnum} from "@/models/priority.enum";
 import ellipsisFilter from "@/filters/ellipsis.filter";
+import {ProjectModel} from "@/models/project.model";
 
 @Component
 export default class ProjectItemCard extends Vue {

@@ -2,15 +2,24 @@ from rest_framework import serializers
 
 from tout_doux.models.daily_task import DailyTask
 from tout_doux.models.task import Task
+from tout_doux.serializers.task import TaskSerializer
 from tout_doux.utils import get_or_raise_error
 
 
+# Todo : block edit if date is passed (except completed)
+# Todo : maybe change name of daily task
+# Todo : optimize to_representation for task object
 class DailyTaskSerializer(serializers.ModelSerializer):
     taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
 
     class Meta:
         model = DailyTask
-        fields = '__all__'
+        fields = ('id', 'date', 'taskId', 'name', 'priority', 'action', 'completed')
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['task'] = TaskSerializer(instance.task).data
+        return rep
 
     def validate(self, data):
         if 'taskId' in data:
@@ -24,7 +33,7 @@ class DailyTaskSerializer(serializers.ModelSerializer):
             else:
                 data['task'] = None
 
-        if not data.get('task') and not data.get('name'):
+        if not self.instance and not data.get('task') and not data.get('name'):
             raise serializers.ValidationError('You must provide a name or a taskId to create a daily task')
 
         if data.get('task') and data.get('name') or data.get('priority'):

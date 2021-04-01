@@ -124,7 +124,7 @@ import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {taskService} from "@/api/task.api";
-import CollectionFormDialog from "@/views/list/components/CollectionFormDialog.vue";
+import CollectionFormDialog from "@/views/collection/components/CollectionFormDialog.vue";
 
 @Component({
   components: {
