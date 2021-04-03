@@ -118,13 +118,13 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {collectionService} from "@/api/collection.api";
-import CollectionModel from "@/models/collection.model";
 import {TaskDisplayModel} from "@/models/task.model";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {taskService} from "@/api/task.api";
 import CollectionFormDialog from "@/views/collection/components/CollectionFormDialog.vue";
+import {CollectionModel} from "@/models/collection.model";
 
 @Component({
   components: {

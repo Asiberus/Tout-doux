@@ -10,6 +10,7 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 
+// Todo : change path of svg
 @Component
 export default class EmptyListDisplay extends Vue {
   @Prop() private message!: string;

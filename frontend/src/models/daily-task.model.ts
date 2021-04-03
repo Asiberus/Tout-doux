@@ -1,6 +1,13 @@
 import {PriorityEnum} from "@/models/priority.enum";
 import {TaskModel} from "@/models/task.model";
 
+// Todo : add get literal in enum
+export enum DailyTaskActionEnum {
+    THINK = 'TH',
+    WORK = 'WO',
+    FINISH = 'FI'
+}
+
 export interface DailyTaskModel {
     id: number;
     date: string;
@@ -13,8 +20,6 @@ export interface DailyTaskModel {
     task: TaskModel;
 }
 
-export enum DailyTaskActionEnum {
-    THINK = 'TH',
-    WORK = 'WO',
-    FINISH = 'FI'
+export interface DailyTaskDisplayModel extends DailyTaskModel {
+    editMode: boolean;
 }

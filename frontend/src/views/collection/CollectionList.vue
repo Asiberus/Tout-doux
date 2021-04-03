@@ -43,11 +43,11 @@
 
 <script lang="ts">
 import {Component, Vue} from "vue-property-decorator";
-import CollectionModel from "@/models/collection.model";
 import {collectionService} from "@/api/collection.api";
 import CollectionFormDialog from "@/views/collection/components/CollectionFormDialog.vue";
 import CollectionItemCard from "@/views/collection/components/CollectionItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
+import {CollectionModel} from "@/models/collection.model";
 
 @Component({
   components: {

@@ -18,7 +18,7 @@
 import {Component, Vue} from "vue-property-decorator";
 import {dailyTaskService} from "@/api/daily-task.api";
 import DailyTaskOverviewModel from "@/models/daily-task-overview.model";
-import DailyTaskOverviewItemCard from "@/views/daily-task/components/DailyTaskOverviewItemCard.vue";
+import DailyTaskOverviewItemCard from "@/views/daily-task/daily-task-overview/components/DailyTaskOverviewItemCard.vue";
 
 @Component({
   components: {

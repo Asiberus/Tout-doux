@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import CollectionModel from "@/models/collection.model";
+import {CollectionModel} from "@/models/collection.model";
 
 // Todo : only send data that has changed
 @Component

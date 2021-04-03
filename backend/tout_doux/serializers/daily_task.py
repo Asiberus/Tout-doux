@@ -9,6 +9,7 @@ from tout_doux.utils import get_or_raise_error
 # Todo : block edit if date is passed (except completed)
 # Todo : maybe change name of daily task
 # Todo : optimize to_representation for task object
+# Todo : Handle when a task is selected and the task is then completed in the project or collection view
 class DailyTaskSerializer(serializers.ModelSerializer):
     taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
 
@@ -36,7 +37,8 @@ class DailyTaskSerializer(serializers.ModelSerializer):
         if not self.instance and not data.get('task') and not data.get('name'):
             raise serializers.ValidationError('You must provide a name or a taskId to create a daily task')
 
-        if data.get('task') and data.get('name') or data.get('priority'):
+        print(data)
+        if data.get('task') and (data.get('name') or data.get('priority')):
             raise serializers.ValidationError('You can\'t create a daily task with a taskId and a name or a priority')
 
         if self.instance:

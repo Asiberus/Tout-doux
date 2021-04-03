@@ -92,7 +92,7 @@ export default class TaskItemCard extends Vue {
     valid: false,
     data: {
       name: '',
-      priority: 0,
+      priority: PriorityEnum.NORMAL,
     },
     rules: {
       name: [(value: string) => !!value || 'Task name is required', (value: string) => value.length <= 50 || 'Max 50 characters']
@@ -112,7 +112,7 @@ export default class TaskItemCard extends Vue {
   private onEditModeChanged(value: boolean): void {
     if (value) {
       this.taskForm.data.name = this.task.name || '';
-      this.taskForm.data.priority = this.task.priority || 0;
+      this.taskForm.data.priority = this.task.priority || PriorityEnum.NORMAL;
     }
   }
 

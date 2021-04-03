@@ -11,6 +11,6 @@ export interface ProjectModel {
     created_at: string;
 }
 
-export interface DailyTaskProjectDisplayModel extends ProjectModel{
+export interface DailyTaskProjectDisplayModel extends ProjectModel {
     selected: boolean;
 }

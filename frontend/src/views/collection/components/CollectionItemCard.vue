@@ -22,8 +22,8 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {TaskDisplayModel} from "@/models/task.model";
-import CollectionModel from "@/models/collection.model";
 import ellipsisFilter from "@/filters/ellipsis.filter";
+import {CollectionModel} from "@/models/collection.model";
 
 
 @Component
