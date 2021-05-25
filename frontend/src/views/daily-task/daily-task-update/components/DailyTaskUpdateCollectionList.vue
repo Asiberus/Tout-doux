@@ -40,9 +40,6 @@
                           <v-card-text class="p-1">
                             <h5 class="white--text">
                               {{ task.name }}
-                              <v-icon v-if="task.priority === priorityEnum.IMPORTANT" color="error" dense small class="ml-1">
-                                mdi-alert-decagram
-                              </v-icon>
                             </h5>
                           </v-card-text>
                         </v-card>
@@ -76,7 +73,6 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {DailyTaskDisplayModel} from "@/models/daily-task.model";
-import {PriorityEnum} from "@/models/priority.enum";
 import {TaskDisplayModel, TaskModel} from "@/models/task.model";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {DailyTaskCollectionDisplayModel} from "@/models/collection.model";
@@ -89,8 +85,6 @@ import {DailyTaskCollectionDisplayModel} from "@/models/collection.model";
 export default class DailyTaskUpdateCollectionList extends Vue {
   @Prop() private collectionList: DailyTaskCollectionDisplayModel[];
   @Prop() private dailyTaskList: DailyTaskDisplayModel[];
-
-  private priorityEnum = PriorityEnum;
 
   get taskUncompleted(): (collection: DailyTaskCollectionDisplayModel) => TaskDisplayModel[] {
     return (collection: DailyTaskCollectionDisplayModel) => collection.tasks.filter((task: TaskDisplayModel) => !task.completed);

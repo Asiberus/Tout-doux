@@ -5,9 +5,7 @@
     </v-progress-linear>
     <v-card-text class="d-flex justify-space-between align-center">
       <div class="d-flex flex-column justify-center">
-        <h1 class="white--text mt-1">{{ project.name }}
-          <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error" dense>mdi-alert-decagram</v-icon>
-        </h1>
+        <h1 class="white--text mt-1">{{ project.name }}</h1>
         <p class="mb-0 mt-3 ml-2">{{ ellipsisFilter(project.description, 50) }}</p>
       </div>
       <div class="pr-7">
@@ -24,14 +22,12 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {TaskDisplayModel} from "@/models/task.model";
-import {PriorityEnum} from "@/models/priority.enum";
 import ellipsisFilter from "@/filters/ellipsis.filter";
 import {ProjectModel} from "@/models/project.model";
 
 @Component
 export default class ProjectItemCard extends Vue {
   @Prop() private project!: ProjectModel;
-  private priorityEnum = PriorityEnum;
 
   get projectTasksCompleted(): number {
     return this.project.tasks.filter((task: TaskDisplayModel) => task.completed).length;

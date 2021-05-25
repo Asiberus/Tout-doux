@@ -3,7 +3,6 @@
     <div class="d-flex justify-space-between align-center">
       <h1>
         Project : {{ project.name }}
-        <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error">mdi-alert-decagram</v-icon>
         <v-chip v-if="project.archived" color="accent" class="ml-3">
           <v-icon small class="mr-1">
             mdi-archive
@@ -143,7 +142,6 @@ import {projectService} from "@/api/project.api";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import {TaskDisplayModel} from "@/models/task.model";
-import {PriorityEnum} from "@/models/priority.enum";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
@@ -168,9 +166,6 @@ export default class ProjectDetail extends Vue {
 
   private createTaskDisplayed = false;
   private editTasksDisplay = false;
-
-  private priorityEnum = PriorityEnum;
-
 
   get tasksUncompleted(): TaskDisplayModel[] {
     return this.project.tasks.filter((task: TaskDisplayModel) => !task.completed);
@@ -256,7 +251,6 @@ export default class ProjectDetail extends Vue {
         (response: any) => {
           this.project.name = response.body.name;
           this.project.description = response.body.description;
-          this.project.priority = response.body.priority;
         }, (error: any) => {
           console.error(error);
         }

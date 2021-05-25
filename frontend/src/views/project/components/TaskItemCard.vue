@@ -8,12 +8,6 @@
               <v-text-field v-model="taskForm.data.name" label="Name" counter="50" maxlength="50" required autofocus
                             :rules="taskForm.rules.name"></v-text-field>
             </v-col>
-            <v-col cols="2" class="d-flex align-center">
-              <v-checkbox v-model="taskForm.data.priority" :true-value="priorityEnum.IMPORTANT"
-                          :false-value="priorityEnum.NORMAL" label="Important"
-                          hide-details class="mt-0">
-              </v-checkbox>
-            </v-col>
           </v-row>
           <v-card-actions class="d-flex justify-end">
             <v-btn color="success" small :disabled="!taskForm.valid" @click="emitTaskFormSubmitEvent">
@@ -34,8 +28,6 @@
             <h3 class="ml-2 white--text font-weight-regular">
               {{ task.name }}
             </h3>
-            <v-icon v-if="task.priority === priorityEnum.IMPORTANT" color="error" class="ml-2">mdi-alert-decagram
-            </v-icon>
           </v-col>
 
           <v-col cols="1" v-if="!displayEditBtn">
@@ -72,7 +64,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {PriorityEnum} from "@/models/priority.enum";
 import {TaskDisplayModel} from "@/models/task.model";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
@@ -87,12 +78,10 @@ export default class TaskItemCard extends Vue {
   @Prop() private disabled!: boolean;
 
   private deleteDialog = false;
-  private priorityEnum = PriorityEnum;
   private taskForm = {
     valid: false,
     data: {
       name: '',
-      priority: PriorityEnum.NORMAL,
     },
     rules: {
       name: [(value: string) => !!value || 'Task name is required', (value: string) => value.length <= 50 || 'Max 50 characters']
@@ -112,7 +101,6 @@ export default class TaskItemCard extends Vue {
   private onEditModeChanged(value: boolean): void {
     if (value) {
       this.taskForm.data.name = this.task.name || '';
-      this.taskForm.data.priority = this.task.priority || PriorityEnum.NORMAL;
     }
   }
 

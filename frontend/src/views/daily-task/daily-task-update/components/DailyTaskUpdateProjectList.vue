@@ -16,9 +16,6 @@
                   <h3 class="white--text">
                     <span v-if="project.selected" class="grey--text">Select task of the project : </span>
                     {{ project.name }}
-                    <v-icon v-if="project.priority === priorityEnum.IMPORTANT" color="error" dense small>
-                      mdi-alert-decagram
-                    </v-icon>
                   </h3>
                   <div class="mx-3" v-if="!project.selected">
                     <span style="font-size: 1.8em;" class="white--text">{{ numberOfTasksCompleted(project) }}</span>
@@ -42,9 +39,6 @@
                           <v-card-text class="p-1">
                             <h5 class="white--text">
                               {{ task.name }}
-                              <v-icon v-if="task.priority === priorityEnum.IMPORTANT" color="error" dense small>
-                                mdi-alert-decagram
-                              </v-icon>
                             </h5>
                           </v-card-text>
                         </v-card>
@@ -79,7 +73,6 @@
 import {Component, Prop, Vue} from "vue-property-decorator";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {DailyTaskProjectDisplayModel} from "@/models/project.model";
-import {PriorityEnum} from "@/models/priority.enum";
 import {DailyTaskDisplayModel} from "@/models/daily-task.model";
 import {TaskDisplayModel, TaskModel} from "@/models/task.model";
 
@@ -92,8 +85,6 @@ import {TaskDisplayModel, TaskModel} from "@/models/task.model";
 export default class DailyTaskUpdateProjectList extends Vue {
   @Prop() private projectList: DailyTaskProjectDisplayModel[];
   @Prop() private dailyTaskList: DailyTaskDisplayModel[];
-
-  private priorityEnum = PriorityEnum;
 
   get taskUncompleted(): (item: DailyTaskProjectDisplayModel) => TaskDisplayModel[] {
     return (item: DailyTaskProjectDisplayModel) => item.tasks.filter((task: TaskDisplayModel) => !task.completed);

@@ -16,7 +16,7 @@ class DailyTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyTask
-        fields = ('id', 'date', 'taskId', 'name', 'priority', 'action', 'completed')
+        fields = ('id', 'date', 'taskId', 'name', 'action', 'completed')
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -42,8 +42,8 @@ class DailyTaskSerializer(serializers.ModelSerializer):
             else:
                 data['task'] = None
 
-        if data.get('task') and (data.get('name') or data.get('priority')):
-            raise serializers.ValidationError('You can\'t create a daily task with a taskId and a name or a priority')
+        if data.get('task') and data.get('name'):
+            raise serializers.ValidationError('You can\'t create a daily task with a taskId and a name')
 
         if not self.instance:
             if not data.get('task') and not data.get('name'):
@@ -55,16 +55,15 @@ class DailyTaskSerializer(serializers.ModelSerializer):
             if self.instance.task:
                 if data.get('task'):
                     raise serializers.ValidationError('You can\'t edit the task of a daily task')
-                if data.get('name') or data.get('priority'):
-                    raise serializers.ValidationError(
-                        'You can\'t edit the name or the priority of a daily task that is related to a task')
+                if data.get('name'):
+                    raise serializers.ValidationError('You can\'t edit the name of a daily task that is related to a task')
 
             if self.instance.name:
                 if data.get('task'):
                     raise serializers.ValidationError('You can\'t edit the task of a daily task that have a name')
 
             if self.instance.date != date.today():
-                if 'taskId' in data or 'name' in data or 'priority' in data or 'action' in data:
+                if 'taskId' in data or 'name' in data or 'action' in data:
                     raise serializers.ValidationError('You can\'t edit a closed daily task')
 
         return data

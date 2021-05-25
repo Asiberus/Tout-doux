@@ -41,19 +41,11 @@
                     <template v-if="dailyTask.taskId">
                       <h4 class="white--text font-weight-regular">
                         {{ dailyTask.task.name }}
-                        <v-icon v-if="dailyTask.task.priority === priorityEnum.IMPORTANT" dense small color="error"
-                                class="ml-1">
-                          mdi-alert-decagram
-                        </v-icon>
                       </h4>
                     </template>
                     <template v-else>
                       <h4 class="white--text font-weight-regular">
                         {{ dailyTask.name }}
-                        <v-icon v-if="dailyTask.priority === priorityEnum.IMPORTANT" dense small color="error"
-                                class="ml-1">
-                          mdi-alert-decagram
-                        </v-icon>
                       </h4>
                     </template>
                   </div>
@@ -82,12 +74,6 @@
                       <v-text-field v-model="dailyTaskForm.data.name" :rules="dailyTaskForm.rules.name"
                                     label="Name" counter="50" maxlength="50" required autofocus>
                       </v-text-field>
-                    </v-col>
-                    <v-col cols="4" class="d-flex align-center">
-                      <v-checkbox v-model="dailyTaskForm.data.priority" :true-value="priorityEnum.IMPORTANT"
-                                  :false-value="priorityEnum.NORMAL" label="Important"
-                                  hide-details class="mt-0">
-                      </v-checkbox>
                     </v-col>
                   </v-row>
                   <v-card-actions class="d-flex justify-end">
@@ -121,7 +107,6 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {DailyTaskActionEnum, DailyTaskDisplayModel} from "@/models/daily-task.model";
-import {PriorityEnum} from "@/models/priority.enum";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 // todo : maybe change v-hover on daily task card
@@ -133,13 +118,11 @@ import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 export default class DailyTaskUpdateList extends Vue {
   @Prop() private dailyTaskList: DailyTaskDisplayModel[];
   private dailyTaskActionEnum = DailyTaskActionEnum;
-  private priorityEnum = PriorityEnum;
   private createDailyTaskDisplayed = false;
   private dailyTaskForm = {
     valid: false,
     data: {
       name: '',
-      priority: PriorityEnum.NORMAL
     },
     rules: {
       name: [(value: string) => !!value || 'Daily task name is required', (value: string) => value.length <= 50 || 'Max 50 characters']
@@ -198,7 +181,6 @@ export default class DailyTaskUpdateList extends Vue {
     if (!dailyTask.id) {
       if (value) {
         this.dailyTaskForm.data.name = '';
-        this.dailyTaskForm.data.priority = PriorityEnum.NORMAL;
       } else {
         this.createDailyTaskDisplayed = false;
       }
@@ -206,7 +188,6 @@ export default class DailyTaskUpdateList extends Vue {
       if (value) {
         this.dailyTaskList.forEach((d: DailyTaskDisplayModel) => d.editMode = false);
         this.dailyTaskForm.data.name = dailyTask.name;
-        this.dailyTaskForm.data.priority = dailyTask.priority;
       }
     }
 

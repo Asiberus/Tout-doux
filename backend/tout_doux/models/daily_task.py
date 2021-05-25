@@ -1,7 +1,5 @@
 from django.db import models
-from django.dispatch import receiver
 
-from tout_doux.models.priority import Priority
 from tout_doux.models.task import Task
 
 
@@ -19,7 +17,6 @@ class DailyTask(models.Model):
     task = models.ForeignKey(Task, on_delete=models.SET_NULL, limit_choices_to={'completed': False},
                              related_name='daily_tasks', null=True, blank=True)
     name = models.CharField(max_length=50, null=True, blank=True)
-    priority = models.IntegerField(choices=Priority.choices, default=Priority.NORMAL, null=True, blank=True)
     action = models.CharField(max_length=2, choices=ACTION_CHOICES, null=True, blank=True)
     completed = models.BooleanField(default=False)
 

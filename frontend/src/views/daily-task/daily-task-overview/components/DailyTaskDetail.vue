@@ -28,19 +28,11 @@
                 <template v-if="dailyTask.taskId">
                   <h4 class="white--text font-weight-regular">
                     {{ dailyTask.task.name }}
-                    <v-icon v-if="dailyTask.task.priority === priorityEnum.IMPORTANT" dense small color="error"
-                            class="ml-1">
-                      mdi-alert-decagram
-                    </v-icon>
                   </h4>
                 </template>
                 <template v-else>
                   <h4 class="white--text font-weight-regular">
                     {{ dailyTask.name }}
-                    <v-icon v-if="dailyTask.priority === priorityEnum.IMPORTANT" dense small color="error"
-                            class="ml-1">
-                      mdi-alert-decagram
-                    </v-icon>
                   </h4>
                 </template>
               </div>
@@ -57,14 +49,11 @@ import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {dailyTaskService} from "@/api/daily-task.api";
 import {DailyTaskActionEnum, DailyTaskModel} from "@/models/daily-task.model";
 import moment from "moment";
-import {PriorityEnum} from "@/models/priority.enum";
 
 @Component
 export default class DailyTaskDetail extends Vue {
   @Prop() private date: string;
   private dailyTaskList: DailyTaskModel[] = [];
-
-  private priorityEnum = PriorityEnum;
 
   get dateFormatted(): string {
     return moment(this.date).format('dddd DD MMMM Y');

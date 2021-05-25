@@ -10,12 +10,6 @@
                           :rules="projectForm.rules.name" :autofocus="!project">
             </v-text-field>
           </v-col>
-          <v-col cols="2" class="d-flex align-center">
-            <v-checkbox v-model="projectForm.data.priority" :true-value="priorityEnum.IMPORTANT"
-                        :false-value="priorityEnum.NORMAL" label="Important"
-                        hide-details class="mt-0">
-            </v-checkbox>
-          </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -39,7 +33,6 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {PriorityEnum} from "@/models/priority.enum";
 import {ProjectModel} from "@/models/project.model";
 
 
@@ -49,13 +42,11 @@ export default class ProjectFormDialog extends Vue {
   @Prop() private isDialogOpen!: boolean;
   @Prop() private project!: ProjectModel;
 
-  private priorityEnum = PriorityEnum;
   private projectForm = {
     valid: false,
     data: {
       name: '',
       description: '',
-      priority: PriorityEnum.NORMAL
     },
     rules: {
       name: [(value: string) => !!value || 'Project name is required', (value: string) => value.length <= 50 || 'Max 50 characters'],
@@ -80,15 +71,14 @@ export default class ProjectFormDialog extends Vue {
       if (this.project) {
         this.populateForm(this.project);
       } else {
-        this.populateForm({name: '', description: '', priority: PriorityEnum.NORMAL} as ProjectModel);
+        this.populateForm({name: '', description: ''} as ProjectModel);
       }
     }
   }
 
-  private populateForm({name, description, priority}: ProjectModel): void {
+  private populateForm({name, description}: ProjectModel): void {
     this.projectForm.data.name = name;
     this.projectForm.data.description = description;
-    this.projectForm.data.priority = priority;
   }
 
   private emitSubmitEvent(): void {

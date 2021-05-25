@@ -15,9 +15,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = (
-            'id', 'name', 'description', 'completed', 'priority', 'projectId', 'collectionId', 'event', 'deadline',
-            'created_at', 'completed_at')
+        fields = ('id', 'name', 'completed', 'projectId', 'collectionId', 'created_at', 'completed_at')
 
     def update(self, instance, validated_data):
         if validated_data.get('completed'):
