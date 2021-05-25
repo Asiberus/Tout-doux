@@ -1,5 +1,5 @@
 import {Action, Module, Mutation, VuexModule} from "vuex-module-decorators";
-import ProjectModel from "@/models/project.model";
+import {ProjectModel} from "@/models/project.model";
 
 @Module
 export default class ProjectModule extends VuexModule {

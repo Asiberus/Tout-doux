@@ -18,6 +18,13 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ('date',)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.date != datetime.date.today():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=False)
     def overview(self, request):
         data = list()

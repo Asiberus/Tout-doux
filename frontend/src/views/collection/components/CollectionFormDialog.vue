@@ -67,7 +67,7 @@ export default class CollectionFormDialog extends Vue {
   private onIsDialogOpenChanges(value: boolean): void {
     if (value) {
       this.form.resetValidation();
-      if (this.project) {
+      if (this.collection) {
         this.populateForm(this.collection);
       } else {
         this.populateForm({name: '', description: ''} as CollectionModel);

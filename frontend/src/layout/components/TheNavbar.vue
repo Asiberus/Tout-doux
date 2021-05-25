@@ -10,7 +10,6 @@
       </v-list-item>
     </v-list>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -24,6 +23,7 @@ export default class TheNavbar extends Vue {
     {name: 'Daily', link: {name: 'daily-task-overview'}},
     {name: 'Projects', link: {name: 'project-list'}},
     {name: 'Collections', link: {name: 'collection-list'}},
+    {name: 'Agenda'}
   ];
 
 }

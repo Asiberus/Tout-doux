@@ -1,6 +1,7 @@
 <template>
   <v-hover v-slot="{ hover }">
-    <v-card :color="backgroundColor" class="position-relative">
+    <v-card v-on="dailyTaskOverview.totalTask ? {click: () => openDailyTaskDetailDialog()} : {}"
+        :color="backgroundColor" class="position-relative">
       <v-card-text>
         <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
         <div class="d-flex justify-space-between">
@@ -52,16 +53,22 @@ export default class DailyTaskOverviewItemCard extends Vue {
 
   // todo : Set colorArray
   get colorOfTaskCompleted(): string {
-    const colorArray = ['#163317', 'green darken-3', 'green darken-2', 'green darken-1', 'green'];
+    const colorArray = ['#163317', 'green darken-4', 'green darken-3', 'green darken-2', 'green'];
     const index = Math.trunc(this.dailyTaskOverview.totalTaskCompleted * colorArray.length / this.dailyTaskOverview.totalTask) - 1;
     return colorArray[index];
   }
 
-  get backgroundColor(): string {
+  get backgroundColor(): string | null {
     if (!this.dailyTaskOverview.totalTask) {
       return '#151515';
+    } else if (!this.dailyTaskOverview.totalTaskCompleted) {
+      return null;
     }
     return this.colorOfTaskCompleted;
+  }
+
+  private openDailyTaskDetailDialog(): void {
+    this.$emit('openDailyTaskDetailDialog');
   }
 }
 </script>

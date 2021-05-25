@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 
 from tout_doux.models.priority import Priority
 from tout_doux.models.task import Task
@@ -26,3 +27,14 @@ class DailyTask(models.Model):
         constraints = [
             models.UniqueConstraint(fields=('date', 'task'), name='unique_task_for_date')
         ]
+
+
+# @receiver(models.signals.post_save, sender=DailyTask)
+# def complete_task(sender, instance, created, raw, using, update_fields, **kwargs):
+#     print('complete task signal')
+#     print(sender)
+#     print(instance)
+#     print(created)
+#     print(raw)
+#     print(using)
+#     print(update_fields)

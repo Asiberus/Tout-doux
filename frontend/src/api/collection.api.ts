@@ -1,6 +1,6 @@
 import {environment} from "@/environments/environment.dev";
 import Vue from "vue";
-import CollectionModel from "@/models/collection.model";
+import {CollectionModel} from "@/models/collection.model";
 
 const getCollectionList = (params = {}) => {
     return Vue.http.get(environment.collection, {params});

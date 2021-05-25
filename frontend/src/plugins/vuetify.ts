@@ -30,6 +30,7 @@ export default new Vuetify({
                 success: '#4CAF50',
                 warning: '#FFC107',
                 taskCompleted: '#212621',
+                // taskCompleted: '#4CAF50',
                 taskInCreation: '#181b1f',
                 projectArchived: '#363e4d',
             },

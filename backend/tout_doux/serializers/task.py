@@ -44,6 +44,8 @@ class TaskSerializer(serializers.ModelSerializer):
             else:
                 data['project'] = None
 
+        # Todo : test if task is created without a project or a collection
+        # Todo : test this condition
         if self.instance and self.instance.project and self.instance.project.archived \
                 or data.get('project') and data.get('project').archived:
             raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
