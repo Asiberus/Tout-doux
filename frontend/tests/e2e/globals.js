@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-// Refer to the entire list of global config settings here:
+// Refer to the entire collection of global config settings here:
 // https://github.com/nightwatchjs/nightwatch/blob/master/lib/settings/defaults.js#L16
 //
 // More info on test globals:

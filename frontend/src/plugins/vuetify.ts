@@ -21,6 +21,19 @@ export default new Vuetify({
                 success: '#4CAF50',
                 warning: '#FFC107'
             },
+            dark: {
+                primary: '#ee44aa',
+                secondary: '#424242',
+                accent: '#82B1FF',
+                error: '#FF5252',
+                info: '#2196F3',
+                success: '#4CAF50',
+                warning: '#FFC107',
+                taskCompleted: '#212621',
+                // taskCompleted: '#4CAF50',
+                taskInCreation: '#181b1f',
+                projectArchived: '#363e4d',
+            },
         },
     },
     lang: {
@@ -28,6 +41,6 @@ export default new Vuetify({
         current: 'fr',
     },
     icons: {
-        iconfont: 'fa',
+        iconfont: 'mdi',
     },
 });
