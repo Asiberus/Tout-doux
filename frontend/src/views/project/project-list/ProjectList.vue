@@ -34,8 +34,8 @@
     <template v-else>
       <EmptyListDisplay class="mt-10">
         <template #img>
-          <img src="../../assets/project.svg" alt="No project" style="max-width: 450px;" v-if="!archived">
-          <img src="../../assets/project_archived.svg" alt="No archived project" style="max-width: 450px;" v-else>
+          <img src="../../../assets/project.svg" alt="No project" style="max-width: 450px;" v-if="!archived">
+          <img src="../../../assets/project_archived.svg" alt="No archived project" style="max-width: 450px;" v-else>
         </template>
         <template #message>
           <div class="d-flex align-center" v-if="!archived">

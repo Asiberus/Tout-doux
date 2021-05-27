@@ -5,7 +5,7 @@
     <v-card-text>
       <v-form ref="form" v-model="projectForm.valid" @submit.prevent="emitSubmitEvent">
         <v-row>
-          <v-col cols="10">
+          <v-col>
             <v-text-field v-model="projectForm.data.name" label="Name" counter="50" maxlength="50" required
                           :rules="projectForm.rules.name" :autofocus="!project">
             </v-text-field>

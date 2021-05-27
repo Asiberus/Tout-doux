@@ -1,5 +1,5 @@
-import ProjectList from "@/views/project/ProjectList.vue";
-import ProjectDetail from "@/views/project/ProjectDetail.vue";
+import ProjectList from "@/views/project/project-list/ProjectList.vue";
+import ProjectDetail from "@/views/project/project-detail/ProjectDetail.vue";
 
 export const projectRoutes = [
     {
