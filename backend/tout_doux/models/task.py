@@ -3,6 +3,7 @@ from django.dispatch import receiver
 
 from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
+from tout_doux.models.section import Section
 
 
 class Task(models.Model):
@@ -10,6 +11,7 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
     project = models.ForeignKey(Project, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
                                 related_name='tasks', null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, editable=False)
