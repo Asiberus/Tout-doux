@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
+from tout_doux.models.section import Section
 from tout_doux.models.task import Task
 from tout_doux.utils import get_or_raise_error
 
@@ -10,12 +11,13 @@ from tout_doux.utils import get_or_raise_error
 # Todo : Map snake_case to camelCase in serializer fields
 class TaskSerializer(serializers.ModelSerializer):
     projectId = serializers.ModelField(model_field=Task()._meta.get_field('project'), required=False, allow_null=True)
+    sectionId = serializers.ModelField(model_field=Task()._meta.get_field('section'), required=False, allow_null=True)
     collectionId = serializers.ModelField(model_field=Task()._meta.get_field('collection'), required=False,
                                           allow_null=True)
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'completed', 'projectId', 'collectionId', 'created_at', 'completed_at')
+        fields = ('id', 'name', 'completed', 'projectId', 'sectionId', 'collectionId', 'created_at', 'completed_at')
 
     def update(self, instance, validated_data):
         if validated_data.get('completed'):
@@ -42,10 +44,24 @@ class TaskSerializer(serializers.ModelSerializer):
             else:
                 data['project'] = None
 
+        # Map projectId to project
+        if 'sectionId' in data:
+            section_id = data.pop('sectionId')
+            if section_id:
+                data['section'] = get_or_raise_error(Section, id=section_id,
+                                                     error=serializers.ValidationError(
+                                                         'This section doesn\'t exist'))
+            else:
+                data['project'] = None
+
         # Todo : test if task is created without a project or a collection
+        # Todo : handle section tests
         # Todo : test this condition
         if self.instance and self.instance.project and self.instance.project.archived \
                 or data.get('project') and data.get('project').archived:
+            raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+
+        if self.instance and self.instance.section and self.instance.section.project.archived or data.get('section') and data.get('section').project.archived :
             raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
 
         if data.get('project') and data.get('collection'):
