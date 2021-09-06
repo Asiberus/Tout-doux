@@ -6,7 +6,7 @@
         <v-btn icon>
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <v-btn>
+        <v-btn icon>
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </div>
