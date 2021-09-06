@@ -61,7 +61,7 @@ class TaskSerializer(serializers.ModelSerializer):
                 or data.get('project') and data.get('project').archived:
             raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
 
-        if self.instance and self.instance.section and self.instance.section.project.archived or data.get('section') and data.get('section').project.archived :
+        if self.instance and self.instance.section and self.instance.section.project.archived or data.get('section') and data.get('section').project.archived:
             raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
 
         if data.get('project') and data.get('collection'):

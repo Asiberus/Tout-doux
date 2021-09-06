@@ -16,7 +16,6 @@
 
     <v-tabs v-model="projectTab" background-color="transparent" color="accent">
       <v-tab href="#description">Description</v-tab>
-
       <v-tab href="#section">Section</v-tab>
       <v-tab disabled>Event</v-tab>
       <v-tab href="#completed-tasks">Completed Task</v-tab>
