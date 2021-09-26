@@ -110,6 +110,7 @@ export default class ProjectDescription extends Vue {
 
   private createTask(taskForm: Partial<TaskDisplayModel>): void {
     this.taskDialog = false;
+    taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
         response => {
           this.project.tasks.unshift(response.body);

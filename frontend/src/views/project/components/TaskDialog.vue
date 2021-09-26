@@ -18,7 +18,7 @@
         <v-row>
           <v-col>
             <v-text-field v-model="taskForm.data.name" label="Name" counter="50" maxlength="50" requried
-                          :rules="taskForm.rules.name">
+                          :rules="taskForm.rules.name" autofocus>
             </v-text-field>
           </v-col>
         </v-row>

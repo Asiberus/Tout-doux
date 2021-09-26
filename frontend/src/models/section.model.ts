@@ -5,3 +5,8 @@ export interface SectionModel {
     name: string;
     tasks: TaskModel[];
 }
+
+export interface SectionPost {
+    name: string;
+    projectId: number;
+}

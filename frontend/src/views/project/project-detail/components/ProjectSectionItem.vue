@@ -1,26 +1,98 @@
 <template>
   <v-container>
-    <div class="d-flex align-center">
+    <div class="d-flex align-center justify-space-between mb-3">
       <h3>{{ section.name }}</h3>
       <div>
-        <v-btn icon>
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-trash-can</v-icon>
-        </v-btn>
+        <v-dialog v-model="taskDialog" width="60%">
+          <template #activator="{ attrs, on }">
+            <v-btn v-bind="attrs" v-on="on">
+              <v-icon>mdi-plus</v-icon>
+              task
+            </v-btn>
+          </template>
+          <TaskDialog :is-dialog-open="taskDialog"
+                      @submit="createTask"
+                      @close="taskDialog = false"
+          >
+          </TaskDialog>
+        </v-dialog>
       </div>
     </div>
+    <TaskItemCard v-for="task in taskUncompleted" :key="task.id" :task="task"
+                  @toggleState="toggleTaskState"
+                  @update="updateTask"
+                  @delete="deleteTask">
+    </TaskItemCard>
   </v-container>
 </template>
 
 <script lang="ts">
+import {taskService} from '@/api/task.api';
+import {TaskDisplayModel, TaskModel} from '@/models/task.model';
+import TaskDialog from '@/views/project/components/TaskDialog.vue';
+import TaskItemCard from '@/views/project/components/TaskItemCard.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {SectionModel} from "@/models/section.model";
 
-@Component
+@Component({
+  components: {
+    TaskItemCard,
+    TaskDialog
+  }
+})
 export default class ProjectSectionItem extends Vue {
   @Prop() section!: SectionModel;
+
+  taskDialog = false;
+
+  get taskUncompleted(): TaskModel[] {
+    return this.section.tasks.filter((task: TaskModel) => !task.completed)
+  }
+
+  private createTask(data: Partial<TaskDisplayModel>): void {
+    this.taskDialog = false;
+    data.sectionId = this.section.id;
+    taskService.createTask(data).then(
+            response => {
+              this.section.tasks.unshift(response.body);
+            }, error => {
+              console.error(error);
+            }
+    )
+  }
+
+  private toggleTaskState(taskId: number, completed: boolean): void {
+    taskService.updateTaskById(taskId, {completed}).then(
+            (response: any) => {
+              const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id);
+              if (task) {
+                task.completed = response.body.completed;
+              }
+            }
+    )
+  }
+
+  private updateTask(taskId: number, data: Partial<TaskDisplayModel>): void {
+    taskService.updateTaskById(taskId, data).then(
+            (response: any) => {
+              const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id)
+              Object.assign(task, response.body)
+            }
+    )
+  }
+
+  private deleteTask(taskId: number): void {
+    taskService.deleteTaskById(taskId).then(
+            () => {
+              const taskIndex = this.section.tasks.findIndex((task: TaskModel) => task.id === taskId);
+              if (taskIndex !== -1) {
+                this.section.tasks.splice(taskIndex, 1);
+              }
+            }, (error: any) => {
+              console.error(error);
+            }
+    )
+  }
 }
 </script>
 
