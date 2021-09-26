@@ -1,10 +1,10 @@
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from '@/models/task.model';
 
 export interface CollectionModel {
     id: number;
     name: string;
     description: string;
-    tasks: TaskDisplayModel[];
+    tasks: TaskModel[];
     created_at: string;
 }
 

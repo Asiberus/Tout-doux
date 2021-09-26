@@ -37,11 +37,11 @@
 
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 
 @Component
 export default class TaskDialog extends Vue {
-  @Prop() private task?: TaskDisplayModel;
+  @Prop() private task?: TaskModel;
   @Prop() private isDialogOpen!: boolean;
 
   private confirmDelete = false;
@@ -74,12 +74,12 @@ export default class TaskDialog extends Vue {
       if (this.task) {
         this.populateForm(this.task);
       } else {
-        this.populateForm({name: ''} as TaskDisplayModel);
+        this.populateForm({name: ''} as TaskModel);
       }
     }
   }
 
-  private populateForm({ name }: TaskDisplayModel): void {
+  private populateForm({ name }: TaskModel): void {
     this.taskForm.data.name = name;
   }
 

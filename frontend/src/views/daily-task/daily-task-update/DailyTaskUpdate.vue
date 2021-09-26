@@ -103,16 +103,16 @@ export default class DailyTaskUpdate extends Vue {
     )
   }
 
-  private createDailyTaskByForm(): void {
-    dailyTaskService.createDailyTask(this.dailyTaskForm.data).then(
-        (response: any) => {
-          this.$set(this.dailyTaskList, this.dailyTaskList.length - 1, Object.assign({editMode: false}, response.body));
-          this.createDailyTaskDisplayed = false;
-        }, (error: any) => {
-          console.error(error);
-        }
-    )
-  }
+  // private createDailyTaskByForm(): void {
+  //   dailyTaskService.createDailyTask(this.dailyTaskForm.data).then(
+  //       (response: any) => {
+  //         this.$set(this.dailyTaskList, this.dailyTaskList.length - 1, Object.assign({editMode: false}, response.body));
+  //         this.createDailyTaskDisplayed = false;
+  //       }, (error: any) => {
+  //         console.error(error);
+  //       }
+  //   )
+  // }
 
   private createDailyTask(dailyTask: Partial<DailyTaskModel>): void {
     dailyTaskService.createDailyTask(dailyTask).then(
@@ -147,7 +147,6 @@ export default class DailyTaskUpdate extends Vue {
         }
     )
   }
-
 }
 </script>
 

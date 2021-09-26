@@ -127,7 +127,7 @@ import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {projectService} from "@/api/project.api";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import ProjectFormDialog from "@/views/project/components/ProjectFormDialog.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
@@ -163,16 +163,16 @@ export default class ProjectDetail extends Vue {
   private createTaskDisplayed = false;
   private editTasksDisplay = false;
 
-  get tasksUncompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !task.completed);
+  get tasksUncompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => !task.completed);
   }
 
-  get tasksCompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
+  get tasksCompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => task.completed);
   }
 
   get totalTask(): number {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
+    return this.project.tasks.filter((task: TaskModel) => !!task.id).length;
   }
 
   get percentageOfTaskCompleted(): number {
@@ -192,7 +192,7 @@ export default class ProjectDetail extends Vue {
   @Watch('createTaskDisplayed')
   private onCreateTaskDisplayedChanges(value: boolean): void {
     if (value) {
-      this.project.tasks.unshift({editMode: true} as TaskDisplayModel);
+      this.project.tasks.unshift({editMode: true} as TaskModel);
     } else {
       // Delete first task if it has no id
       if (!this.project.tasks[0].id) {
@@ -209,12 +209,12 @@ export default class ProjectDetail extends Vue {
   }
 
   private disableAllCreatedTasksEditMode(): void {
-    this.project.tasks.filter((task: TaskDisplayModel) => task.id && task.editMode).forEach((task: TaskDisplayModel) => {
+    this.project.tasks.filter((task: TaskModel) => task.id && task.editMode).forEach((task: TaskModel) => {
       task.editMode = false;
     });
   }
 
-  private toggleTaskEditMode(task: TaskDisplayModel, value: boolean): void {
+  private toggleTaskEditMode(task: TaskModel, value: boolean): void {
     // handle close create task card
     if (!task.id && !value) {
       this.createTaskDisplayed = false;
@@ -230,7 +230,7 @@ export default class ProjectDetail extends Vue {
     projectService.getProjectById(this.projectId).then(
         (response: any) => {
           this.project = response.body;
-          this.project.tasks.forEach((task: TaskDisplayModel) => {
+          this.project.tasks.forEach((task: TaskModel) => {
             // Set all task to editMode false with the Vue reactivity $set function
             this.$set(task, 'editMode', false);
           });
@@ -275,7 +275,7 @@ export default class ProjectDetail extends Vue {
     )
   }
 
-  private handleTaskFormSubmit(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private handleTaskFormSubmit(taskId: number, taskForm: Partial<TaskModel>): void {
     if (taskId) {
       this.updateTask(taskId, taskForm);
     } else {
@@ -284,12 +284,12 @@ export default class ProjectDetail extends Vue {
   }
 
   private toggleTaskState(taskId: number): void {
-    const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === taskId);
+    const task = this.project.tasks.find((task: TaskModel) => task.id === taskId);
     if (!task) {
       return;
     }
 
-    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
+    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskModel).then(
         (response: any) => {
           task.completed = response.body.completed
         }, (error: any) => {
@@ -298,7 +298,7 @@ export default class ProjectDetail extends Vue {
     )
   }
 
-  private createTask(taskForm: Partial<TaskDisplayModel>): void {
+  private createTask(taskForm: Partial<TaskModel>): void {
     taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
         (response: any) => {
@@ -310,10 +310,10 @@ export default class ProjectDetail extends Vue {
     )
   }
 
-  private updateTask(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, taskForm).then(
         (response: any) => {
-          const task = this.project.tasks.find((t: TaskDisplayModel) => t.id === response.body.id);
+          const task = this.project.tasks.find((t: TaskModel) => t.id === response.body.id);
           Object.assign(task, response.body, {editMode: false});
         }, (error: any) => {
           console.error(error);
@@ -324,7 +324,7 @@ export default class ProjectDetail extends Vue {
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
         () => {
-          const taskIndex = this.project.tasks.findIndex((task: TaskDisplayModel) => task.id === taskId);
+          const taskIndex = this.project.tasks.findIndex((task: TaskModel) => task.id === taskId);
           if (taskIndex !== -1) {
             this.project.tasks.splice(taskIndex, 1);
           }

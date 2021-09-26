@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import ellipsisFilter from "@/filters/ellipsis.filter";
 import {ProjectModel} from "@/models/project.model";
 
@@ -30,7 +30,7 @@ export default class ProjectItemCard extends Vue {
   @Prop() private project!: ProjectModel;
 
   get projectTasksCompleted(): number {
-    return this.project.tasks.filter((task: TaskDisplayModel) => task.completed).length;
+    return this.project.tasks.filter((task: TaskModel) => task.completed).length;
   }
 
   get projectPercentageOfTaskCompleted(): number {

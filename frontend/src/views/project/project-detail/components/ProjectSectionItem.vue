@@ -41,7 +41,7 @@
 <script lang="ts">
 import {taskService} from '@/api/task.api';
 import ProgressCircular from '@/components/ProgressCircular.vue';
-import {TaskDisplayModel, TaskModel} from '@/models/task.model';
+import {TaskModel} from '@/models/task.model';
 import TaskDialog from '@/views/project/components/TaskDialog.vue';
 import TaskItemCard from '@/views/project/components/TaskItemCard.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
@@ -67,7 +67,7 @@ export default class ProjectSectionItem extends Vue {
     return this.section.tasks.filter((task: TaskModel) => !task.completed)
   }
 
-  private createTask(data: Partial<TaskDisplayModel>): void {
+  private createTask(data: Partial<TaskModel>): void {
     this.taskDialog = false;
     data.sectionId = this.section.id;
     taskService.createTask(data).then(
@@ -90,7 +90,7 @@ export default class ProjectSectionItem extends Vue {
     )
   }
 
-  private updateTask(taskId: number, data: Partial<TaskDisplayModel>): void {
+  private updateTask(taskId: number, data: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, data).then(
             (response: any) => {
               const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id)

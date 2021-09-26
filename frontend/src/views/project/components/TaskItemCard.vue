@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import TaskDialog from "@/views/project/components/TaskDialog.vue";
 
 @Component({
@@ -40,7 +40,7 @@ import TaskDialog from "@/views/project/components/TaskDialog.vue";
   }
 })
 export default class TaskItemCard extends Vue {
-  @Prop() private task!: TaskDisplayModel;
+  @Prop() private task!: TaskModel;
   @Prop() private disabled!: boolean;
 
   private taskDialog = false;
@@ -58,7 +58,7 @@ export default class TaskItemCard extends Vue {
     this.$emit('toggleState', this.task.id, !this.task.completed);
   }
 
-  private emitUpdateEvent(data: Partial<TaskDisplayModel>): void {
+  private emitUpdateEvent(data: Partial<TaskModel>): void {
     this.taskDialog = false;
     this.$emit('update', this.task.id, data);
   }

@@ -8,7 +8,3 @@ export interface TaskModel {
     created_at: string;
     completed_at: string;
 }
-
-export interface TaskDisplayModel extends TaskModel {
-    editMode: boolean;
-}

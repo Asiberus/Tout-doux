@@ -52,7 +52,7 @@
 import ProgressCircular from '@/components/ProgressCircular.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import TaskDialog from "@/views/project/components/TaskDialog.vue";
@@ -69,18 +69,18 @@ export default class ProjectDescription extends Vue {
 
   taskDialog = false;
 
-  get taskUncompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !task.completed)
+  get taskUncompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => !task.completed)
   }
 
-  get tasksCompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
+  get tasksCompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => task.completed);
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
     taskService.updateTaskById(taskId, {completed}).then(
         (response: any) => {
-          const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === response.body.id);
+          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id);
           if (task) {
             task.completed = response.body.completed;
           }
@@ -88,7 +88,7 @@ export default class ProjectDescription extends Vue {
     )
   }
 
-  private createTask(taskForm: Partial<TaskDisplayModel>): void {
+  private createTask(taskForm: Partial<TaskModel>): void {
     this.taskDialog = false;
     taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
@@ -100,10 +100,10 @@ export default class ProjectDescription extends Vue {
     )
   }
 
-  private updateTask(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, taskForm).then(
         (response: any) => {
-          const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === response.body.id)
+          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id)
           Object.assign(task, response.body)
         }
     )
@@ -112,7 +112,7 @@ export default class ProjectDescription extends Vue {
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
         () => {
-          const taskIndex = this.project.tasks.findIndex((task: TaskDisplayModel) => task.id === taskId);
+          const taskIndex = this.project.tasks.findIndex((task: TaskModel) => task.id === taskId);
           if (taskIndex !== -1) {
             this.project.tasks.splice(taskIndex, 1);
           }
