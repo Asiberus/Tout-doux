@@ -18,16 +18,29 @@
         </v-dialog>
       </div>
     </div>
-    <TaskItemCard v-for="task in taskUncompleted" :key="task.id" :task="task"
-                  @toggleState="toggleTaskState"
-                  @update="updateTask"
-                  @delete="deleteTask">
-    </TaskItemCard>
+    <v-row class="mb-3">
+      <v-col cols="9">
+        <TaskItemCard v-for="task in taskUncompleted" :key="task.id" :task="task"
+                      @toggleState="toggleTaskState"
+                      @update="updateTask"
+                      @delete="deleteTask">
+        </TaskItemCard>
+      </v-col>
+      <v-col cols="3">
+        <div class="d-flex align-center justify-center">
+          <ProgressCircular :value="taskCompletedLength" :max="section.tasks.length"
+                            :size="180" :width="15">
+          </ProgressCircular>
+        </div>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
 <script lang="ts">
 import {taskService} from '@/api/task.api';
+import ProgressCircular from '@/components/ProgressCircular.vue';
 import {TaskDisplayModel, TaskModel} from '@/models/task.model';
 import TaskDialog from '@/views/project/components/TaskDialog.vue';
 import TaskItemCard from '@/views/project/components/TaskItemCard.vue';
@@ -37,13 +50,18 @@ import {SectionModel} from "@/models/section.model";
 @Component({
   components: {
     TaskItemCard,
-    TaskDialog
+    TaskDialog,
+    ProgressCircular,
   }
 })
 export default class ProjectSectionItem extends Vue {
   @Prop() section!: SectionModel;
 
   taskDialog = false;
+
+  get taskCompletedLength(): number {
+    return this.section.tasks.filter((task: TaskModel) => task.completed).length;
+  }
 
   get taskUncompleted(): TaskModel[] {
     return this.section.tasks.filter((task: TaskModel) => !task.completed)

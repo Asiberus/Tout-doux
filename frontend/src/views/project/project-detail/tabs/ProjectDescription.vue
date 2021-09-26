@@ -11,16 +11,8 @@
       </v-col>
       <v-col cols="3">
         <div class="d-flex justify-center mt-3">
-          <v-progress-circular :value="percentageOfTaskCompleted" :color="colorOfProgressTaskCompleted"
-                               :rotate="-90" :size="200" :width="20">
-            <div>
-              <span style="font-size: 2.5em;">{{ tasksCompleted.length }}</span>
-              /
-              <span style="font-size: 1em; transform: translateY(0.3em); display: inline-block">
-                {{ totalTask }}
-              </span>
-            </div>
-          </v-progress-circular>
+          <ProgressCircular :value="tasksCompleted.length" :max="project.tasks.length">
+          </ProgressCircular>
         </div>
       </v-col>
     </v-row>
@@ -57,6 +49,7 @@
 </template>
 
 <script lang="ts">
+import ProgressCircular from '@/components/ProgressCircular.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
 import {TaskDisplayModel} from "@/models/task.model";
@@ -68,6 +61,7 @@ import TaskDialog from "@/views/project/components/TaskDialog.vue";
   components: {
     TaskItemCard,
     TaskDialog,
+    ProgressCircular,
   }
 })
 export default class ProjectDescription extends Vue {
@@ -81,20 +75,6 @@ export default class ProjectDescription extends Vue {
 
   get tasksCompleted(): TaskDisplayModel[] {
     return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
-  }
-
-  get totalTask(): number {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
-  }
-
-  get percentageOfTaskCompleted(): number {
-    return (this.tasksCompleted.length / this.totalTask) * 100;
-  }
-
-  get colorOfProgressTaskCompleted(): string {
-    const colorArray = ['green lighten-4', 'green lighten-3', 'green lighten-2', 'green lighten-1', 'green'];
-    const index = Math.trunc(this.percentageOfTaskCompleted * colorArray.length / 100) - 1;
-    return colorArray[index];
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
