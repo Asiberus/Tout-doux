@@ -35,7 +35,7 @@
         <ProjectCompletedTasks :project="project"></ProjectCompletedTasks>
       </v-tab-item>
       <v-tab-item value="configuration" :transition="false">
-        <ProjectConfiguration></ProjectConfiguration>
+        <ProjectConfiguration :project="project" :tab="projectTab"></ProjectConfiguration>
       </v-tab-item>
     </v-tabs-items>
 

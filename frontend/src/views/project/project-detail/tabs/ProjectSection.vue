@@ -16,10 +16,10 @@
       </v-dialog>
 
     </div>
-    <div v-for="section in project.sections" :key="section.id">
+    <div v-for="(section, index) in project.sections" :key="section.id">
       <ProjectSectionItem :section="section">
       </ProjectSectionItem>
-      <v-divider/>
+      <v-divider v-if="index !== project.sections.length - 1"/>
     </div>
   </v-container>
 </template>
