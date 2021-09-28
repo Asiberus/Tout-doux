@@ -33,7 +33,7 @@ export default class ProjectCompletedTasks extends Vue {
   get tasksList(): { name: string; tasks: TaskModel[] }[] {
     return [
       {
-        name: 'Project\'s tasks',
+        name: 'General tasks',
         tasks: this.project.tasks.filter(task => task.completed)
       },
       ...this.project.sections.map(section => ({

@@ -11,7 +11,7 @@
       </v-col>
       <v-col cols="3">
         <div class="d-flex justify-center mt-3">
-          <ProgressCircular :value="tasksCompleted.length" :max="project.tasks.length">
+          <ProgressCircular :value="projectAllTasksCompleted.length" :max="projectAllTasks.length">
           </ProgressCircular>
         </div>
       </v-col>
@@ -73,8 +73,12 @@ export default class ProjectDescription extends Vue {
     return this.project.tasks.filter((task: TaskModel) => !task.completed)
   }
 
-  get tasksCompleted(): TaskModel[] {
-    return this.project.tasks.filter((task: TaskModel) => task.completed);
+  get projectAllTasks(): TaskModel[] {
+    return this.project.tasks.concat(...this.project.sections.map(section => section.tasks))
+  }
+
+  get projectAllTasksCompleted(): TaskModel[] {
+    return this.projectAllTasks.filter(task => task.completed)
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
