@@ -104,7 +104,7 @@ export default class ProjectDescription extends Vue {
 
   private toggleTaskState(taskId: number, completed: boolean): void {
     taskService.updateTaskById(taskId, {completed}).then(
-        (response: any) => {
+        response => {
           const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id);
           if (task) {
             task.completed = response.body.completed;
@@ -127,7 +127,7 @@ export default class ProjectDescription extends Vue {
 
   private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, taskForm).then(
-        (response: any) => {
+        response => {
           const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id)
           Object.assign(task, response.body);
         }
@@ -141,7 +141,7 @@ export default class ProjectDescription extends Vue {
           if (taskIndex !== -1) {
             this.project.tasks.splice(taskIndex, 1);
           }
-        }, (error: any) => {
+        }, error => {
           console.error(error);
         }
     )

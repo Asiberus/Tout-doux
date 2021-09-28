@@ -72,11 +72,11 @@ export default class ProjectSection extends Vue {
       projectId: this.project.id
     };
     sectionService.createSection(section).then(
-            response => {
-              this.project.sections.unshift(response.body)
-            }, error => {
-              console.error(error)
-            }
+        response => {
+          this.project.sections.unshift(response.body)
+        }, error => {
+          console.error(error)
+        }
     )
   }
 

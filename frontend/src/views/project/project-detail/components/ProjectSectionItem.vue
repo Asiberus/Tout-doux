@@ -92,44 +92,44 @@ export default class ProjectSectionItem extends Vue {
     this.taskDialog = false;
     data.sectionId = this.section.id;
     taskService.createTask(data).then(
-            response => {
-              this.section.tasks.unshift(response.body);
-            }, error => {
-              console.error(error);
-            }
+        response => {
+          this.section.tasks.unshift(response.body);
+        }, error => {
+          console.error(error);
+        }
     )
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
     taskService.updateTaskById(taskId, {completed}).then(
-            (response: any) => {
-              const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id);
-              if (task) {
-                task.completed = response.body.completed;
-              }
-            }
+        response => {
+          const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id);
+          if (task) {
+            task.completed = response.body.completed;
+          }
+        }
     )
   }
 
   private updateTask(taskId: number, data: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, data).then(
-            (response: any) => {
-              const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id)
-              Object.assign(task, response.body)
-            }
+        response => {
+          const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id)
+          Object.assign(task, response.body)
+        }
     )
   }
 
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
-            () => {
-              const taskIndex = this.section.tasks.findIndex((task: TaskModel) => task.id === taskId);
-              if (taskIndex !== -1) {
-                this.section.tasks.splice(taskIndex, 1);
-              }
-            }, (error: any) => {
-              console.error(error);
-            }
+        () => {
+          const taskIndex = this.section.tasks.findIndex((task: TaskModel) => task.id === taskId);
+          if (taskIndex !== -1) {
+            this.section.tasks.splice(taskIndex, 1);
+          }
+        }, error => {
+          console.error(error);
+        }
     )
   }
 }

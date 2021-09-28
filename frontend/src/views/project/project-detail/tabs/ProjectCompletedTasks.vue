@@ -55,7 +55,7 @@ export default class ProjectCompletedTasks extends Vue {
 
   private toggleTaskState(taskId: number, completed: boolean): void {
     taskService.updateTaskById(taskId, {completed}).then(
-        (response: any) => {
+        response => {
           const task = this.project.tasks.concat(
               ...this.project.sections.map(section => section.tasks)
           ).find((task: TaskModel) => task.id === response.body.id);

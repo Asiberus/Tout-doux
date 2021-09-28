@@ -66,7 +66,8 @@
                                 :rules="projectForm.rules.name" :disabled="project.archived">
                   </v-text-field>
                   <v-textarea v-model="projectForm.data.description" label="Description" counter="500" maxlength="500"
-                              required :rules="projectForm.rules.description" rows="2" auto-grow class="my-5" :disabled="project.archived">
+                              required :rules="projectForm.rules.description" rows="2" auto-grow class="my-5"
+                              :disabled="project.archived">
                   </v-textarea>
                   <div v-if="!project.archived" class="float-right mt-5">
                     <v-btn color="success" :disabled="!projectForm.valid || isFormUntouched" @click="updateProject">
@@ -148,10 +149,10 @@ export default class ProjectConfiguration extends Vue {
 
   private updateProject(): void {
     projectService.updateProject(this.project.id, this.projectForm.data).then(
-        (response: any) => {
+        response => {
           this.project.name = response.body.name;
           this.project.description = response.body.description;
-        }, (error: any) => {
+        }, error => {
           console.error(error);
         }
     )
@@ -161,7 +162,7 @@ export default class ProjectConfiguration extends Vue {
     this.deleteProjectDialog = false;
     projectService.deleteProject(this.project.id).then(
         () => {
-          this.$router.push({ name: 'project-list' });
+          this.$router.push({name: 'project-list'});
         }, error => {
           console.error(error);
         }
