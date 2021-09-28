@@ -16,13 +16,15 @@
 
   const colorArray = ['green lighten-4', 'green lighten-3', 'green lighten-2', 'green lighten-1', 'green'];
 
+
+
   @Component
   export default class ProgressCircular extends Vue {
     @Prop({ default: 0 }) value!: number;
     @Prop({ default: 100 }) max!: number;
     @Prop({ default: 200 }) size?: number;
     @Prop({ default: 20 }) width?: number;
-    @Prop({ default: colorArray }) colorArray?: string[];
+    @Prop({ default: () => colorArray }) colorArray?: string[];
 
     get percentage(): number {
       return (this.value / this.max) * 100;

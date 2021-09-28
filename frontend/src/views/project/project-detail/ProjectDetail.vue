@@ -32,7 +32,7 @@
       <v-tab-item value="event" :transition="false">
       </v-tab-item>
       <v-tab-item value="completed-tasks" :transition="false">
-        <ProjectCompletedTasks></ProjectCompletedTasks>
+        <ProjectCompletedTasks :project="project"></ProjectCompletedTasks>
       </v-tab-item>
       <v-tab-item value="configuration" :transition="false">
         <ProjectConfiguration></ProjectConfiguration>

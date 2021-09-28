@@ -1,7 +1,8 @@
 <template>
   <div class="mb-2">
-    <v-card @click.stop="taskDialog = true"
-            :color="backgroundColor">
+    <v-card @click.stop="onCardClick"
+            :color="backgroundColor"
+            :title="task.completed ? 'Uncomplete task ?' : null">
       <v-card-text>
         <v-row align-content="center">
           <v-col cols="11" class="d-flex align-center">
@@ -11,10 +12,15 @@
           </v-col>
 
           <v-col cols="1">
-            <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
-                        @click.native.prevent.stop.capture="emitToggleStateEvent"
-                        class="mt-0">
-            </v-checkbox>
+            <template v-if="!task.completed">
+              <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
+                          @click.native.prevent.stop.capture="emitToggleStateEvent"
+                          class="mt-0">
+              </v-checkbox>
+            </template>
+            <template v-else>
+              <v-icon small>mdi-check</v-icon>
+            </template>
           </v-col>
         </v-row>
       </v-card-text>
@@ -47,11 +53,17 @@ export default class TaskItemCard extends Vue {
 
   get backgroundColor(): string | null {
     if (this.task.completed) {
-      return 'taskCompleted';
-    } else if (!this.task.id) {
-      return 'taskInCreation';
+      return 'success';
     }
     return null;
+  }
+
+  private onCardClick(): void {
+    if (this.task.completed) {
+      this.emitToggleStateEvent()
+    } else {
+      this.taskDialog = true
+    }
   }
 
   private emitToggleStateEvent(): void {

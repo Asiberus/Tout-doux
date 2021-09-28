@@ -29,7 +29,7 @@ export default new Vuetify({
                 info: '#2196F3',
                 success: '#4CAF50',
                 warning: '#FFC107',
-                taskCompleted: '#212621',
+                taskCompleted: '#497549',
                 // taskCompleted: '#4CAF50',
                 taskInCreation: '#181b1f',
                 projectArchived: '#363e4d',
