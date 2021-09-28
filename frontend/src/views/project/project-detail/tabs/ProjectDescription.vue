@@ -17,7 +17,7 @@
       </v-col>
     </v-row>
 
-    <div class="d-flex align-center mt-12 mb-3">
+    <div class="d-flex align-center mt-12 mb-5">
       <h3 class="flex-grow-1">General Tasks</h3>
       <div>
         <v-dialog v-model="taskDialog" width="60%">
@@ -35,15 +35,31 @@
       </div>
     </div>
 
-    <v-row no-gutters>
-      <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
-        <TaskItemCard :task="task" :disabled="project.archived"
-                      @toggleState="toggleTaskState"
-                      @update="updateTask"
-                      @delete="deleteTask">
-        </TaskItemCard>
-      </v-col>
-    </v-row>
+    <template v-if="taskUncompleted.length > 0">
+      <v-row no-gutters>
+        <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
+          <TaskItemCard :task="task" :disabled="project.archived"
+                        @toggleState="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
+          </TaskItemCard>
+        </v-col>
+      </v-row>
+    </template>
+    <template v-else-if="project.tasks.length > 0 && project.tasks.length === taskCompleted.length">
+      <EmptyListDisplay message="You completed all general tasks of this project !">
+        <template #img>
+          <img src="../../../../assets/all_task_completed.svg" width="300" alt="All tasks completed">
+        </template>
+      </EmptyListDisplay>
+    </template>
+    <template v-else>
+      <EmptyListDisplay message="This project has no general task yet">
+        <template #img>
+          <img src="../../../../assets/no_tasks.svg" width="300" alt="No tasks">
+        </template>
+      </EmptyListDisplay>
+    </template>
   </v-container>
 </template>
 
@@ -55,12 +71,14 @@ import {TaskModel} from "@/models/task.model";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import TaskDialog from "@/views/project/components/TaskDialog.vue";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     TaskItemCard,
     TaskDialog,
     ProgressCircular,
+    EmptyListDisplay,
   }
 })
 export default class ProjectDescription extends Vue {
@@ -69,15 +87,19 @@ export default class ProjectDescription extends Vue {
   taskDialog = false;
 
   get taskUncompleted(): TaskModel[] {
-    return this.project.tasks.filter((task: TaskModel) => !task.completed)
+    return this.project.tasks.filter((task: TaskModel) => !task.completed);
+  }
+
+  get taskCompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => task.completed);
   }
 
   get projectAllTasks(): TaskModel[] {
-    return this.project.tasks.concat(...this.project.sections.map(section => section.tasks))
+    return this.project.tasks.concat(...this.project.sections.map(section => section.tasks));
   }
 
   get projectAllTasksCompleted(): TaskModel[] {
-    return this.projectAllTasks.filter(task => task.completed)
+    return this.projectAllTasks.filter(task => task.completed);
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
@@ -107,7 +129,7 @@ export default class ProjectDescription extends Vue {
     taskService.updateTaskById(taskId, taskForm).then(
         (response: any) => {
           const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id)
-          Object.assign(task, response.body)
+          Object.assign(task, response.body);
         }
     )
   }

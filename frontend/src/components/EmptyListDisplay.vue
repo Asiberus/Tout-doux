@@ -2,7 +2,7 @@
   <div class="img-wrapper">
     <slot name="img"></slot>
     <div class="img-description">
-      <slot name="message">{{message}}</slot>
+      <slot name="message">{{ message }}</slot>
     </div>
   </div>
 </template>
@@ -14,6 +14,7 @@ import {Component, Prop, Vue} from "vue-property-decorator";
 @Component
 export default class EmptyListDisplay extends Vue {
   @Prop() private message!: string;
+
 }
 </script>
 
@@ -30,7 +31,7 @@ export default class EmptyListDisplay extends Vue {
   }
 
   .img-description {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
   }
 
 }

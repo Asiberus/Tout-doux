@@ -2,14 +2,22 @@
   <v-container>
     <div v-for="(taskList, index) in tasksList" :key="taskList.name + index">
       <h3 class="mb-3">{{ taskList.name }}</h3>
-      <v-row no-gutters>
-        <v-col v-for="task in taskList.tasks" :key="task.id" cols="6" class="px-2">
-          <TaskItemCard :task="task" :disabled="project.archived"
-                        @toggleState="toggleTaskState"
-          >
-          </TaskItemCard>
-        </v-col>
-      </v-row>
+      <template v-if="taskList.tasks.length > 0">
+        <v-row no-gutters>
+          <v-col v-for="task in taskList.tasks" :key="task.id" cols="6" class="px-2">
+            <TaskItemCard :task="task" :disabled="project.archived"
+                          @toggleState="toggleTaskState">
+            </TaskItemCard>
+          </v-col>
+        </v-row>
+      </template>
+      <template v-else>
+        <EmptyListDisplay message="No tasks completed yet !" class="my-7">
+          <template #img>
+            <img src="../../../../assets/no-task-completed.svg" width="300" alt="No tasks completed">
+          </template>
+        </EmptyListDisplay>
+      </template>
       <v-divider v-if="index !== tasksList.length - 1" class="my-3"></v-divider>
     </div>
   </v-container>
@@ -21,10 +29,12 @@ import {ProjectModel} from "@/models/project.model";
 import {TaskModel} from "@/models/task.model";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
-    TaskItemCard
+    TaskItemCard,
+    EmptyListDisplay,
   }
 })
 export default class ProjectCompletedTasks extends Vue {

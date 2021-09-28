@@ -4,15 +4,15 @@
       <v-col cols="2">
         <v-tabs v-model="configurationTab" vertical background-color="transparent" color="accent">
           <v-tab href="#general">
-            <v-icon class="mr-3" small>mdi-cog</v-icon>
+            <v-icon left small>mdi-cog</v-icon>
             General
           </v-tab>
           <v-tab disabled>
-            <v-icon class="mr-3" small>mdi-tag</v-icon>
+            <v-icon left small>mdi-tag</v-icon>
             Tags
           </v-tab>
           <v-tab disabled>
-            <v-icon class="mr-3" small>mdi-account</v-icon>
+            <v-icon left small>mdi-account</v-icon>
             User
           </v-tab>
         </v-tabs>
@@ -24,7 +24,7 @@
               <v-dialog v-model="archiveProjectDialog" width="50%">
                 <template #activator="{ attrs, on }">
                   <v-btn v-bind="attrs" v-on="on" :outlined="!project.archived" color="accent mr-3">
-                    <v-icon small class="mr-1">mdi-archive</v-icon>
+                    <v-icon small left>mdi-archive</v-icon>
                     {{ project.archived ? 'archived' : 'archive' }}
                   </v-btn>
                 </template>
@@ -42,7 +42,7 @@
                 <v-dialog v-model="deleteProjectDialog" width="50%">
                   <template #activator="{ attrs, on }">
                     <v-btn v-bind="attrs" v-on="on" color="error">
-                      <v-icon small class="mr-1">mdi-trash-can</v-icon>
+                      <v-icon small left>mdi-trash-can</v-icon>
                       delete
                     </v-btn>
                   </template>

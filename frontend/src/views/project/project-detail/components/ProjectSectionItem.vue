@@ -20,12 +20,30 @@
     </div>
     <v-row class="mb-3">
       <v-col cols="9">
-        <TaskItemCard v-for="task in taskUncompleted" :key="task.id"
-                      :task="task" :disabled="disabled"
-                      @toggleState="toggleTaskState"
-                      @update="updateTask"
-                      @delete="deleteTask">
-        </TaskItemCard>
+        <template v-if="taskUncompleted.length > 0">
+          <TaskItemCard v-for="task in taskUncompleted" :key="task.id"
+                        :task="task" :disabled="disabled"
+                        @toggleState="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
+          </TaskItemCard>
+        </template>
+        <template v-else-if="section.tasks.length > 0 && section.tasks.length === taskCompletedLength">
+          <EmptyListDisplay message="You completed all tasks of this section !">
+            <template #img>
+              <img src="../../../../assets/all_task_completed.svg" width="200" alt="All tasks completed">
+            </template>
+          </EmptyListDisplay>
+        </template>
+        <template v-else>
+          <EmptyListDisplay message="This section has no task yet">
+            <template #img>
+              <img src="../../../../assets/no_tasks.svg" width="200" alt="No tasks">
+            </template>
+          </EmptyListDisplay>
+        </template>
+
+
       </v-col>
       <v-col cols="3">
         <div class="d-flex align-center justify-center">
@@ -46,12 +64,14 @@ import TaskDialog from '@/views/project/components/TaskDialog.vue';
 import TaskItemCard from '@/views/project/components/TaskItemCard.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {SectionModel} from "@/models/section.model";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     TaskItemCard,
     TaskDialog,
     ProgressCircular,
+    EmptyListDisplay,
   }
 })
 export default class ProjectSectionItem extends Vue {

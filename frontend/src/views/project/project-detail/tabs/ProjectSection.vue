@@ -1,9 +1,11 @@
 <template>
   <v-container>
-    <div class="d-flex justify-end">
+    <div class="d-flex justify-end mb-5">
       <v-dialog v-model="sectionDialog" width="60%">
         <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
+          <v-btn v-if="project.sections.length > 0"
+                 v-bind="attrs" v-on="on"
+                 :disabled="project.archived">
             <v-icon>mdi-plus</v-icon>
             section
           </v-btn>
@@ -14,13 +16,31 @@
         >
         </SectionDialog>
       </v-dialog>
+    </div>
 
-    </div>
-    <div v-for="(section, index) in project.sections" :key="section.id">
-      <ProjectSectionItem :section="section" :disabled="project.archived">
-      </ProjectSectionItem>
-      <v-divider v-if="index !== project.sections.length - 1"/>
-    </div>
+    <template v-if="project.sections.length > 0">
+      <div v-for="(section, index) in project.sections" :key="section.id">
+        <ProjectSectionItem :section="section" :disabled="project.archived">
+        </ProjectSectionItem>
+        <v-divider v-if="index !== project.sections.length - 1"/>
+      </div>
+    </template>
+    <template v-else>
+      <EmptyListDisplay class="mt-15">
+        <template #img>
+          <img src="../../../../assets/project_section.svg" alt="No sections">
+        </template>
+        <template #message>
+          <div class="d-flex align-center mt-2">
+            <span>This project has no section</span>
+            <v-btn v-if="!project.archived" @click="sectionDialog = true" small class="ml-3">
+              <v-icon left small>mdi-plus</v-icon>
+              add a section
+            </v-btn>
+          </div>
+        </template>
+      </EmptyListDisplay>
+    </template>
   </v-container>
 </template>
 
@@ -31,11 +51,13 @@ import SectionDialog from '@/views/project/project-detail/components/SectionDial
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
 import ProjectSectionItem from "@/views/project/project-detail/components/ProjectSectionItem.vue";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     ProjectSectionItem,
-    SectionDialog
+    SectionDialog,
+    EmptyListDisplay,
   }
 })
 export default class ProjectSection extends Vue {
