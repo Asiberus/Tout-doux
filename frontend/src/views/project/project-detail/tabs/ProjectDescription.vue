@@ -17,8 +17,8 @@
       </v-col>
     </v-row>
 
-    <div class="d-flex align-center mt-12">
-      <h3 class="flex-grow-1 mb-3">General Tasks</h3>
+    <div class="d-flex align-center mt-12 mb-3">
+      <h3 class="flex-grow-1">General Tasks</h3>
       <div>
         <v-dialog v-model="taskDialog" width="60%">
           <template #activator="{ on, attrs }">
@@ -32,13 +32,12 @@
                       @close="taskDialog = false">
           </TaskDialog>
         </v-dialog>
-
       </div>
     </div>
 
     <v-row no-gutters>
       <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
-        <TaskItemCard :task="task"
+        <TaskItemCard :task="task" :disabled="project.archived"
                       @toggleState="toggleTaskState"
                       @update="updateTask"
                       @delete="deleteTask">

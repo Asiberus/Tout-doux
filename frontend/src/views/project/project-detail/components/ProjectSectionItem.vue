@@ -5,7 +5,7 @@
       <div>
         <v-dialog v-model="taskDialog" width="60%">
           <template #activator="{ attrs, on }">
-            <v-btn v-bind="attrs" v-on="on">
+            <v-btn v-bind="attrs" v-on="on" :disabled="disabled">
               <v-icon>mdi-plus</v-icon>
               task
             </v-btn>
@@ -20,7 +20,8 @@
     </div>
     <v-row class="mb-3">
       <v-col cols="9">
-        <TaskItemCard v-for="task in taskUncompleted" :key="task.id" :task="task"
+        <TaskItemCard v-for="task in taskUncompleted" :key="task.id"
+                      :task="task" :disabled="disabled"
                       @toggleState="toggleTaskState"
                       @update="updateTask"
                       @delete="deleteTask">
@@ -34,7 +35,6 @@
         </div>
       </v-col>
     </v-row>
-
   </v-container>
 </template>
 
@@ -56,6 +56,7 @@ import {SectionModel} from "@/models/section.model";
 })
 export default class ProjectSectionItem extends Vue {
   @Prop() section!: SectionModel;
+  @Prop() disabled!: boolean;
 
   taskDialog = false;
 

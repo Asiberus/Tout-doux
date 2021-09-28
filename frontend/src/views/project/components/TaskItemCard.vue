@@ -1,8 +1,7 @@
 <template>
   <div class="mb-2">
-    <v-card @click.stop="onCardClick"
-            :color="backgroundColor"
-            :title="task.completed ? 'Uncomplete task ?' : null">
+    <v-card @click.stop="onCardClick" :disabled="disabled"
+            :color="task.completed ? 'success' : null">
       <v-card-text>
         <v-row align-content="center">
           <v-col cols="11" class="d-flex align-center">
@@ -19,7 +18,10 @@
               </v-checkbox>
             </template>
             <template v-else>
-              <v-icon small>mdi-check</v-icon>
+              <v-btn @click="emitToggleStateEvent"
+                     icon small title="Uncomplete task ?">
+                <v-icon small>mdi-check</v-icon>
+              </v-btn>
             </template>
           </v-col>
         </v-row>
@@ -47,7 +49,7 @@ import TaskDialog from "@/views/project/components/TaskDialog.vue";
 })
 export default class TaskItemCard extends Vue {
   @Prop() private task!: TaskModel;
-  @Prop() private disabled!: boolean;
+  @Prop({ default: false }) private disabled!: boolean;
 
   private taskDialog = false;
 
@@ -59,11 +61,9 @@ export default class TaskItemCard extends Vue {
   }
 
   private onCardClick(): void {
-    if (this.task.completed) {
-      this.emitToggleStateEvent()
-    } else {
-      this.taskDialog = true
-    }
+    if (this.task.completed || this.disabled) return
+
+    this.taskDialog = true
   }
 
   private emitToggleStateEvent(): void {

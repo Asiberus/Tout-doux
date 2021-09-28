@@ -3,7 +3,7 @@
     <div class="d-flex justify-end">
       <v-dialog v-model="sectionDialog" width="60%">
         <template #activator="{ on, attrs }">
-          <v-btn v-bind="attrs" v-on="on">
+          <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
             <v-icon>mdi-plus</v-icon>
             section
           </v-btn>
@@ -17,7 +17,7 @@
 
     </div>
     <div v-for="(section, index) in project.sections" :key="section.id">
-      <ProjectSectionItem :section="section">
+      <ProjectSectionItem :section="section" :disabled="project.archived">
       </ProjectSectionItem>
       <v-divider v-if="index !== project.sections.length - 1"/>
     </div>

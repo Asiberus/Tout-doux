@@ -4,7 +4,7 @@
       <h3 class="mb-3">{{ taskList.name }}</h3>
       <v-row no-gutters>
         <v-col v-for="task in taskList.tasks" :key="task.id" cols="6" class="px-2">
-          <TaskItemCard :task="task"
+          <TaskItemCard :task="task" :disabled="project.archived"
                         @toggleState="toggleTaskState"
           >
           </TaskItemCard>
