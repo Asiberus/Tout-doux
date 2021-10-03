@@ -20,9 +20,10 @@
 
     <template v-if="project.sections.length > 0">
       <div v-for="(section, index) in project.sections" :key="section.id">
-        <ProjectSectionItem :section="section" :disabled="project.archived">
+        <ProjectSectionItem :section="section" :disabled="project.archived"
+                            @update="updateSection" @delete="deleteSection">
         </ProjectSectionItem>
-        <v-divider v-if="index !== project.sections.length - 1"/>
+        <v-divider v-if="index !== project.sections.length - 1" class="my-3"/>
       </div>
     </template>
     <template v-else>
@@ -65,7 +66,7 @@ export default class ProjectSection extends Vue {
 
   sectionDialog = false;
 
-  createSection(data: { name: string }): void {
+  private createSection(data: { name: string }): void {
     this.sectionDialog = false;
     const section: SectionPost = {
       name: data.name,
@@ -74,6 +75,31 @@ export default class ProjectSection extends Vue {
     sectionService.createSection(section).then(
         response => {
           this.project.sections.unshift(response.body)
+        }, error => {
+          console.error(error)
+        }
+    )
+  }
+
+  private updateSection(id: number, name: string): void {
+    sectionService.updateSection(id, { name }).then(
+        response => {
+          const section = this.project.sections.find(s => s.id === id);
+          if (section) {
+            section.name = response.body.name;
+          }
+        }, error => {
+          console.error(error)
+        })
+  }
+
+  private deleteSection(id: number): void {
+    sectionService.deleteSection(id).then(
+        response => {
+          const index = this.project.sections.findIndex(s => s.id === id);
+          if (index !== -1) {
+            this.project.sections.splice(index, 1);
+          }
         }, error => {
           console.error(error)
         }

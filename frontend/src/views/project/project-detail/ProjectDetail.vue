@@ -19,6 +19,7 @@
       <v-tab href="#section">Section</v-tab>
       <v-tab disabled>Event</v-tab>
       <v-tab href="#completed-tasks">Completed Task</v-tab>
+      <v-tab disabled>Historic</v-tab>
       <v-tab href="#configuration">Configuration</v-tab>
     </v-tabs>
 
