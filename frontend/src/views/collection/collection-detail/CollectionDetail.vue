@@ -15,7 +15,7 @@
         <CollectionDescription :collection="collection"/>
       </v-tab-item>
       <v-tab-item value="completed-tasks" :transition="false">
-        <CollectionCompletedTasks/>
+        <CollectionCompletedTasks :collection="collection"/>
       </v-tab-item>
       <v-tab-item value="configuration" :transition="false">
         <CollectionConfiguration/>
@@ -47,6 +47,7 @@
     EmptyListDisplay
   }
 })
+  //Todo : remove v-container
 export default class CollectionDetail extends Vue {
   @Prop() collectionId!: number;
 

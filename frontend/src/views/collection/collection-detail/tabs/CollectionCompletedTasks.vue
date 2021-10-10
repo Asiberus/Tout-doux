@@ -1,13 +1,49 @@
 <template>
-    <div>Collection COmpleted tasks</div>
+    <v-container class="mt-3">
+            <template v-if="taskCompleted.length > 0">
+                <TaskItemCard v-for="task in taskCompleted" :key="task.id" :task="task"
+                              @toggleState="toggleTaskState">
+                </TaskItemCard>
+            </template>
+            <template v-else>
+                <EmptyListDisplay message="No tasks completed yet !" class="my-7">
+                    <template #img>
+                        <img src="../../../../assets/no-task-completed.svg" width="300" alt="No tasks completed">
+                    </template>
+                </EmptyListDisplay>
+            </template>
+    </v-container>
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from 'vue-property-decorator';
+  import {taskService} from '@/api/task.api';
+  import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
+  import {CollectionModel} from '@/models/collection.model';
+  import {TaskModel} from '@/models/task.model';
+  import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
+  import {Component, Prop, Vue} from 'vue-property-decorator';
 
-  @Component
+  @Component({
+    components: {
+      TaskItemCard,
+      EmptyListDisplay,
+    }
+  })
   export default class CollectionCompletedTasks extends Vue {
+    @Prop() collection!: CollectionModel;
 
+    get taskCompleted(): TaskModel[] {
+      return this.collection.tasks.filter(task => task.completed);
+    }
+
+    private toggleTaskState(taskId: number, completed: boolean): void {
+      taskService.updateTaskById(taskId, {completed}).then(
+          response => {
+            const task = this.collection.tasks.find((task: TaskModel) => task.id === response.body.id);
+            if (task) task.completed = response.body.completed;
+          }
+      );
+    }
   }
 </script>
 
