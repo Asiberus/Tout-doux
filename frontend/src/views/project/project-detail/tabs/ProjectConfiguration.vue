@@ -79,8 +79,8 @@
             </v-row>
 
           </v-tab-item>
-          <v-tab-item value="tag" :transition="false"></v-tab-item>
-          <v-tab-item value="user" :transition="false"></v-tab-item>
+          <v-tab-item value="tag" :transition="false"/>
+          <v-tab-item value="user" :transition="false"/>
         </v-tabs-items>
       </v-col>
     </v-row>

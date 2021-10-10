@@ -18,7 +18,7 @@
     <template v-if="collectionList.length > 0">
       <v-row>
         <v-col v-for="collection in collectionList" :key="collection.id" cols="4">
-          <CollectionItemCard :collection="collection"></CollectionItemCard>
+          <CollectionItemCard :collection="collection"/>
         </v-col>
       </v-row>
     </template>

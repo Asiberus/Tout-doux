@@ -32,7 +32,6 @@
   import CollectionCompletedTasks from '@/views/collection/collection-detail/tabs/CollectionCompletedTasks.vue';
   import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue';
   import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue';
-  import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue';
   import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
   import {Component, Prop, Vue} from 'vue-property-decorator';
 
@@ -42,7 +41,6 @@
     CollectionCompletedTasks,
     CollectionDescription,
     TaskItemCard,
-    CollectionFormDialog,
     ConfirmDialog,
     EmptyListDisplay
   }

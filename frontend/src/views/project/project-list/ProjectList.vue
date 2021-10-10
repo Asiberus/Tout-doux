@@ -27,7 +27,7 @@
     <template v-if="projectList.length > 0">
       <v-row>
         <v-col v-for="project in projectList" :key="project.id" cols="4">
-          <ProjectItemCard :project="project"></ProjectItemCard>
+          <ProjectItemCard :project="project"/>
         </v-col>
       </v-row>
     </template>

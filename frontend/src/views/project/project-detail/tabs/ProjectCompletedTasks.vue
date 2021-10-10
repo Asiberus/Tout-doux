@@ -18,7 +18,7 @@
           </template>
         </EmptyListDisplay>
       </template>
-      <v-divider v-if="index !== tasksList.length - 1" class="my-3"></v-divider>
+      <v-divider v-if="index !== tasksList.length - 1" class="my-3"/>
     </div>
   </v-container>
 </template>

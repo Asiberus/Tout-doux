@@ -12,7 +12,7 @@
       </h1>
     </div>
 
-    <v-divider class="my-3"></v-divider>
+    <v-divider class="my-3"/>
 
     <v-tabs v-model="projectTab" background-color="transparent" color="accent">
       <v-tab href="#description">Description</v-tab>
@@ -25,18 +25,18 @@
 
     <v-tabs-items v-model="projectTab" class="transparent">
       <v-tab-item value="description" :transition="false">
-        <ProjectDescription :project="project"></ProjectDescription>
+        <ProjectDescription :project="project"/>
       </v-tab-item>
       <v-tab-item value="section" :transition="false">
-        <ProjectSection :project="project"></ProjectSection>
+        <ProjectSection :project="project"/>
       </v-tab-item>
       <v-tab-item value="event" :transition="false">
       </v-tab-item>
       <v-tab-item value="completed-tasks" :transition="false">
-        <ProjectCompletedTasks :project="project"></ProjectCompletedTasks>
+        <ProjectCompletedTasks :project="project"/>
       </v-tab-item>
       <v-tab-item value="configuration" :transition="false">
-        <ProjectConfiguration :project="project" :tab="projectTab"></ProjectConfiguration>
+        <ProjectConfiguration :project="project" :tab="projectTab"/>
       </v-tab-item>
     </v-tabs-items>
   </v-container>
@@ -62,7 +62,7 @@ import ProjectCompletedTasks from "@/views/project/project-detail/tabs/ProjectCo
 export default class ProjectDetail extends Vue {
   @Prop() private projectId!: number;
 
-  private project!: ProjectModel = null;
+  private project: ProjectModel | null = null;
   private projectTab = 'description';
 
   created(): void {
