@@ -129,9 +129,9 @@ export default class ProjectConfiguration extends Vue {
   @Watch('tab')
   private onTabChanges(value: string): void {
     if (value === 'configuration') {
-      this.form.resetValidation()
-      this.projectForm.data.name = this.project.name
-      this.projectForm.data.description = this.project.description
+      this.form.resetValidation();
+      this.projectForm.data.name = this.project.name;
+      this.projectForm.data.description = this.project.description;
     }
   }
 

@@ -40,7 +40,7 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {TaskModel} from "@/models/task.model";
-import TaskDialog from "@/views/project/components/TaskDialog.vue";
+import TaskDialog from "@/views/components/task/TaskDialog.vue";
 
 @Component({
   components: {

@@ -104,8 +104,8 @@
 import {taskService} from '@/api/task.api';
 import ProgressCircular from '@/components/ProgressCircular.vue';
 import {TaskModel} from '@/models/task.model';
-import TaskDialog from '@/views/project/components/TaskDialog.vue';
-import TaskItemCard from '@/views/project/components/TaskItemCard.vue';
+import TaskDialog from '@/views/components/task/TaskDialog.vue';
+import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {SectionModel} from "@/models/section.model";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";

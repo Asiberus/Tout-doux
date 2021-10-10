@@ -1,5 +1,5 @@
-import CollectionList from "@/views/collection/CollectionList.vue";
-import CollectionDetail from "@/views/collection/CollectionDetail.vue";
+import CollectionList from "@/views/collection/collection-list/CollectionList.vue";
+import CollectionDetail from "@/views/collection/collection-detail/CollectionDetail.vue";
 
 export const collectionRoutes = [
     {
