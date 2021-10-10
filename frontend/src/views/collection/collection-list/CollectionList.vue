@@ -25,7 +25,7 @@
     <template v-else>
       <EmptyListDisplay>
         <template #img>
-          <img src="../../assets/project.svg" alt="No project" style="max-width: 450px;">
+          <img src="../../../assets/project.svg" alt="No project" style="max-width: 450px;">
         </template>
         <template #message>
           <div class="d-flex align-center">

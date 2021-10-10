@@ -27,7 +27,7 @@
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
 import {TaskModel} from "@/models/task.model";
-import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
+import TaskItemCard from "@/views/components/task/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
