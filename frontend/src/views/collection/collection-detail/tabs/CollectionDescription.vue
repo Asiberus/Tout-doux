@@ -50,6 +50,10 @@
                     <v-card-title>Description</v-card-title>
                     <v-card-text>
                         {{ collection.description }}
+                        <div class="d-flex justify-end align-center mt-2" title="Created at">
+                            <v-icon small>mdi-clock</v-icon>
+                            <span class="font-italic ml-1">{{ createdDate }}</span>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -65,6 +69,7 @@
   import {TaskModel} from '@/models/task.model';
   import TaskDialog from '@/views/components/task/TaskDialog.vue';
   import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
+  import moment from 'moment';
   import {Component, Prop, Vue} from 'vue-property-decorator';
 
   @Component({
@@ -79,6 +84,10 @@
     @Prop() private collection!: CollectionModel;
 
     private taskDialog = false;
+
+    get createdDate(): string {
+      return moment(this.collection.created_at).format('D MMM. Y');
+    }
 
     get tasksUncompleted(): TaskModel[] {
       return this.collection.tasks.filter((task: TaskModel) => !task.completed);

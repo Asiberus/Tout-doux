@@ -6,6 +6,10 @@
         <v-card>
           <v-card-text>
             {{ project.description }}
+            <div class="d-flex justify-end align-center mt-2" title="Created at">
+              <v-icon small>mdi-clock</v-icon>
+              <span class="font-italic ml-1">{{ createdDate }}</span>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -65,6 +69,7 @@
 
 <script lang="ts">
 import ProgressCircular from '@/components/ProgressCircular.vue';
+import moment from 'moment';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
 import {TaskModel} from "@/models/task.model";
@@ -85,6 +90,10 @@ export default class ProjectDescription extends Vue {
   @Prop() project!: ProjectModel;
 
   taskDialog = false;
+
+  get createdDate(): string {
+    return moment(this.project.created_at).format('D MMM. Y');
+  }
 
   get taskUncompleted(): TaskModel[] {
     return this.project.tasks.filter((task: TaskModel) => !task.completed);
