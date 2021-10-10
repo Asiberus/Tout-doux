@@ -9,6 +9,6 @@ const ellipsisFilter = (value: string, numberOfCharacter: number) => {
     }
 
     return value.slice(0, numberOfCharacter) + '...';
-}
+};
 
 export default ellipsisFilter

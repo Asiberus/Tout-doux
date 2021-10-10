@@ -1,4 +1,4 @@
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import {SectionModel} from "@/models/section.model";
 
 export interface ProjectModel {
@@ -7,7 +7,7 @@ export interface ProjectModel {
     description: string;
     archived: boolean;
     sections: SectionModel[];
-    tasks: TaskDisplayModel[];
+    tasks: TaskModel[];
     created_at: string;
 }
 

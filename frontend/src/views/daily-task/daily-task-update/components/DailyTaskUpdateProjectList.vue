@@ -73,8 +73,8 @@
 import {Component, Prop, Vue} from "vue-property-decorator";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {DailyTaskProjectDisplayModel} from "@/models/project.model";
-import {DailyTaskDisplayModel} from "@/models/daily-task.model";
-import {TaskDisplayModel, TaskModel} from "@/models/task.model";
+import {DailyTaskModel} from "@/models/daily-task.model";
+import {TaskModel} from "@/models/task.model";
 
 // Todo : add btn to create project in no project svg
 @Component({
@@ -83,20 +83,20 @@ import {TaskDisplayModel, TaskModel} from "@/models/task.model";
   }
 })
 export default class DailyTaskUpdateProjectList extends Vue {
-  @Prop() private projectList: DailyTaskProjectDisplayModel[];
-  @Prop() private dailyTaskList: DailyTaskDisplayModel[];
+  @Prop() private projectList!: DailyTaskProjectDisplayModel[];
+  @Prop() private dailyTaskList!: DailyTaskModel[];
 
-  get taskUncompleted(): (item: DailyTaskProjectDisplayModel) => TaskDisplayModel[] {
-    return (item: DailyTaskProjectDisplayModel) => item.tasks.filter((task: TaskDisplayModel) => !task.completed);
+  get taskUncompleted(): (item: DailyTaskProjectDisplayModel) => TaskModel[] {
+    return (item: DailyTaskProjectDisplayModel) => item.tasks.filter((task: TaskModel) => !task.completed);
   }
 
   // todo : change color of task selected
   get isTaskSelected(): (task: TaskModel) => boolean {
-    return (task: TaskModel) => this.dailyTaskList.some((dailyTask: DailyTaskDisplayModel) => task.id === dailyTask.taskId);
+    return (task: TaskModel) => this.dailyTaskList.some((dailyTask: DailyTaskModel) => task.id === dailyTask.taskId);
   }
 
   get numberOfTasksCompleted(): (item: DailyTaskProjectDisplayModel) => number {
-    return (item: DailyTaskProjectDisplayModel) => item.tasks.filter((task: TaskDisplayModel) => task.completed).length;
+    return (item: DailyTaskProjectDisplayModel) => item.tasks.filter((task: TaskModel) => task.completed).length;
   }
 
   get percentageOfTaskCompleted(): (item: DailyTaskProjectDisplayModel) => number {
@@ -107,7 +107,7 @@ export default class DailyTaskUpdateProjectList extends Vue {
     project.selected = true;
   }
 
-  private selectTask(task: TaskDisplayModel): void {
+  private selectTask(task: TaskModel): void {
     this.$emit('selectTask', {taskId: task.id});
   }
 }

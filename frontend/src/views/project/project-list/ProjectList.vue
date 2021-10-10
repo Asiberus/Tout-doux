@@ -48,7 +48,6 @@
           <div v-else>
             You don't have any archived project
           </div>
-
         </template>
       </EmptyListDisplay>
     </template>

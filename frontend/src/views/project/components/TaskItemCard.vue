@@ -1,7 +1,7 @@
 <template>
-  <v-container>
-    <v-card @click.stop="taskDialog = true"
-            class="mb-4" :color="backgroundColor">
+  <div class="mb-2">
+    <v-card @click.stop="onCardClick" :disabled="disabled"
+            :color="task.completed ? 'success' : null">
       <v-card-text>
         <v-row align-content="center">
           <v-col cols="11" class="d-flex align-center">
@@ -11,9 +11,18 @@
           </v-col>
 
           <v-col cols="1">
-            <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
-                        @click.native.prevent.stop.capture="emitToggleStateEvent"
-                        class="mt-0"></v-checkbox>
+            <template v-if="!task.completed">
+              <v-checkbox v-if="!disabled" color="success" hide-details :input-value="task.completed"
+                          @click.native.prevent.stop.capture="emitToggleStateEvent"
+                          class="mt-0">
+              </v-checkbox>
+            </template>
+            <template v-else>
+              <v-btn @click="emitToggleStateEvent"
+                     icon small title="Uncomplete task ?">
+                <v-icon small>mdi-check</v-icon>
+              </v-btn>
+            </template>
           </v-col>
         </v-row>
       </v-card-text>
@@ -22,14 +31,15 @@
     <v-dialog v-model="taskDialog" width="60%">
       <TaskDialog :task="task" :is-dialog-open="taskDialog"
                   @submit="emitUpdateEvent" @delete="emitDeleteEvent"
-                  @close="taskDialog = false"></TaskDialog>
+                  @close="taskDialog = false">
+      </TaskDialog>
     </v-dialog>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import TaskDialog from "@/views/project/components/TaskDialog.vue";
 
 @Component({
@@ -38,25 +48,29 @@ import TaskDialog from "@/views/project/components/TaskDialog.vue";
   }
 })
 export default class TaskItemCard extends Vue {
-  @Prop() private task!: TaskDisplayModel;
-  @Prop() private disabled!: boolean;
+  @Prop() private task!: TaskModel;
+  @Prop({ default: false }) private disabled!: boolean;
 
   private taskDialog = false;
 
   get backgroundColor(): string | null {
     if (this.task.completed) {
-      return 'taskCompleted';
-    } else if (!this.task.id) {
-      return 'taskInCreation';
+      return 'success';
     }
     return null;
+  }
+
+  private onCardClick(): void {
+    if (this.task.completed || this.disabled) return
+
+    this.taskDialog = true
   }
 
   private emitToggleStateEvent(): void {
     this.$emit('toggleState', this.task.id, !this.task.completed);
   }
 
-  private emitUpdateEvent(data: Partial<TaskDisplayModel>): void {
+  private emitUpdateEvent(data: Partial<TaskModel>): void {
     this.taskDialog = false;
     this.$emit('update', this.task.id, data);
   }

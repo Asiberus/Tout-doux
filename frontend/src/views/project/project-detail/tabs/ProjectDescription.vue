@@ -11,22 +11,14 @@
       </v-col>
       <v-col cols="3">
         <div class="d-flex justify-center mt-3">
-          <v-progress-circular :value="percentageOfTaskCompleted" :color="colorOfProgressTaskCompleted"
-                               :rotate="-90" :size="200" :width="20">
-            <div>
-              <span style="font-size: 2.5em;">{{ tasksCompleted.length }}</span>
-              /
-              <span style="font-size: 1em; transform: translateY(0.3em); display: inline-block">
-                {{ totalTask }}
-              </span>
-            </div>
-          </v-progress-circular>
+          <ProgressCircular :value="projectAllTasksCompleted.length" :max="projectAllTasks.length">
+          </ProgressCircular>
         </div>
       </v-col>
     </v-row>
 
-    <div class="d-flex align-center mt-12">
-      <h3 class="flex-grow-1 mb-3">General Tasks</h3>
+    <div class="d-flex align-center mt-12 mb-5">
+      <h3 class="flex-grow-1">General Tasks</h3>
       <div>
         <v-dialog v-model="taskDialog" width="60%">
           <template #activator="{ on, attrs }">
@@ -40,34 +32,53 @@
                       @close="taskDialog = false">
           </TaskDialog>
         </v-dialog>
-
       </div>
     </div>
 
-    <v-row no-gutters>
-      <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
-        <TaskItemCard :task="task"
-                      @toggleState="toggleTaskState"
-                      @update="updateTask"
-                      @delete="deleteTask">
-        </TaskItemCard>
-      </v-col>
-    </v-row>
+    <template v-if="taskUncompleted.length > 0">
+      <v-row no-gutters>
+        <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
+          <TaskItemCard :task="task" :disabled="project.archived"
+                        @toggleState="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
+          </TaskItemCard>
+        </v-col>
+      </v-row>
+    </template>
+    <template v-else-if="project.tasks.length > 0 && project.tasks.length === taskCompleted.length">
+      <EmptyListDisplay message="You completed all general tasks of this project !">
+        <template #img>
+          <img src="../../../../assets/all_task_completed.svg" width="300" alt="All tasks completed">
+        </template>
+      </EmptyListDisplay>
+    </template>
+    <template v-else>
+      <EmptyListDisplay message="This project has no general task yet">
+        <template #img>
+          <img src="../../../../assets/no_tasks.svg" width="300" alt="No tasks">
+        </template>
+      </EmptyListDisplay>
+    </template>
   </v-container>
 </template>
 
 <script lang="ts">
+import ProgressCircular from '@/components/ProgressCircular.vue';
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import {taskService} from "@/api/task.api";
 import TaskDialog from "@/views/project/components/TaskDialog.vue";
+import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
 @Component({
   components: {
     TaskItemCard,
     TaskDialog,
+    ProgressCircular,
+    EmptyListDisplay,
   }
 })
 export default class ProjectDescription extends Vue {
@@ -75,32 +86,26 @@ export default class ProjectDescription extends Vue {
 
   taskDialog = false;
 
-  get taskUncompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !task.completed)
+  get taskUncompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => !task.completed);
   }
 
-  get tasksCompleted(): TaskDisplayModel[] {
-    return this.project.tasks.filter((task: TaskDisplayModel) => task.completed);
+  get taskCompleted(): TaskModel[] {
+    return this.project.tasks.filter((task: TaskModel) => task.completed);
   }
 
-  get totalTask(): number {
-    return this.project.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
+  get projectAllTasks(): TaskModel[] {
+    return this.project.tasks.concat(...this.project.sections.map(section => section.tasks));
   }
 
-  get percentageOfTaskCompleted(): number {
-    return (this.tasksCompleted.length / this.totalTask) * 100;
-  }
-
-  get colorOfProgressTaskCompleted(): string {
-    const colorArray = ['green lighten-4', 'green lighten-3', 'green lighten-2', 'green lighten-1', 'green'];
-    const index = Math.trunc(this.percentageOfTaskCompleted * colorArray.length / 100) - 1;
-    return colorArray[index];
+  get projectAllTasksCompleted(): TaskModel[] {
+    return this.projectAllTasks.filter(task => task.completed);
   }
 
   private toggleTaskState(taskId: number, completed: boolean): void {
     taskService.updateTaskById(taskId, {completed}).then(
-        (response: any) => {
-          const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === response.body.id);
+        response => {
+          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id);
           if (task) {
             task.completed = response.body.completed;
           }
@@ -108,8 +113,9 @@ export default class ProjectDescription extends Vue {
     )
   }
 
-  private createTask(taskForm: Partial<TaskDisplayModel>): void {
+  private createTask(taskForm: Partial<TaskModel>): void {
     this.taskDialog = false;
+    taskForm.projectId = this.project.id;
     taskService.createTask(taskForm).then(
         response => {
           this.project.tasks.unshift(response.body);
@@ -119,11 +125,11 @@ export default class ProjectDescription extends Vue {
     )
   }
 
-  private updateTask(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, taskForm).then(
-        (response: any) => {
-          const task = this.project.tasks.find((task: TaskDisplayModel) => task.id === response.body.id)
-          Object.assign(task, response.body)
+        response => {
+          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id)
+          Object.assign(task, response.body);
         }
     )
   }
@@ -131,11 +137,11 @@ export default class ProjectDescription extends Vue {
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
         () => {
-          const taskIndex = this.project.tasks.findIndex((task: TaskDisplayModel) => task.id === taskId);
+          const taskIndex = this.project.tasks.findIndex((task: TaskModel) => task.id === taskId);
           if (taskIndex !== -1) {
             this.project.tasks.splice(taskIndex, 1);
           }
-        }, (error: any) => {
+        }, error => {
           console.error(error);
         }
     )

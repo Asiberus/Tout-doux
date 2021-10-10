@@ -24,13 +24,15 @@ class SectionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Map projectId to project
-        project_id = data.pop('projectId')
-        project = get_or_raise_error(Project, id=project_id,
-                                     error=serializers.ValidationError('This project doesn\'t exist'))
-        if project.archived:
-            raise serializers.ValidationError('This project is archived')
+        if 'projectId' in data:
+            project_id = data.pop('projectId')
+            project = get_or_raise_error(Project, id=project_id,
+                                         error=serializers.ValidationError('This project doesn\'t exist'))
+            if project.archived:
+                raise serializers.ValidationError('This project is archived')
 
-        data['project'] = project
+            data['project'] = project
+
         return data
 
 

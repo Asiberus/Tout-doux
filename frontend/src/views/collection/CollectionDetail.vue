@@ -118,7 +118,7 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {collectionService} from "@/api/collection.api";
-import {TaskDisplayModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import TaskItemCard from "@/views/project/components/TaskItemCard.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
@@ -147,16 +147,16 @@ export default class CollectionDetail extends Vue {
   private editTasksDisplay = false;
 
 
-  get tasksUncompleted(): TaskDisplayModel[] {
-    return this.collection.tasks.filter((task: TaskDisplayModel) => !task.completed);
+  get tasksUncompleted(): TaskModel[] {
+    return this.collection.tasks.filter((task: TaskModel) => !task.completed);
   }
 
-  get tasksCompleted(): TaskDisplayModel[] {
-    return this.collection.tasks.filter((task: TaskDisplayModel) => task.completed);
+  get tasksCompleted(): TaskModel[] {
+    return this.collection.tasks.filter((task: TaskModel) => task.completed);
   }
 
   get totalTask(): number {
-    return this.collection.tasks.filter((task: TaskDisplayModel) => !!task.id).length;
+    return this.collection.tasks.filter((task: TaskModel) => !!task.id).length;
   }
 
   get percentageOfTaskCompleted(): number {
@@ -176,7 +176,7 @@ export default class CollectionDetail extends Vue {
   @Watch('createTaskDisplayed')
   private onCreateTaskDisplayedChanges(value: boolean): void {
     if (value) {
-      this.collection.tasks.unshift({editMode: true} as TaskDisplayModel);
+      this.collection.tasks.unshift({editMode: true} as TaskModel);
     } else {
       // Delete first task if it has no id
       if (!this.collection.tasks[0].id) {
@@ -193,12 +193,12 @@ export default class CollectionDetail extends Vue {
   }
 
   private disableAllCreatedTasksEditMode(): void {
-    this.collection.tasks.filter((task: TaskDisplayModel) => task.id && task.editMode).forEach((task: TaskDisplayModel) => {
+    this.collection.tasks.filter((task: TaskModel) => task.id && task.editMode).forEach((task: TaskModel) => {
       task.editMode = false;
     });
   }
 
-  private toggleTaskEditMode(task: TaskDisplayModel, value: boolean): void {
+  private toggleTaskEditMode(task: TaskModel, value: boolean): void {
     // handle close create task card
     if (!task.id && !value) {
       this.createTaskDisplayed = false;
@@ -214,7 +214,7 @@ export default class CollectionDetail extends Vue {
     collectionService.getCollectionById(this.collectionId).then(
         (response: any) => {
           this.collection = response.body;
-          this.collection.tasks.forEach((task: TaskDisplayModel) => {
+          this.collection.tasks.forEach((task: TaskModel) => {
             // Set all task to editMode false with the Vue reactivity $set function
             this.$set(task, 'editMode', false);
           });
@@ -248,7 +248,7 @@ export default class CollectionDetail extends Vue {
     )
   }
 
-  private handleTaskFormSubmit(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private handleTaskFormSubmit(taskId: number, taskForm: Partial<TaskModel>): void {
     if (taskId) {
       this.updateTask(taskId, taskForm);
     } else {
@@ -257,12 +257,12 @@ export default class CollectionDetail extends Vue {
   }
 
   private toggleTaskState(taskId: number): void {
-    const task = this.collection.tasks.find((task: TaskDisplayModel) => task.id === taskId);
+    const task = this.collection.tasks.find((task: TaskModel) => task.id === taskId);
     if (!task) {
       return;
     }
 
-    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskDisplayModel).then(
+    taskService.updateTaskById(taskId, {completed: !task.completed} as TaskModel).then(
         (response: any) => {
           task.completed = response.body.completed
         }, (error: any) => {
@@ -271,7 +271,7 @@ export default class CollectionDetail extends Vue {
     )
   }
 
-  private createTask(taskForm: Partial<TaskDisplayModel>): void {
+  private createTask(taskForm: Partial<TaskModel>): void {
     taskForm.collectionId = this.collection.id;
     taskService.createTask(taskForm).then(
         (response: any) => {
@@ -283,10 +283,10 @@ export default class CollectionDetail extends Vue {
     )
   }
 
-  private updateTask(taskId: number, taskForm: Partial<TaskDisplayModel>): void {
+  private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
     taskService.updateTaskById(taskId, taskForm).then(
         (response: any) => {
-          const task = this.collection.tasks.find((t: TaskDisplayModel) => t.id === response.body.id);
+          const task = this.collection.tasks.find((t: TaskModel) => t.id === response.body.id);
           Object.assign(task, response.body, {editMode: false});
         }, (error: any) => {
           console.error(error);
@@ -297,7 +297,7 @@ export default class CollectionDetail extends Vue {
   private deleteTask(taskId: number): void {
     taskService.deleteTaskById(taskId).then(
         () => {
-          const taskIndex = this.collection.tasks.findIndex((task: TaskDisplayModel) => task.id === taskId);
+          const taskIndex = this.collection.tasks.findIndex((task: TaskModel) => task.id === taskId);
           if (taskIndex !== -1) {
             this.collection.tasks.splice(taskIndex, 1);
           }

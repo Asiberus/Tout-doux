@@ -116,7 +116,7 @@ import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
   }
 })
 export default class DailyTaskUpdateList extends Vue {
-  @Prop() private dailyTaskList: DailyTaskDisplayModel[];
+  @Prop() private dailyTaskList!: DailyTaskDisplayModel[];
   private dailyTaskActionEnum = DailyTaskActionEnum;
   private createDailyTaskDisplayed = false;
   private dailyTaskForm = {

@@ -73,7 +73,7 @@
 <script lang="ts">
 import {Component, Prop, Vue} from "vue-property-decorator";
 import {DailyTaskDisplayModel} from "@/models/daily-task.model";
-import {TaskDisplayModel, TaskModel} from "@/models/task.model";
+import {TaskModel} from "@/models/task.model";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 import {DailyTaskCollectionDisplayModel} from "@/models/collection.model";
 
@@ -86,8 +86,8 @@ export default class DailyTaskUpdateCollectionList extends Vue {
   @Prop() private collectionList: DailyTaskCollectionDisplayModel[];
   @Prop() private dailyTaskList: DailyTaskDisplayModel[];
 
-  get taskUncompleted(): (collection: DailyTaskCollectionDisplayModel) => TaskDisplayModel[] {
-    return (collection: DailyTaskCollectionDisplayModel) => collection.tasks.filter((task: TaskDisplayModel) => !task.completed);
+  get taskUncompleted(): (collection: DailyTaskCollectionDisplayModel) => TaskModel[] {
+    return (collection: DailyTaskCollectionDisplayModel) => collection.tasks.filter((task: TaskModel) => !task.completed);
   }
 
   // todo : change color of task selected
@@ -96,7 +96,7 @@ export default class DailyTaskUpdateCollectionList extends Vue {
   }
 
   get numberOfTasksCompleted(): (collection: DailyTaskCollectionDisplayModel) => number {
-    return (collection: DailyTaskCollectionDisplayModel) => collection.tasks.filter((task: TaskDisplayModel) => task.completed).length;
+    return (collection: DailyTaskCollectionDisplayModel) => collection.tasks.filter((task: TaskModel) => task.completed).length;
   }
 
   get percentageOfTaskCompleted(): (collection: DailyTaskCollectionDisplayModel) => number {
@@ -107,7 +107,7 @@ export default class DailyTaskUpdateCollectionList extends Vue {
     collection.selected = true;
   }
 
-  private selectTask(task: TaskDisplayModel): void {
+  private selectTask(task: TaskModel): void {
     this.$emit('selectTask', {taskId: task.id});
   }
 }
