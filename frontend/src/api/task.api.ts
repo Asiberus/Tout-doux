@@ -4,7 +4,7 @@ import {TaskModel} from "@/models/task.model";
 
 const createTask = (task: Partial<TaskModel>) => {
     return Vue.http.post(environment.task, task);
-}
+};
 
 const updateTaskById = (taskId: number, task: Partial<TaskModel>) => {
     return Vue.http.patch(environment.taskById.replace(':taskId', taskId.toString()), task);

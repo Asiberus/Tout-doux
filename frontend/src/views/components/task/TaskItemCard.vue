@@ -60,22 +60,22 @@ export default class TaskItemCard extends Vue {
     return null;
   }
 
-  private onCardClick(): void {
-    if (this.task.completed || this.disabled) return
+  onCardClick(): void {
+    if (this.task.completed || this.disabled) return;
 
     this.taskDialog = true
   }
 
-  private emitToggleStateEvent(): void {
+  emitToggleStateEvent(): void {
     this.$emit('toggleState', this.task.id, !this.task.completed);
   }
 
-  private emitUpdateEvent(data: Partial<TaskModel>): void {
+  emitUpdateEvent(data: Partial<TaskModel>): void {
     this.taskDialog = false;
     this.$emit('update', this.task.id, data);
   }
 
-  private emitDeleteEvent(): void {
+  emitDeleteEvent(): void {
     this.taskDialog = false;
     this.$emit('delete', this.task.id);
   }

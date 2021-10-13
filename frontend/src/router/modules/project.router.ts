@@ -1,7 +1,12 @@
+import ProjectCompletedTasks from '@/views/project/project-detail/tabs/ProjectCompletedTasks.vue';
+import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectConfiguration.vue';
+import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue';
+import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue';
 import ProjectList from "@/views/project/project-list/ProjectList.vue";
 import ProjectDetail from "@/views/project/project-detail/ProjectDetail.vue";
+import {RouteConfig} from 'vue-router';
 
-export const projectRoutes = [
+export const projectRoutes: Array<RouteConfig> = [
     {
         path: '/project',
         name: 'project-list',
@@ -16,6 +21,33 @@ export const projectRoutes = [
         component: ProjectDetail,
         props: (route: any) => ({
             projectId: parseInt(route.params.id)
-        })
+        }),
+        children: [
+            // {
+            //     path: '',
+            //     redirect: { name: 'project-detail-description' },
+            // },
+            {
+                path: 'description',
+                name: 'project-detail-description',
+                component: ProjectDescription,
+                alias: ''
+            },
+            {
+                path: 'section',
+                name: 'project-detail-section',
+                component: ProjectSection,
+            },
+            {
+                path: 'completed-tasks',
+                name: 'project-detail-completed-tasks',
+                component: ProjectCompletedTasks,
+            },
+            {
+                path: 'configuration',
+                name: 'project-detail-configuration',
+                component: ProjectConfiguration,
+            }
+        ]
     }
-]
+];

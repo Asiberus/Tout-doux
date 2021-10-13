@@ -1,7 +1,8 @@
 import CollectionList from "@/views/collection/collection-list/CollectionList.vue";
 import CollectionDetail from "@/views/collection/collection-detail/CollectionDetail.vue";
+import {RouteConfig} from 'vue-router';
 
-export const collectionRoutes = [
+export const collectionRoutes: Array<RouteConfig> = [
     {
         path: '/collection',
         name: 'collection-list',
@@ -15,4 +16,4 @@ export const collectionRoutes = [
             collectionId: parseInt(route.params.id)
         })
     }
-]
+];

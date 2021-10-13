@@ -83,14 +83,14 @@ export default class TaskDialog extends Vue {
     this.taskForm.data.name = name;
   }
 
-  private emitSubmitEvent(): void {
+  emitSubmitEvent(): void {
     if (!this.taskForm.valid) {
       return;
     }
     this.$emit('submit', this.taskForm.data);
   }
 
-  private emitDeleteTask(): void {
+  emitDeleteTask(): void {
     if (!this.confirmDelete) {
       this.confirmDelete = true;
       return;
@@ -99,7 +99,7 @@ export default class TaskDialog extends Vue {
     this.$emit('delete');
   }
 
-  private emitCloseEvent(): void {
+  emitCloseEvent(): void {
     this.$emit('close');
   }
 }

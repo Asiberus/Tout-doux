@@ -28,7 +28,7 @@ import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 
 @Component
 export default class SectionDialog extends Vue {
-  @Prop() private isDialogOpen!: boolean;
+  @Prop() isDialogOpen!: boolean;
 
   private sectionForm = {
     valid: false,
@@ -45,20 +45,20 @@ export default class SectionDialog extends Vue {
   }
 
   @Watch('isDialogOpen')
-  private onIsDialogOpenChanges(value: boolean): void {
+  onIsDialogOpenChanges(value: boolean): void {
     if (value) {
       this.form.resetValidation();
       this.sectionForm.data.name = '';
     }
   }
 
-  private emitSubmitEvent(): void {
+  emitSubmitEvent(): void {
     if (!this.sectionForm.valid) return;
 
     this.$emit('submit', this.sectionForm.data);
   }
 
-  private emitCloseEvent(): void {
+  emitCloseEvent(): void {
     this.$emit('close')
   }
 }

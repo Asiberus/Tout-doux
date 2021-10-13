@@ -101,17 +101,17 @@
 </template>
 
 <script lang="ts">
-import {taskService} from '@/api/task.api';
-import ProgressCircular from '@/components/ProgressCircular.vue';
-import {TaskModel} from '@/models/task.model';
-import TaskDialog from '@/views/components/task/TaskDialog.vue';
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
-import {Component, Prop, Vue} from "vue-property-decorator";
-import {SectionModel} from "@/models/section.model";
-import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
+  import ConfirmDialog from '@/components/ConfirmDialog.vue';
+  import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
+  import ProgressCircular from '@/components/ProgressCircular.vue';
+  import {SectionModel} from '@/models/section.model';
+  import {TaskModel} from '@/models/task.model';
+  import {projectActions} from '@/store/modules/project.store';
+  import TaskDialog from '@/views/components/task/TaskDialog.vue';
+  import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
+  import {Component, Prop, Vue} from 'vue-property-decorator';
 
-@Component({
+  @Component({
   components: {
     TaskItemCard,
     TaskDialog,
@@ -150,67 +150,40 @@ export default class ProjectSectionItem extends Vue {
     return this.section.tasks.filter((task: TaskModel) => !task.completed)
   }
 
-  private closeEditMode(): void {
+  closeEditMode(): void {
     this.sectionForm.data.name = this.section.name;
     this.form.resetValidation();
     this.editMode = false;
   }
 
-  private emitUpdateEvent(): void {
+  emitUpdateEvent(): void {
     if (!this.sectionForm.valid) return;
 
     this.editMode = false;
     this.$emit('update', this.section.id, this.sectionForm.data.name);
   }
 
-  private emitDeleteEvent(): void {
+  emitDeleteEvent(): void {
     this.deleteSectionDialog = false;
     this.$emit('delete', this.section.id);
   }
 
-  private createTask(data: Partial<TaskModel>): void {
+  createTask(task: Partial<TaskModel>): void {
     this.taskDialog = false;
-    data.sectionId = this.section.id;
-    taskService.createTask(data).then(
-        response => {
-          this.section.tasks.unshift(response.body);
-        }, error => {
-          console.error(error);
-        }
-    )
+    task.sectionId = this.section.id;
+    this.$store.dispatch(projectActions.task.addTask, task);
   }
 
-  private toggleTaskState(taskId: number, completed: boolean): void {
-    taskService.updateTaskById(taskId, {completed}).then(
-        response => {
-          const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id);
-          if (task) {
-            task.completed = response.body.completed;
-          }
-        }
-    )
+  toggleTaskState(id: number, completed: boolean): void {
+    this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } });
   }
 
-  private updateTask(taskId: number, data: Partial<TaskModel>): void {
-    taskService.updateTaskById(taskId, data).then(
-        response => {
-          const task = this.section.tasks.find((task: TaskModel) => task.id === response.body.id)
-          Object.assign(task, response.body)
-        }
-    )
+  updateTask(id: number, taskForm: Partial<TaskModel>): void {
+    this.$store.dispatch(projectActions.task.editTask, { id, taskForm });
   }
 
-  private deleteTask(taskId: number): void {
-    taskService.deleteTaskById(taskId).then(
-        () => {
-          const taskIndex = this.section.tasks.findIndex((task: TaskModel) => task.id === taskId);
-          if (taskIndex !== -1) {
-            this.section.tasks.splice(taskIndex, 1);
-          }
-        }, error => {
-          console.error(error);
-        }
-    )
+  deleteTask(id: number): void {
+    this.$store.dispatch(projectActions.task.deleteTask, { id, sectionId: this.section.id });
   }
 }
 </script>

@@ -5,7 +5,7 @@ import {collectionRoutes} from "@/router/modules/collection.router";
 import {dailyTaskRoutes} from "@/router/modules/daily-task.router";
 
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
     {

@@ -69,12 +69,12 @@
 
 <script lang="ts">
 import ProgressCircular from '@/components/ProgressCircular.vue';
+import {projectActions} from '@/store/modules/project.store';
 import moment from 'moment';
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import {ProjectModel} from "@/models/project.model";
 import {TaskModel} from "@/models/task.model";
 import TaskItemCard from "@/views/components/task/TaskItemCard.vue";
-import {taskService} from "@/api/task.api";
 import TaskDialog from "@/views/components/task/TaskDialog.vue";
 import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
 
@@ -87,9 +87,11 @@ import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
   }
 })
 export default class ProjectDescription extends Vue {
-  @Prop() project!: ProjectModel;
-
   taskDialog = false;
+
+  get project(): ProjectModel {
+    return this.$store.state.project.currentProject;
+  }
 
   get createdDate(): string {
     return moment(this.project.created_at).format('D MMM. Y');
@@ -111,49 +113,22 @@ export default class ProjectDescription extends Vue {
     return this.projectAllTasks.filter(task => task.completed);
   }
 
-  private toggleTaskState(taskId: number, completed: boolean): void {
-    taskService.updateTaskById(taskId, {completed}).then(
-        response => {
-          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id);
-          if (task) {
-            task.completed = response.body.completed;
-          }
-        }
-    )
-  }
-
-  private createTask(taskForm: Partial<TaskModel>): void {
+  createTask(task: Partial<TaskModel>): void {
     this.taskDialog = false;
-    taskForm.projectId = this.project.id;
-    taskService.createTask(taskForm).then(
-        response => {
-          this.project.tasks.unshift(response.body);
-        }, error => {
-          console.error(error);
-        }
-    )
+    task.projectId = this.project.id;
+    this.$store.dispatch(projectActions.task.addTask, task);
   }
 
-  private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
-    taskService.updateTaskById(taskId, taskForm).then(
-        response => {
-          const task = this.project.tasks.find((task: TaskModel) => task.id === response.body.id)
-          Object.assign(task, response.body);
-        }
-    )
+  toggleTaskState(id: number, completed: boolean): void {
+    this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed }});
   }
 
-  private deleteTask(taskId: number): void {
-    taskService.deleteTaskById(taskId).then(
-        () => {
-          const taskIndex = this.project.tasks.findIndex((task: TaskModel) => task.id === taskId);
-          if (taskIndex !== -1) {
-            this.project.tasks.splice(taskIndex, 1);
-          }
-        }, error => {
-          console.error(error);
-        }
-    )
+  updateTask(id: number, taskForm: Partial<TaskModel>): void {
+    this.$store.dispatch(projectActions.task.editTask, { id, taskForm });
+  }
+
+  deleteTask(id: number): void {
+    this.$store.dispatch(projectActions.task.deleteTask, { id });
   }
 }
 </script>

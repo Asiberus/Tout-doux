@@ -3,27 +3,28 @@
     <div class="d-flex justify-end mb-5">
       <v-dialog v-model="sectionDialog" width="60%">
         <template #activator="{ on, attrs }">
-          <v-btn v-if="project.sections.length > 0"
+          <v-btn v-if="sections.length > 0"
+                 :disabled="project.archived"
                  v-bind="attrs" v-on="on"
-                 :disabled="project.archived">
+                 >
             <v-icon>mdi-plus</v-icon>
             section
           </v-btn>
         </template>
         <SectionDialog :is-dialog-open="sectionDialog"
                        @submit="createSection"
-                       @close="sectionDialog = false"
-        >
+                       @close="sectionDialog = false">
         </SectionDialog>
       </v-dialog>
     </div>
 
-    <template v-if="project.sections.length > 0">
-      <div v-for="(section, index) in project.sections" :key="section.id">
-        <ProjectSectionItem :section="section" :disabled="project.archived"
-                            @update="updateSection" @delete="deleteSection">
+    <template v-if="sections.length > 0">
+      <div v-for="(section, index) in sections" :key="section.id">
+        <ProjectSectionItem :section="section"
+                            @update="updateSection"
+                            @delete="deleteSection">
         </ProjectSectionItem>
-        <v-divider v-if="index !== project.sections.length - 1" class="my-3"/>
+        <v-divider v-if="index !== sections.length - 1" class="my-3"/>
       </div>
     </template>
     <template v-else>
@@ -46,15 +47,15 @@
 </template>
 
 <script lang="ts">
-import {sectionService} from '@/api/section.api';
-import {SectionPost} from '@/models/section.model';
-import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue';
-import {Component, Prop, Vue} from "vue-property-decorator";
-import {ProjectModel} from "@/models/project.model";
-import ProjectSectionItem from "@/views/project/project-detail/components/ProjectSectionItem.vue";
-import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
+  import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
+  import {ProjectModel} from '@/models/project.model';
+  import {SectionModel} from '@/models/section.model';
+  import {projectActions} from '@/store/modules/project.store';
+  import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue';
+  import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue';
+  import {Component, Vue} from 'vue-property-decorator';
 
-@Component({
+  @Component({
   components: {
     ProjectSectionItem,
     SectionDialog,
@@ -62,48 +63,30 @@ import EmptyListDisplay from "@/components/EmptyListDisplay.vue";
   }
 })
 export default class ProjectSection extends Vue {
-  @Prop() project!: ProjectModel;
-
   sectionDialog = false;
 
-  private createSection(data: { name: string }): void {
+  get project(): ProjectModel {
+    return this.$store.state.project.currentProject;
+  }
+
+  get sections(): SectionModel[] {
+    return this.project.sections;
+  }
+
+  createSection(data: { name: string }): void {
     this.sectionDialog = false;
-    const section: SectionPost = {
+    this.$store.dispatch(projectActions.section.addSection, {
       name: data.name,
       projectId: this.project.id
-    };
-    sectionService.createSection(section).then(
-        response => {
-          this.project.sections.unshift(response.body)
-        }, error => {
-          console.error(error)
-        }
-    )
+    });
   }
 
-  private updateSection(id: number, name: string): void {
-    sectionService.updateSection(id, { name }).then(
-        response => {
-          const section = this.project.sections.find(s => s.id === id);
-          if (section) {
-            section.name = response.body.name;
-          }
-        }, error => {
-          console.error(error)
-        })
+  updateSection(id: number, name: string): void {
+    this.$store.dispatch(projectActions.section.editSection, { id, name });
   }
 
-  private deleteSection(id: number): void {
-    sectionService.deleteSection(id).then(
-        response => {
-          const index = this.project.sections.findIndex(s => s.id === id);
-          if (index !== -1) {
-            this.project.sections.splice(index, 1);
-          }
-        }, error => {
-          console.error(error)
-        }
-    )
+  deleteSection(id: number): void {
+    this.$store.dispatch(projectActions.section.deleteSection, id);
   }
 
 }

@@ -88,25 +88,23 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-import {ProjectModel} from "@/models/project.model";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import {projectService} from "@/api/project.api";
+  import {projectService} from '@/api/project.api';
+  import ConfirmDialog from '@/components/ConfirmDialog.vue';
+  import {ProjectModel} from '@/models/project.model';
+  import {projectActions} from '@/store/modules/project.store';
+  import {Component, Vue} from 'vue-property-decorator';
 
-@Component({
+  @Component({
   components: {
     ConfirmDialog
   }
 })
 export default class ProjectConfiguration extends Vue {
-  @Prop() project!: ProjectModel;
-  @Prop() tab!: string;
+  configurationTab = 'general';
+  archiveProjectDialog = false;
+  deleteProjectDialog = false;
 
-  private configurationTab = 'general';
-  private archiveProjectDialog = false;
-  private deleteProjectDialog = false;
-
-  private projectForm = {
+  projectForm = {
     valid: false,
     data: {
       name: this.project.name,
@@ -116,59 +114,35 @@ export default class ProjectConfiguration extends Vue {
       name: [(value: string) => !!value || 'Project name is required', (value: string) => value.length <= 50 || 'Max 50 characters'],
       description: [(value: string) => !!value || 'Project description is required', (value: string) => value.length <= 500 || 'Max 500 characters'],
     }
-  }
+  };
+
+    get project(): ProjectModel {
+      return this.$store.state.project.currentProject;
+    }
 
   get isFormUntouched(): boolean {
     return this.projectForm.data.name === this.project.name && this.projectForm.data.description === this.project.description;
   }
 
-  get form(): Vue & { resetValidation: () => void } {
-    return this.$refs.form as Vue & { resetValidation: () => void };
-  }
-
-  @Watch('tab')
-  private onTabChanges(value: string): void {
-    if (value === 'configuration') {
-      this.form.resetValidation();
-      this.projectForm.data.name = this.project.name;
-      this.projectForm.data.description = this.project.description;
-    }
-  }
-
-  private toggleProjectArchiveState(): void {
+  toggleProjectArchiveState(): void {
     this.archiveProjectDialog = false;
-    projectService.updateProject(this.project.id, {archived: !this.project.archived}).then(
-        response => {
-          this.project.archived = response.body.archived
-        },
-        error => {
-          console.error(error)
-        }
-    );
+    this.$store.dispatch(projectActions.updateProperties, { id: this.project.id, data: { archived: !this.project.archived }});
   }
 
-  private updateProject(): void {
-    projectService.updateProject(this.project.id, this.projectForm.data).then(
-        response => {
-          this.project.name = response.body.name;
-          this.project.description = response.body.description;
-        }, error => {
-          console.error(error);
-        }
-    )
+  updateProject(): void {
+    this.$store.dispatch(projectActions.updateProperties, { id: this.project.id, data: this.projectForm.data });
   }
 
-  private deleteProject(): void {
+  deleteProject(): void {
     this.deleteProjectDialog = false;
     projectService.deleteProject(this.project.id).then(
         () => {
           this.$router.push({name: 'project-list'});
-        }, error => {
+        }, (error: any) => {
           console.error(error);
         }
     );
   }
-
 }
 </script>
 

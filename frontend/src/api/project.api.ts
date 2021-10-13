@@ -10,6 +10,11 @@ const getProjectById = (projectId: number) => {
     return Vue.http.get(environment.projectById.replace(':projectId', projectId.toString()));
 };
 
+const getProjectSections = (projectId: number) => {
+    const url = environment.projectSections.replace(':projectId', projectId.toString());
+    return Vue.http.get(url);
+};
+
 const createProject = (project: Partial<ProjectModel>) => {
     return Vue.http.post(environment.project, project);
 };
@@ -20,11 +25,12 @@ const updateProject = (projectId: number, project: Partial<ProjectModel>) => {
 
 const deleteProject = (projectId: number) => {
     return Vue.http.delete(environment.projectById.replace(':projectId', projectId.toString()));
-}
+};
 
 export const projectService = {
     getProjectList,
     getProjectById,
+    getProjectSections,
     createProject,
     updateProject,
     deleteProject
