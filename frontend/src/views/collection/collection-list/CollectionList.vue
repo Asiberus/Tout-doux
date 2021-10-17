@@ -57,8 +57,8 @@ import {CollectionModel} from "@/models/collection.model";
   }
 })
 export default class CollectionList extends Vue {
-  private collectionList: CollectionModel[] = [];
-  private collectionDialog = false;
+  collectionList: CollectionModel[] = [];
+  collectionDialog = false;
 
   created(): void {
     this.retrieveCollectionList();
@@ -74,7 +74,7 @@ export default class CollectionList extends Vue {
     )
   }
 
-  private createCollection(collectionForm: Partial<CollectionModel>): void {
+  createCollection(collectionForm: Partial<CollectionModel>): void {
     this.collectionDialog = false;
     collectionService.createCollection(collectionForm).then(
         (response: any) => {

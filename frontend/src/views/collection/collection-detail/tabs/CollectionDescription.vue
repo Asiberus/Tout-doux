@@ -62,82 +62,61 @@
 </template>
 
 <script lang="ts">
-  import {taskService} from '@/api/task.api';
-  import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
-  import ProgressCircular from '@/components/ProgressCircular.vue';
-  import {CollectionModel} from '@/models/collection.model';
-  import {TaskModel} from '@/models/task.model';
-  import TaskDialog from '@/views/components/task/TaskDialog.vue';
-  import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
-  import moment from 'moment';
-  import {Component, Prop, Vue} from 'vue-property-decorator';
+    import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
+    import ProgressCircular from '@/components/ProgressCircular.vue';
+    import {CollectionModel} from '@/models/collection.model';
+    import {TaskModel} from '@/models/task.model';
+    import {collectionActions} from '@/store/modules/collection.store';
+    import TaskDialog from '@/views/components/task/TaskDialog.vue';
+    import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
+    import moment from 'moment';
+    import {Component, Vue} from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      TaskDialog,
-      TaskItemCard,
-      EmptyListDisplay,
-      ProgressCircular,
-    }
-  })
-  export default class CollectionDescription extends Vue {
-    @Prop() private collection!: CollectionModel;
+    @Component({
+        components: {
+            TaskDialog,
+            TaskItemCard,
+            EmptyListDisplay,
+            ProgressCircular,
+        }
+    })
+    export default class CollectionDescription extends Vue {
+        taskDialog = false;
 
-    private taskDialog = false;
+        get collection(): CollectionModel {
+            return this.$store.state.collection.currentCollection;
+        }
 
-    get createdDate(): string {
-      return moment(this.collection.created_at).format('D MMM. Y');
-    }
+        get createdDate(): string {
+            return moment(this.collection.created_at).format('D MMM. Y');
+        }
 
-    get tasksUncompleted(): TaskModel[] {
-      return this.collection.tasks.filter((task: TaskModel) => !task.completed);
-    }
+        get tasksUncompleted(): TaskModel[] {
+            return this.collection.tasks.filter((task: TaskModel) => !task.completed);
+        }
 
-    get tasksCompleted(): TaskModel[] {
-      return this.collection.tasks.filter((task: TaskModel) => task.completed);
-    }
+        get tasksCompleted(): TaskModel[] {
+            return this.collection.tasks.filter((task: TaskModel) => task.completed);
+        }
 
-    private toggleTaskState(taskId: number, completed: boolean): void {
-      taskService.updateTaskById(taskId, {completed}).then(
-          response => {
-            const task = this.collection.tasks.find((task: TaskModel) => task.id === response.body.id);
-            if (task) task.completed = response.body.completed;
-          }
-      )
-    }
-
-    private createTask(taskForm: Partial<TaskModel>): void {
-      taskForm.collectionId = this.collection.id;
-      taskService.createTask(taskForm).then(
-          (response: any) => {
-            this.collection.tasks.unshift(response.body);
+        createTask(task: Partial<TaskModel>): void {
             this.taskDialog = false;
-          }, (error: any) => {
-            console.error(error);
-          }
-      );
-    }
+            task.collectionId = this.collection.id;
+            this.$store.dispatch(collectionActions.task.addTask, task);
+        }
 
-    private updateTask(taskId: number, taskForm: Partial<TaskModel>): void {
-      taskService.updateTaskById(taskId, taskForm).then(
-          response => {
-            const task = this.collection.tasks.find((task: TaskModel) => task.id === response.body.id);
-            if (task) Object.assign(task, response.body);
-          }
-      )
-    }
+        toggleTaskState(id: number, completed: boolean): void {
+            this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } });
+        }
 
-    private deleteTask(taskId: number): void {
-      taskService.deleteTaskById(taskId).then(
-          () => {
-            const taskIndex = this.collection.tasks.findIndex((task: TaskModel) => task.id === taskId);
-            if (taskIndex !== -1) this.collection.tasks.splice(taskIndex, 1);
-          }, error => {
-            console.error(error);
-          }
-      )
+        updateTask(id: number, taskForm: Partial<TaskModel>): void {
+            this.$store.dispatch(collectionActions.task.editTask, { id, taskForm });
+        }
+
+        deleteTask(id: number): void {
+            this.$store.dispatch(collectionActions.task.deleteTask, id);
+        }
     }
-  }
 </script>
 
 <style scoped lang="scss">

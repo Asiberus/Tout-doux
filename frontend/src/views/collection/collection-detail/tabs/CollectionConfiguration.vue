@@ -22,7 +22,7 @@
             </v-dialog>
         </div>
 
-        <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="updateCollection" class="px-3">
+        <v-form v-model="collectionForm.valid" @submit.prevent="updateCollection" class="px-3">
             <v-row>
                 <v-col>
                     <v-text-field v-model="collectionForm.data.name" label="Name" counter="50" maxlength="50" required
@@ -32,7 +32,8 @@
             </v-row>
             <v-row>
                 <v-col>
-                    <v-textarea v-model="collectionForm.data.description" label="Description" counter="500" maxlength="500"
+                    <v-textarea v-model="collectionForm.data.description" label="Description" counter="500"
+                                maxlength="500"
                                 required :rules="collectionForm.rules.description" rows="1" auto-grow>
                     </v-textarea>
                 </v-col>
@@ -48,72 +49,54 @@
 </template>
 
 <script lang="ts">
-  import {collectionService} from '@/api/collection.api';
-  import ConfirmDialog from '@/components/ConfirmDialog.vue';
-  import {CollectionModel} from '@/models/collection.model';
-  import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {collectionService} from '@/api/collection.api';
+    import ConfirmDialog from '@/components/ConfirmDialog.vue';
+    import {CollectionModel} from '@/models/collection.model';
+    import {collectionActions} from '@/store/modules/collection.store';
+    import {Component, Vue} from 'vue-property-decorator';
 
-  @Component({
-    components: {
-      ConfirmDialog,
+    @Component({
+        components: {
+            ConfirmDialog,
+        }
+    })
+    export default class CollectionConfiguration extends Vue {
+        deleteCollectionDialog = false;
+        collectionForm = {
+            valid: false,
+            data: {
+                name: this.collection.name,
+                description: this.collection.description,
+            },
+            rules: {
+                name: [(value: string) => !!value || 'Collection name is required', (value: string) => value.length <= 50 || 'Max 50 characters'],
+                description: [(value: string) => !!value || 'Collection description is required', (value: string) => value.length <= 500 || 'Max 500 characters'],
+            }
+        };
+
+        get collection(): CollectionModel {
+            return this.$store.state.collection.currentCollection;
+        }
+
+        get isFormUntouched(): boolean {
+            return this.collectionForm.data.name === this.collection.name && this.collectionForm.data.description === this.collection.description;
+        }
+
+        updateCollection(): void {
+            this.$store.dispatch(collectionActions.updateProperties, { id: this.collection.id, data: this.collectionForm.data });
+        }
+
+        deleteCollection(): void {
+            this.deleteCollectionDialog = false;
+            collectionService.deleteCollection(this.collection.id).then(
+                () => {
+                    this.$router.push({name: 'collection-list'});
+                }, (error: any) => {
+                    console.error(error);
+                }
+            )
+        }
     }
-  })
-  export default class CollectionConfiguration extends Vue {
-    @Prop() collection!: CollectionModel;
-    @Prop() tab!: string;
-
-    private deleteCollectionDialog = false;
-
-    private collectionForm = {
-      valid: false,
-      data: {
-        name: this.collection.name,
-        description: this.collection.description,
-      },
-      rules: {
-        name: [(value: string) => !!value || 'Collection name is required', (value: string) => value.length <= 50 || 'Max 50 characters'],
-        description: [(value: string) => !!value || 'Collection description is required', (value: string) => value.length <= 500 || 'Max 500 characters'],
-      }
-    };
-
-    get form(): Vue & { resetValidation: () => void } {
-      return this.$refs.form as Vue & { resetValidation: () => void };
-    }
-
-    get isFormUntouched(): boolean {
-      return this.collectionForm.data.name === this.collection.name && this.collectionForm.data.description === this.collection.description;
-    }
-
-    @Watch('tab')
-    private onTabChanges(value: string): void {
-      if (value === 'configuration') {
-        this.form.resetValidation();
-        this.collectionForm.data.name = this.collection.name;
-        this.collectionForm.data.description = this.collection.description;
-      }
-    }
-
-    updateCollection(): void {
-      collectionService.updateCollection(this.collection.id, this.collectionForm.data).then(
-          response => {
-            this.collection.name = response.body.name;
-            this.collection.description = response.body.description;
-          }, error => {
-            console.error(error);
-          }
-      )
-    }
-
-    deleteCollection(): void {
-      collectionService.deleteCollection(this.collection.id).then(
-          response => {
-            this.$router.push({name: 'collection-list'});
-          }, error => {
-            console.error(error);
-          }
-      )
-    }
-  }
 </script>
 
 <style scoped lang="scss">

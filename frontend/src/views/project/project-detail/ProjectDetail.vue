@@ -28,22 +28,11 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from "vue-property-decorator";
-import {ProjectModel} from "@/models/project.model";
-import ProjectDescription from "@/views/project/project-detail/tabs/ProjectDescription.vue";
-import ProjectSection from "@/views/project/project-detail/tabs/ProjectSection.vue";
-import ProjectConfiguration from "@/views/project/project-detail/tabs/ProjectConfiguration.vue";
-import ProjectCompletedTasks from "@/views/project/project-detail/tabs/ProjectCompletedTasks.vue";
-import {projectActions} from '@/store/modules/project.store';
+  import {ProjectModel} from '@/models/project.model';
+  import {projectActions} from '@/store/modules/project.store';
+  import {Component, Prop, Vue} from 'vue-property-decorator';
 
-@Component({
-  components: {
-    ProjectCompletedTasks,
-    ProjectConfiguration,
-    ProjectSection,
-    ProjectDescription,
-  }
-})
+  @Component
 export default class ProjectDetail extends Vue {
   @Prop() private projectId!: number;
 

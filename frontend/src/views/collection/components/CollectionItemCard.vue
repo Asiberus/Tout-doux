@@ -1,5 +1,5 @@
 <template>
-  <v-card rounded :to="{name: 'collection-detail', params: {id: collection.id}}">
+  <v-card rounded :to="{ name: 'collection-detail', params: {id: collection.id} }">
     <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2"
                        height="6">
     </v-progress-linear>
@@ -38,7 +38,7 @@ export default class CollectionItemCard extends Vue {
     return (this.tasksCompleted / this.collection.tasks.length) * 100;
   }
 
-  private ellipsisFilter(value: string, numberOfCharacter: number): string {
+  ellipsisFilter(value: string, numberOfCharacter: number): string {
     return ellipsisFilter(value, numberOfCharacter);
   }
 }

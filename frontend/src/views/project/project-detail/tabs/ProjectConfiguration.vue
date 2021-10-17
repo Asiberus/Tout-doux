@@ -61,7 +61,7 @@
             </div>
             <v-row>
               <v-col cols="10">
-                <v-form ref="form" v-model="projectForm.valid" @submit.prevent="updateProject">
+                <v-form v-model="projectForm.valid" @submit.prevent="updateProject">
                   <v-text-field v-model="projectForm.data.name" label="Name" counter="50" maxlength="50" required
                                 :rules="projectForm.rules.name" :disabled="project.archived">
                   </v-text-field>

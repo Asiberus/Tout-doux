@@ -9,36 +9,36 @@ import {projectService} from "@/api/project.api";
 
 export const projectMutations = {
     setCurrentProject: 'SET_CURRENT_PROJECT',
-    updateProperties: 'UPDATE_PROPERTIES',
+    updateProperties: 'UPDATE_PROJECT_PROPERTIES',
     section: {
-        addSection: 'ADD_SECTION',
-        editSection: 'EDIT_SECTION',
-        deleteSection: 'DELETE_SECTION',
+        addSection: 'PROJECT_ADD_SECTION',
+        editSection: 'PROJECT_EDIT_SECTION',
+        deleteSection: 'PROJECT_DELETE_SECTION',
     },
     task: {
-        addTask: 'ADD_TASK',
-        editTask: 'EDIT_TASK',
-        deleteTask: 'DELETE_TASK',
+        addTask: 'PROJECT_ADD_TASK',
+        editTask: 'PROJECT_EDIT_TASK',
+        deleteTask: 'PROJECT_DELETE_TASK',
     }
 };
 
 export const projectActions = {
     retrieveProject: 'retrieveProject',
-    updateProperties: 'updateProperties',
+    updateProperties: 'updateProjectProperties',
     section: {
-        addSection: 'addSection',
-        editSection: 'editSection',
-        deleteSection: 'deleteSection',
+        addSection: 'projectAddSection',
+        editSection: 'projectEditSection',
+        deleteSection: 'projectDeleteSection',
     },
     task: {
-        addTask: 'addTask',
-        editTask: 'editTask',
-        deleteTask: 'deleteTask',
+        addTask: 'projectAddTask',
+        editTask: 'projectEditTask',
+        deleteTask: 'projectDeleteTask',
     }
 };
 
 @Module
-export default class ProjectModule extends VuexModule {
+export class ProjectModule extends VuexModule {
     // State
     currentProject?: ProjectModel;
 
