@@ -11,32 +11,42 @@
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
                             </template>
-                            <TaskDialog :is-dialog-open="taskDialog"
-                                        @submit="createTask"
-                                        @close="taskDialog = false">
+                            <TaskDialog
+                                :is-dialog-open="taskDialog"
+                                @submit="createTask"
+                                @close="taskDialog = false">
                             </TaskDialog>
                         </v-dialog>
                     </div>
                 </div>
 
                 <template v-if="tasksUncompleted.length > 0">
-                    <TaskItemCard v-for="task in tasksUncompleted" :key="task.id" :task="task"
-                                  @toggleState="toggleTaskState"
-                                  @update="updateTask"
-                                  @delete="deleteTask">
+                    <TaskItemCard
+                        v-for="task in tasksUncompleted"
+                        :key="task.id"
+                        :task="task"
+                        @toggleState="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
                     </TaskItemCard>
                 </template>
-                <template v-else-if="collection.tasks.length > 0 && collection.tasks.length === tasksCompleted.length">
+                <template
+                    v-else-if="
+                        collection.tasks.length > 0 &&
+                        collection.tasks.length === tasksCompleted.length
+                    ">
                     <EmptyListDisplay message="You completed all the tasks for this collection!">
                         <template #img>
-                            <img src="../../../../assets/all_task_completed.svg" alt="All tasks completed">
+                            <img
+                                src="../../../../assets/all_task_completed.svg"
+                                alt="All tasks completed" />
                         </template>
                     </EmptyListDisplay>
                 </template>
                 <template v-else>
                     <EmptyListDisplay message="No task are related to this collection">
                         <template #img>
-                            <img src="../../../../assets/no_tasks.svg" alt="No tasks">
+                            <img src="../../../../assets/no_tasks.svg" alt="No tasks" />
                         </template>
                     </EmptyListDisplay>
                 </template>
@@ -62,63 +72,61 @@
 </template>
 
 <script lang="ts">
-    import EmptyListDisplay from '@/components/EmptyListDisplay.vue';
-    import ProgressCircular from '@/components/ProgressCircular.vue';
-    import {CollectionModel} from '@/models/collection.model';
-    import {TaskModel} from '@/models/task.model';
-    import {collectionActions} from '@/store/modules/collection.store';
-    import TaskDialog from '@/views/components/task/TaskDialog.vue';
-    import TaskItemCard from '@/views/components/task/TaskItemCard.vue';
-    import moment from 'moment';
-    import {Component, Vue} from 'vue-property-decorator';
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import ProgressCircular from '@/components/ProgressCircular.vue'
+import { CollectionModel } from '@/models/collection.model'
+import { TaskModel } from '@/models/task.model'
+import { collectionActions } from '@/store/modules/collection.store'
+import TaskDialog from '@/views/components/task/TaskDialog.vue'
+import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import moment from 'moment'
+import { Component, Vue } from 'vue-property-decorator'
 
-    @Component({
-        components: {
-            TaskDialog,
-            TaskItemCard,
-            EmptyListDisplay,
-            ProgressCircular,
-        }
-    })
-    export default class CollectionDescription extends Vue {
-        taskDialog = false;
+@Component({
+    components: {
+        TaskDialog,
+        TaskItemCard,
+        EmptyListDisplay,
+        ProgressCircular,
+    },
+})
+export default class CollectionDescription extends Vue {
+    taskDialog = false
 
-        get collection(): CollectionModel {
-            return this.$store.state.collection.currentCollection;
-        }
-
-        get createdDate(): string {
-            return moment(this.collection.created_at).format('D MMM. Y');
-        }
-
-        get tasksUncompleted(): TaskModel[] {
-            return this.collection.tasks.filter((task: TaskModel) => !task.completed);
-        }
-
-        get tasksCompleted(): TaskModel[] {
-            return this.collection.tasks.filter((task: TaskModel) => task.completed);
-        }
-
-        createTask(task: Partial<TaskModel>): void {
-            this.taskDialog = false;
-            task.collectionId = this.collection.id;
-            this.$store.dispatch(collectionActions.task.addTask, task);
-        }
-
-        toggleTaskState(id: number, completed: boolean): void {
-            this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } });
-        }
-
-        updateTask(id: number, taskForm: Partial<TaskModel>): void {
-            this.$store.dispatch(collectionActions.task.editTask, { id, taskForm });
-        }
-
-        deleteTask(id: number): void {
-            this.$store.dispatch(collectionActions.task.deleteTask, id);
-        }
+    get collection(): CollectionModel {
+        return this.$store.state.collection.currentCollection
     }
+
+    get createdDate(): string {
+        return moment(this.collection.created_at).format('D MMM. Y')
+    }
+
+    get tasksUncompleted(): TaskModel[] {
+        return this.collection.tasks.filter((task: TaskModel) => !task.completed)
+    }
+
+    get tasksCompleted(): TaskModel[] {
+        return this.collection.tasks.filter((task: TaskModel) => task.completed)
+    }
+
+    createTask(task: Partial<TaskModel>): void {
+        this.taskDialog = false
+        task.collectionId = this.collection.id
+        this.$store.dispatch(collectionActions.task.addTask, task)
+    }
+
+    toggleTaskState(id: number, completed: boolean): void {
+        this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } })
+    }
+
+    updateTask(id: number, taskForm: Partial<TaskModel>): void {
+        this.$store.dispatch(collectionActions.task.editTask, { id, taskForm })
+    }
+
+    deleteTask(id: number): void {
+        this.$store.dispatch(collectionActions.task.deleteTask, id)
+    }
+}
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

@@ -1,10 +1,10 @@
-import ProjectCompletedTasks from '@/views/project/project-detail/tabs/ProjectCompletedTasks.vue';
-import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectConfiguration.vue';
-import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue';
-import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue';
-import ProjectList from "@/views/project/project-list/ProjectList.vue";
-import ProjectDetail from "@/views/project/project-detail/ProjectDetail.vue";
-import {RouteConfig} from 'vue-router';
+import ProjectCompletedTasks from '@/views/project/project-detail/tabs/ProjectCompletedTasks.vue'
+import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectConfiguration.vue'
+import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue'
+import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
+import ProjectList from '@/views/project/project-list/ProjectList.vue'
+import ProjectDetail from '@/views/project/project-detail/ProjectDetail.vue'
+import { RouteConfig } from 'vue-router'
 
 export const projectRoutes: Array<RouteConfig> = [
     {
@@ -12,26 +12,21 @@ export const projectRoutes: Array<RouteConfig> = [
         name: 'project-list',
         component: ProjectList,
         props: (route: any) => ({
-            archived: route.query.archived === 'true'
-        })
+            archived: route.query.archived === 'true',
+        }),
     },
     {
         path: '/project/:id',
         name: 'project-detail',
         component: ProjectDetail,
         props: (route: any) => ({
-            projectId: parseInt(route.params.id)
+            projectId: parseInt(route.params.id),
         }),
         children: [
-            // {
-            //     path: '',
-            //     redirect: { name: 'project-detail-description' },
-            // },
             {
-                path: 'description',
+                path: '',
                 name: 'project-detail-description',
                 component: ProjectDescription,
-                alias: ''
             },
             {
                 path: 'section',
@@ -47,7 +42,7 @@ export const projectRoutes: Array<RouteConfig> = [
                 path: 'configuration',
                 name: 'project-detail-configuration',
                 component: ProjectConfiguration,
-            }
-        ]
-    }
-];
+            },
+        ],
+    },
+]

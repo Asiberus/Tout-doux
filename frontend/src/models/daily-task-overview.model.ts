@@ -1,5 +1,5 @@
 export default interface DailyTaskOverviewModel {
-    date: string;
-    totalTask: number;
-    totalTaskCompleted: number;
+    date: string
+    totalTask: number
+    totalTaskCompleted: number
 }

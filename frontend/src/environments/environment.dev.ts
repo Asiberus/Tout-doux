@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:8000/api/';
+export const BASE_URL = 'http://localhost:8000/api/'
 
 export const environment = {
     project: 'project/',
@@ -10,7 +10,7 @@ export const environment = {
     taskById: 'task/:taskId/',
     collection: 'collection/',
     collectionById: 'collection/:collectionId/',
-    dailyTask : 'daily-task/',
+    dailyTask: 'daily-task/',
     dailyTaskOverview: 'daily-task/overview/',
-    dailyTaskById: 'daily-task/:dailyTaskId/'
-};
+    dailyTaskById: 'daily-task/:dailyTaskId/',
+}

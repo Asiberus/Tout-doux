@@ -1,16 +1,12 @@
 <template>
-  <div></div>
+    <div></div>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class TheHeader extends Vue {
-
-}
+export default class TheHeader extends Vue {}
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

@@ -1,23 +1,22 @@
-import Vue from 'vue';
-import VueRouter, {RouteConfig} from 'vue-router';
-import {projectRoutes} from "@/router/modules/project.router";
-import {collectionRoutes} from "@/router/modules/collection.router";
-import {dailyTaskRoutes} from "@/router/modules/daily-task.router";
+import Vue from 'vue'
+import VueRouter, { RouteConfig } from 'vue-router'
+import { projectRoutes } from '@/router/modules/project.router'
+import { collectionRoutes } from '@/router/modules/collection.router'
+import { dailyTaskRoutes } from '@/router/modules/daily-task.router'
 
-
-Vue.use(VueRouter);
+Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
     {
         path: '/',
         name: 'Home',
     },
-];
+]
 
 const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
-    routes: [...routes, ...projectRoutes, ...collectionRoutes, ...dailyTaskRoutes]
-});
+    routes: [...routes, ...projectRoutes, ...collectionRoutes, ...dailyTaskRoutes],
+})
 
-export default router;
+export default router

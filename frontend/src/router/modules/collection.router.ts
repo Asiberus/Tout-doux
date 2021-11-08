@@ -1,29 +1,28 @@
-import CollectionCompletedTasks from '@/views/collection/collection-detail/tabs/CollectionCompletedTasks.vue';
-import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue';
-import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue';
-import CollectionList from "@/views/collection/collection-list/CollectionList.vue";
-import CollectionDetail from "@/views/collection/collection-detail/CollectionDetail.vue";
-import {RouteConfig} from 'vue-router';
+import CollectionCompletedTasks from '@/views/collection/collection-detail/tabs/CollectionCompletedTasks.vue'
+import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue'
+import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue'
+import CollectionList from '@/views/collection/collection-list/CollectionList.vue'
+import CollectionDetail from '@/views/collection/collection-detail/CollectionDetail.vue'
+import { RouteConfig } from 'vue-router'
 
 export const collectionRoutes: Array<RouteConfig> = [
     {
         path: '/collection',
         name: 'collection-list',
-        component: CollectionList
+        component: CollectionList,
     },
     {
         path: '/collection/:id',
         name: 'collection-detail',
         component: CollectionDetail,
         props: (route: any) => ({
-            collectionId: parseInt(route.params.id)
+            collectionId: parseInt(route.params.id),
         }),
         children: [
             {
-                path: 'description',
+                path: '',
                 name: 'collection-detail-description',
                 component: CollectionDescription,
-                alias: '',
             },
             {
                 path: 'completed-tasks',
@@ -35,7 +34,6 @@ export const collectionRoutes: Array<RouteConfig> = [
                 name: 'collection-detail-configuration',
                 component: CollectionConfiguration,
             },
-
-        ]
-    }
-];
+        ],
+    },
+]

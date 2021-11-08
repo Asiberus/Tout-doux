@@ -1,12 +1,12 @@
-import {TaskModel} from "@/models/task.model";
+import { TaskModel } from '@/models/task.model'
 
 export interface SectionModel {
-    id: number;
-    name: string;
-    tasks: TaskModel[];
+    id: number
+    name: string
+    tasks: TaskModel[]
 }
 
 export interface SectionPost {
-    name: string;
-    projectId: number;
+    name: string
+    projectId: number
 }
