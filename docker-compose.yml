@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - td_node_modules:/frontend/node_modules
+      - ./frontend:/frontend
+  server:
+    container_name: server
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - db
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      POSTGRES_DB: tout_doux
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # DEV
+      - ../db:/var/lib/postgresql/data
+volumes:
+  td_node_modules:
+    name: td_node_modules

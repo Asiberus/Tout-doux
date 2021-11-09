@@ -25,7 +25,7 @@ SECRET_KEY = 'dh8pjli&8*-co)plp+ug-^)mp5jor7k76$m3%7zx72i3hq*ank'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -89,12 +89,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 DATABASES = {
   'default': {
-    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'ENGINE': 'django.db.backends.postgresql',
+    'HOST': 'db',
+#   'HOST': '127.0.0.1',
     'NAME': 'tout_doux',
     'USER': 'postgres',
     'PASSWORD': 'postgres',
-    # 'HOST': 'db',
-    'HOST': '127.0.0.1',
     'PORT': '5432'
   }
 }
