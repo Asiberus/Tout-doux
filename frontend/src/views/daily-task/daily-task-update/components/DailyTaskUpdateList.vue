@@ -102,7 +102,7 @@
                                     v-model="dailyTaskForm.valid"
                                     @submit.prevent="handleDailyTaskFormSubmit(dailyTask.id)">
                                     <v-row align-content="center">
-                                        <v-col cols="8">
+                                        <v-col>
                                             <v-text-field
                                                 v-model="dailyTaskForm.data.name"
                                                 :rules="dailyTaskForm.rules.name"
@@ -117,17 +117,18 @@
                                     <v-card-actions class="d-flex justify-end">
                                         <v-btn
                                             color="success"
+                                            text
                                             small
                                             :disabled="!dailyTaskForm.valid"
                                             @click="handleDailyTaskFormSubmit(dailyTask.id)">
-                                            <v-icon>mdi-check</v-icon>
+                                            {{ dailyTask.id ? 'update' : 'create' }}
                                         </v-btn>
                                         <v-btn
-                                            color="error"
+                                            plain
                                             small
-                                            class="ml-1"
+                                            class="ml-2"
                                             @click="toggleDailyTaskEditMode(dailyTask, false)">
-                                            <v-icon>mdi-close</v-icon>
+                                            cancel
                                         </v-btn>
                                     </v-card-actions>
                                 </v-form>

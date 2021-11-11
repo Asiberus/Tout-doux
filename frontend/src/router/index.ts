@@ -10,6 +10,7 @@ const routes: Array<RouteConfig> = [
     {
         path: '/',
         name: 'Home',
+        redirect: { name: 'project-list' },
     },
 ]
 

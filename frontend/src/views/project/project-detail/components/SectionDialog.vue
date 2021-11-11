@@ -19,14 +19,12 @@
                 <v-card-actions class="d-flex justify-end mt-3">
                     <v-btn
                         color="success"
-                        small
+                        text
                         :disabled="!sectionForm.valid"
                         @click="emitSubmitEvent">
-                        <v-icon>mdi-check</v-icon>
+                        create
                     </v-btn>
-                    <v-btn color="error" small class="ml-1" @click="emitCloseEvent">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
+                    <v-btn plain class="ml-2" @click="emitCloseEvent"> cancel </v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>
