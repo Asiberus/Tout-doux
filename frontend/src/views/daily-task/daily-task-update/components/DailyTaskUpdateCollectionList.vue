@@ -126,8 +126,8 @@ import { DailyTaskCollectionDisplayModel } from '@/models/collection.model'
     },
 })
 export default class DailyTaskUpdateCollectionList extends Vue {
-    @Prop() private collectionList: DailyTaskCollectionDisplayModel[]
-    @Prop() private dailyTaskList: DailyTaskDisplayModel[]
+    @Prop() collectionList: DailyTaskCollectionDisplayModel[] = []
+    @Prop() dailyTaskList: DailyTaskDisplayModel[] = []
 
     get taskUncompleted(): (collection: DailyTaskCollectionDisplayModel) => TaskModel[] {
         return (collection: DailyTaskCollectionDisplayModel) =>
@@ -152,11 +152,11 @@ export default class DailyTaskUpdateCollectionList extends Vue {
             (this.numberOfTasksCompleted(collection) / collection.tasks.length) * 100
     }
 
-    private selectCollection(collection: DailyTaskCollectionDisplayModel): void {
+    selectCollection(collection: DailyTaskCollectionDisplayModel): void {
         collection.selected = true
     }
 
-    private selectTask(task: TaskModel): void {
+    selectTask(task: TaskModel): void {
         this.$emit('selectTask', { taskId: task.id })
     }
 }

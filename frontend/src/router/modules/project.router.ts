@@ -17,7 +17,6 @@ export const projectRoutes: Array<RouteConfig> = [
     },
     {
         path: '/project/:id',
-        name: 'project-detail',
         component: ProjectDetail,
         props: (route: any) => ({
             projectId: parseInt(route.params.id),
@@ -25,7 +24,7 @@ export const projectRoutes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                name: 'project-detail-description',
+                name: 'project-detail',
                 component: ProjectDescription,
             },
             {

@@ -5,9 +5,9 @@
         <v-divider class="my-3" />
 
         <v-tabs v-model="collectionTab" background-color="transparent" color="accent">
-            <v-tab :to="{ name: 'collection-detail-description' }">Description</v-tab>
-            <v-tab :to="{ name: 'collection-detail-completed-tasks' }">Completed Task</v-tab>
-            <v-tab :to="{ name: 'collection-detail-configuration' }">Configuration</v-tab>
+            <v-tab :to="{ name: 'collection-detail' }" exact>Description</v-tab>
+            <v-tab :to="{ name: 'collection-detail-completed-tasks' }" exact>Completed Task</v-tab>
+            <v-tab :to="{ name: 'collection-detail-configuration' }" exact>Configuration</v-tab>
         </v-tabs>
 
         <router-view />

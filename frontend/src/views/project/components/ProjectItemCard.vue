@@ -1,7 +1,7 @@
 <template>
     <v-card
         rounded
-        :to="{ name: 'project-detail-description', params: { id: project.id } }"
+        :to="{ name: 'project-detail', params: { id: project.id } }"
         :color="project.archived ? 'projectArchived' : null">
         <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
         </v-progress-linear>

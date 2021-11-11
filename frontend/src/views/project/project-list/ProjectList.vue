@@ -74,7 +74,7 @@ import { ProjectModel } from '@/models/project.model'
     },
 })
 export default class ProjectList extends Vue {
-    @Prop() archived!: boolean
+    @Prop() archived: boolean = false
 
     projectList: ProjectModel[] = []
     projectDialog = false
@@ -88,7 +88,7 @@ export default class ProjectList extends Vue {
         this.retrieveProjectList({ archived: value })
     }
 
-    private retrieveProjectList(params = {}): void {
+    retrieveProjectList(params = {}): void {
         projectService.getProjectList(params).then(
             (response: any) => {
                 this.projectList = response.body.content
@@ -99,7 +99,7 @@ export default class ProjectList extends Vue {
         )
     }
 
-    private createProject(projectForm: Partial<ProjectModel>): void {
+    createProject(projectForm: Partial<ProjectModel>): void {
         this.projectDialog = false
         projectService.createProject(projectForm).then(
             (response: any) => {
@@ -111,8 +111,8 @@ export default class ProjectList extends Vue {
         )
     }
 
-    private toggleArchivedProject(): void {
-        this.$router.replace({ query: { archived: !this.archived } })
+    toggleArchivedProject(): void {
+        this.$router.replace({ query: { archived: (!this.archived).toString() } })
     }
 }
 </script>

@@ -159,10 +159,9 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
     },
 })
 export default class DailyTaskUpdateList extends Vue {
-    @Prop() private dailyTaskList!: DailyTaskDisplayModel[]
-    private dailyTaskActionEnum = DailyTaskActionEnum
-    private createDailyTaskDisplayed = false
-    private dailyTaskForm = {
+    @Prop() dailyTaskList: DailyTaskDisplayModel[] = []
+    createDailyTaskDisplayed = false
+    dailyTaskForm = {
         valid: false,
         data: {
             name: '',
@@ -174,6 +173,8 @@ export default class DailyTaskUpdateList extends Vue {
             ],
         },
     }
+
+    private dailyTaskActionEnum = DailyTaskActionEnum
 
     get dailyTaskActionItems(): { text: string | null; value: DailyTaskActionEnum | null }[] {
         return [
@@ -221,7 +222,7 @@ export default class DailyTaskUpdateList extends Vue {
         }
     }
 
-    private getActionChipColor(action: DailyTaskActionEnum): string {
+    getActionChipColor(action: DailyTaskActionEnum): string {
         switch (action) {
             case DailyTaskActionEnum.THINK:
                 return 'teal'
@@ -232,7 +233,7 @@ export default class DailyTaskUpdateList extends Vue {
         }
     }
 
-    private toggleDailyTaskEditMode(dailyTask: DailyTaskDisplayModel, value: boolean): void {
+    toggleDailyTaskEditMode(dailyTask: DailyTaskDisplayModel, value: boolean): void {
         if (!dailyTask.id) {
             if (value) {
                 this.dailyTaskForm.data.name = ''
@@ -242,14 +243,14 @@ export default class DailyTaskUpdateList extends Vue {
         } else {
             if (value) {
                 this.dailyTaskList.forEach((d: DailyTaskDisplayModel) => (d.editMode = false))
-                this.dailyTaskForm.data.name = dailyTask.name
+                this.dailyTaskForm.data.name = dailyTask.name ?? ''
             }
         }
 
         dailyTask.editMode = value
     }
 
-    private handleDailyTaskFormSubmit(dailyTaskId: number): void {
+    handleDailyTaskFormSubmit(dailyTaskId: number): void {
         if (dailyTaskId) {
             this.$emit('updateDailyTask', dailyTaskId, this.dailyTaskForm.data)
         } else {
@@ -258,11 +259,11 @@ export default class DailyTaskUpdateList extends Vue {
         }
     }
 
-    private updateDailyTaskAction(dailyTaskId: number, action: DailyTaskActionEnum | null): void {
+    updateDailyTaskAction(dailyTaskId: number, action: DailyTaskActionEnum | null): void {
         this.$emit('updateDailyTask', dailyTaskId, { action })
     }
 
-    private deleteDailyTask(dailyTaskId: number): void {
+    deleteDailyTask(dailyTaskId: number): void {
         this.$emit('deleteDailyTask', dailyTaskId)
     }
 }

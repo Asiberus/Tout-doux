@@ -1,5 +1,5 @@
 <template>
-    <v-card rounded :to="{ name: 'collection-detail-description', params: { id: collection.id } }">
+    <v-card rounded :to="{ name: 'collection-detail', params: { id: collection.id } }">
         <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">

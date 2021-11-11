@@ -13,7 +13,6 @@ export const collectionRoutes: Array<RouteConfig> = [
     },
     {
         path: '/collection/:id',
-        name: 'collection-detail',
         component: CollectionDetail,
         props: (route: any) => ({
             collectionId: parseInt(route.params.id),
@@ -21,7 +20,7 @@ export const collectionRoutes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                name: 'collection-detail-description',
+                name: 'collection-detail',
                 component: CollectionDescription,
             },
             {

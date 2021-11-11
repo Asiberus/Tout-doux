@@ -58,7 +58,7 @@ import moment from 'moment'
 
 @Component
 export default class DailyTaskDetail extends Vue {
-    @Prop() private date: string
+    @Prop() private date: string = ''
     private dailyTaskList: DailyTaskModel[] = []
 
     get dateFormatted(): string {
