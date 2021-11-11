@@ -7,11 +7,11 @@
                     <v-col>
                         <v-text-field
                             v-model="projectForm.data.name"
+                            :rules="projectForm.rules.name"
                             label="Name"
                             counter="50"
                             maxlength="50"
                             required
-                            :rules="projectForm.rules.name"
                             autofocus>
                         </v-text-field>
                     </v-col>
@@ -20,11 +20,12 @@
                     <v-col>
                         <v-textarea
                             v-model="projectForm.data.description"
+                            :rules="projectForm.rules.description"
+                            @keyup.enter.ctrl="emitSubmitEvent"
                             label="Description"
                             counter="500"
                             maxlength="500"
                             required
-                            :rules="projectForm.rules.description"
                             rows="1"
                             auto-grow>
                         </v-textarea>
@@ -48,7 +49,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
-// Todo : add handler of ctrl + enter to submit form in textearea
 @Component
 export default class ProjectFormDialog extends Vue {
     private projectForm = {

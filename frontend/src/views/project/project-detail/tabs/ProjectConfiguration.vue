@@ -78,24 +78,25 @@
                                 <v-form v-model="projectForm.valid" @submit.prevent="updateProject">
                                     <v-text-field
                                         v-model="projectForm.data.name"
+                                        :rules="projectForm.rules.name"
+                                        :disabled="project.archived"
                                         label="Name"
                                         counter="50"
                                         maxlength="50"
-                                        required
-                                        :rules="projectForm.rules.name"
-                                        :disabled="project.archived">
+                                        required>
                                     </v-text-field>
                                     <v-textarea
                                         v-model="projectForm.data.description"
+                                        :rules="projectForm.rules.description"
+                                        :disabled="project.archived"
+                                        @keyup.enter.ctrl="updateProject"
                                         label="Description"
                                         counter="500"
                                         maxlength="500"
                                         required
-                                        :rules="projectForm.rules.description"
                                         rows="2"
                                         auto-grow
-                                        class="my-5"
-                                        :disabled="project.archived">
+                                        class="my-5">
                                     </v-textarea>
                                     <div v-if="!project.archived" class="float-right mt-5">
                                         <v-btn

@@ -7,11 +7,11 @@
                     <v-col>
                         <v-text-field
                             v-model="collectionForm.data.name"
+                            :rules="collectionForm.rules.name"
                             label="Name"
                             counter="50"
                             maxlength="50"
                             required
-                            :rules="collectionForm.rules.name"
                             autofocus>
                         </v-text-field>
                     </v-col>
@@ -20,11 +20,12 @@
                     <v-col>
                         <v-textarea
                             v-model="collectionForm.data.description"
+                            :rules="collectionForm.rules.description"
+                            @keyup.enter.ctrl="emitSubmitEvent"
                             label="Description"
                             counter="500"
                             maxlength="500"
                             required
-                            :rules="collectionForm.rules.description"
                             rows="1"
                             auto-grow>
                         </v-textarea>
