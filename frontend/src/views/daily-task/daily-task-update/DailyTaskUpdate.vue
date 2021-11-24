@@ -6,19 +6,47 @@
 
         <v-row>
             <v-col cols="8">
-                <DailyTaskUpdateProjectList
-                    :projectList="projectList"
-                    :dailyTaskList="dailyTaskList"
-                    @selectTask="createDailyTask">
-                </DailyTaskUpdateProjectList>
-
-                <v-divider class="my-3"></v-divider>
-
-                <DailyTaskUpdateCollectionList
-                    :collectionList="collectionList"
-                    :dailyTaskList="dailyTaskList"
-                    @selectTask="createDailyTask">
-                </DailyTaskUpdateCollectionList>
+                <v-tabs v-model="updateTab" background-color="transparent" class="mb-3">
+                    <v-tab>Project</v-tab>
+                    <v-tab>Collection</v-tab>
+                </v-tabs>
+                <v-tabs-items v-model="updateTab" class="transparent">
+                    <v-tab-item :transition="false" class="tab-wrapper">
+                        <template v-if="projectList.length">
+                            <v-row align-content="start" no-gutters class="position-relative">
+                                <v-col
+                                    v-for="project in projectList"
+                                    :key="'project-' + project.content.id"
+                                    cols="4">
+                                    <DailyTaskUpdateProjectListItem
+                                        :project="project.content"
+                                        :daily-task-list="dailyTaskList"
+                                        :selected.sync="project.selected"
+                                        @select-task="createDailyTask"
+                                        @unselect="project.selected = false">
+                                    </DailyTaskUpdateProjectListItem>
+                                </v-col>
+                            </v-row>
+                        </template>
+                        <template v-else>
+                            <EmptyListDisplay message="No projects available">
+                                <template #img>
+                                    <img
+                                        src="../../../assets/project.svg"
+                                        alt="No Project"
+                                        height="250" />
+                                </template>
+                            </EmptyListDisplay>
+                        </template>
+                    </v-tab-item>
+                    <v-tab-item :transition="false" class="tab-wrapper">
+                        <!--                        <DailyTaskUpdateCollectionList-->
+                        <!--                                :collectionList="collectionList"-->
+                        <!--                                :dailyTaskList="dailyTaskList"-->
+                        <!--                                @selectTask="createDailyTask">-->
+                        <!--                        </DailyTaskUpdateCollectionList>-->
+                    </v-tab-item>
+                </v-tabs-items>
             </v-col>
             <v-col cols="4" class="daily-task-wrapper">
                 <DailyTaskUpdateList
@@ -33,31 +61,40 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import moment from 'moment'
-import { DailyTaskProjectDisplayModel } from '@/models/project.model'
-import { projectService } from '@/api/project.api'
 import { collectionService } from '@/api/collection.api'
-import { DailyTaskDisplayModel, DailyTaskModel } from '@/models/daily-task.model'
 import { dailyTaskService } from '@/api/daily-task.api'
-import DailyTaskUpdateProjectList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateProjectList.vue'
+import { projectService } from '@/api/project.api'
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { DailyTaskCollectionDisplayModel } from '@/models/collection.model'
+import {
+    DailyTaskDisplayModel,
+    DailyTaskDisplayWrapper,
+    DailyTaskModel,
+} from '@/models/daily-task.model'
+import { ProjectModel } from '@/models/project.model'
 import DailyTaskUpdateCollectionList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateCollectionList.vue'
 import DailyTaskUpdateList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateList.vue'
+import DailyTaskUpdateProjectListItem from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateProjectListItem.vue'
+import moment from 'moment'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
+// Todo : add btn to create project in no project svg
 @Component({
     components: {
-        DailyTaskUpdateProjectList,
+        DailyTaskUpdateProjectListItem,
         DailyTaskUpdateCollectionList,
         DailyTaskUpdateList,
+        EmptyListDisplay,
     },
 })
 export default class DailyTaskUpdate extends Vue {
     @Prop() private date!: string
 
-    private dailyTaskList: DailyTaskDisplayModel[] = []
-    private projectList: DailyTaskProjectDisplayModel[] = []
-    private collectionList: DailyTaskCollectionDisplayModel[] = []
+    dailyTaskList: DailyTaskDisplayModel[] = []
+    projectList: DailyTaskDisplayWrapper<ProjectModel>[] = []
+    collectionList: DailyTaskCollectionDisplayModel[] = []
+
+    updateTab = 'project'
 
     get dateFormatted(): string {
         return moment(this.date).format('dddd DD MMMM Y')
@@ -87,10 +124,10 @@ export default class DailyTaskUpdate extends Vue {
     private retrieveProjectList(): void {
         projectService.getProjectList({ archived: false }).then(
             (response: any) => {
-                this.projectList = response.body.content
-                this.projectList.forEach((project: DailyTaskProjectDisplayModel) => {
-                    this.$set(project, 'selected', false)
-                })
+                this.projectList = response.body.content.map((project: ProjectModel) => ({
+                    content: project,
+                    selected: false,
+                }))
             },
             (error: any) => {
                 console.error(error)
@@ -123,7 +160,7 @@ export default class DailyTaskUpdate extends Vue {
     //   )
     // }
 
-    private createDailyTask(dailyTask: Partial<DailyTaskModel>): void {
+    createDailyTask(dailyTask: Partial<DailyTaskModel>): void {
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
                 this.dailyTaskList.push(response.body)
@@ -134,7 +171,7 @@ export default class DailyTaskUpdate extends Vue {
         )
     }
 
-    private updateDailyTask(dailyTaskId: number, dailyTaskForm: Partial<DailyTaskModel>): void {
+    updateDailyTask(dailyTaskId: number, dailyTaskForm: Partial<DailyTaskModel>): void {
         dailyTaskService.updateDailyTask(dailyTaskId, dailyTaskForm).then(
             (response: any) => {
                 const dailyTask = this.dailyTaskList.find(
@@ -148,7 +185,7 @@ export default class DailyTaskUpdate extends Vue {
         )
     }
 
-    private deleteDailyTask(dailyTaskId: number): void {
+    deleteDailyTask(dailyTaskId: number): void {
         dailyTaskService.deleteDailyTask(dailyTaskId).then(
             () => {
                 const dailyTaskIndex = this.dailyTaskList.findIndex(
@@ -166,4 +203,13 @@ export default class DailyTaskUpdate extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.position-relative {
+    position: relative;
+    height: 100%;
+}
+
+.tab-wrapper {
+    height: 30rem;
+}
+</style>

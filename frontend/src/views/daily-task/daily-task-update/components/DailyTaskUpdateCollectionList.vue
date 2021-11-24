@@ -126,8 +126,8 @@ import { DailyTaskCollectionDisplayModel } from '@/models/collection.model'
     },
 })
 export default class DailyTaskUpdateCollectionList extends Vue {
-    @Prop() collectionList: DailyTaskCollectionDisplayModel[] = []
-    @Prop() dailyTaskList: DailyTaskDisplayModel[] = []
+    @Prop() collectionList!: DailyTaskCollectionDisplayModel[]
+    @Prop() dailyTaskList!: DailyTaskDisplayModel[]
 
     get taskUncompleted(): (collection: DailyTaskCollectionDisplayModel) => TaskModel[] {
         return (collection: DailyTaskCollectionDisplayModel) =>

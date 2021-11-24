@@ -27,4 +27,23 @@ export default Vue.extend({
 .cursor-pointer {
     cursor: pointer;
 }
+
+// TODO : fix scroll bar design
+//::-webkit-scrollbar {
+//  height: 0.4rem;
+//  width: 0.4rem;
+//}
+//
+//::-webkit-scrollbar-track {
+//  border-radius: 1rem;
+//}
+//
+//::-webkit-scrollbar-thumb {
+//  background: #d4d4d4;
+//  border-radius: 1.5rem;
+//}
+//
+//::-webkit-scrollbar-thumb:hover {
+//  background: #c4c4c4;
+//}
 </style>

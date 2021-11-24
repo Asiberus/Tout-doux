@@ -20,3 +20,9 @@ export interface DailyTaskModel {
 export interface DailyTaskDisplayModel extends DailyTaskModel {
     editMode: boolean
 }
+
+// Todo : Change Name
+export interface DailyTaskDisplayWrapper<T> {
+    content: T
+    selected: boolean
+}
