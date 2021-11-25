@@ -1,0 +1,182 @@
+<template>
+    <div class="card-wrapper" :class="{ selected: selected }" @click="selectCollection">
+        <v-card :disabled="tasksUncompleted.length === 0" :class="{ 'cursor-pointer': !selected }">
+            <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="4">
+            </v-progress-linear>
+            <v-card-text>
+                <div class="d-flex justify-space-between align-center">
+                    <h3 class="d-flex align-center white--text flex-grow-1 collection-title">
+                        <span :title="collection.name">
+                            {{ collection.name }}
+                        </span>
+                        <template v-if="selected">
+                            <v-hover v-slot="{ hover }">
+                                <v-btn
+                                    :to="{
+                                        name: 'collection-detail',
+                                        params: { id: collection.id },
+                                    }"
+                                    icon
+                                    small
+                                    :color="hover ? 'grey' : 'grey darken-3'"
+                                    class="ml-1"
+                                    title="Go to collection">
+                                    <v-icon small>mdi-open-in-new</v-icon>
+                                </v-btn>
+                            </v-hover>
+                        </template>
+                    </h3>
+                    <template v-if="!selected">
+                        <div class="mx-3">
+                            <span style="font-size: 1.8em" class="white--text">
+                                {{ tasksCompleted.length }}
+                            </span>
+                            /
+                            <span
+                                style="
+                                    font-size: 1.1em;
+                                    transform: translateY(0.3em);
+                                    display: inline-block;
+                                ">
+                                {{ collection.tasks.length }}
+                            </span>
+                        </div>
+                    </template>
+                    <template v-if="selected">
+                        <v-btn @click.stop="unselectCollection" color="red" icon>
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </template>
+                </div>
+                <template v-if="selected">
+                    <v-divider class="mt-3"></v-divider>
+                    <div class="task-wrapper pt-3">
+                        <v-row align-content="start" class="fill-width">
+                            <v-col
+                                v-for="task of tasksUncompleted"
+                                :key="`task-${task.id}`"
+                                cols="6">
+                                <v-card
+                                    @click="selectTask(task)"
+                                    :disabled="isTaskSelected(task)"
+                                    :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
+                                    elevation="5"
+                                    title="Select task">
+                                    <v-card-text class="p-1">
+                                        <h5 class="white--text">
+                                            {{ task.name }}
+                                        </h5>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </template>
+            </v-card-text>
+        </v-card>
+    </div>
+</template>
+
+<script lang="ts">
+import { DailyTaskModel } from '@/models/daily-task.model'
+import { TaskModel } from '@/models/task.model'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { CollectionModel } from '@/models/collection.model'
+
+@Component
+export default class DailyTaskUpdateCollectionListItem extends Vue {
+    @Prop() collection!: CollectionModel
+    @Prop() dailyTaskList!: DailyTaskModel[]
+    @Prop() selected!: boolean
+
+    // todo : change color of task selected
+    get isTaskSelected(): (task: TaskModel) => boolean {
+        return (task: TaskModel) =>
+            this.dailyTaskList.some((dailyTask: DailyTaskModel) => task.id === dailyTask.taskId)
+    }
+
+    get tasks(): TaskModel[] {
+        return this.collection.tasks
+    }
+
+    get tasksCompleted(): TaskModel[] {
+        return this.collection.tasks.filter(task => task.completed)
+    }
+
+    get tasksUncompleted(): TaskModel[] {
+        return this.collection.tasks.filter(task => !task.completed)
+    }
+
+    get numberOfTasksCompleted(): number {
+        return this.collection.tasks.filter((task: TaskModel) => task.completed).length
+    }
+
+    get percentageOfTaskCompleted(): number {
+        return (this.tasksCompleted.length / this.tasks.length) * 100
+    }
+
+    selectCollection(): void {
+        if (this.tasksUncompleted.length !== 0 && !this.selected)
+            this.$emit('update:selected', true)
+    }
+
+    unselectCollection(): void {
+        this.$emit('update:selected', false)
+    }
+
+    selectTask(task: TaskModel): void {
+        this.$emit('select-task', { taskId: task.id })
+    }
+}
+</script>
+
+<style scoped lang="scss">
+.card-wrapper {
+    padding: 0.5rem;
+
+    .collection-title {
+        max-width: 13rem;
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+
+.selected {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    cursor: default;
+
+    .v-card {
+        height: 100%;
+
+        .v-card__text {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            .collection-title {
+                max-width: unset;
+            }
+
+            .task-wrapper {
+                flex-grow: 1;
+                overflow-y: auto;
+                width: 100%;
+            }
+        }
+    }
+}
+
+// Todo : place in common css file
+.fill-width {
+    width: 100%;
+}
+</style>

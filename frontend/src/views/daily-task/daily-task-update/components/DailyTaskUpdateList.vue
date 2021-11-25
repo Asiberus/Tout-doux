@@ -12,7 +12,7 @@
 
         <template v-if="dailyTaskList.length">
             <template v-for="dailyTask in dailyTaskList">
-                <v-hover v-slot="{ hover }" :key="'daily-task' + dailyTask.id + dailyTask.name">
+                <v-hover v-slot="{ hover }" :key="'daily-task-' + dailyTask.id + dailyTask.name">
                     <v-card class="daily-task-card mb-3">
                         <v-card-text>
                             <template v-if="!dailyTask.editMode">
@@ -53,9 +53,9 @@
                                                 <span
                                                     :class="{
                                                         'font-italic grey--text': !action.value,
-                                                    }"
-                                                    >{{ action.text }}</span
-                                                >
+                                                    }">
+                                                    {{ action.text }}
+                                                </span>
                                             </v-list-item>
                                         </v-list>
                                     </v-menu>
@@ -178,7 +178,7 @@ export default class DailyTaskUpdateList extends Vue {
 
     private dailyTaskActionEnum = DailyTaskActionEnum
 
-    get dailyTaskActionItems(): { text: string | null; value: DailyTaskActionEnum | null }[] {
+    get dailyTaskActionItems(): { value: DailyTaskActionEnum | null; text: string }[] {
         return [
             { value: null, text: 'No action' },
             {
@@ -211,7 +211,7 @@ export default class DailyTaskUpdateList extends Vue {
 
     // Todo : move this function to a better place
     // Todo : define color for dailytask action chip
-    private getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string | null {
+    private getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
         switch (action) {
             case DailyTaskActionEnum.THINK:
                 return 'Réfléchir'
@@ -219,8 +219,6 @@ export default class DailyTaskUpdateList extends Vue {
                 return 'Travailler'
             case DailyTaskActionEnum.FINISH:
                 return 'Finir'
-            default:
-                return null
         }
     }
 
@@ -236,6 +234,7 @@ export default class DailyTaskUpdateList extends Vue {
     }
 
     toggleDailyTaskEditMode(dailyTask: DailyTaskDisplayModel, value: boolean): void {
+        this.dailyTaskList.forEach((d: DailyTaskDisplayModel) => (d.editMode = false))
         if (!dailyTask.id) {
             if (value) {
                 this.dailyTaskForm.data.name = ''
@@ -244,7 +243,7 @@ export default class DailyTaskUpdateList extends Vue {
             }
         } else {
             if (value) {
-                this.dailyTaskList.forEach((d: DailyTaskDisplayModel) => (d.editMode = false))
+                this.createDailyTaskDisplayed = false
                 this.dailyTaskForm.data.name = dailyTask.name ?? ''
             }
         }
@@ -254,19 +253,19 @@ export default class DailyTaskUpdateList extends Vue {
 
     handleDailyTaskFormSubmit(dailyTaskId: number): void {
         if (dailyTaskId) {
-            this.$emit('updateDailyTask', dailyTaskId, this.dailyTaskForm.data)
+            this.$emit('update-daily-task', dailyTaskId, this.dailyTaskForm.data)
         } else {
             this.createDailyTaskDisplayed = false
-            this.$emit('createDailyTask', this.dailyTaskForm.data)
+            this.$emit('create-daily-task', this.dailyTaskForm.data)
         }
     }
 
     updateDailyTaskAction(dailyTaskId: number, action: DailyTaskActionEnum | null): void {
-        this.$emit('updateDailyTask', dailyTaskId, { action })
+        this.$emit('update-daily-task', dailyTaskId, { action })
     }
 
     deleteDailyTask(dailyTaskId: number): void {
-        this.$emit('deleteDailyTask', dailyTaskId)
+        this.$emit('delete-daily-task', dailyTaskId)
     }
 }
 </script>

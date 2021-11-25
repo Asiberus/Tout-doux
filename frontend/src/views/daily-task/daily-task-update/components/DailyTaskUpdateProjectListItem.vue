@@ -2,20 +2,17 @@
     <div class="card-wrapper" :class="{ selected: selected }" @click="selectProject">
         <v-card
             :disabled="allTasksUncompleted.length === 0"
-            :class="{ 'cursor-pointer': !selected }"
-            :ripple="!selected">
+            :class="{ 'cursor-pointer': !selected }">
             <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="4">
             </v-progress-linear>
             <v-card-text>
-                <div class="d-flex justify-space-between align-stretch project-card-header">
-                    <v-hover v-slot="{ hover }">
-                        <h3
-                            class="d-flex align-center white--text project-title"
-                            :class="{ hover: hover && selected }">
-                            <span :title="project.name">
-                                {{ project.name }}
-                            </span>
-                            <template v-if="selected">
+                <div class="d-flex justify-space-between align-center">
+                    <h3 class="d-flex align-center white--text project-title">
+                        <span :title="project.name">
+                            {{ project.name }}
+                        </span>
+                        <template v-if="selected">
+                            <v-hover v-slot="{ hover }">
                                 <v-btn
                                     :to="{ name: 'project-detail', params: { id: project.id } }"
                                     icon
@@ -25,9 +22,9 @@
                                     title="Go to project">
                                     <v-icon small>mdi-open-in-new</v-icon>
                                 </v-btn>
-                            </template>
-                        </h3>
-                    </v-hover>
+                            </v-hover>
+                        </template>
+                    </h3>
                     <template v-if="!selected">
                         <div class="mx-3">
                             <span style="font-size: 1.8em" class="white--text">
@@ -94,7 +91,8 @@
                                 </v-row>
                             </template>
                             <template v-else>
-                                <EmptyListDisplay message="No task are related to this project">
+                                <EmptyListDisplay
+                                    :message="`No task are related to ${section.name}`">
                                     <template #img>
                                         <img
                                             src="../../../../assets/no_tasks.svg"
@@ -113,8 +111,8 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { DailyTaskDisplayWrapper, DailyTaskModel } from '@/models/daily-task.model'
-import { DailyTaskProjectDisplayModel, ProjectModel } from '@/models/project.model'
+import { DailyTaskModel } from '@/models/daily-task.model'
+import { ProjectModel } from '@/models/project.model'
 import { TaskModel } from '@/models/task.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
@@ -128,7 +126,7 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
     @Prop() dailyTaskList!: DailyTaskModel[]
     @Prop() selected!: boolean
 
-    sectionTab = 'General Task'
+    sectionTab = 0
 
     // todo : change color of task selected
     get isTaskSelected(): (task: TaskModel) => boolean {
@@ -165,16 +163,15 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
         return (tasks: TaskModel[]) => tasks.filter(task => !task.completed)
     }
 
-    get numberOfTasksCompleted(): number {
-        return this.project.tasks.filter((task: TaskModel) => task.completed).length
-    }
-
     get percentageOfTaskCompleted(): number {
         return (this.allTasksCompleted.length / this.allTasks.length) * 100
     }
 
     selectProject(): void {
-        if (this.allTasksUncompleted.length !== 0) this.$emit('update:selected', true)
+        if (this.allTasksUncompleted.length === 0 || this.selected) return
+
+        this.sectionTab = 0
+        this.$emit('update:selected', true)
     }
 
     unselectProject(): void {
@@ -192,7 +189,7 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
     padding: 0.5rem;
 
     .project-title {
-        max-width: 12rem;
+        max-width: 13rem;
 
         span {
             overflow: hidden;
@@ -220,18 +217,7 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
             flex-direction: column;
 
             .project-title {
-                max-width: 10rem;
-                transition: all 0.5s ease;
-
-                &:hover {
-                    max-width: 30rem;
-                }
-
-                span {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+                max-width: 17.5rem;
             }
 
             .section-wrapper {

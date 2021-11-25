@@ -6,11 +6,11 @@
 
         <v-row>
             <v-col cols="8">
-                <v-tabs v-model="updateTab" background-color="transparent" class="mb-3">
+                <v-tabs v-model="projectCollectionTab" background-color="transparent" class="mb-3">
                     <v-tab>Project</v-tab>
                     <v-tab>Collection</v-tab>
                 </v-tabs>
-                <v-tabs-items v-model="updateTab" class="transparent">
+                <v-tabs-items v-model="projectCollectionTab" class="transparent">
                     <v-tab-item :transition="false" class="tab-wrapper">
                         <template v-if="projectList.length">
                             <v-row align-content="start" no-gutters class="position-relative">
@@ -40,20 +40,41 @@
                         </template>
                     </v-tab-item>
                     <v-tab-item :transition="false" class="tab-wrapper">
-                        <!--                        <DailyTaskUpdateCollectionList-->
-                        <!--                                :collectionList="collectionList"-->
-                        <!--                                :dailyTaskList="dailyTaskList"-->
-                        <!--                                @selectTask="createDailyTask">-->
-                        <!--                        </DailyTaskUpdateCollectionList>-->
+                        <template v-if="collectionList.length">
+                            <v-row align-content="start" no-gutters class="position-relative">
+                                <v-col
+                                    v-for="collection in collectionList"
+                                    :key="'collection-' + collection.content.id"
+                                    cols="4">
+                                    <DailyTaskUpdateCollectionListItem
+                                        :collection="collection.content"
+                                        :daily-task-list="dailyTaskList"
+                                        :selected.sync="collection.selected"
+                                        @unselect="collection.selected = false"
+                                        @select-task="createDailyTask">
+                                    </DailyTaskUpdateCollectionListItem>
+                                </v-col>
+                            </v-row>
+                        </template>
+                        <template v-else>
+                            <EmptyListDisplay message="No projects available">
+                                <template #img>
+                                    <img
+                                        src="../../../assets/project.svg"
+                                        alt="No Project"
+                                        height="250" />
+                                </template>
+                            </EmptyListDisplay>
+                        </template>
                     </v-tab-item>
                 </v-tabs-items>
             </v-col>
             <v-col cols="4" class="daily-task-wrapper">
                 <DailyTaskUpdateList
                     :dailyTaskList="dailyTaskList"
-                    @createDailyTask="createDailyTask"
-                    @updateDailyTask="updateDailyTask"
-                    @deleteDailyTask="deleteDailyTask">
+                    @create-daily-task="createDailyTask"
+                    @update-daily-task="updateDailyTask"
+                    @delete-daily-task="deleteDailyTask">
                 </DailyTaskUpdateList>
             </v-col>
         </v-row>
@@ -65,24 +86,25 @@ import { collectionService } from '@/api/collection.api'
 import { dailyTaskService } from '@/api/daily-task.api'
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { DailyTaskCollectionDisplayModel } from '@/models/collection.model'
+import { CollectionModel } from '@/models/collection.model'
 import {
     DailyTaskDisplayModel,
     DailyTaskDisplayWrapper,
     DailyTaskModel,
 } from '@/models/daily-task.model'
 import { ProjectModel } from '@/models/project.model'
-import DailyTaskUpdateCollectionList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateCollectionList.vue'
 import DailyTaskUpdateList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateList.vue'
 import DailyTaskUpdateProjectListItem from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateProjectListItem.vue'
 import moment from 'moment'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import DailyTaskUpdateCollectionListItem from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateCollectionListItem.vue'
 
 // Todo : add btn to create project in no project svg
+// Todo : add btn to create collection in no collection svg
 @Component({
     components: {
         DailyTaskUpdateProjectListItem,
-        DailyTaskUpdateCollectionList,
+        DailyTaskUpdateCollectionListItem,
         DailyTaskUpdateList,
         EmptyListDisplay,
     },
@@ -92,9 +114,9 @@ export default class DailyTaskUpdate extends Vue {
 
     dailyTaskList: DailyTaskDisplayModel[] = []
     projectList: DailyTaskDisplayWrapper<ProjectModel>[] = []
-    collectionList: DailyTaskCollectionDisplayModel[] = []
+    collectionList: DailyTaskDisplayWrapper<CollectionModel>[] = []
 
-    updateTab = 'project'
+    projectCollectionTab = 0
 
     get dateFormatted(): string {
         return moment(this.date).format('dddd DD MMMM Y')
@@ -104,6 +126,12 @@ export default class DailyTaskUpdate extends Vue {
         this.retrieveDailyTaskList()
         this.retrieveProjectList()
         this.retrieveCollectionList()
+    }
+
+    @Watch('projectCollectionTab')
+    onProjectCollectionTabChanges(): void {
+        this.projectList.forEach(p => (p.selected = false))
+        this.collectionList.forEach(p => (p.selected = false))
     }
 
     private retrieveDailyTaskList(): void {
@@ -138,27 +166,16 @@ export default class DailyTaskUpdate extends Vue {
     private retrieveCollectionList(): void {
         collectionService.getCollectionList().then(
             (response: any) => {
-                this.collectionList = response.body.content
-                this.collectionList.forEach((collection: DailyTaskCollectionDisplayModel) => {
-                    this.$set(collection, 'selected', false)
-                })
+                this.collectionList = response.body.content.map((collection: CollectionModel) => ({
+                    content: collection,
+                    selected: false,
+                }))
             },
             (error: any) => {
                 console.error(error)
             }
         )
     }
-
-    // private createDailyTaskByForm(): void {
-    //   dailyTaskService.createDailyTask(this.dailyTaskForm.data).then(
-    //       (response: any) => {
-    //         this.$set(this.dailyTaskList, this.dailyTaskList.length - 1, Object.assign({editMode: false}, response.body));
-    //         this.createDailyTaskDisplayed = false;
-    //       }, (error: any) => {
-    //         console.error(error);
-    //       }
-    //   )
-    // }
 
     createDailyTask(dailyTask: Partial<DailyTaskModel>): void {
         dailyTaskService.createDailyTask(dailyTask).then(
