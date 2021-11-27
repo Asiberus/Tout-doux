@@ -2,12 +2,12 @@ import Vue from 'vue'
 import { environment } from '@/environments/environment.dev'
 import { DailyTask } from '@/models/daily-task.model'
 
-const getDailyTaskOverview = (page: number, size = 21) => {
+const getDailyTaskSummary = (page: number, size = 21) => {
     const params = {
         page: page.toString(),
         size: size.toString(),
     }
-    return Vue.http.get(environment.dailyTaskOverview, { params })
+    return Vue.http.get(environment.dailyTaskSummary, { params })
 }
 
 const getDailyTasksByDate = (date: string) => {
@@ -33,7 +33,7 @@ const deleteDailyTask = (dailyTaskId: number) => {
 }
 
 export const dailyTaskService = {
-    getDailyTaskOverview,
+    getDailyTaskSummary,
     getDailyTasksByDate,
     createDailyTask,
     updateDailyTask,

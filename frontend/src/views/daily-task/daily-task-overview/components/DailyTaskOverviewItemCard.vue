@@ -1,16 +1,16 @@
 <template>
     <v-hover v-slot="{ hover }">
         <v-card
-            v-on="dailyTaskOverview.totalTask ? { click: () => openDailyTaskDetailDialog() } : {}"
+            v-on="dailyTaskSummary.totalTask ? { click: () => openDailyTaskDetailDialog() } : {}"
             :color="backgroundColor"
             class="position-relative">
             <v-card-text>
                 <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
                 <div class="d-flex justify-space-between">
                     <p class="daily-task-date">{{ dailyTaskDateFormat }}</p>
-                    <div class="pr-2" v-if="dailyTaskOverview.totalTask">
+                    <div class="pr-2" v-if="dailyTaskSummary.totalTask">
                         <span style="font-size: 3em" class="white--text">{{
-                            dailyTaskOverview.totalTaskCompleted
+                            dailyTaskSummary.totalTaskCompleted
                         }}</span>
                         /
                         <span
@@ -19,7 +19,7 @@
                                 transform: translateY(0.3em);
                                 display: inline-block;
                             ">
-                            {{ dailyTaskOverview.totalTask }}
+                            {{ dailyTaskSummary.totalTask }}
                         </span>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                     <v-btn
                         :to="{
                             name: 'daily-task-update',
-                            params: { date: dailyTaskOverview.date },
+                            params: { date: dailyTaskSummary.date },
                         }"
                         class="action-button"
                         color="accent"
@@ -45,23 +45,23 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import DailyTaskOverview from '../../../../models/daily-task-overview.model'
+import DailyTaskSummary from '../../../../models/daily-task-overview.model'
 import moment from 'moment'
 
 @Component
 export default class DailyTaskOverviewItemCard extends Vue {
-    @Prop() private dailyTaskOverview!: DailyTaskOverview
+    @Prop() dailyTaskSummary!: DailyTaskSummary
 
     get isToday(): boolean {
-        return moment().isSame(this.dailyTaskOverview.date, 'days')
+        return moment().isSame(this.dailyTaskSummary.date, 'days')
     }
 
     get dailyTaskDayOfWeek(): string {
-        return moment(this.dailyTaskOverview.date).format('dddd')
+        return moment(this.dailyTaskSummary.date).format('dddd')
     }
 
     get dailyTaskDateFormat(): string {
-        return moment(this.dailyTaskOverview.date).format('DD MMMM Y')
+        return moment(this.dailyTaskSummary.date).format('DD MMMM Y')
     }
 
     // todo : Set colorArray
@@ -75,23 +75,23 @@ export default class DailyTaskOverviewItemCard extends Vue {
         ]
         const index =
             Math.trunc(
-                (this.dailyTaskOverview.totalTaskCompleted * colorArray.length) /
-                    this.dailyTaskOverview.totalTask
+                (this.dailyTaskSummary.totalTaskCompleted * colorArray.length) /
+                    this.dailyTaskSummary.totalTask
             ) - 1
         return colorArray[index]
     }
 
     get backgroundColor(): string | null {
-        if (!this.dailyTaskOverview.totalTask) {
+        if (!this.dailyTaskSummary.totalTask) {
             return '#151515'
-        } else if (!this.dailyTaskOverview.totalTaskCompleted) {
+        } else if (!this.dailyTaskSummary.totalTaskCompleted) {
             return null
         }
         return this.colorOfTaskCompleted
     }
 
-    private openDailyTaskDetailDialog(): void {
-        this.$emit('openDailyTaskDetailDialog')
+    openDailyTaskDetailDialog(): void {
+        this.$emit('open-daily-task-detail')
     }
 }
 </script>

@@ -1,5 +1,5 @@
 import { ProjectTask } from '@/models/project.model'
-import { SectionExtended, SectionTask } from '@/models/section.model'
+import { SectionExtended } from '@/models/section.model'
 import { CollectionTask } from '@/models/collection.model'
 
 export interface TaskPost {

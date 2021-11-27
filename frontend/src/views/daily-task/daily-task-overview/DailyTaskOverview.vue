@@ -2,17 +2,14 @@
     <v-container>
         <h1 class="mb-6">Daily Overview</h1>
         <v-row>
-            <v-col
-                v-for="(dailyTaskOverview, index) in dailyTaskOverviewList"
-                :key="index"
-                cols="2">
+            <v-col v-for="(dailyTaskOverview, index) in dailyTaskSummaryList" :key="index" cols="2">
                 <DailyTaskOverviewItemCard
-                    :dailyTaskOverview="dailyTaskOverview"
-                    @openDailyTaskDetailDialog="openDailyTaskDetailDialog(dailyTaskOverview.date)">
+                    :dailyTaskSummary="dailyTaskOverview"
+                    @open-daily-task-detail="openDailyTaskDetailDialog(dailyTaskOverview.date)">
                 </DailyTaskOverviewItemCard>
             </v-col>
         </v-row>
-        <div class="mt-5 d-flex justify-center" v-if="dailyTaskOverviewList.length">
+        <div class="mt-5 d-flex justify-center" v-if="dailyTaskSummaryList.length">
             <v-btn @click="loadNextPage" :loading="dailyTaskOverviewLoading" rounded>
                 Load more days
             </v-btn>
@@ -26,7 +23,7 @@
             transition="dialog-bottom-transition">
             <DailyTaskDetail
                 :date="dateSelected"
-                @dailyTaskCompleted="updateDailyTaskCompleted"
+                @daily-task-completed="updateDailyTaskCompleted"
                 @close="dailyTaskDialog = false">
             </DailyTaskDetail>
         </v-dialog>
@@ -36,7 +33,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import DailyTaskOverview from '@/models/daily-task-overview.model'
+import DailyTaskSummary from '@/models/daily-task-overview.model'
 import DailyTaskOverviewItemCard from '@/views/daily-task/daily-task-overview/components/DailyTaskOverviewItemCard.vue'
 import DailyTaskDetail from '@/views/daily-task/daily-task-overview/components/DailyTaskDetail.vue'
 
@@ -47,23 +44,21 @@ import DailyTaskDetail from '@/views/daily-task/daily-task-overview/components/D
     },
 })
 export default class DailyTaskOverview extends Vue {
-    private dailyTaskOverviewList: DailyTaskOverview[] = []
-    private dailyTaskOverviewLoading = false
-    private page = 1
-    private dailyTaskDialog = false
-    private dateSelected = ''
+    dailyTaskSummaryList: DailyTaskSummary[] = []
+    dailyTaskOverviewLoading = false
+    page = 1
+    dailyTaskDialog = false
+    dateSelected = ''
 
     created(): void {
-        this.retrieveDailyTaskOverviewList()
+        this.retrieveDailyTaskSummaryList()
     }
 
-    private retrieveDailyTaskOverviewList(): void {
+    private retrieveDailyTaskSummaryList(): void {
         this.dailyTaskOverviewLoading = true
-        dailyTaskService.getDailyTaskOverview(this.page).then(
+        dailyTaskService.getDailyTaskSummary(this.page).then(
             (response: any) => {
-                this.dailyTaskOverviewList = this.dailyTaskOverviewList.concat(
-                    response.body.content
-                )
+                this.dailyTaskSummaryList = this.dailyTaskSummaryList.concat(response.body.content)
                 this.dailyTaskOverviewLoading = false
             },
             (error: any) => {
@@ -73,22 +68,20 @@ export default class DailyTaskOverview extends Vue {
         )
     }
 
-    private loadNextPage(): void {
+    loadNextPage(): void {
         this.page += 1
-        this.retrieveDailyTaskOverviewList()
+        this.retrieveDailyTaskSummaryList()
     }
 
-    private openDailyTaskDetailDialog(date: string): void {
+    openDailyTaskDetailDialog(date: string): void {
         this.dailyTaskDialog = true
         this.dateSelected = date
     }
 
-    private updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
-        const dailyTaskOverview = this.dailyTaskOverviewList.find(
-            (d: DailyTaskOverview) => d.date === date
-        )
-        if (dailyTaskOverview) {
-            dailyTaskOverview.totalTaskCompleted = numberOfDailyTaskCompleted
+    updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
+        const dailyTaskSummary = this.dailyTaskSummaryList.find(d => d.date === date)
+        if (dailyTaskSummary) {
+            dailyTaskSummary.totalTaskCompleted = numberOfDailyTaskCompleted
         }
     }
 }

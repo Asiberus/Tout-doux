@@ -11,6 +11,6 @@ export const environment = {
     collection: 'collection/',
     collectionById: 'collection/:collectionId/',
     dailyTask: 'daily-task/',
-    dailyTaskOverview: 'daily-task/overview/',
+    dailyTaskSummary: 'daily-task/summary/',
     dailyTaskById: 'daily-task/:dailyTaskId/',
 }

@@ -8,10 +8,23 @@
         <div class="content">
             <h1>{{ dateFormatted }}</h1>
             <p class="grey--text text--lighten-1 ml-2">
-                <template v-if="dailyTaskUncompleted">
-                    You have {{ dailyTaskUncompleted }} tasks left to do today!
+                <template v-if="isToday">
+                    <template v-if="numberOfDailyTaskUncompleted">
+                        You have {{ numberOfDailyTaskUncompleted }} tasks left to do today!
+                    </template>
+                    <template v-else>All tasks done for today !</template>
                 </template>
-                <template v-else> All tasks done for today ! </template>
+                <template v-else>
+                    <template v-if="numberOfDailyTaskCompleted === dailyTaskList.length">
+                        All tasks completed for that day! :)
+                    </template>
+                    <template v-else-if="numberOfDailyTaskCompleted > 0">
+                        {{ numberOfDailyTaskCompleted }} on {{ dailyTaskList.length }}
+                        {{ numberOfDailyTaskCompleted > 1 ? 'tasks' : 'task' }} were completed that
+                        day.
+                    </template>
+                    <template v-else> No tasks completed that day :( </template>
+                </template>
             </p>
             <v-timeline dense>
                 <v-timeline-item
@@ -90,15 +103,23 @@ import moment from 'moment'
 
 @Component
 export default class DailyTaskDetail extends Vue {
-    @Prop() private date!: string
-    private dailyTaskList: DailyTask[] = []
+    @Prop() date!: string
+    dailyTaskList: DailyTask[] = []
+
+    get isToday(): boolean {
+        return moment().isSame(this.date, 'days')
+    }
 
     get dateFormatted(): string {
         return moment(this.date).format('dddd DD MMMM Y')
     }
 
-    get dailyTaskUncompleted(): number {
-        return this.dailyTaskList.filter((dailyTask: DailyTask) => !dailyTask.completed).length
+    get numberOfDailyTaskCompleted(): number {
+        return this.dailyTaskList.filter(dailyTask => dailyTask.completed).length
+    }
+
+    get numberOfDailyTaskUncompleted(): number {
+        return this.dailyTaskList.filter(dailyTask => !dailyTask.completed).length
     }
 
     @Watch('date', { immediate: true })
@@ -117,7 +138,7 @@ export default class DailyTaskDetail extends Vue {
         )
     }
 
-    private toggleDailyTaskCompleteState(dailyTask: DailyTask): void {
+    toggleDailyTaskCompleteState(dailyTask: DailyTask): void {
         dailyTaskService.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
             (response: any) => {
                 dailyTask.completed = response.body.completed
@@ -138,7 +159,7 @@ export default class DailyTaskDetail extends Vue {
 
     // Todo : move this function to a better place
     // Todo : define color for dailytask action chip
-    private getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string | null {
+    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string | null {
         switch (action) {
             case DailyTaskActionEnum.THINK:
                 return 'Réfléchir'
@@ -151,7 +172,7 @@ export default class DailyTaskDetail extends Vue {
         }
     }
 
-    private getActionChipColor(action: DailyTaskActionEnum): string {
+    getActionChipColor(action: DailyTaskActionEnum): string {
         switch (action) {
             case DailyTaskActionEnum.THINK:
                 return 'teal'
@@ -162,14 +183,11 @@ export default class DailyTaskDetail extends Vue {
         }
     }
 
-    private emitDailyTaskCompletedEvent(): void {
-        const numberOfDailyTaskCompleted = this.dailyTaskList.filter(
-            (dailyTask: DailyTask) => dailyTask.completed
-        ).length
-        this.$emit('dailyTaskCompleted', this.date, numberOfDailyTaskCompleted)
+    emitDailyTaskCompletedEvent(): void {
+        this.$emit('daily-task-completed', this.date, this.numberOfDailyTaskCompleted)
     }
 
-    private closeDialog(): void {
+    closeDialog(): void {
         this.$emit('close')
     }
 }

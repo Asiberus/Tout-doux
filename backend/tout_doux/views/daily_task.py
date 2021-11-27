@@ -26,7 +26,7 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False)
-    def overview(self, request):
+    def summary(self, request):
         data = list()
         size = int(request.query_params.get('size', 20))
         page = int(request.query_params.get('page', 1))

@@ -3,7 +3,7 @@
         <v-card
             @click.stop="onCardClick"
             :disabled="disabled"
-            :color="task.completed ? 'success' : null">
+            :color="task.completed ? 'green' : null">
             <v-card-text>
                 <v-row align-content="center">
                     <v-col cols="11" class="d-flex align-center">

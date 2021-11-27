@@ -76,6 +76,7 @@
                                     <template v-if="dailyTask.task">
                                         <v-chip
                                             small
+                                            label
                                             class="daily-chip"
                                             :color="getTagColor(dailyTask)">
                                             <template v-if="dailyTask.task.project">
