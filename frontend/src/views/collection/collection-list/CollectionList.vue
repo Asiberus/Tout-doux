@@ -52,7 +52,7 @@ import { collectionService } from '@/api/collection.api'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { CollectionModel } from '@/models/collection.model'
+import { Collection, CollectionTask } from '@/models/collection.model'
 
 @Component({
     components: {
@@ -62,7 +62,7 @@ import { CollectionModel } from '@/models/collection.model'
     },
 })
 export default class CollectionList extends Vue {
-    collectionList: CollectionModel[] = []
+    collectionList: CollectionTask[] = []
     collectionDialog = false
 
     created(): void {
@@ -80,7 +80,7 @@ export default class CollectionList extends Vue {
         )
     }
 
-    createCollection(collectionForm: Partial<CollectionModel>): void {
+    createCollection(collectionForm: Partial<Collection>): void {
         this.collectionDialog = false
         collectionService.createCollection(collectionForm).then(
             (response: any) => {

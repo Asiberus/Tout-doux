@@ -1,10 +1,10 @@
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
-import { SectionModel, SectionPost } from '@/models/section.model'
-import { TaskModel } from '@/models/task.model'
+import { SectionTask, SectionPost } from '@/models/section.model'
+import { Task, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
-import { ProjectModel } from '@/models/project.model'
+import { Project, ProjectTask } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
 
 export const projectMutations = {
@@ -40,11 +40,11 @@ export const projectActions = {
 @Module
 export class ProjectModule extends VuexModule {
     // State
-    currentProject?: ProjectModel
+    currentProject?: ProjectTask
 
     // Mutations
     @Mutation
-    private [projectMutations.setCurrentProject](project: ProjectModel | undefined): void {
+    private [projectMutations.setCurrentProject](project: ProjectTask | undefined): void {
         // Due to Vue reactivity lack with undefined properties we need to call the Vue.set function
         Vue.set(this, 'currentProject', project)
     }
@@ -61,7 +61,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Mutation
-    private [projectMutations.section.addSection](section: SectionModel): void {
+    private [projectMutations.section.addSection](section: SectionTask): void {
         if (!this.currentProject) return
 
         this.currentProject.sections.unshift(section)
@@ -86,26 +86,36 @@ export class ProjectModule extends VuexModule {
     }
 
     @Mutation
-    private [projectMutations.task.addTask](task: TaskModel): void {
+    private [projectMutations.task.addTask](payload: {
+        task: Task
+        projectId?: number
+        sectionId?: number
+    }): void {
         if (!this.currentProject) return
 
-        if (task.projectId) {
+        const { task, projectId, sectionId } = payload
+        if (projectId) {
             this.currentProject.tasks.unshift(task)
-        } else if (task.sectionId) {
-            const section = this.currentProject.sections.find(s => s.id === task.sectionId)
+        } else if (sectionId) {
+            const section = this.currentProject.sections.find(s => s.id === sectionId)
             if (section) section.tasks.unshift(task)
         }
     }
 
     @Mutation
-    private [projectMutations.task.editTask](task: TaskModel): void {
+    private [projectMutations.task.editTask](payload: {
+        task: Task
+        projectId?: number
+        sectionId?: number
+    }): void {
         if (!this.currentProject) return
 
-        if (task.projectId) {
+        const { task, projectId, sectionId } = payload
+        if (projectId) {
             const t = this.currentProject.tasks.find(t => t.id === task.id)
             Object.assign(t, task)
-        } else if (task.sectionId) {
-            const section = this.currentProject.sections.find(s => s.id === task.sectionId)
+        } else if (sectionId) {
+            const section = this.currentProject.sections.find(s => s.id === sectionId)
             if (section) {
                 const t = section.tasks.find(t => t.id === task.id)
                 Object.assign(t, task)
@@ -148,7 +158,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.updateProperties](payload: {
         id: number
-        data: Partial<ProjectModel>
+        data: Partial<Project>
     }): Promise<void> {
         const { id, data } = payload
         projectService.updateProject(id, data).then(
@@ -210,7 +220,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.task.addTask](task: Partial<TaskModel>): Promise<void> {
+    async [projectActions.task.addTask](task: Partial<TaskPost>): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(projectMutations.task.addTask, response.body)
@@ -224,7 +234,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.task.editTask](payload: {
         id: number
-        taskForm: Partial<TaskModel>
+        taskForm: Partial<TaskPost>
     }): Promise<void> {
         const { id, taskForm } = payload
         await taskService.updateTaskById(id, taskForm).then(

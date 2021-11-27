@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectModel } from '@/models/project.model'
+import { ProjectTask } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
@@ -36,7 +36,7 @@ export default class ProjectDetail extends Vue {
 
     projectTab = 'description'
 
-    get project(): ProjectModel | undefined {
+    get project(): ProjectTask | undefined {
         return this.$store.state.project.currentProject
     }
 

@@ -121,7 +121,7 @@
 <script lang="ts">
 import { projectService } from '@/api/project.api'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { ProjectModel } from '@/models/project.model'
+import { ProjectTask } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -153,7 +153,7 @@ export default class ProjectConfiguration extends Vue {
         },
     }
 
-    get project(): ProjectModel {
+    get project(): ProjectTask {
         return this.$store.state.project.currentProject
     }
 

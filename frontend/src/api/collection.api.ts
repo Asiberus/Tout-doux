@@ -1,6 +1,6 @@
 import { environment } from '@/environments/environment.dev'
 import Vue from 'vue'
-import { CollectionModel } from '@/models/collection.model'
+import { Collection } from '@/models/collection.model'
 
 const getCollectionList = (params = {}) => {
     return Vue.http.get(environment.collection, { params })
@@ -12,11 +12,11 @@ const getCollectionById = (collectionId: number) => {
     )
 }
 
-const createCollection = (collectionForm: Partial<CollectionModel>) => {
+const createCollection = (collectionForm: Partial<Collection>) => {
     return Vue.http.post(environment.collection, collectionForm)
 }
 
-const updateCollection = (collectionId: number, collectionForm: Partial<CollectionModel>) => {
+const updateCollection = (collectionId: number, collectionForm: Partial<Collection>) => {
     return Vue.http.patch(
         environment.collectionById.replace(':collectionId', collectionId.toString()),
         collectionForm

@@ -86,13 +86,9 @@ import { collectionService } from '@/api/collection.api'
 import { dailyTaskService } from '@/api/daily-task.api'
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { CollectionModel } from '@/models/collection.model'
-import {
-    DailyTaskDisplayModel,
-    DailyTaskDisplayWrapper,
-    DailyTaskModel,
-} from '@/models/daily-task.model'
-import { ProjectModel } from '@/models/project.model'
+import { CollectionTask } from '@/models/collection.model'
+import { DailyTaskDisplay, DailyTaskDisplayWrapper, DailyTask } from '@/models/daily-task.model'
+import { ProjectTask } from '@/models/project.model'
 import DailyTaskUpdateList from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateList.vue'
 import DailyTaskUpdateProjectListItem from '@/views/daily-task/daily-task-update/components/DailyTaskUpdateProjectListItem.vue'
 import moment from 'moment'
@@ -112,9 +108,9 @@ import DailyTaskUpdateCollectionListItem from '@/views/daily-task/daily-task-upd
 export default class DailyTaskUpdate extends Vue {
     @Prop() private date!: string
 
-    dailyTaskList: DailyTaskDisplayModel[] = []
-    projectList: DailyTaskDisplayWrapper<ProjectModel>[] = []
-    collectionList: DailyTaskDisplayWrapper<CollectionModel>[] = []
+    dailyTaskList: DailyTaskDisplay[] = []
+    projectList: DailyTaskDisplayWrapper<ProjectTask>[] = []
+    collectionList: DailyTaskDisplayWrapper<CollectionTask>[] = []
 
     projectCollectionTab = 0
 
@@ -139,7 +135,7 @@ export default class DailyTaskUpdate extends Vue {
         dailyTaskService.getDailyTasksByDate(date).then(
             (response: any) => {
                 this.dailyTaskList = response.body.content
-                this.dailyTaskList.forEach((dailyTask: DailyTaskDisplayModel) => {
+                this.dailyTaskList.forEach((dailyTask: DailyTaskDisplay) => {
                     this.$set(dailyTask, 'editMode', false)
                 })
             },
@@ -152,7 +148,7 @@ export default class DailyTaskUpdate extends Vue {
     private retrieveProjectList(): void {
         projectService.getProjectList({ archived: false }).then(
             (response: any) => {
-                this.projectList = response.body.content.map((project: ProjectModel) => ({
+                this.projectList = response.body.content.map((project: ProjectTask) => ({
                     content: project,
                     selected: false,
                 }))
@@ -166,7 +162,7 @@ export default class DailyTaskUpdate extends Vue {
     private retrieveCollectionList(): void {
         collectionService.getCollectionList().then(
             (response: any) => {
-                this.collectionList = response.body.content.map((collection: CollectionModel) => ({
+                this.collectionList = response.body.content.map((collection: CollectionTask) => ({
                     content: collection,
                     selected: false,
                 }))
@@ -177,7 +173,7 @@ export default class DailyTaskUpdate extends Vue {
         )
     }
 
-    createDailyTask(dailyTask: Partial<DailyTaskModel>): void {
+    createDailyTask(dailyTask: Partial<DailyTask>): void {
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
                 this.dailyTaskList.push(response.body)
@@ -188,11 +184,11 @@ export default class DailyTaskUpdate extends Vue {
         )
     }
 
-    updateDailyTask(dailyTaskId: number, dailyTaskForm: Partial<DailyTaskModel>): void {
+    updateDailyTask(dailyTaskId: number, dailyTaskForm: Partial<DailyTask>): void {
         dailyTaskService.updateDailyTask(dailyTaskId, dailyTaskForm).then(
             (response: any) => {
                 const dailyTask = this.dailyTaskList.find(
-                    (dailyTask: DailyTaskDisplayModel) => dailyTask.id === response.body.id
+                    (dailyTask: DailyTaskDisplay) => dailyTask.id === response.body.id
                 )
                 Object.assign(dailyTask, response.body, { editMode: false })
             },
@@ -206,7 +202,7 @@ export default class DailyTaskUpdate extends Vue {
         dailyTaskService.deleteDailyTask(dailyTaskId).then(
             () => {
                 const dailyTaskIndex = this.dailyTaskList.findIndex(
-                    (dailyTask: DailyTaskDisplayModel) => dailyTask.id === dailyTaskId
+                    (dailyTask: DailyTaskDisplay) => dailyTask.id === dailyTaskId
                 )
                 if (dailyTaskIndex !== -1) {
                     this.dailyTaskList.splice(dailyTaskIndex, 1)

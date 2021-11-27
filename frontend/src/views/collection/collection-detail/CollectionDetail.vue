@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { CollectionModel } from '@/models/collection.model'
+import { CollectionTask } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
@@ -26,7 +26,7 @@ export default class CollectionDetail extends Vue {
 
     collectionTab = 'description'
 
-    get collection(): CollectionModel | undefined {
+    get collection(): CollectionTask | undefined {
         return this.$store.state.collection.currentCollection
     }
 

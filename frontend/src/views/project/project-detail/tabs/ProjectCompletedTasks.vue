@@ -30,8 +30,8 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { ProjectModel } from '@/models/project.model'
-import { TaskModel } from '@/models/task.model'
+import { ProjectTask } from '@/models/project.model'
+import { Task } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
 import { Component, Vue } from 'vue-property-decorator'
@@ -43,11 +43,11 @@ import { Component, Vue } from 'vue-property-decorator'
     },
 })
 export default class ProjectCompletedTasks extends Vue {
-    get project(): ProjectModel {
+    get project(): ProjectTask {
         return this.$store.state.project.currentProject
     }
 
-    get tasksList(): { name: string; tasks: TaskModel[] }[] {
+    get tasksList(): { name: string; tasks: Task[] }[] {
         return [
             {
                 name: 'General tasks',

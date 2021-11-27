@@ -25,19 +25,19 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { TaskModel } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import ellipsisFilter from '@/filters/ellipsis.filter'
-import { ProjectModel } from '@/models/project.model'
+import { ProjectTask } from '@/models/project.model'
 
 @Component
 export default class ProjectItemCard extends Vue {
-    @Prop() private project!: ProjectModel
+    @Prop() private project!: ProjectTask
 
-    get allTasks(): TaskModel[] {
+    get allTasks(): Task[] {
         return this.project.tasks.concat(...this.project.sections.map(section => section.tasks))
     }
 
-    get allTasksCompleted(): TaskModel[] {
+    get allTasksCompleted(): Task[] {
         return this.allTasks.filter(task => task.completed)
     }
 

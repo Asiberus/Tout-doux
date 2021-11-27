@@ -36,7 +36,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import DailyTaskOverviewModel from '@/models/daily-task-overview.model'
+import DailyTaskOverview from '@/models/daily-task-overview.model'
 import DailyTaskOverviewItemCard from '@/views/daily-task/daily-task-overview/components/DailyTaskOverviewItemCard.vue'
 import DailyTaskDetail from '@/views/daily-task/daily-task-overview/components/DailyTaskDetail.vue'
 
@@ -47,7 +47,7 @@ import DailyTaskDetail from '@/views/daily-task/daily-task-overview/components/D
     },
 })
 export default class DailyTaskOverview extends Vue {
-    private dailyTaskOverviewList: DailyTaskOverviewModel[] = []
+    private dailyTaskOverviewList: DailyTaskOverview[] = []
     private dailyTaskOverviewLoading = false
     private page = 1
     private dailyTaskDialog = false
@@ -85,7 +85,7 @@ export default class DailyTaskOverview extends Vue {
 
     private updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
         const dailyTaskOverview = this.dailyTaskOverviewList.find(
-            (d: DailyTaskOverviewModel) => d.date === date
+            (d: DailyTaskOverview) => d.date === date
         )
         if (dailyTaskOverview) {
             dailyTaskOverview.totalTaskCompleted = numberOfDailyTaskCompleted

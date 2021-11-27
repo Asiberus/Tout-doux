@@ -78,37 +78,37 @@
 </template>
 
 <script lang="ts">
-import { DailyTaskModel } from '@/models/daily-task.model'
-import { TaskModel } from '@/models/task.model'
+import { DailyTask } from '@/models/daily-task.model'
+import { Task } from '@/models/task.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { CollectionModel } from '@/models/collection.model'
+import { CollectionTask } from '@/models/collection.model'
 
 @Component
 export default class DailyTaskUpdateCollectionListItem extends Vue {
-    @Prop() collection!: CollectionModel
-    @Prop() dailyTaskList!: DailyTaskModel[]
+    @Prop() collection!: CollectionTask
+    @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
 
     // todo : change color of task selected
-    get isTaskSelected(): (task: TaskModel) => boolean {
-        return (task: TaskModel) =>
-            this.dailyTaskList.some((dailyTask: DailyTaskModel) => task.id === dailyTask.taskId)
+    get isTaskSelected(): (task: Task) => boolean {
+        return (task: Task) =>
+            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.taskId)
     }
 
-    get tasks(): TaskModel[] {
+    get tasks(): Task[] {
         return this.collection.tasks
     }
 
-    get tasksCompleted(): TaskModel[] {
+    get tasksCompleted(): Task[] {
         return this.collection.tasks.filter(task => task.completed)
     }
 
-    get tasksUncompleted(): TaskModel[] {
+    get tasksUncompleted(): Task[] {
         return this.collection.tasks.filter(task => !task.completed)
     }
 
     get numberOfTasksCompleted(): number {
-        return this.collection.tasks.filter((task: TaskModel) => task.completed).length
+        return this.collection.tasks.filter((task: Task) => task.completed).length
     }
 
     get percentageOfTaskCompleted(): number {
@@ -124,7 +124,7 @@ export default class DailyTaskUpdateCollectionListItem extends Vue {
         this.$emit('update:selected', false)
     }
 
-    selectTask(task: TaskModel): void {
+    selectTask(task: Task): void {
         this.$emit('select-task', { taskId: task.id })
     }
 }

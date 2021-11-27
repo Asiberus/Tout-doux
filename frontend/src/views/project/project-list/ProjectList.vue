@@ -64,7 +64,7 @@ import { projectService } from '@/api/project.api'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectItemCard from '@/views/project/components/ProjectItemCard.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { ProjectModel } from '@/models/project.model'
+import { Project, ProjectTask } from '@/models/project.model'
 
 @Component({
     components: {
@@ -76,7 +76,7 @@ import { ProjectModel } from '@/models/project.model'
 export default class ProjectList extends Vue {
     @Prop() archived: boolean = false
 
-    projectList: ProjectModel[] = []
+    projectList: ProjectTask[] = []
     projectDialog = false
 
     created(): void {
@@ -99,7 +99,7 @@ export default class ProjectList extends Vue {
         )
     }
 
-    createProject(projectForm: Partial<ProjectModel>): void {
+    createProject(projectForm: Partial<Project>): void {
         this.projectDialog = false
         projectService.createProject(projectForm).then(
             (response: any) => {

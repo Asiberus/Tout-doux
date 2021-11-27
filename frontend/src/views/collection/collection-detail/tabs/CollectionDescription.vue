@@ -74,8 +74,8 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { CollectionModel } from '@/models/collection.model'
-import { TaskModel } from '@/models/task.model'
+import { CollectionTask } from '@/models/collection.model'
+import { Task, TaskPost } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -93,7 +93,7 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class CollectionDescription extends Vue {
     taskDialog = false
 
-    get collection(): CollectionModel {
+    get collection(): CollectionTask {
         return this.$store.state.collection.currentCollection
     }
 
@@ -101,15 +101,15 @@ export default class CollectionDescription extends Vue {
         return moment(this.collection.created_at).format('D MMM. Y')
     }
 
-    get tasksUncompleted(): TaskModel[] {
-        return this.collection.tasks.filter((task: TaskModel) => !task.completed)
+    get tasksUncompleted(): Task[] {
+        return this.collection.tasks.filter((task: Task) => !task.completed)
     }
 
-    get tasksCompleted(): TaskModel[] {
-        return this.collection.tasks.filter((task: TaskModel) => task.completed)
+    get tasksCompleted(): Task[] {
+        return this.collection.tasks.filter((task: Task) => task.completed)
     }
 
-    createTask(task: Partial<TaskModel>): void {
+    createTask(task: Partial<TaskPost>): void {
         this.taskDialog = false
         task.collectionId = this.collection.id
         this.$store.dispatch(collectionActions.task.addTask, task)
@@ -119,7 +119,7 @@ export default class CollectionDescription extends Vue {
         this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskModel>): void {
+    updateTask(id: number, taskForm: Partial<TaskPost>): void {
         this.$store.dispatch(collectionActions.task.editTask, { id, taskForm })
     }
 

@@ -20,16 +20,16 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { TaskModel } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import ellipsisFilter from '@/filters/ellipsis.filter'
-import { CollectionModel } from '@/models/collection.model'
+import { CollectionTask } from '@/models/collection.model'
 
 @Component
 export default class CollectionItemCard extends Vue {
-    @Prop() private collection!: CollectionModel
+    @Prop() private collection!: CollectionTask
 
     get tasksCompleted(): number {
-        return this.collection.tasks.filter((task: TaskModel) => task.completed).length
+        return this.collection.tasks.filter((task: Task) => task.completed).length
     }
 
     get percentageOfTaskCompleted(): number {

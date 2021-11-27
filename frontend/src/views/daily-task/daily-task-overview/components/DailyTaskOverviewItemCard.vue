@@ -45,12 +45,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import DailyTaskOverviewModel from '../../../../models/daily-task-overview.model'
+import DailyTaskOverview from '../../../../models/daily-task-overview.model'
 import moment from 'moment'
 
 @Component
 export default class DailyTaskOverviewItemCard extends Vue {
-    @Prop() private dailyTaskOverview!: DailyTaskOverviewModel
+    @Prop() private dailyTaskOverview!: DailyTaskOverview
 
     get isToday(): boolean {
         return moment().isSame(this.dailyTaskOverview.date, 'days')

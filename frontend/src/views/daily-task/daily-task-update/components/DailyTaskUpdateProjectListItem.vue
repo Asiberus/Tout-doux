@@ -111,9 +111,9 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { DailyTaskModel } from '@/models/daily-task.model'
-import { ProjectModel } from '@/models/project.model'
-import { TaskModel } from '@/models/task.model'
+import { DailyTask } from '@/models/daily-task.model'
+import { ProjectTask } from '@/models/project.model'
+import { Task } from '@/models/task.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
@@ -122,19 +122,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
     },
 })
 export default class DailyTaskUpdateProjectListItem extends Vue {
-    @Prop() project!: ProjectModel
-    @Prop() dailyTaskList!: DailyTaskModel[]
+    @Prop() project!: ProjectTask
+    @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
 
     sectionTab = 0
 
     // todo : change color of task selected
-    get isTaskSelected(): (task: TaskModel) => boolean {
-        return (task: TaskModel) =>
-            this.dailyTaskList.some((dailyTask: DailyTaskModel) => task.id === dailyTask.taskId)
+    get isTaskSelected(): (task: Task) => boolean {
+        return (task: Task) =>
+            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.taskId)
     }
 
-    get taskBySection(): { name: string; tasks: TaskModel[] }[] {
+    get taskBySection(): { name: string; tasks: Task[] }[] {
         return [
             {
                 name: 'General tasks',
@@ -147,20 +147,20 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
         ]
     }
 
-    get allTasks(): TaskModel[] {
+    get allTasks(): Task[] {
         return this.project.tasks.concat(this.project.sections.map(s => s.tasks).flat())
     }
 
-    get allTasksCompleted(): TaskModel[] {
+    get allTasksCompleted(): Task[] {
         return this.allTasks.filter(task => task.completed)
     }
 
-    get allTasksUncompleted(): TaskModel[] {
+    get allTasksUncompleted(): Task[] {
         return this.allTasks.filter(task => !task.completed)
     }
 
-    get taskUncompleted(): (tasks: TaskModel[]) => TaskModel[] {
-        return (tasks: TaskModel[]) => tasks.filter(task => !task.completed)
+    get taskUncompleted(): (tasks: Task[]) => Task[] {
+        return (tasks: Task[]) => tasks.filter(task => !task.completed)
     }
 
     get percentageOfTaskCompleted(): number {
@@ -178,7 +178,7 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
         this.$emit('update:selected', false)
     }
 
-    selectTask(task: TaskModel): void {
+    selectTask(task: Task): void {
         this.$emit('select-task', { taskId: task.id })
     }
 }

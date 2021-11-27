@@ -53,20 +53,20 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import { DailyTaskActionEnum, DailyTaskModel } from '@/models/daily-task.model'
+import { DailyTaskActionEnum, DailyTask } from '@/models/daily-task.model'
 import moment from 'moment'
 
 @Component
 export default class DailyTaskDetail extends Vue {
     @Prop() private date: string = ''
-    private dailyTaskList: DailyTaskModel[] = []
+    private dailyTaskList: DailyTask[] = []
 
     get dateFormatted(): string {
         return moment(this.date).format('dddd DD MMMM Y')
     }
 
     get dailyTaskUncompleted(): number {
-        return this.dailyTaskList.filter((dailyTask: DailyTaskModel) => !dailyTask.completed).length
+        return this.dailyTaskList.filter((dailyTask: DailyTask) => !dailyTask.completed).length
     }
 
     @Watch('date', { immediate: true })
@@ -85,7 +85,7 @@ export default class DailyTaskDetail extends Vue {
         )
     }
 
-    private toggleDailyTaskCompleteState(dailyTask: DailyTaskModel): void {
+    private toggleDailyTaskCompleteState(dailyTask: DailyTask): void {
         dailyTaskService.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
             (response: any) => {
                 dailyTask.completed = response.body.completed
@@ -125,7 +125,7 @@ export default class DailyTaskDetail extends Vue {
 
     private emitDailyTaskCompletedEvent(): void {
         const numberOfDailyTaskCompleted = this.dailyTaskList.filter(
-            (dailyTask: DailyTaskModel) => dailyTask.completed
+            (dailyTask: DailyTask) => dailyTask.completed
         ).length
         this.$emit('dailyTaskCompleted', this.date, numberOfDailyTaskCompleted)
     }

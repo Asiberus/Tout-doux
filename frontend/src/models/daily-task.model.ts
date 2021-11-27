@@ -1,4 +1,4 @@
-import { TaskModel } from '@/models/task.model'
+import { TaskExtended } from '@/models/task.model'
 
 // Todo : add get literal in enum
 export enum DailyTaskActionEnum {
@@ -7,17 +7,18 @@ export enum DailyTaskActionEnum {
     FINISH = 'FI',
 }
 
-export interface DailyTaskModel {
+// TODO : remove taskId (create post interface)
+export interface DailyTask {
     id: number
     date: string
-    taskId?: number
-    name?: string
-    action?: DailyTaskActionEnum
     completed: boolean
-    task: TaskModel
+    action?: DailyTaskActionEnum
+    taskId?: number
+    task?: TaskExtended
+    name?: string
 }
 
-export interface DailyTaskDisplayModel extends DailyTaskModel {
+export interface DailyTaskDisplay extends DailyTask {
     editMode: boolean
 }
 

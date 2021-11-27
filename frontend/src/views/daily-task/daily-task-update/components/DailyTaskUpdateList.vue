@@ -150,7 +150,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { DailyTaskActionEnum, DailyTaskDisplayModel } from '@/models/daily-task.model'
+import { DailyTaskActionEnum, DailyTaskDisplay } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 
 // todo : maybe change v-hover on daily task card
@@ -160,7 +160,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
     },
 })
 export default class DailyTaskUpdateList extends Vue {
-    @Prop() dailyTaskList!: DailyTaskDisplayModel[]
+    @Prop() dailyTaskList!: DailyTaskDisplay[]
 
     createDailyTaskDisplayed = false
     dailyTaskForm = {
@@ -199,7 +199,7 @@ export default class DailyTaskUpdateList extends Vue {
     @Watch('createDailyTaskDisplayed')
     private onCreateDailyTaskDisplayedChanges(value: boolean): void {
         if (value) {
-            const newDailyTask = {} as DailyTaskDisplayModel
+            const newDailyTask = {} as DailyTaskDisplay
             this.dailyTaskList.push(newDailyTask)
             this.toggleDailyTaskEditMode(newDailyTask, true)
         } else {
@@ -233,8 +233,8 @@ export default class DailyTaskUpdateList extends Vue {
         }
     }
 
-    toggleDailyTaskEditMode(dailyTask: DailyTaskDisplayModel, value: boolean): void {
-        this.dailyTaskList.forEach((d: DailyTaskDisplayModel) => (d.editMode = false))
+    toggleDailyTaskEditMode(dailyTask: DailyTaskDisplay, value: boolean): void {
+        this.dailyTaskList.forEach((d: DailyTaskDisplay) => (d.editMode = false))
         if (!dailyTask.id) {
             if (value) {
                 this.dailyTaskForm.data.name = ''

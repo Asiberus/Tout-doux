@@ -55,8 +55,8 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { ProjectModel } from '@/models/project.model'
-import { SectionModel } from '@/models/section.model'
+import { ProjectTask } from '@/models/project.model'
+import { SectionTask } from '@/models/section.model'
 import { projectActions } from '@/store/modules/project.store'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
@@ -72,11 +72,11 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class ProjectSection extends Vue {
     sectionDialog = false
 
-    get project(): ProjectModel {
+    get project(): ProjectTask {
         return this.$store.state.project.currentProject
     }
 
-    get sections(): SectionModel[] {
+    get sections(): SectionTask[] {
         return this.project.sections
     }
 

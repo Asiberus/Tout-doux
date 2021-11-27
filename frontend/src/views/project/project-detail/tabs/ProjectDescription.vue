@@ -15,9 +15,7 @@
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
-                    <ProgressCircular
-                        :value="projectAllTasksCompleted.length"
-                        :max="projectAllTasks.length">
+                    <ProgressCircular :value="allTasksCompleted.length" :max="allTasks.length">
                     </ProgressCircular>
                 </div>
             </v-col>
@@ -80,8 +78,8 @@ import ProgressCircular from '@/components/ProgressCircular.vue'
 import { projectActions } from '@/store/modules/project.store'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
-import { ProjectModel } from '@/models/project.model'
-import { TaskModel } from '@/models/task.model'
+import { ProjectTask } from '@/models/project.model'
+import { Task, TaskPost } from '@/models/task.model'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
@@ -97,7 +95,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 export default class ProjectDescription extends Vue {
     taskDialog = false
 
-    get project(): ProjectModel {
+    get project(): ProjectTask {
         return this.$store.state.project.currentProject
     }
 
@@ -105,23 +103,23 @@ export default class ProjectDescription extends Vue {
         return moment(this.project.created_at).format('D MMM. Y')
     }
 
-    get taskUncompleted(): TaskModel[] {
-        return this.project.tasks.filter((task: TaskModel) => !task.completed)
+    get taskUncompleted(): Task[] {
+        return this.project.tasks.filter((task: Task) => !task.completed)
     }
 
-    get taskCompleted(): TaskModel[] {
-        return this.project.tasks.filter((task: TaskModel) => task.completed)
+    get taskCompleted(): Task[] {
+        return this.project.tasks.filter((task: Task) => task.completed)
     }
 
-    get projectAllTasks(): TaskModel[] {
+    get allTasks(): Task[] {
         return this.project.tasks.concat(...this.project.sections.map(section => section.tasks))
     }
 
-    get projectAllTasksCompleted(): TaskModel[] {
-        return this.projectAllTasks.filter(task => task.completed)
+    get allTasksCompleted(): Task[] {
+        return this.allTasks.filter(task => task.completed)
     }
 
-    createTask(task: Partial<TaskModel>): void {
+    createTask(task: Partial<TaskPost>): void {
         this.taskDialog = false
         task.projectId = this.project.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -131,7 +129,7 @@ export default class ProjectDescription extends Vue {
         this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskModel>): void {
+    updateTask(id: number, taskForm: Partial<TaskPost>): void {
         this.$store.dispatch(projectActions.task.editTask, { id, taskForm })
     }
 

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { environment } from '@/environments/environment.dev'
-import { DailyTaskModel } from '@/models/daily-task.model'
+import { DailyTask } from '@/models/daily-task.model'
 
 const getDailyTaskOverview = (page: number, size = 21) => {
     const params = {
@@ -15,11 +15,11 @@ const getDailyTasksByDate = (date: string) => {
     return Vue.http.get(environment.dailyTask, { params })
 }
 
-const createDailyTask = (dailyTaskForm: Partial<DailyTaskModel>) => {
+const createDailyTask = (dailyTaskForm: Partial<DailyTask>) => {
     return Vue.http.post(environment.dailyTask, dailyTaskForm)
 }
 
-const updateDailyTask = (dailyTaskId: number, dailyTaskForm: Partial<DailyTaskModel>) => {
+const updateDailyTask = (dailyTaskId: number, dailyTaskForm: Partial<DailyTask>) => {
     return Vue.http.patch(
         environment.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()),
         dailyTaskForm

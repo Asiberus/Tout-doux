@@ -1,16 +1,15 @@
-import { TaskModel } from '@/models/task.model'
-import { SectionModel } from '@/models/section.model'
+import { Task } from '@/models/task.model'
+import { SectionTask } from '@/models/section.model'
 
-export interface ProjectModel {
+export interface Project {
     id: number
     name: string
     description: string
     archived: boolean
-    sections: SectionModel[]
-    tasks: TaskModel[]
     created_at: string
 }
 
-export interface DailyTaskProjectDisplayModel extends ProjectModel {
-    selected: boolean
+export interface ProjectTask extends Project {
+    sections: SectionTask[]
+    tasks: Task[]
 }

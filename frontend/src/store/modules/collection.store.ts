@@ -1,7 +1,7 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
-import { CollectionModel } from '@/models/collection.model'
-import { TaskModel } from '@/models/task.model'
+import { Collection, CollectionTask } from '@/models/collection.model'
+import { Task } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 
@@ -28,12 +28,12 @@ export const collectionActions = {
 @Module
 export class CollectionModule extends VuexModule {
     // State
-    currentCollection?: CollectionModel
+    currentCollection?: CollectionTask
 
     // Mutations
     @Mutation
     private [collectionMutations.setCurrentCollection](
-        collection: CollectionModel | undefined
+        collection: CollectionTask | undefined
     ): void {
         // Due to Vue reactivity lack with undefined properties with need to call the Vue.set function
         Vue.set(this, 'currentCollection', collection)
@@ -50,14 +50,14 @@ export class CollectionModule extends VuexModule {
     }
 
     @Mutation
-    private [collectionMutations.task.addTask](task: TaskModel): void {
+    private [collectionMutations.task.addTask](task: Task): void {
         if (!this.currentCollection) return
 
         this.currentCollection.tasks.unshift(task)
     }
 
     @Mutation
-    private [collectionMutations.task.editTask](task: TaskModel): void {
+    private [collectionMutations.task.editTask](task: Task): void {
         if (!this.currentCollection) return
 
         const t = this.currentCollection.tasks.find(t => t.id === task.id)
@@ -90,7 +90,7 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.updateProperties](payload: {
         id: number
-        data: Partial<CollectionModel>
+        data: Partial<Collection>
     }): Promise<void> {
         const { id, data } = payload
         collectionService.updateCollection(id, data).then(
@@ -105,7 +105,7 @@ export class CollectionModule extends VuexModule {
     }
 
     @Action
-    async [collectionActions.task.addTask](task: Partial<TaskModel>): Promise<void> {
+    async [collectionActions.task.addTask](task: Partial<Task>): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(collectionMutations.task.addTask, response.body)
@@ -119,7 +119,7 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.task.editTask](payload: {
         id: number
-        taskForm: Partial<TaskModel>
+        taskForm: Partial<Task>
     }): Promise<void> {
         const { id, taskForm } = payload
         await taskService.updateTaskById(id, taskForm).then(

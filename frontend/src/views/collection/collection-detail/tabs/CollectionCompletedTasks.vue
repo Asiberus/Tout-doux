@@ -23,8 +23,8 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { CollectionModel } from '@/models/collection.model'
-import { TaskModel } from '@/models/task.model'
+import { CollectionTask } from '@/models/collection.model'
+import { Task } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
 import { Component, Vue } from 'vue-property-decorator'
@@ -36,11 +36,11 @@ import { Component, Vue } from 'vue-property-decorator'
     },
 })
 export default class CollectionCompletedTasks extends Vue {
-    get collection(): CollectionModel {
+    get collection(): CollectionTask {
         return this.$store.state.collection.currentCollection
     }
 
-    get taskCompleted(): TaskModel[] {
+    get taskCompleted(): Task[] {
         return this.collection.tasks.filter(task => task.completed)
     }
 

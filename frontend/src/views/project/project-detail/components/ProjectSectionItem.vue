@@ -128,8 +128,8 @@
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { SectionModel } from '@/models/section.model'
-import { TaskModel } from '@/models/task.model'
+import { SectionTask } from '@/models/section.model'
+import { Task, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -145,7 +145,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
     },
 })
 export default class ProjectSectionItem extends Vue {
-    @Prop() section!: SectionModel
+    @Prop() section!: SectionTask
     @Prop() disabled!: boolean
 
     private editMode = false
@@ -170,11 +170,11 @@ export default class ProjectSectionItem extends Vue {
     }
 
     get taskCompletedLength(): number {
-        return this.section.tasks.filter((task: TaskModel) => task.completed).length
+        return this.section.tasks.filter((task: Task) => task.completed).length
     }
 
-    get taskUncompleted(): TaskModel[] {
-        return this.section.tasks.filter((task: TaskModel) => !task.completed)
+    get taskUncompleted(): Task[] {
+        return this.section.tasks.filter((task: Task) => !task.completed)
     }
 
     closeEditMode(): void {
@@ -195,7 +195,7 @@ export default class ProjectSectionItem extends Vue {
         this.$emit('delete', this.section.id)
     }
 
-    createTask(task: Partial<TaskModel>): void {
+    createTask(task: Partial<TaskPost>): void {
         this.taskDialog = false
         task.sectionId = this.section.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -205,7 +205,7 @@ export default class ProjectSectionItem extends Vue {
         this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskModel>): void {
+    updateTask(id: number, taskForm: Partial<TaskPost>): void {
         this.$store.dispatch(projectActions.task.editTask, { id, taskForm })
     }
 
