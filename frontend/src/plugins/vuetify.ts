@@ -33,6 +33,8 @@ export default new Vuetify({
                 // taskCompleted: '#4CAF50',
                 taskInCreation: '#181b1f',
                 projectArchived: '#363e4d',
+                project: '#004D40',
+                collection: '#827717',
             },
         },
     },

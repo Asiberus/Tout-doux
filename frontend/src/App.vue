@@ -28,6 +28,10 @@ export default Vue.extend({
     cursor: pointer;
 }
 
+.cursor-default {
+    cursor: default;
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

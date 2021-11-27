@@ -32,14 +32,46 @@
                                     {{ getLiteralFormOfDailyActionEnum(dailyTask.action) }}
                                 </v-chip>
                                 <template v-if="dailyTask.taskId">
-                                    <h4 class="white--text font-weight-regular">
+                                    <h4 class="white--text font-weight-regular mr-3">
                                         {{ dailyTask.task.name }}
                                     </h4>
                                 </template>
                                 <template v-else>
-                                    <h4 class="white--text font-weight-regular">
+                                    <h4 class="white--text font-weight-regular mr-3">
                                         {{ dailyTask.name }}
                                     </h4>
+                                </template>
+
+                                <template v-if="dailyTask.task">
+                                    <v-chip
+                                        @click.stop=""
+                                        :ripple="false"
+                                        label
+                                        small
+                                        :color="getTagColor(dailyTask)"
+                                        class="daily-chip">
+                                        <template v-if="dailyTask.task.project">
+                                            <span :title="dailyTask.task.project.name">{{
+                                                dailyTask.task.project.name
+                                            }}</span>
+                                        </template>
+                                        <template v-else-if="dailyTask.task.section">
+                                            <span :title="dailyTask.task.section.project.name">{{
+                                                dailyTask.task.section.project.name
+                                            }}</span>
+                                            <v-divider
+                                                vertical
+                                                class="chip-divider mx-1"></v-divider>
+                                            <span :title="dailyTask.task.section.name">{{
+                                                dailyTask.task.section.name
+                                            }}</span>
+                                        </template>
+                                        <template v-else-if="dailyTask.task.collection">
+                                            <span :title="dailyTask.task.collection.name">{{
+                                                dailyTask.task.collection.name
+                                            }}</span>
+                                        </template>
+                                    </v-chip>
                                 </template>
                             </div>
                         </v-card-text>
@@ -53,12 +85,12 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import { DailyTaskActionEnum, DailyTask } from '@/models/daily-task.model'
+import { DailyTaskActionEnum, DailyTask, DailyTaskDisplay } from '@/models/daily-task.model'
 import moment from 'moment'
 
 @Component
 export default class DailyTaskDetail extends Vue {
-    @Prop() private date: string = ''
+    @Prop() private date!: string
     private dailyTaskList: DailyTask[] = []
 
     get dateFormatted(): string {
@@ -95,6 +127,13 @@ export default class DailyTaskDetail extends Vue {
                 console.error(error)
             }
         )
+    }
+
+    getTagColor(dailyTask: DailyTask): string | undefined {
+        if (dailyTask.task) {
+            if (dailyTask.task.project || dailyTask.task.section) return 'project'
+            else if (dailyTask.task.collection) return 'collection'
+        }
     }
 
     // Todo : move this function to a better place
@@ -149,6 +188,21 @@ export default class DailyTaskDetail extends Vue {
     top: 0;
     right: 0;
     padding: 1rem;
+}
+
+.daily-chip {
+    cursor: default !important;
+
+    span {
+        max-width: 5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .chip-divider {
+        border-width: 1px;
+    }
 }
 
 .content {

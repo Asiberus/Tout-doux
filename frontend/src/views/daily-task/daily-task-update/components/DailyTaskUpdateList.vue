@@ -60,7 +60,7 @@
                                         </v-list>
                                     </v-menu>
 
-                                    <div class="flex-grow-1 d-flex align-center">
+                                    <div class="d-flex align-center mr-3">
                                         <template v-if="dailyTask.taskId">
                                             <h4 class="white--text font-weight-regular">
                                                 {{ dailyTask.task.name }}
@@ -72,6 +72,38 @@
                                             </h4>
                                         </template>
                                     </div>
+
+                                    <template v-if="dailyTask.task">
+                                        <v-chip
+                                            small
+                                            class="daily-chip"
+                                            :color="getTagColor(dailyTask)">
+                                            <template v-if="dailyTask.task.project">
+                                                <span :title="dailyTask.task.project.name">{{
+                                                    dailyTask.task.project.name
+                                                }}</span>
+                                            </template>
+                                            <template v-else-if="dailyTask.task.section">
+                                                <span
+                                                    :title="dailyTask.task.section.project.name"
+                                                    >{{ dailyTask.task.section.project.name }}</span
+                                                >
+                                                <v-divider
+                                                    vertical
+                                                    class="chip-divider mx-1"></v-divider>
+                                                <span :title="dailyTask.task.section.name">{{
+                                                    dailyTask.task.section.name
+                                                }}</span>
+                                            </template>
+                                            <template v-else-if="dailyTask.task.collection">
+                                                <span :title="dailyTask.task.collection.name">{{
+                                                    dailyTask.task.collection.name
+                                                }}</span>
+                                            </template>
+                                        </v-chip>
+                                    </template>
+
+                                    <span class="flex-grow-1"></span>
 
                                     <v-slide-x-reverse-transition>
                                         <div v-if="hover" class="daily-task-card-actions">
@@ -233,6 +265,13 @@ export default class DailyTaskUpdateList extends Vue {
         }
     }
 
+    getTagColor(dailyTask: DailyTaskDisplay): string | undefined {
+        if (dailyTask.task) {
+            if (dailyTask.task.project || dailyTask.task.section) return 'project'
+            else if (dailyTask.task.collection) return 'collection'
+        }
+    }
+
     toggleDailyTaskEditMode(dailyTask: DailyTaskDisplay, value: boolean): void {
         this.dailyTaskList.forEach((d: DailyTaskDisplay) => (d.editMode = false))
         if (!dailyTask.id) {
@@ -274,6 +313,19 @@ export default class DailyTaskUpdateList extends Vue {
 .daily-task-wrapper {
     max-height: 45rem;
     overflow: auto;
+
+    .daily-chip {
+        span {
+            max-width: 5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chip-divider {
+            border-width: 1px;
+        }
+    }
 
     .daily-task-card {
         //&:hover .daily-task-card-actions {
