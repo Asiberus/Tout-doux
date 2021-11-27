@@ -4,12 +4,11 @@ from rest_framework import serializers
 
 from tout_doux.models.daily_task import DailyTask
 from tout_doux.models.task import Task
-from tout_doux.serializers.task import TaskSerializer
+from tout_doux.serializers.task.task_extended import TaskExtendedSerializer
 from tout_doux.utils import get_or_raise_error
 
 
 # Todo : maybe change name of daily task
-# Todo : optimize to_representation for task object
 # Todo : Handle when a task is selected and the task is then completed in the project or collection view
 class DailyTaskSerializer(serializers.ModelSerializer):
     taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
@@ -20,7 +19,8 @@ class DailyTaskSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['task'] = TaskSerializer(instance.task).data
+        if rep['taskId']:
+            rep['task'] = TaskExtendedSerializer(instance.task).data
         return rep
 
     def update(self, instance, validated_data):

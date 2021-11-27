@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from tout_doux.models.daily_task import DailyTask
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.daily_task import DailyTaskSerializer
+from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 from tout_doux.utils import daterange
 
 
