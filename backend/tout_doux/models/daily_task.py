@@ -24,4 +24,3 @@ class DailyTask(models.Model):
         constraints = [
             models.UniqueConstraint(fields=('date', 'task'), name='unique_task_for_date')
         ]
-        

@@ -1,7 +1,12 @@
 <template>
     <v-container>
         <h1 class="mb-6">Collections</h1>
-        <div class="d-flex justify-end align-center">
+        <div class="d-flex justify-end align-center mb-3">
+            <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
+                <v-icon v-if="archived" small class="mr-1"> mdi-archive </v-icon>
+                <v-icon v-else small class="mr-1"> mdi-checkbox-blank-outline </v-icon>
+                Archived
+            </v-chip>
             <v-dialog v-model="collectionDialog" width="60%">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
@@ -33,13 +38,14 @@
                         style="max-width: 450px" />
                 </template>
                 <template #message>
-                    <div class="d-flex align-center">
+                    <div class="d-flex align-center" v-if="!archived">
                         <span>You don't have any collection yet !</span>
                         <v-btn @click="collectionDialog = true" small class="ml-2">
                             <v-icon left>mdi-plus</v-icon>
                             add a collection
                         </v-btn>
                     </div>
+                    <div v-else>You don't have any archived collection</div>
                 </template>
             </EmptyListDisplay>
         </template>
@@ -47,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { collectionService } from '@/api/collection.api'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
@@ -62,15 +68,21 @@ import { Collection, CollectionTask } from '@/models/collection.model'
     },
 })
 export default class CollectionList extends Vue {
+    @Prop() archived: boolean = false
     collectionList: CollectionTask[] = []
     collectionDialog = false
 
     created(): void {
-        this.retrieveCollectionList()
+        this.retrieveCollectionList({ archived: this.archived })
     }
 
-    private retrieveCollectionList(): void {
-        collectionService.getCollectionList().then(
+    @Watch('archived')
+    private onArchivedProjectsChanges(value: boolean): void {
+        this.retrieveCollectionList({ archived: value })
+    }
+
+    private retrieveCollectionList(params = {}): void {
+        collectionService.getCollectionList(params).then(
             (response: any) => {
                 this.collectionList = response.body.content
             },
@@ -91,6 +103,10 @@ export default class CollectionList extends Vue {
                 console.error(error)
             }
         )
+    }
+
+    toggleArchivedProject(): void {
+        this.$router.replace({ query: { archived: (!this.archived).toString() } })
     }
 }
 </script>

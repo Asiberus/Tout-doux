@@ -5,6 +5,7 @@
                 v-for="task in taskCompleted"
                 :key="task.id"
                 :task="task"
+                :disabled="collection.archived"
                 @toggle-state="toggleTaskState">
             </TaskItemCard>
         </template>

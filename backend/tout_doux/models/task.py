@@ -11,7 +11,8 @@ class Task(models.Model):
     project = models.ForeignKey(Project, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
                                 related_name='tasks', null=True, blank=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
+    collection = models.ForeignKey(Collection, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
+                                   related_name='tasks', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, editable=False)
 

@@ -10,6 +10,9 @@ export const collectionRoutes: Array<RouteConfig> = [
         path: '/collection',
         name: 'collection-list',
         component: CollectionList,
+        props: (route: any) => ({
+            archived: route.query.archived === 'true',
+        }),
     },
     {
         path: '/collection/:id',

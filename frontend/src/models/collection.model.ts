@@ -5,6 +5,7 @@ export interface Collection {
     name: string
     description: string
     created_at: string
+    archived: boolean
 }
 
 export interface CollectionTask extends Collection {

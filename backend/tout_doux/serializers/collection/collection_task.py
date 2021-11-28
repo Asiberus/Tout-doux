@@ -9,4 +9,4 @@ class CollectionTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ('id', 'name', 'description', 'tasks', 'created_at')
+        fields = ('id', 'name', 'description', 'tasks', 'created_at', 'archived')

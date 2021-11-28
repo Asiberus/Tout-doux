@@ -7,7 +7,11 @@
                     <div>
                         <v-dialog v-model="taskDialog" width="60%">
                             <template #activator="{ on, attrs }">
-                                <v-btn v-bind="attrs" v-on="on" icon>
+                                <v-btn
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    icon
+                                    :disabled="collection.archived">
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
                             </template>
@@ -25,6 +29,7 @@
                         v-for="task in tasksUncompleted"
                         :key="task.id"
                         :task="task"
+                        :disabled="collection.archived"
                         @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask">

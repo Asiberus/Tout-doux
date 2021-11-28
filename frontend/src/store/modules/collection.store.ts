@@ -43,6 +43,7 @@ export class CollectionModule extends VuexModule {
     private [collectionMutations.updateProperties](payload: {
         name: string
         description: string
+        archived: boolean
     }): void {
         if (!this.currentCollection) return
 
@@ -95,8 +96,12 @@ export class CollectionModule extends VuexModule {
         const { id, data } = payload
         collectionService.updateCollection(id, data).then(
             (response: any) => {
-                const { name, description } = response.body
-                this.context.commit(collectionMutations.updateProperties, { name, description })
+                const { name, description, archived } = response.body
+                this.context.commit(collectionMutations.updateProperties, {
+                    name,
+                    description,
+                    archived,
+                })
             },
             (error: any) => {
                 console.error(error)

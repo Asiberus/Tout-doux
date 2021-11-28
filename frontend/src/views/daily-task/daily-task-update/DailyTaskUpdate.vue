@@ -160,7 +160,7 @@ export default class DailyTaskUpdate extends Vue {
     }
 
     private retrieveCollectionList(): void {
-        collectionService.getCollectionList().then(
+        collectionService.getCollectionList({ archived: false }).then(
             (response: any) => {
                 this.collectionList = response.body.content.map((collection: CollectionTask) => ({
                     content: collection,

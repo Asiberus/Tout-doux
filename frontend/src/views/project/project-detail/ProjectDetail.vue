@@ -1,14 +1,12 @@
 <template>
     <v-container v-if="project">
-        <div class="d-flex justify-space-between align-center">
-            <h1>
-                Project : {{ project.name }}
-                <v-chip v-if="project.archived" color="accent" class="ml-3">
-                    <v-icon small class="mr-1"> mdi-archive </v-icon>
-                    Archived
-                </v-chip>
-            </h1>
-        </div>
+        <h1>
+            Project : {{ project.name }}
+            <v-chip v-if="project.archived" color="accent" class="ml-3">
+                <v-icon small class="mr-1"> mdi-archive </v-icon>
+                Archived
+            </v-chip>
+        </h1>
 
         <v-divider class="my-3" />
 

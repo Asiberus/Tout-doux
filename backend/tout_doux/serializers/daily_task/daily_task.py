@@ -38,6 +38,7 @@ class DailyTaskSerializer(serializers.ModelSerializer):
 
         return instance_updated
 
+    # Todo : test if project or collection is archived
     def validate(self, data):
         if 'taskId' in data:
             task_id = data.pop('taskId')
