@@ -6,4 +6,4 @@ from tout_doux.models.task import Task
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id', 'name', 'completed', 'created_at')
+        fields = ('id', 'name', 'completed', 'created_at', 'completed_at')

@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from tout_doux.models.daily_task import DailyTask
@@ -9,7 +10,6 @@ from tout_doux.utils import get_or_raise_error
 
 
 # Todo : maybe change name of daily task
-# Todo : Handle when a task is selected and the task is then completed in the project or collection view
 class DailyTaskSerializer(serializers.ModelSerializer):
     taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
 
@@ -24,8 +24,16 @@ class DailyTaskSerializer(serializers.ModelSerializer):
         return rep
 
     def update(self, instance, validated_data):
-        if instance.task and instance.action == DailyTask.FINISH and validated_data.get('completed'):
-            print('COMPLETED TASK')
+        if 'completed' in validated_data and instance.task and (
+                not instance.action or instance.action == DailyTask.FINISH):
+            if validated_data.get('completed', False):
+                instance.task.completed = True
+                instance.task.completed_at = timezone.now()
+            else:
+                instance.task.completed = False
+                instance.task.completed_at = None
+            instance.task.save()
+
         instance_updated = super().update(instance, validated_data)
 
         return instance_updated
@@ -56,7 +64,8 @@ class DailyTaskSerializer(serializers.ModelSerializer):
                 if data.get('task'):
                     raise serializers.ValidationError('You can\'t edit the task of a daily task')
                 if data.get('name'):
-                    raise serializers.ValidationError('You can\'t edit the name of a daily task that is related to a task')
+                    raise serializers.ValidationError(
+                        'You can\'t edit the name of a daily task that is related to a task')
 
             if self.instance.name:
                 if data.get('task'):

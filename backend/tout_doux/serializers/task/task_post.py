@@ -25,8 +25,11 @@ class TaskPostSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def update(self, instance, validated_data):
-        if validated_data.get('completed'):
-            validated_data['completed_at'] = timezone.now()
+        if 'completed' in validated_data:
+            if validated_data.get('completed'):
+                validated_data['completed_at'] = timezone.now()
+            else:
+                validated_data['completed_at'] = None
 
         return super().update(instance, validated_data)
 
@@ -61,7 +64,7 @@ class TaskPostSerializer(serializers.ModelSerializer):
 
         # Todo : test if task is created without a project or a collection
         # Todo : handle section tests
-        # Todo : test this condition
+        # Todo : test this conditions
         if self.instance and self.instance.project and self.instance.project.archived \
                 or data.get('project') and data.get('project').archived:
             raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')

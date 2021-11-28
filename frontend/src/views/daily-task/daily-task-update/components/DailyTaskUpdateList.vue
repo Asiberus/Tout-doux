@@ -80,26 +80,37 @@
                                             class="daily-chip"
                                             :color="getTagColor(dailyTask)">
                                             <template v-if="dailyTask.task.project">
-                                                <span :title="dailyTask.task.project.name">{{
-                                                    dailyTask.task.project.name
-                                                }}</span>
+                                                <span
+                                                    :title="
+                                                        'Project : ' + dailyTask.task.project.name
+                                                    "
+                                                    >{{ dailyTask.task.project.name }}</span
+                                                >
                                             </template>
                                             <template v-else-if="dailyTask.task.section">
                                                 <span
-                                                    :title="dailyTask.task.section.project.name"
+                                                    :title="
+                                                        'Project : ' +
+                                                        dailyTask.task.section.project.name
+                                                    "
                                                     >{{ dailyTask.task.section.project.name }}</span
                                                 >
-                                                <v-divider
-                                                    vertical
-                                                    class="chip-divider mx-1"></v-divider>
-                                                <span :title="dailyTask.task.section.name">{{
-                                                    dailyTask.task.section.name
-                                                }}</span>
+                                                <span class="mx-1">•</span>
+                                                <span
+                                                    :title="
+                                                        'Section : ' + dailyTask.task.section.name
+                                                    "
+                                                    >{{ dailyTask.task.section.name }}</span
+                                                >
                                             </template>
                                             <template v-else-if="dailyTask.task.collection">
-                                                <span :title="dailyTask.task.collection.name">{{
-                                                    dailyTask.task.collection.name
-                                                }}</span>
+                                                <span
+                                                    :title="
+                                                        'Collection : ' +
+                                                        dailyTask.task.collection.name
+                                                    "
+                                                    >{{ dailyTask.task.collection.name }}</span
+                                                >
                                             </template>
                                         </v-chip>
                                     </template>
