@@ -82,7 +82,7 @@
                         :key="task.id"
                         :task="task"
                         :disabled="disabled"
-                        @toggleState="toggleTaskState"
+                        @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask">
                     </TaskItemCard>
@@ -202,11 +202,15 @@ export default class ProjectSectionItem extends Vue {
     }
 
     toggleTaskState(id: number, completed: boolean): void {
-        this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } })
+        this.$store.dispatch(projectActions.task.editTask, {
+            id,
+            data: { completed },
+            sectionId: this.section.id,
+        })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskPost>): void {
-        this.$store.dispatch(projectActions.task.editTask, { id, taskForm })
+    updateTask(id: number, data: Partial<TaskPost>): void {
+        this.$store.dispatch(projectActions.task.editTask, { id, data, sectionId: this.section.id })
     }
 
     deleteTask(id: number): void {

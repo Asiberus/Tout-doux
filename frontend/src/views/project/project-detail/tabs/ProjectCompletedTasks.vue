@@ -8,7 +8,7 @@
                         <TaskItemCard
                             :task="task"
                             :disabled="project.archived"
-                            @toggleState="toggleTaskState">
+                            @toggle-state="toggleTaskState">
                         </TaskItemCard>
                     </v-col>
                 </v-row>
@@ -47,7 +47,7 @@ export default class ProjectCompletedTasks extends Vue {
         return this.$store.state.project.currentProject
     }
 
-    get tasksList(): { name: string; tasks: Task[] }[] {
+    get tasksList(): { name: string; tasks: Task[]; sectionId?: number }[] {
         return [
             {
                 name: 'General tasks',
@@ -56,12 +56,22 @@ export default class ProjectCompletedTasks extends Vue {
             ...this.project.sections.map(section => ({
                 name: section.name,
                 tasks: section.tasks.filter(task => task.completed),
+                sectionId: section.id,
             })),
         ]
     }
 
     toggleTaskState(id: number, completed: boolean): void {
-        this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } })
+        let payload
+        if (this.project.tasks.some(task => task.id === id))
+            payload = { id, data: { completed }, projectId: this.project.id }
+        else {
+            const section = this.project.sections.find(section =>
+                section.tasks.some(task => task.id === id)
+            )
+            if (section) payload = { id, data: { completed }, sectionId: section.id }
+        }
+        this.$store.dispatch(projectActions.task.editTask, payload)
     }
 }
 </script>

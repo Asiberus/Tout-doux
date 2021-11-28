@@ -73,13 +73,14 @@ export default class TaskItemCard extends Vue {
     }
 
     onCardClick(): void {
-        if (this.task.completed || this.disabled) return
+        if (this.disabled) return
 
-        this.taskDialog = true
+        if (this.task.completed) this.emitToggleStateEvent()
+        else this.taskDialog = true
     }
 
     emitToggleStateEvent(): void {
-        this.$emit('toggleState', this.task.id, !this.task.completed)
+        this.$emit('toggle-state', this.task.id, !this.task.completed)
     }
 
     emitUpdateEvent(data: Partial<TaskPost>): void {

@@ -45,7 +45,7 @@
                     <TaskItemCard
                         :task="task"
                         :disabled="project.archived"
-                        @toggleState="toggleTaskState"
+                        @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask">
                     </TaskItemCard>
@@ -126,11 +126,15 @@ export default class ProjectDescription extends Vue {
     }
 
     toggleTaskState(id: number, completed: boolean): void {
-        this.$store.dispatch(projectActions.task.editTask, { id, taskForm: { completed } })
+        this.$store.dispatch(projectActions.task.editTask, {
+            id,
+            data: { completed },
+            projectId: this.project.id,
+        })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskPost>): void {
-        this.$store.dispatch(projectActions.task.editTask, { id, taskForm })
+    updateTask(id: number, data: Partial<TaskPost>): void {
+        this.$store.dispatch(projectActions.task.editTask, { id, data, projectId: this.project.id })
     }
 
     deleteTask(id: number): void {

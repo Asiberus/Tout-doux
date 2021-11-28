@@ -5,7 +5,7 @@
                 v-for="task in taskCompleted"
                 :key="task.id"
                 :task="task"
-                @toggleState="toggleTaskState">
+                @toggle-state="toggleTaskState">
             </TaskItemCard>
         </template>
         <template v-else>
@@ -45,7 +45,7 @@ export default class CollectionCompletedTasks extends Vue {
     }
 
     toggleTaskState(id: number, completed: boolean): void {
-        this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } })
+        this.$store.dispatch(collectionActions.task.editTask, { id, data: { completed } })
     }
 }
 </script>

@@ -223,7 +223,11 @@ export class ProjectModule extends VuexModule {
     async [projectActions.task.addTask](task: Partial<TaskPost>): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
-                this.context.commit(projectMutations.task.addTask, response.body)
+                this.context.commit(projectMutations.task.addTask, {
+                    task: response.body,
+                    projectId: task.projectId,
+                    sectionId: task.sectionId,
+                })
             },
             (error: any) => {
                 console.error(error)
@@ -234,12 +238,18 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.task.editTask](payload: {
         id: number
-        taskForm: Partial<TaskPost>
+        data: Partial<TaskPost>
+        projectId?: number
+        sectionId?: number
     }): Promise<void> {
-        const { id, taskForm } = payload
-        await taskService.updateTaskById(id, taskForm).then(
+        const { id, data, projectId, sectionId } = payload
+        await taskService.updateTaskById(id, data).then(
             (response: any) => {
-                this.context.commit(projectMutations.task.editTask, response.body)
+                this.context.commit(projectMutations.task.editTask, {
+                    task: response.body,
+                    projectId,
+                    sectionId,
+                })
             },
             (error: any) => {
                 console.error(error)

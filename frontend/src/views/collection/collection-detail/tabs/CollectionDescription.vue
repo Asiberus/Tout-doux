@@ -25,7 +25,7 @@
                         v-for="task in tasksUncompleted"
                         :key="task.id"
                         :task="task"
-                        @toggleState="toggleTaskState"
+                        @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask">
                     </TaskItemCard>
@@ -116,11 +116,11 @@ export default class CollectionDescription extends Vue {
     }
 
     toggleTaskState(id: number, completed: boolean): void {
-        this.$store.dispatch(collectionActions.task.editTask, { id, taskForm: { completed } })
+        this.$store.dispatch(collectionActions.task.editTask, { id, data: { completed } })
     }
 
-    updateTask(id: number, taskForm: Partial<TaskPost>): void {
-        this.$store.dispatch(collectionActions.task.editTask, { id, taskForm })
+    updateTask(id: number, data: Partial<TaskPost>): void {
+        this.$store.dispatch(collectionActions.task.editTask, { id, data })
     }
 
     deleteTask(id: number): void {

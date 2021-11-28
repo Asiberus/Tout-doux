@@ -10,12 +10,6 @@ const getProjectById = (projectId: number) => {
     return Vue.http.get(environment.projectById.replace(':projectId', projectId.toString()))
 }
 
-// TODO : remove if unused
-const getProjectSections = (projectId: number) => {
-    const url = environment.projectSections.replace(':projectId', projectId.toString())
-    return Vue.http.get(url)
-}
-
 const createProject = (project: Partial<Project>) => {
     return Vue.http.post(environment.project, project)
 }
@@ -34,7 +28,6 @@ const deleteProject = (projectId: number) => {
 export const projectService = {
     getProjectList,
     getProjectById,
-    getProjectSections,
     createProject,
     updateProject,
     deleteProject,

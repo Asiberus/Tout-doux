@@ -119,10 +119,10 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.task.editTask](payload: {
         id: number
-        taskForm: Partial<Task>
+        data: Partial<Task>
     }): Promise<void> {
-        const { id, taskForm } = payload
-        await taskService.updateTaskById(id, taskForm).then(
+        const { id, data } = payload
+        await taskService.updateTaskById(id, data).then(
             (response: any) => {
                 this.context.commit(collectionMutations.task.editTask, response.body)
             },
