@@ -25,8 +25,14 @@ class SectionSerializer(serializers.ModelSerializer):
             project = get_or_raise_error(Project, id=project_id,
                                          error=serializers.ValidationError('This project doesn\'t exist'))
             if project.archived:
-                raise serializers.ValidationError('This project is archived')
+                raise serializers.ValidationError('You can\'t add a section to an archived project')
 
             data['project'] = project
+
+        if self.instance:
+            if data.get('project'):
+                raise serializers.ValidationError('This section is already link to a project')
+            if self.instance.project.archived:
+                raise serializers.ValidationError('You can\'t edit a section to an archived project')
 
         return data

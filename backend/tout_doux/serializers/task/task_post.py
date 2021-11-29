@@ -62,26 +62,37 @@ class TaskPostSerializer(serializers.ModelSerializer):
             else:
                 data['project'] = None
 
-        # Todo : test if task is created without a project or a collection
-        # Todo : handle section tests
-        # Todo : test this conditions
-        if self.instance and self.instance.project and self.instance.project.archived \
-                or data.get('project') and data.get('project').archived:
-            raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+        if self.instance:
+            if self.instance.project:
+                if self.instance.project.archived:
+                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+                if data.get('project') or data.get('section') or data.get('collection'):
+                    raise serializers.ValidationError('This task is already linked to a project')
+            if self.instance.section:
+                if self.instance.section.project.archived:
+                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+                if data.get('project') or data.get('section') or data.get('collection'):
+                    raise serializers.ValidationError('This task is already linked to a section')
+            if self.instance.collection:
+                if self.instance.collection.archived:
+                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')
+                if data.get('project') or data.get('section') or data.get('collection'):
+                    raise serializers.ValidationError('This task is already linked to a collection')
+        else:
+            if not data.get('project') and not data.get('section') and not data.get('collection'):
+                raise serializers.ValidationError('You must link a task to either a project, a section or a collection')
 
-        if self.instance and self.instance.collection and self.instance.collection.archived or data.get(
-                'collection') and data.get('collection').archived:
-            raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')
+            # Archived
+            if (data.get('project') and data.get('project').archived) or (data.get('section') and data.get('section').project.archived):
+                raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+            if data.get('collection') and data.get('collection').archived:
+                raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')
 
-        if self.instance and self.instance.section and self.instance.section.project.archived or data.get(
-                'section') and data.get('section').project.archived:
-            raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
-
-        if data.get('project') and data.get('collection'):
-            raise serializers.ValidationError('You can\'t create a task related to a project and a collection')
-        elif self.instance and self.instance.project and data.get('collection'):
-            raise serializers.ValidationError('This task is already linked to a project')
-        elif self.instance and self.instance.collection and data.get('project'):
-            raise serializers.ValidationError('This task is already linked to a collection')
+            # Link
+            if (data.get('project') and data.get('section')) \
+                    or (data.get('project') and data.get('collection')) \
+                    or (data.get('section') and data.get('collection')):
+                raise serializers.ValidationError(
+                    'You can\'t create a task related to a project, a section and collection')
 
         return data

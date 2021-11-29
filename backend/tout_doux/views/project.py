@@ -20,16 +20,3 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         # Case for create, update, partial_update and destroy
         return ProjectSerializer
-
-    # TODO : see if we delete (I think so)
-    # @action(detail=True)
-    # def sections(self, request, pk=None):
-    #     size = int(request.query_params.get('size', 20))
-    #     page = int(request.query_params.get('page', 1))
-    #
-    #     if Project.objects.filter(id=pk).exists():
-    #         project = Project.objects.get(id=pk)
-    #         sections = SectionSerializer(project.sections.all(), many=True)
-    #         return Response(sections.data)
-    #     else:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
