@@ -36,31 +36,18 @@ class TaskPostSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # Map collectionId to collection
         if 'collectionId' in data:
-            collection_id = data.pop('collectionId')
-            if collection_id:
-                data['collection'] = get_or_raise_error(Collection, id=collection_id, error=serializers.ValidationError(
-                    'This collection doesn\'t exist'))
-            else:
-                data['collection'] = None
+            data['collection'] = get_or_raise_error(Collection, id=data.pop('collectionId'),
+                                                    error=serializers.ValidationError('This collection doesn\'t exist'))
 
         # Map projectId to project
         if 'projectId' in data:
-            project_id = data.pop('projectId')
-            if project_id:
-                data['project'] = get_or_raise_error(Project, id=project_id,
-                                                     error=serializers.ValidationError('This project doesn\'t exist'))
-            else:
-                data['project'] = None
+            data['project'] = get_or_raise_error(Project, id=data.pop('projectId'),
+                                                 error=serializers.ValidationError('This project doesn\'t exist'))
 
         # Map projectId to project
         if 'sectionId' in data:
-            section_id = data.pop('sectionId')
-            if section_id:
-                data['section'] = get_or_raise_error(Section, id=section_id,
-                                                     error=serializers.ValidationError(
-                                                         'This section doesn\'t exist'))
-            else:
-                data['project'] = None
+            data['section'] = get_or_raise_error(Section, id=data.pop('sectionId'),
+                                                 error=serializers.ValidationError('This section doesn\'t exist'))
 
         if self.instance:
             if self.instance.project:
@@ -75,7 +62,8 @@ class TaskPostSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError('This task is already linked to a section')
             if self.instance.collection:
                 if self.instance.collection.archived:
-                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')
+                    raise serializers.ValidationError(
+                        'You can\'t create or edit a task related to an archived collection')
                 if data.get('project') or data.get('section') or data.get('collection'):
                     raise serializers.ValidationError('This task is already linked to a collection')
         else:
@@ -83,7 +71,8 @@ class TaskPostSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('You must link a task to either a project, a section or a collection')
 
             # Archived
-            if (data.get('project') and data.get('project').archived) or (data.get('section') and data.get('section').project.archived):
+            if (data.get('project') and data.get('project').archived) or (
+                    data.get('section') and data.get('section').project.archived):
                 raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
             if data.get('collection') and data.get('collection').archived:
                 raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')

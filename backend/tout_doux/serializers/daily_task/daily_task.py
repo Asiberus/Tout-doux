@@ -21,10 +21,14 @@ class DailyTaskSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         if rep['taskId']:
             rep['task'] = TaskExtendedSerializer(instance.task).data
+            del rep['name']
+
+        del rep['taskId']
         return rep
 
     def update(self, instance, validated_data):
-        if instance.task and 'completed' in validated_data and (not instance.action or instance.action == DailyTask.FINISH):
+        if instance.task and 'completed' in validated_data and (
+                not instance.action or instance.action == DailyTask.FINISH):
             # Test if task is not related to an archived project or collection
             if (instance.task.project and not instance.task.project.archived) \
                     or (instance.task.section and not instance.task.section.project.archived) \
@@ -38,14 +42,10 @@ class DailyTaskSerializer(serializers.ModelSerializer):
         return instance_updated
 
     def validate(self, data):
+        # Map taskId to task
         if 'taskId' in data:
-            task_id = data.pop('taskId')
-            if task_id:
-                task = get_or_raise_error(Task, id=task_id,
-                                          error=serializers.ValidationError('This task doesn\'t exist'))
-                data['task'] = task
-            else:
-                data['task'] = None
+            data['task'] = get_or_raise_error(Task, id=data.pop('taskId'),
+                                              error=serializers.ValidationError('This task doesn\'t exist'))
 
         if self.instance:
             if self.instance.task:
