@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import DailyTaskSummary from '../../../../models/daily-task-overview.model'
+import DailyTaskSummary from '../../../../models/daily-task-summary.model'
 import moment from 'moment'
 
 @Component

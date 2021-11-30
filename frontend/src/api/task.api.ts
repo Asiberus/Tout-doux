@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import { environment } from '@/environments/environment.dev'
-import { Task, TaskPost } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 
-const createTask = (task: Partial<TaskPost>) => {
+const createTask = (task: Partial<Task>) => {
     return Vue.http.post(environment.task, task)
 }
 
-const updateTaskById = (taskId: number, task: Partial<TaskPost>) => {
+const updateTaskById = (taskId: number, task: Partial<Task>) => {
     return Vue.http.patch(environment.taskById.replace(':taskId', taskId.toString()), task)
 }
 

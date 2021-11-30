@@ -129,7 +129,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { SectionTask } from '@/models/section.model'
-import { Task, TaskPost } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -195,7 +195,7 @@ export default class ProjectSectionItem extends Vue {
         this.$emit('delete', this.section.id)
     }
 
-    createTask(task: Partial<TaskPost>): void {
+    createTask(task: Partial<Task>): void {
         this.taskDialog = false
         task.sectionId = this.section.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -209,7 +209,7 @@ export default class ProjectSectionItem extends Vue {
         })
     }
 
-    updateTask(id: number, data: Partial<TaskPost>): void {
+    updateTask(id: number, data: Partial<Task>): void {
         this.$store.dispatch(projectActions.task.editTask, { id, data, sectionId: this.section.id })
     }
 

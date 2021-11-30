@@ -7,7 +7,6 @@ export enum DailyTaskActionEnum {
     FINISH = 'FI',
 }
 
-// TODO : remove taskId (create post interface)
 export interface DailyTask {
     id: number
     date: string

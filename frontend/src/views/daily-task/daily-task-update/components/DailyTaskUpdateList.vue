@@ -61,7 +61,7 @@
                                     </v-menu>
 
                                     <div class="d-flex align-center mr-3">
-                                        <template v-if="dailyTask.taskId">
+                                        <template v-if="dailyTask.task">
                                             <h4 class="white--text font-weight-regular">
                                                 {{ dailyTask.task.name }}
                                             </h4>

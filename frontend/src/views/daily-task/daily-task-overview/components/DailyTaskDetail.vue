@@ -44,7 +44,7 @@
                                     :color="getActionChipColor(dailyTask.action)">
                                     {{ getLiteralFormOfDailyActionEnum(dailyTask.action) }}
                                 </v-chip>
-                                <template v-if="dailyTask.taskId">
+                                <template v-if="dailyTask.task">
                                     <h4 class="white--text font-weight-regular mr-3">
                                         {{ dailyTask.task.name }}
                                     </h4>

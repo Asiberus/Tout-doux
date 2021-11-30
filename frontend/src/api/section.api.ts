@@ -1,8 +1,8 @@
 import { environment } from '@/environments/environment.dev'
-import { SectionPost } from '@/models/section.model'
+import { SectionTask } from '@/models/section.model'
 import Vue from 'vue'
 
-const createSection = (section: SectionPost) => {
+const createSection = (section: Partial<SectionTask>) => {
     return Vue.http.post(environment.section, section)
 }
 

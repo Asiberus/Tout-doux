@@ -17,5 +17,3 @@ class ProjectSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('You can\'t edit an archived project')
 
         return data
-
-

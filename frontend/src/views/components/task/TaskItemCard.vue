@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Task, TaskPost } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 
 @Component({
@@ -83,7 +83,7 @@ export default class TaskItemCard extends Vue {
         this.$emit('toggle-state', this.task.id, !this.task.completed)
     }
 
-    emitUpdateEvent(data: Partial<TaskPost>): void {
+    emitUpdateEvent(data: Partial<Task>): void {
         this.taskDialog = false
         this.$emit('update', this.task.id, data)
     }

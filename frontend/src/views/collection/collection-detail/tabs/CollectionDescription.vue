@@ -80,7 +80,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { CollectionTask } from '@/models/collection.model'
-import { Task, TaskPost } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -114,7 +114,7 @@ export default class CollectionDescription extends Vue {
         return this.collection.tasks.filter((task: Task) => task.completed)
     }
 
-    createTask(task: Partial<TaskPost>): void {
+    createTask(task: Partial<Task>): void {
         this.taskDialog = false
         task.collectionId = this.collection.id
         this.$store.dispatch(collectionActions.task.addTask, task)
@@ -124,7 +124,7 @@ export default class CollectionDescription extends Vue {
         this.$store.dispatch(collectionActions.task.editTask, { id, data: { completed } })
     }
 
-    updateTask(id: number, data: Partial<TaskPost>): void {
+    updateTask(id: number, data: Partial<Task>): void {
         this.$store.dispatch(collectionActions.task.editTask, { id, data })
     }
 

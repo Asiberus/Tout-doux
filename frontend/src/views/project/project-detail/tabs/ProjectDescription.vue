@@ -79,7 +79,7 @@ import { projectActions } from '@/store/modules/project.store'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 import { ProjectTask } from '@/models/project.model'
-import { Task, TaskPost } from '@/models/task.model'
+import { Task } from '@/models/task.model'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
@@ -119,7 +119,7 @@ export default class ProjectDescription extends Vue {
         return this.allTasks.filter(task => task.completed)
     }
 
-    createTask(task: Partial<TaskPost>): void {
+    createTask(task: Partial<Task>): void {
         this.taskDialog = false
         task.projectId = this.project.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -133,7 +133,7 @@ export default class ProjectDescription extends Vue {
         })
     }
 
-    updateTask(id: number, data: Partial<TaskPost>): void {
+    updateTask(id: number, data: Partial<Task>): void {
         this.$store.dispatch(projectActions.task.editTask, { id, data, projectId: this.project.id })
     }
 

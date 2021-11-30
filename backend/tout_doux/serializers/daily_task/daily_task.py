@@ -9,7 +9,6 @@ from tout_doux.serializers.task.task_extended import TaskExtendedSerializer
 from tout_doux.utils import get_or_raise_error
 
 
-# Todo : maybe change name of daily task
 class DailyTaskSerializer(serializers.ModelSerializer):
     taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
 
@@ -19,11 +18,9 @@ class DailyTaskSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        if rep['taskId']:
+        if rep.get('taskId'):
             rep['task'] = TaskExtendedSerializer(instance.task).data
-            del rep['name']
 
-        del rep['taskId']
         return rep
 
     def update(self, instance, validated_data):
@@ -33,7 +30,7 @@ class DailyTaskSerializer(serializers.ModelSerializer):
             if (instance.task.project and not instance.task.project.archived) \
                     or (instance.task.section and not instance.task.section.project.archived) \
                     or (instance.task.collection and not instance.task.collection.archived):
-                instance.task.completed = validated_data.get('completed')
+                instance.task.completed = validated_data.get('completed', False)
                 instance.task.completed_at = timezone.now() if validated_data.get('completed') else None
                 instance.task.save()
 
@@ -48,22 +45,22 @@ class DailyTaskSerializer(serializers.ModelSerializer):
                                               error=serializers.ValidationError('This task doesn\'t exist'))
 
         if self.instance:
+            if self.instance.date != date.today():
+                if 'task' in data or 'name' in data or 'action' in data:
+                    raise serializers.ValidationError('You can\'t edit a closed daily task')
             if self.instance.task:
-                if data.get('task'):
+                if 'task' in data:
                     raise serializers.ValidationError('You can\'t edit the task of a daily task')
-                if data.get('name'):
+                if 'name' in data:
                     raise serializers.ValidationError(
                         'You can\'t edit the name of a daily task related to a task')
             if self.instance.name:
-                if data.get('task'):
+                if 'task' in data:
                     raise serializers.ValidationError('You can\'t edit the task of a daily task that have a name')
-            if self.instance.date != date.today():
-                if data.get('task') or data.get('name') or data.get('action'):
-                    raise serializers.ValidationError('You can\'t edit a closed daily task')
         else:
-            if data.get('task'):
+            if 'task' in data:
                 task = data.get('task')
-                if data.get('name'):
+                if 'name' in data:
                     raise serializers.ValidationError('You can\'t create a daily task with a taskId and a name')
                 if task.completed:
                     raise serializers.ValidationError('You can\'t link a completed task to a daily task')
@@ -74,7 +71,7 @@ class DailyTaskSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         'You can\'t create a daily task with a task related to an archived collection')
 
-            if not data.get('task') and not data.get('name'):
+            if 'task' not in data and 'name' not in data:
                 raise serializers.ValidationError('You must provide a name or a taskId to create a daily task')
 
             if data.get('completed'):

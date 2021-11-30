@@ -33,7 +33,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import DailyTaskSummary from '@/models/daily-task-overview.model'
+import DailyTaskSummary from '@/models/daily-task-summary.model'
 import DailyTaskOverviewItemCard from '@/views/daily-task/daily-task-overview/components/DailyTaskOverviewItemCard.vue'
 import DailyTaskDetail from '@/views/daily-task/daily-task-overview/components/DailyTaskDetail.vue'
 

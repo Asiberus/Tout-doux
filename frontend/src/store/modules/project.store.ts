@@ -1,7 +1,7 @@
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
-import { SectionTask, SectionPost } from '@/models/section.model'
-import { Task, TaskPost } from '@/models/task.model'
+import { SectionTask } from '@/models/section.model'
+import { Task } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { Project, ProjectTask } from '@/models/project.model'
@@ -177,7 +177,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.section.addSection](section: SectionPost): Promise<void> {
+    async [projectActions.section.addSection](section: Partial<SectionTask>): Promise<void> {
         await sectionService.createSection(section).then(
             (response: any) => {
                 this.context.commit(projectMutations.section.addSection, response.body)
@@ -220,7 +220,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.task.addTask](task: Partial<TaskPost>): Promise<void> {
+    async [projectActions.task.addTask](task: Partial<Task>): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(projectMutations.task.addTask, {
@@ -238,7 +238,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.task.editTask](payload: {
         id: number
-        data: Partial<TaskPost>
+        data: Partial<Task>
         projectId?: number
         sectionId?: number
     }): Promise<void> {
