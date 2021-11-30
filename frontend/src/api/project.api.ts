@@ -3,7 +3,7 @@ import Vue from 'vue'
 import { Project } from '@/models/project.model'
 
 const getProjectList = (params = {}) => {
-    return Vue.http.get(environment.project, { params })
+    return Vue.http.get(environment.project, { params: { size: 0, ...params } })
 }
 
 const getProjectById = (projectId: number) => {

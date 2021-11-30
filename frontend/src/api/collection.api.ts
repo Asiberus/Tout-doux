@@ -3,7 +3,7 @@ import Vue from 'vue'
 import { Collection } from '@/models/collection.model'
 
 const getCollectionList = (params = {}) => {
-    return Vue.http.get(environment.collection, { params })
+    return Vue.http.get(environment.collection, { params: { size: 0, ...params } })
 }
 
 const getCollectionById = (collectionId: number) => {

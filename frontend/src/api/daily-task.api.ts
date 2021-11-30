@@ -11,7 +11,7 @@ const getDailyTaskSummary = (page: number, size = 21) => {
 }
 
 const getDailyTasksByDate = (date: string) => {
-    const params = { date }
+    const params = { date, size: 0 }
     return Vue.http.get(environment.dailyTask, { params })
 }
 
