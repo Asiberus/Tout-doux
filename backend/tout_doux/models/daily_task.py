@@ -21,6 +21,7 @@ class DailyTask(models.Model):
     completed = models.BooleanField(default=False)
 
     class Meta:
+        ordering = ('pk',)
         constraints = [
             models.UniqueConstraint(fields=('date', 'task'), name='unique_task_for_date')
         ]
