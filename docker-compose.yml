@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
   db:
-    image: postgres
+    image: postgres:13
     container_name: db
     environment:
       POSTGRES_DB: tout_doux
