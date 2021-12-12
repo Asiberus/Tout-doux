@@ -1,5 +1,5 @@
 <template>
-    <v-container class="mt-3">
+    <div>
         <template v-if="taskCompleted.length > 0">
             <TaskItemCard
                 v-for="task in taskCompleted"
@@ -19,7 +19,7 @@
                 </template>
             </EmptyListDisplay>
         </template>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <div class="d-flex justify-space-between align-center mb-3">
             <h3>General</h3>
             <div>
@@ -93,7 +93,7 @@
                 </v-btn>
             </div>
         </v-form>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

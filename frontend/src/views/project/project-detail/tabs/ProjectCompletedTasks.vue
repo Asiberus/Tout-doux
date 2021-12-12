@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <div v-for="(taskList, index) in tasksList" :key="taskList.name + index">
             <h3 class="mb-3">{{ taskList.name }}</h3>
             <template v-if="taskList.tasks.length > 0">
@@ -25,7 +25,7 @@
             </template>
             <v-divider v-if="index !== tasksList.length - 1" class="my-3" />
         </div>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

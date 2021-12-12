@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <h1 class="mb-6">
             <span class="grey--text">Update Daily Task : </span>{{ dateFormatted }}
         </h1>
@@ -78,7 +78,7 @@
                 </DailyTaskUpdateList>
             </v-col>
         </v-row>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

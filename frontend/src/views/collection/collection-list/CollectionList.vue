@@ -1,6 +1,6 @@
 <template>
-    <v-container>
-        <h1 class="mb-6">Collections</h1>
+    <div>
+        <h1>Collections</h1>
         <div class="d-flex justify-end align-center mb-3">
             <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
                 <v-icon v-if="archived" small class="mr-1"> mdi-archive </v-icon>
@@ -49,7 +49,7 @@
                 </template>
             </EmptyListDisplay>
         </template>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

@@ -1,6 +1,6 @@
 <template>
-    <v-container>
-        <v-row class="mt-3">
+    <div>
+        <v-row>
             <v-col cols="9">
                 <h3 class="mb-3">Description</h3>
                 <v-card>
@@ -70,7 +70,7 @@
                 </template>
             </EmptyListDisplay>
         </template>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

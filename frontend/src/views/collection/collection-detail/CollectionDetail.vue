@@ -1,5 +1,5 @@
 <template>
-    <v-container v-if="collection">
+    <div v-if="collection">
         <h1>
             Collection : {{ collection.name }}
             <v-chip v-if="collection.archived" color="accent" class="ml-3">
@@ -16,8 +16,10 @@
             <v-tab :to="{ name: 'collection-detail-configuration' }" exact>Configuration</v-tab>
         </v-tabs>
 
-        <router-view />
-    </v-container>
+        <div class="pa-5">
+            <router-view />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -25,7 +27,6 @@ import { CollectionTask } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
-//Todo : remove v-container
 @Component
 export default class CollectionDetail extends Vue {
     @Prop() collectionId!: number

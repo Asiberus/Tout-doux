@@ -1,121 +1,119 @@
 <template>
-    <v-container>
-        <v-row class="mt-3">
-            <v-col cols="2">
-                <v-tabs
-                    v-model="configurationTab"
-                    vertical
-                    background-color="transparent"
-                    color="accent">
-                    <v-tab href="#general">
-                        <v-icon left small>mdi-cog</v-icon>
-                        General
-                    </v-tab>
-                    <v-tab disabled>
-                        <v-icon left small>mdi-tag</v-icon>
-                        Tags
-                    </v-tab>
-                    <v-tab disabled>
-                        <v-icon left small>mdi-account</v-icon>
-                        User
-                    </v-tab>
-                </v-tabs>
-            </v-col>
-            <v-col>
-                <v-tabs-items v-model="configurationTab" class="transparent">
-                    <v-tab-item value="general" :transition="false">
-                        <div class="d-flex justify-end align-center mb-3">
-                            <v-dialog v-model="archiveProjectDialog" width="50%">
+    <v-row>
+        <v-col cols="2">
+            <v-tabs
+                v-model="configurationTab"
+                vertical
+                background-color="transparent"
+                color="accent">
+                <v-tab href="#general">
+                    <v-icon left small>mdi-cog</v-icon>
+                    General
+                </v-tab>
+                <v-tab disabled>
+                    <v-icon left small>mdi-tag</v-icon>
+                    Tags
+                </v-tab>
+                <v-tab disabled>
+                    <v-icon left small>mdi-account</v-icon>
+                    User
+                </v-tab>
+            </v-tabs>
+        </v-col>
+        <v-col>
+            <v-tabs-items v-model="configurationTab" class="transparent">
+                <v-tab-item value="general" :transition="false">
+                    <div class="d-flex justify-end align-center mb-3">
+                        <v-dialog v-model="archiveProjectDialog" width="50%">
+                            <template #activator="{ attrs, on }">
+                                <v-btn
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    :outlined="!project.archived"
+                                    color="accent mr-3">
+                                    <v-icon small left>mdi-archive</v-icon>
+                                    {{ project.archived ? 'archived' : 'archive' }}
+                                </v-btn>
+                            </template>
+                            <ConfirmDialog
+                                color="accent"
+                                @confirm="toggleProjectArchiveState"
+                                @cancel="archiveProjectDialog = false">
+                                <template #icon>
+                                    <v-icon x-large>mdi-archive</v-icon>
+                                </template>
+                                <p>
+                                    Are you sure to
+                                    {{ this.project.archived ? 'unarchive' : 'archive' }} this
+                                    project ?
+                                </p>
+                            </ConfirmDialog>
+                        </v-dialog>
+                        <template v-if="project.archived">
+                            <v-dialog v-model="deleteProjectDialog" width="50%">
                                 <template #activator="{ attrs, on }">
-                                    <v-btn
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :outlined="!project.archived"
-                                        color="accent mr-3">
-                                        <v-icon small left>mdi-archive</v-icon>
-                                        {{ project.archived ? 'archived' : 'archive' }}
+                                    <v-btn v-bind="attrs" v-on="on" color="error">
+                                        <v-icon small left>mdi-trash-can</v-icon>
+                                        delete
                                     </v-btn>
                                 </template>
                                 <ConfirmDialog
-                                    color="accent"
-                                    @confirm="toggleProjectArchiveState"
-                                    @cancel="archiveProjectDialog = false">
+                                    color="error"
+                                    @confirm="deleteProject"
+                                    @cancel="deleteProjectDialog = false">
                                     <template #icon>
-                                        <v-icon x-large>mdi-archive</v-icon>
+                                        <v-icon x-large>mdi-trash-can</v-icon>
                                     </template>
-                                    <p>
-                                        Are you sure to
-                                        {{ this.project.archived ? 'unarchive' : 'archive' }} this
-                                        project ?
+                                    <p>Are you sure to delete this project ?</p>
+                                    <p class="mb-0 font-italic" style="font-size: 1.1rem">
+                                        All related tasks will be deleted
                                     </p>
                                 </ConfirmDialog>
                             </v-dialog>
-                            <template v-if="project.archived">
-                                <v-dialog v-model="deleteProjectDialog" width="50%">
-                                    <template #activator="{ attrs, on }">
-                                        <v-btn v-bind="attrs" v-on="on" color="error">
-                                            <v-icon small left>mdi-trash-can</v-icon>
-                                            delete
-                                        </v-btn>
-                                    </template>
-                                    <ConfirmDialog
-                                        color="error"
-                                        @confirm="deleteProject"
-                                        @cancel="deleteProjectDialog = false">
-                                        <template #icon>
-                                            <v-icon x-large>mdi-trash-can</v-icon>
-                                        </template>
-                                        <p>Are you sure to delete this project ?</p>
-                                        <p class="mb-0 font-italic" style="font-size: 1.1rem">
-                                            All related tasks will be deleted
-                                        </p>
-                                    </ConfirmDialog>
-                                </v-dialog>
-                            </template>
-                        </div>
-                        <v-row>
-                            <v-col cols="10">
-                                <v-form v-model="projectForm.valid" @submit.prevent="updateProject">
-                                    <v-text-field
-                                        v-model="projectForm.data.name"
-                                        :rules="projectForm.rules.name"
-                                        :disabled="project.archived"
-                                        label="Name"
-                                        counter="50"
-                                        maxlength="50"
-                                        required>
-                                    </v-text-field>
-                                    <v-textarea
-                                        v-model="projectForm.data.description"
-                                        :rules="projectForm.rules.description"
-                                        :disabled="project.archived"
-                                        @keyup.enter.ctrl="updateProject"
-                                        label="Description"
-                                        counter="500"
-                                        maxlength="500"
-                                        required
-                                        rows="2"
-                                        auto-grow
-                                        class="my-5">
-                                    </v-textarea>
-                                    <div v-if="!project.archived" class="float-right mt-5">
-                                        <v-btn
-                                            color="success"
-                                            :disabled="!projectForm.valid || isFormUntouched"
-                                            @click="updateProject">
-                                            update
-                                        </v-btn>
-                                    </div>
-                                </v-form>
-                            </v-col>
-                        </v-row>
-                    </v-tab-item>
-                    <v-tab-item value="tag" :transition="false" />
-                    <v-tab-item value="user" :transition="false" />
-                </v-tabs-items>
-            </v-col>
-        </v-row>
-    </v-container>
+                        </template>
+                    </div>
+                    <v-row>
+                        <v-col cols="10">
+                            <v-form v-model="projectForm.valid" @submit.prevent="updateProject">
+                                <v-text-field
+                                    v-model="projectForm.data.name"
+                                    :rules="projectForm.rules.name"
+                                    :disabled="project.archived"
+                                    label="Name"
+                                    counter="50"
+                                    maxlength="50"
+                                    required>
+                                </v-text-field>
+                                <v-textarea
+                                    v-model="projectForm.data.description"
+                                    :rules="projectForm.rules.description"
+                                    :disabled="project.archived"
+                                    @keyup.enter.ctrl="updateProject"
+                                    label="Description"
+                                    counter="500"
+                                    maxlength="500"
+                                    required
+                                    rows="2"
+                                    auto-grow
+                                    class="my-5">
+                                </v-textarea>
+                                <div v-if="!project.archived" class="float-right mt-5">
+                                    <v-btn
+                                        color="success"
+                                        :disabled="!projectForm.valid || isFormUntouched"
+                                        @click="updateProject">
+                                        update
+                                    </v-btn>
+                                </div>
+                            </v-form>
+                        </v-col>
+                    </v-row>
+                </v-tab-item>
+                <v-tab-item value="tag" :transition="false" />
+                <v-tab-item value="user" :transition="false" />
+            </v-tabs-items>
+        </v-col>
+    </v-row>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <div class="d-flex justify-end mb-5">
             <v-dialog v-model="sectionDialog" width="60%">
                 <template #activator="{ on, attrs }">
@@ -50,7 +50,7 @@
                 </template>
             </EmptyListDisplay>
         </template>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <h1 class="mb-6">Daily Overview</h1>
         <v-row>
             <v-col v-for="(dailyTaskOverview, index) in dailyTaskSummaryList" :key="index" cols="2">
@@ -27,7 +27,7 @@
                 @close="dailyTaskDialog = false">
             </DailyTaskDetail>
         </v-dialog>
-    </v-container>
+    </div>
 </template>
 
 <script lang="ts">

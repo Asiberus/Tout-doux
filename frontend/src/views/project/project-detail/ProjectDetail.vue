@@ -1,5 +1,5 @@
 <template>
-    <v-container v-if="project">
+    <div v-if="project">
         <h1>
             Project : {{ project.name }}
             <v-chip v-if="project.archived" color="accent" class="ml-3">
@@ -19,8 +19,10 @@
             <v-tab :to="{ name: 'project-detail-configuration' }" exact>Configuration</v-tab>
         </v-tabs>
 
-        <router-view />
-    </v-container>
+        <div class="pa-5">
+            <router-view />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
