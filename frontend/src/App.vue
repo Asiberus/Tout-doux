@@ -32,6 +32,12 @@ export default Vue.extend({
     cursor: default;
 }
 
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

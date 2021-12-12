@@ -5,15 +5,15 @@
         </h1>
 
         <v-row>
-            <v-col cols="8">
+            <v-col cols="8" class="">
                 <v-tabs v-model="projectCollectionTab" background-color="transparent" class="mb-3">
                     <v-tab>Project</v-tab>
                     <v-tab>Collection</v-tab>
                 </v-tabs>
                 <v-tabs-items v-model="projectCollectionTab" class="transparent">
-                    <v-tab-item :transition="false" class="tab-wrapper">
+                    <v-tab-item :transition="false">
                         <template v-if="projectList.length">
-                            <v-row align-content="start" no-gutters class="position-relative">
+                            <v-row align-content="start" no-gutters class="project-card-wrapper">
                                 <v-col
                                     v-for="project in projectList"
                                     :key="'project-' + project.content.id"
@@ -39,9 +39,9 @@
                             </EmptyListDisplay>
                         </template>
                     </v-tab-item>
-                    <v-tab-item :transition="false" class="tab-wrapper">
+                    <v-tab-item :transition="false">
                         <template v-if="collectionList.length">
-                            <v-row align-content="start" no-gutters class="position-relative">
+                            <v-row align-content="start" no-gutters class="collection-card-wrapper">
                                 <v-col
                                     v-for="collection in collectionList"
                                     :key="'collection-' + collection.content.id"
@@ -69,7 +69,7 @@
                     </v-tab-item>
                 </v-tabs-items>
             </v-col>
-            <v-col cols="4" class="daily-task-wrapper">
+            <v-col cols="4">
                 <DailyTaskUpdateList
                     :dailyTaskList="dailyTaskList"
                     @create-daily-task="createDailyTask"
@@ -217,12 +217,9 @@ export default class DailyTaskUpdate extends Vue {
 </script>
 
 <style scoped lang="scss">
-.position-relative {
-    position: relative;
+.project-card-wrapper,
+.collection-card-wrapper {
+    min-height: 35rem;
     height: 100%;
-}
-
-.tab-wrapper {
-    height: 30rem;
 }
 </style>

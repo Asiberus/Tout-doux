@@ -22,7 +22,7 @@
                                             <v-chip
                                                 v-bind="attrs"
                                                 v-on="on"
-                                                class="mr-3"
+                                                class="mr-3 flex-shrink-0"
                                                 :color="getActionChipColor(dailyTask.action)">
                                                 <template v-if="dailyTask.action">
                                                     {{
@@ -31,11 +31,8 @@
                                                         )
                                                     }}
                                                 </template>
-                                                <!--                    <template v-else><v-icon>mdi-playlist-check</v-icon></template>-->
                                                 <template v-else>
                                                     <v-icon>mdi-nut</v-icon>
-                                                    <!--                          <v-icon>mdi-checkbox-multiple-marked-circle</v-icon>-->
-                                                    <!--                          <v-icon>mdi-notification-clear-all</v-icon>-->
                                                 </template>
                                             </v-chip>
                                         </template>
@@ -60,24 +57,25 @@
                                         </v-list>
                                     </v-menu>
 
-                                    <div class="d-flex align-center mr-3">
-                                        <template v-if="dailyTask.task">
-                                            <h4 class="white--text font-weight-regular">
-                                                {{ dailyTask.task.name }}
-                                            </h4>
-                                        </template>
-                                        <template v-else>
-                                            <h4 class="white--text font-weight-regular">
-                                                {{ dailyTask.name }}
-                                            </h4>
-                                        </template>
-                                    </div>
+                                    <h4
+                                        class="
+                                            white--text
+                                            font-weight-regular
+                                            flex-shrink-1
+                                            text-ellipsis
+                                            mr-3
+                                        "
+                                        :title="
+                                            dailyTask.task ? dailyTask.task.name : dailyTask.name
+                                        ">
+                                        {{ dailyTask.task ? dailyTask.task.name : dailyTask.name }}
+                                    </h4>
 
                                     <template v-if="dailyTask.task">
                                         <v-chip
                                             small
                                             label
-                                            class="daily-chip"
+                                            class="daily-chip flex-shrink-0"
                                             :color="getTagColor(dailyTask)">
                                             <template v-if="dailyTask.task.project">
                                                 <span
@@ -117,27 +115,25 @@
 
                                     <span class="flex-grow-1"></span>
 
-                                    <v-slide-x-reverse-transition>
-                                        <div v-if="hover" class="daily-task-card-actions">
-                                            <v-btn
-                                                v-if="!dailyTask.taskId"
-                                                @click="toggleDailyTaskEditMode(dailyTask, true)"
-                                                icon
-                                                small
-                                                color="accent">
-                                                <v-icon>mdi-pencil</v-icon>
-                                            </v-btn>
+                                    <div class="daily-actions" :class="{ 'is-hover': hover }">
+                                        <v-btn
+                                            v-if="!dailyTask.taskId"
+                                            @click="toggleDailyTaskEditMode(dailyTask, true)"
+                                            icon
+                                            small
+                                            color="accent">
+                                            <v-icon>mdi-pencil</v-icon>
+                                        </v-btn>
 
-                                            <v-btn
-                                                @click="deleteDailyTask(dailyTask.id)"
-                                                icon
-                                                color="error"
-                                                small
-                                                class="ml-3">
-                                                <v-icon>mdi-trash-can</v-icon>
-                                            </v-btn>
-                                        </div>
-                                    </v-slide-x-reverse-transition>
+                                        <v-btn
+                                            @click="deleteDailyTask(dailyTask.id)"
+                                            icon
+                                            color="error"
+                                            small
+                                            class="ml-3">
+                                            <v-icon>mdi-trash-can</v-icon>
+                                        </v-btn>
+                                    </div>
                                 </div>
                             </template>
 
@@ -322,34 +318,26 @@ export default class DailyTaskUpdateList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.daily-task-wrapper {
-    max-height: 45rem;
-    overflow: auto;
-
-    .daily-chip {
-        span {
-            max-width: 5rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .chip-divider {
-            border-width: 1px;
-        }
+.daily-chip {
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .daily-task-card {
-        //&:hover .daily-task-card-actions {
-        //  opacity: 1;
-        //  transform: translateX(0);
-        //}
+    .chip-divider {
+        border-width: 1px;
+    }
+}
 
-        //.daily-task-card-actions {
-        //  opacity: 0;
-        //  transform: translateX(10px);
-        //  transition: all .15s ease-in;
-        //}
+.daily-actions {
+    opacity: 0;
+    transform: translateX(15px);
+    transition: all 0.2s ease-in-out;
+
+    &.is-hover {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
 </style>
