@@ -3,7 +3,7 @@
         <v-card
             v-on="dailyTaskSummary.totalTask ? { click: () => openDailyTaskDetailDialog() } : {}"
             :color="backgroundColor"
-            class="position-relative">
+            :ripple="false">
             <v-card-text>
                 <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
                 <div class="d-flex justify-space-between">
@@ -31,11 +31,10 @@
                             name: 'daily-task-update',
                             params: { date: dailyTaskSummary.date },
                         }"
-                        class="action-button"
                         color="accent"
                         x-small
                         fab>
-                        <v-icon> mdi-pencil </v-icon>
+                        <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                 </v-card-actions>
             </v-scale-transition>
@@ -82,11 +81,9 @@ export default class DailyTaskOverviewItemCard extends Vue {
     }
 
     get backgroundColor(): string | null {
-        if (!this.dailyTaskSummary.totalTask) {
-            return '#151515'
-        } else if (!this.dailyTaskSummary.totalTaskCompleted) {
-            return null
-        }
+        if (!this.dailyTaskSummary.totalTask) return '#151515'
+        else if (!this.dailyTaskSummary.totalTaskCompleted) return null
+
         return this.colorOfTaskCompleted
     }
 
@@ -97,11 +94,6 @@ export default class DailyTaskOverviewItemCard extends Vue {
 </script>
 
 <style scoped lang="scss">
-//Todo : move to general file
-.position-relative {
-    position: relative;
-}
-
 .daily-task-date {
     font-size: 1rem;
     padding-left: 0.3rem;
@@ -111,8 +103,5 @@ export default class DailyTaskOverviewItemCard extends Vue {
     position: absolute;
     top: -20px;
     right: 5px;
-}
-
-.action-button {
 }
 </style>

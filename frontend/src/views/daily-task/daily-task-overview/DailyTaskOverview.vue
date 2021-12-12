@@ -2,7 +2,7 @@
     <div>
         <h1 class="mb-6">Daily Overview</h1>
         <v-row>
-            <v-col v-for="(dailyTaskOverview, index) in dailyTaskSummaryList" :key="index" cols="2">
+            <v-col v-for="(dailyTaskOverview, index) in dailyTaskSummaryList" :key="index" cols="3">
                 <DailyTaskOverviewItemCard
                     :dailyTaskSummary="dailyTaskOverview"
                     @open-daily-task-detail="openDailyTaskDetailDialog(dailyTaskOverview.date)">
