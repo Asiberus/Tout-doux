@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="mb-6">Daily Overview</h1>
+        <h1 class="text-h3 mb-6">Daily Overview</h1>
         <v-row>
             <v-col v-for="(dailyTaskOverview, index) in dailyTaskSummaryList" :key="index" cols="3">
                 <DailyTaskOverviewItemCard

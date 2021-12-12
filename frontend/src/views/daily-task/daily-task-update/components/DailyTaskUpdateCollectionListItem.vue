@@ -1,33 +1,15 @@
 <template>
-    <div class="card-wrapper" :class="{ selected: selected }" @click="selectCollection">
+    <div class="pa-2" :class="{ selected: selected }" @click="selectCollection">
         <v-card :disabled="tasksUncompleted.length === 0" :class="{ 'cursor-pointer': !selected }">
             <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="4">
             </v-progress-linear>
             <v-card-text>
                 <div class="d-flex justify-space-between align-center">
-                    <h3 class="d-flex align-center white--text flex-grow-1 collection-title">
-                        <span :title="collection.name">
-                            {{ collection.name }}
-                        </span>
-                        <template v-if="selected">
-                            <v-hover v-slot="{ hover }">
-                                <v-btn
-                                    :to="{
-                                        name: 'collection-detail',
-                                        params: { id: collection.id },
-                                    }"
-                                    icon
-                                    small
-                                    :color="hover ? 'grey' : 'grey darken-3'"
-                                    class="ml-1"
-                                    title="Go to collection">
-                                    <v-icon small>mdi-open-in-new</v-icon>
-                                </v-btn>
-                            </v-hover>
-                        </template>
+                    <h3 class="white--text text-ellipsis" :title="collection.name">
+                        {{ collection.name }}
                     </h3>
                     <template v-if="!selected">
-                        <div class="mx-3">
+                        <div class="mx-2 mt-1 flex-shrink-0">
                             <span style="font-size: 1.8em" class="white--text">
                                 {{ tasksCompleted.length }}
                             </span>
@@ -43,6 +25,18 @@
                         </div>
                     </template>
                     <template v-if="selected">
+                        <v-hover v-slot="{ hover }">
+                            <v-btn
+                                :to="{ name: 'collection-detail', params: { id: collection.id } }"
+                                icon
+                                small
+                                :color="hover ? 'grey' : 'grey darken-3'"
+                                class="ml-1"
+                                title="Go to collection">
+                                <v-icon small>mdi-open-in-new</v-icon>
+                            </v-btn>
+                        </v-hover>
+                        <span class="flex-grow-1"></span>
                         <v-btn @click.stop="unselectCollection" color="red" icon>
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
@@ -131,20 +125,6 @@ export default class DailyTaskUpdateCollectionListItem extends Vue {
 </script>
 
 <style scoped lang="scss">
-.card-wrapper {
-    padding: 0.5rem;
-
-    .collection-title {
-        max-width: 13rem;
-
-        span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
-}
-
 .selected {
     position: absolute;
     top: 0;

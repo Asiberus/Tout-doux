@@ -1,5 +1,5 @@
 <template>
-    <div class="card-wrapper" :class="{ selected: selected }" @click="selectProject">
+    <div class="pa-2" :class="{ selected: selected }" @click="selectProject">
         <v-card
             :disabled="allTasksUncompleted.length === 0"
             :class="{ 'cursor-pointer': !selected }">
@@ -7,26 +7,11 @@
             </v-progress-linear>
             <v-card-text>
                 <div class="d-flex justify-space-between align-center">
-                    <h3 class="d-flex align-center white--text project-title">
-                        <span :title="project.name">
-                            {{ project.name }}
-                        </span>
-                        <template v-if="selected">
-                            <v-hover v-slot="{ hover }">
-                                <v-btn
-                                    :to="{ name: 'project-detail', params: { id: project.id } }"
-                                    icon
-                                    small
-                                    :color="hover ? 'grey' : 'grey darken-3'"
-                                    class="ml-1"
-                                    title="Go to project">
-                                    <v-icon small>mdi-open-in-new</v-icon>
-                                </v-btn>
-                            </v-hover>
-                        </template>
+                    <h3 class="white--text text-ellipsis" :title="project.name">
+                        {{ project.name }}
                     </h3>
                     <template v-if="!selected">
-                        <div class="mx-3">
+                        <div class="mx-2 mt-1 flex-shrink-0">
                             <span style="font-size: 1.8em" class="white--text">
                                 {{ allTasksCompleted.length }}
                             </span>
@@ -42,6 +27,17 @@
                         </div>
                     </template>
                     <template v-if="selected">
+                        <v-hover v-slot="{ hover }">
+                            <v-btn
+                                :to="{ name: 'project-detail', params: { id: project.id } }"
+                                icon
+                                small
+                                :color="hover ? 'grey' : 'grey darken-3'"
+                                class="ml-1"
+                                title="Go to project">
+                                <v-icon small>mdi-open-in-new</v-icon>
+                            </v-btn>
+                        </v-hover>
                         <v-tabs
                             v-model="sectionTab"
                             color="accent"
@@ -51,8 +47,10 @@
                             <v-tab
                                 active-class="font-weight-bold"
                                 v-for="section of taskBySection"
-                                :key="`tab-${section.name}`">
-                                {{ section.name }}
+                                :key="`tab-${section.id}`">
+                                <span class="text-ellipsis" :title="section.name">
+                                    {{ section.name }}
+                                </span>
                             </v-tab>
                         </v-tabs>
                         <v-btn @click.stop="unselectProject" color="red" icon>
@@ -66,7 +64,7 @@
                     <v-tabs-items v-model="sectionTab" class="task-wrapper pt-3">
                         <v-tab-item
                             v-for="section of taskBySection"
-                            :key="`tab-item-${section.name}`">
+                            :key="`tab-item-${section.id}`">
                             <template v-if="taskUncompleted(section.tasks).length">
                                 <v-row align-content="start">
                                     <v-col
@@ -134,13 +132,15 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
             this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.taskId)
     }
 
-    get taskBySection(): { name: string; tasks: Task[] }[] {
+    get taskBySection(): { id: number; name: string; tasks: Task[] }[] {
         return [
             {
+                id: 0,
                 name: 'General tasks',
                 tasks: this.project.tasks.filter(task => !task.completed),
             },
             ...this.project.sections.map(section => ({
+                id: section.id,
                 name: section.name,
                 tasks: section.tasks.filter(task => !task.completed),
             })),
@@ -185,20 +185,6 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
 </script>
 
 <style scoped lang="scss">
-.card-wrapper {
-    padding: 0.5rem;
-
-    .project-title {
-        max-width: 13rem;
-
-        span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
-}
-
 .selected {
     position: absolute;
     top: 0;

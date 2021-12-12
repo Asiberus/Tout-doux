@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="d-flex justify-space-between align-center mb-3">
-            <h2>Tasks of the day</h2>
+            <h2 class="text-h5">Tasks of the day</h2>
             <v-btn
                 @click="createDailyTaskDisplayed = !createDailyTaskDisplayed"
                 icon
@@ -72,13 +72,10 @@
                                     </h4>
 
                                     <template v-if="dailyTask.task">
-                                        <v-chip
-                                            small
-                                            label
-                                            class="daily-chip flex-shrink-0"
-                                            :color="getTagColor(dailyTask)">
+                                        <v-chip small label :color="getTagColor(dailyTask)">
                                             <template v-if="dailyTask.task.project">
                                                 <span
+                                                    class="text-ellipsis"
                                                     :title="
                                                         'Project : ' + dailyTask.task.project.name
                                                     "
@@ -87,6 +84,7 @@
                                             </template>
                                             <template v-else-if="dailyTask.task.section">
                                                 <span
+                                                    class="text-ellipsis"
                                                     :title="
                                                         'Project : ' +
                                                         dailyTask.task.section.project.name
@@ -95,6 +93,7 @@
                                                 >
                                                 <span class="mx-1">•</span>
                                                 <span
+                                                    class="text-ellipsis"
                                                     :title="
                                                         'Section : ' + dailyTask.task.section.name
                                                     "
@@ -103,6 +102,7 @@
                                             </template>
                                             <template v-else-if="dailyTask.task.collection">
                                                 <span
+                                                    class="text-ellipsis"
                                                     :title="
                                                         'Collection : ' +
                                                         dailyTask.task.collection.name
@@ -318,16 +318,8 @@ export default class DailyTaskUpdateList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.daily-chip {
-    span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .chip-divider {
-        border-width: 1px;
-    }
+.chip-divider {
+    border-width: 1px;
 }
 
 .daily-actions {

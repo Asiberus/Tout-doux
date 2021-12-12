@@ -1,7 +1,8 @@
 <template>
     <div>
-        <h1>Projects</h1>
-        <div class="d-flex justify-end align-center mb-3">
+        <div class="d-flex justify-end align-end mb-4">
+            <h1 class="flex-grow-1 text-h3 mb-3">Projects</h1>
+
             <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
                 <v-icon v-if="archived" small class="mr-1"> mdi-archive </v-icon>
                 <v-icon v-else small class="mr-1"> mdi-checkbox-blank-outline </v-icon>

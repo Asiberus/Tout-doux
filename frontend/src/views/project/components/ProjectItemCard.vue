@@ -6,11 +6,17 @@
         <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
-            <div class="d-flex flex-column justify-center">
-                <h1 class="white--text mt-1">{{ project.name }}</h1>
-                <p class="mb-0 mt-3 ml-2">{{ ellipsisFilter(project.description, 50) }}</p>
+            <div class="flex-shrink-1 overflow-hidden">
+                <p
+                    class="text-h5 white--text font-weight-bold text-ellipsis mb-1"
+                    :title="project.name">
+                    {{ project.name }}
+                </p>
+                <p class="mb-0 ml-2 text-ellipsis" :title="project.description">
+                    {{ project.description }}
+                </p>
             </div>
-            <div class="pr-7">
+            <div class="px-3 flex-shrink-0">
                 <span style="font-size: 2.5em" class="white--text">{{
                     allTasksCompleted.length
                 }}</span>
@@ -44,11 +50,13 @@ export default class ProjectItemCard extends Vue {
     get percentageOfTaskCompleted(): number {
         return (this.allTasksCompleted.length / this.allTasks.length) * 100
     }
-
-    ellipsisFilter(value: string, numberOfCharacter: number): string {
-        return ellipsisFilter(value, numberOfCharacter)
-    }
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.project-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>

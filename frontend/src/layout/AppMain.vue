@@ -3,7 +3,7 @@
         <v-navigation-drawer app><TheNavbar></TheNavbar></v-navigation-drawer>
         <v-app-bar app dense><TheHeader></TheHeader></v-app-bar>
         <v-main>
-            <v-container fluid class="px-8">
+            <v-container fluid class="pa-8">
                 <router-view />
             </v-container>
         </v-main>

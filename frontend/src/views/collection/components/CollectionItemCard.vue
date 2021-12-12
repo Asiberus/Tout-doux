@@ -6,11 +6,18 @@
         <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
-            <div class="d-flex flex-column justify-center">
-                <h1 class="white--text mt-1">{{ collection.name }}</h1>
-                <p class="mb-0 mt-3 ml-2">{{ ellipsisFilter(collection.description, 50) }}</p>
+            <div class="flex-shrink-1 overflow-hidden">
+                <p
+                    class="text-h5 white--text font-weight-bold text-ellipsis mb-1"
+                    :title="collection.name">
+                    {{ collection.name }}
+                </p>
+                <p class="mb-0 ml-2 text-ellipsis" :title="collection.description">
+                    {{ collection.description }}
+                </p>
             </div>
-            <div class="pr-7">
+
+            <div class="px-3 flex-shrink-0">
                 <span style="font-size: 2.5em" class="white--text">{{ tasksCompleted }}</span>
                 /
                 <span style="font-size: 1.5em; transform: translateY(0.3em); display: inline-block">
@@ -37,10 +44,6 @@ export default class CollectionItemCard extends Vue {
 
     get percentageOfTaskCompleted(): number {
         return (this.tasksCompleted / this.collection.tasks.length) * 100
-    }
-
-    ellipsisFilter(value: string, numberOfCharacter: number): string {
-        return ellipsisFilter(value, numberOfCharacter)
     }
 }
 </script>

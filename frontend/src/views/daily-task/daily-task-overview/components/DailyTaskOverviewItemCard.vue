@@ -8,7 +8,7 @@
                 <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
                 <div class="d-flex justify-space-between">
                     <p class="daily-task-date">{{ dailyTaskDateFormat }}</p>
-                    <div class="pr-2" v-if="dailyTaskSummary.totalTask">
+                    <div class="pr-2 flex-shrink-0" v-if="dailyTaskSummary.totalTask">
                         <span style="font-size: 3em" class="white--text">{{
                             dailyTaskSummary.totalTaskCompleted
                         }}</span>

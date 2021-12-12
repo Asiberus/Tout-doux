@@ -1,11 +1,11 @@
 <template>
     <div>
-        <h1 class="mb-6">
-            <span class="grey--text">Update Daily Task : </span>{{ dateFormatted }}
+        <h1 class="mb-6 text-h4">
+            <span class="grey--text">Daily Task : </span>{{ dateFormatted }}
         </h1>
 
         <v-row>
-            <v-col cols="8" class="">
+            <v-col cols="8">
                 <v-tabs v-model="projectCollectionTab" background-color="transparent" class="mb-3">
                     <v-tab>Project</v-tab>
                     <v-tab>Collection</v-tab>
