@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
@@ -12,6 +13,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
     pagination_class = ExtendedPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ('archived',)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.request.query_params.get('has_uncompleted_task'):
+            queryset = queryset.filter(Q(tasks__completed=False) | Q(sections__tasks__completed=False)).distinct()
+
+        return queryset
 
     def get_serializer_class(self):
         if hasattr(self, 'action'):

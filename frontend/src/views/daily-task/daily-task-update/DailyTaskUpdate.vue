@@ -146,7 +146,7 @@ export default class DailyTaskUpdate extends Vue {
     }
 
     private retrieveProjectList(): void {
-        projectService.getProjectList({ archived: false }).then(
+        projectService.getProjectList({ archived: false, has_uncompleted_task: true }).then(
             (response: any) => {
                 this.projectList = response.body.content.map((project: ProjectTask) => ({
                     content: project,
@@ -160,7 +160,7 @@ export default class DailyTaskUpdate extends Vue {
     }
 
     private retrieveCollectionList(): void {
-        collectionService.getCollectionList({ archived: false }).then(
+        collectionService.getCollectionList({ archived: false, has_uncompleted_task: true }).then(
             (response: any) => {
                 this.collectionList = response.body.content.map((collection: CollectionTask) => ({
                     content: collection,

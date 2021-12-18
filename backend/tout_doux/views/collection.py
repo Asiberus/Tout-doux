@@ -13,6 +13,13 @@ class CollectionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ('archived',)
 
+    def get_queryset(self):
+        queryset = self.queryset
+        if self.request.query_params.get('has_uncompleted_task'):
+            queryset = queryset.filter(tasks__completed=False).distinct()
+
+        return queryset
+
     def get_serializer_class(self):
         if hasattr(self, 'action'):
             if self.action == 'list' or self.action == 'retrieve':
