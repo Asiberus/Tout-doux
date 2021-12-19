@@ -29,7 +29,7 @@ export default Vue.extend({
 }
 
 .cursor-default {
-    cursor: default;
+    cursor: default !important;
 }
 
 .text-ellipsis {

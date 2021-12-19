@@ -1,13 +1,15 @@
 <template>
     <div>
         <template v-if="taskCompleted.length > 0">
-            <TaskItemCard
-                v-for="task in taskCompleted"
-                :key="task.id"
-                :task="task"
-                :disabled="collection.archived"
-                @toggle-state="toggleTaskState">
-            </TaskItemCard>
+            <v-row no-gutters>
+                <v-col v-for="task in taskCompleted" :key="task.id" cols="6" class="px-2">
+                    <TaskItemCard
+                        :task="task"
+                        :disabled="collection.archived"
+                        @toggle-state="toggleTaskState">
+                    </TaskItemCard>
+                </v-col>
+            </v-row>
         </template>
         <template v-else>
             <EmptyListDisplay message="No tasks completed yet !" class="my-7">

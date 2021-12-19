@@ -13,7 +13,6 @@
 
         <v-tabs-items v-model="sectionTabs" class="transparent pa-3">
             <v-tab-item v-for="section of tasksBySection" :key="'tab-item-' + section.id">
-                <h3 class="mb-3">{{ section.name }}</h3>
                 <template v-if="section.tasks.length > 0">
                     <v-row no-gutters>
                         <v-col v-for="task in section.tasks" :key="task.id" cols="6" class="px-2">
