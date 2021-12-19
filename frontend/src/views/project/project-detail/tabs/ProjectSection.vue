@@ -1,34 +1,32 @@
 <template>
     <div>
-        <div class="d-flex justify-end mb-5">
-            <v-dialog v-model="sectionDialog" width="60%">
-                <template #activator="{ on, attrs }">
-                    <v-btn
-                        v-if="sections.length > 0"
-                        :disabled="project.archived"
-                        v-bind="attrs"
-                        v-on="on">
-                        <v-icon>mdi-plus</v-icon>
-                        section
-                    </v-btn>
-                </template>
-                <SectionDialog
-                    :is-dialog-open="sectionDialog"
-                    @submit="createSection"
-                    @close="sectionDialog = false">
-                </SectionDialog>
-            </v-dialog>
-        </div>
-
         <template v-if="sections.length > 0">
-            <div v-for="(section, index) in sections" :key="section.id">
-                <ProjectSectionItem
-                    :section="section"
-                    @update="updateSection"
-                    @delete="deleteSection">
-                </ProjectSectionItem>
-                <v-divider v-if="index !== sections.length - 1" class="my-3" />
+            <div class="d-flex align-center mb-2">
+                <v-tabs
+                    v-model="sectionTabs"
+                    color="accent"
+                    hide-slider
+                    show-arrows
+                    background-color="transparent">
+                    <v-tab v-for="section of sections" :key="'tab-' + section.id">
+                        {{ section.name }}
+                    </v-tab>
+                </v-tabs>
+
+                <v-btn
+                    v-if="sections.length > 0"
+                    @click="sectionDialog = true"
+                    :disabled="project.archived">
+                    <v-icon>mdi-plus</v-icon>
+                    section
+                </v-btn>
             </div>
+
+            <v-tabs-items v-model="sectionTabs" class="transparent pa-3">
+                <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
+                    <ProjectSectionItem :section="section"> </ProjectSectionItem>
+                </v-tab-item>
+            </v-tabs-items>
         </template>
         <template v-else>
             <EmptyListDisplay class="mt-15">
@@ -50,6 +48,14 @@
                 </template>
             </EmptyListDisplay>
         </template>
+
+        <v-dialog v-model="sectionDialog" width="60%">
+            <SectionDialog
+                :is-dialog-open="sectionDialog"
+                @submit="createSection"
+                @close="sectionDialog = false">
+            </SectionDialog>
+        </v-dialog>
     </div>
 </template>
 
@@ -71,6 +77,7 @@ import { Component, Vue } from 'vue-property-decorator'
 })
 export default class ProjectSection extends Vue {
     sectionDialog = false
+    sectionTabs = 0
 
     get project(): ProjectTask {
         return this.$store.state.project.currentProject
@@ -82,18 +89,14 @@ export default class ProjectSection extends Vue {
 
     createSection(data: { name: string }): void {
         this.sectionDialog = false
-        this.$store.dispatch(projectActions.section.addSection, {
-            name: data.name,
-            projectId: this.project.id,
-        })
-    }
-
-    updateSection(id: number, name: string): void {
-        this.$store.dispatch(projectActions.section.editSection, { id, name })
-    }
-
-    deleteSection(id: number): void {
-        this.$store.dispatch(projectActions.section.deleteSection, id)
+        this.$store
+            .dispatch(projectActions.section.addSection, {
+                name: data.name,
+                projectId: this.project.id,
+            })
+            .then(() => {
+                this.sectionTabs = this.sections.length - 1
+            })
     }
 }
 </script>

@@ -51,9 +51,8 @@ export default class TaskDialog extends Vue {
     @Prop() private task?: Task
     @Prop() private isDialogOpen!: boolean
 
-    private confirmDelete = false
-
-    private taskForm = {
+    confirmDelete = false
+    taskForm = {
         valid: false,
         data: {
             name: '',
@@ -71,9 +70,7 @@ export default class TaskDialog extends Vue {
     }
 
     beforeMount(): void {
-        if (this.task) {
-            this.populateForm(this.task)
-        }
+        if (this.task) this.populateForm(this.task)
     }
 
     @Watch('isDialogOpen')
@@ -81,11 +78,8 @@ export default class TaskDialog extends Vue {
         if (value) {
             this.confirmDelete = false
             this.form.resetValidation()
-            if (this.task) {
-                this.populateForm(this.task)
-            } else {
-                this.populateForm({ name: '' } as Task)
-            }
+            if (this.task) this.populateForm(this.task)
+            else this.populateForm({ name: '' } as Task)
         }
     }
 
@@ -94,9 +88,8 @@ export default class TaskDialog extends Vue {
     }
 
     emitSubmitEvent(): void {
-        if (!this.taskForm.valid) {
-            return
-        }
+        if (!this.taskForm.valid) return
+
         this.$emit('submit', this.taskForm.data)
     }
 

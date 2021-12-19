@@ -31,7 +31,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Task } from '@/models/task.model'
-import ellipsisFilter from '@/filters/ellipsis.filter'
 import { CollectionTask } from '@/models/collection.model'
 
 @Component
