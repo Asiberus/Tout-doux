@@ -1,8 +1,6 @@
 <template>
     <div>
-        <h1 class="mb-6 text-h4">
-            <span class="grey--text">Daily Task : </span>{{ dateFormatted }}
-        </h1>
+        <h1 class="mb-6 text-h4"><span class="grey--text">Daily : </span>{{ dateFormatted }}</h1>
 
         <v-row>
             <v-col cols="8">
