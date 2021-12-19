@@ -12,7 +12,7 @@
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
                         <v-icon left>mdi-plus</v-icon>
-                        Add a project
+                        project
                     </v-btn>
                 </template>
                 <ProjectFormDialog
@@ -49,7 +49,7 @@
                         <span>You don't have any project yet !</span>
                         <v-btn @click="projectDialog = true" small class="ml-2">
                             <v-icon left>mdi-plus</v-icon>
-                            add a project
+                            project
                         </v-btn>
                     </div>
                     <div v-else>You don't have any archived project</div>

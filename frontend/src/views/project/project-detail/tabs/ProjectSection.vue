@@ -17,7 +17,7 @@
                     v-if="sections.length > 0"
                     @click="sectionDialog = true"
                     :disabled="project.archived">
-                    <v-icon>mdi-plus</v-icon>
+                    <v-icon left>mdi-plus</v-icon>
                     section
                 </v-btn>
             </div>
@@ -42,7 +42,7 @@
                             small
                             class="ml-3">
                             <v-icon left small>mdi-plus</v-icon>
-                            add a section
+                            section
                         </v-btn>
                     </div>
                 </template>

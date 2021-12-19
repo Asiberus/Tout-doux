@@ -12,7 +12,7 @@
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
                         <v-icon left>mdi-plus</v-icon>
-                        Add a collection
+                        collection
                     </v-btn>
                 </template>
                 <CollectionFormDialog
@@ -43,7 +43,7 @@
                         <span>You don't have any collection yet !</span>
                         <v-btn @click="collectionDialog = true" small class="ml-2">
                             <v-icon left>mdi-plus</v-icon>
-                            add a collection
+                            collection
                         </v-btn>
                     </div>
                     <div v-else>You don't have any archived collection</div>

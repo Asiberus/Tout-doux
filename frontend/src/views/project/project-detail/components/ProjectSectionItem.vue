@@ -4,7 +4,7 @@
             <v-dialog v-model="sectionDialog" width="60%">
                 <template #activator="{ attrs, on }">
                     <v-btn v-bind="attrs" v-on="on" :disabled="disabled" class="mr-1">
-                        <v-icon>mdi-pencil</v-icon>
+                        <v-icon left>mdi-pencil</v-icon>
                         edit section
                     </v-btn>
                 </template>
@@ -20,7 +20,7 @@
             <v-dialog v-model="taskDialog" width="60%">
                 <template #activator="{ attrs, on }">
                     <v-btn v-bind="attrs" v-on="on" :disabled="disabled">
-                        <v-icon>mdi-plus</v-icon>
+                        <v-icon left>mdi-plus</v-icon>
                         task
                     </v-btn>
                 </template>
