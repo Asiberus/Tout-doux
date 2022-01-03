@@ -44,10 +44,7 @@
                             class="section-wrapper"
                             hide-slider
                             show-arrows>
-                            <v-tab
-                                active-class="font-weight-bold"
-                                v-for="section of taskBySection"
-                                :key="`tab-${section.id}`">
+                            <v-tab v-for="section of taskBySection" :key="`tab-${section.id}`">
                                 <span class="text-ellipsis" :title="section.name">
                                     {{ section.name }}
                                 </span>
@@ -139,11 +136,13 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
                 name: 'General tasks',
                 tasks: this.project.tasks.filter(task => !task.completed),
             },
-            ...this.project.sections.map(section => ({
-                id: section.id,
-                name: section.name,
-                tasks: section.tasks.filter(task => !task.completed),
-            })),
+            ...this.project.sections
+                .filter(section => section.tasks.some(task => !task.completed))
+                .map(section => ({
+                    id: section.id,
+                    name: section.name,
+                    tasks: section.tasks.filter(task => !task.completed),
+                })),
         ]
     }
 
