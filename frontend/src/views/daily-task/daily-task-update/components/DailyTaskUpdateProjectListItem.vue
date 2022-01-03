@@ -47,6 +47,18 @@
                             <v-tab v-for="section of taskBySection" :key="`tab-${section.id}`">
                                 <span class="text-ellipsis" :title="section.name">
                                     {{ section.name }}
+                                    <ProgressCircular
+                                        v-if="section.tasks.length > 0"
+                                        :value="section.tasks.filter(t => t.completed).length"
+                                        :max="section.tasks.length"
+                                        :size="16"
+                                        :width="8"
+                                        :display-text="false"
+                                        class="ml-1"
+                                        :title="`${
+                                            section.tasks.filter(t => t.completed).length
+                                        } of ${section.tasks.length} tasks completed`">
+                                    </ProgressCircular>
                                 </span>
                             </v-tab>
                         </v-tabs>
@@ -106,6 +118,7 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import ProgressCircular from '@/components/ProgressCircular.vue'
 import { DailyTask } from '@/models/daily-task.model'
 import { ProjectTask } from '@/models/project.model'
 import { Task } from '@/models/task.model'
@@ -114,6 +127,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component({
     components: {
         EmptyListDisplay,
+        ProgressCircular,
     },
 })
 export default class DailyTaskUpdateProjectListItem extends Vue {
@@ -134,14 +148,14 @@ export default class DailyTaskUpdateProjectListItem extends Vue {
             {
                 id: 0,
                 name: 'General tasks',
-                tasks: this.project.tasks.filter(task => !task.completed),
+                tasks: this.project.tasks,
             },
             ...this.project.sections
                 .filter(section => section.tasks.some(task => !task.completed))
                 .map(section => ({
                     id: section.id,
                     name: section.name,
-                    tasks: section.tasks.filter(task => !task.completed),
+                    tasks: section.tasks,
                 })),
         ]
     }

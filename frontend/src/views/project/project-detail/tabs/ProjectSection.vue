@@ -10,6 +10,18 @@
                     background-color="transparent">
                     <v-tab v-for="section of sections" :key="'tab-' + section.id">
                         {{ section.name }}
+                        <ProgressCircular
+                            v-if="section.tasks.length > 0"
+                            :value="section.tasks.filter(t => t.completed).length"
+                            :max="section.tasks.length"
+                            :size="16"
+                            :width="8"
+                            :display-text="false"
+                            class="ml-1"
+                            :title="`${section.tasks.filter(t => t.completed).length} of ${
+                                section.tasks.length
+                            } tasks completed`">
+                        </ProgressCircular>
                     </v-tab>
                 </v-tabs>
 
@@ -61,6 +73,7 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import ProgressCircular from '@/components/ProgressCircular.vue'
 import { ProjectTask } from '@/models/project.model'
 import { SectionTask } from '@/models/section.model'
 import { projectActions } from '@/store/modules/project.store'
@@ -73,6 +86,7 @@ import { Component, Vue } from 'vue-property-decorator'
         ProjectSectionItem,
         SectionDialog,
         EmptyListDisplay,
+        ProgressCircular,
     },
 })
 export default class ProjectSection extends Vue {

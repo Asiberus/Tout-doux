@@ -5,7 +5,7 @@
         :rotate="-90"
         :size="size"
         :width="width">
-        <div>
+        <div v-if="displayText">
             <span style="font-size: 2.5em">{{ value }}</span>
             /
             <span style="font-size: 1em; transform: translateY(0.3em); display: inline-block">
@@ -33,6 +33,7 @@ export default class ProgressCircular extends Vue {
     @Prop({ default: 200 }) size?: number
     @Prop({ default: 20 }) width?: number
     @Prop({ default: () => colorArray }) colorArray?: string[]
+    @Prop({ default: true }) displayText?: boolean
 
     get percentage(): number {
         return (this.value / this.max) * 100
