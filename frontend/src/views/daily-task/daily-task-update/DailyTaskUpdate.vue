@@ -27,7 +27,7 @@
                             </v-row>
                         </template>
                         <template v-else>
-                            <EmptyListDisplay message="No projects available">
+                            <EmptyListDisplay message="No project available">
                                 <template #img>
                                     <img
                                         src="../../../assets/project.svg"
@@ -55,7 +55,7 @@
                             </v-row>
                         </template>
                         <template v-else>
-                            <EmptyListDisplay message="No projects available">
+                            <EmptyListDisplay message="No collection available">
                                 <template #img>
                                     <img
                                         src="../../../assets/project.svg"
