@@ -2,8 +2,6 @@
 node_modules
 /dist
 
-# Database
-db
 
 /tests/e2e/reports/
 selenium-debug.log
@@ -145,4 +143,4 @@ media/
 
 .idea/
 
- assets/
+assets/

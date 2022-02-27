@@ -1,11 +1,11 @@
 <template>
     <div class="d-flex justify-end flex-fill">
-        <span class="version" :title="`Tout version ${version}`">v{{ version }}</span>
+        <span class="version" :title="`Tout Doux version : ${version}`">v{{ version }}</span>
     </div>
 </template>
 
 <script lang="ts">
-import { version } from '@/environments/environment.dev'
+import { version } from '@/environment'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component

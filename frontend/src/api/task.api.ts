@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { apiRoutes } from '@/environments/environment.dev'
+import { apiRoutes } from '@/environment'
 import { Task } from '@/models/task.model'
 
 const createTask = (task: Partial<Task>) => {

@@ -1,5 +1,3 @@
-export const BASE_URL = 'http://localhost:8000/api/'
-
 export const version = '0.1.0'
 
 export const apiRoutes = {

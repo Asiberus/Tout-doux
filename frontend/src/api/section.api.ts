@@ -1,4 +1,4 @@
-import { apiRoutes } from '@/environments/environment.dev'
+import { apiRoutes } from '@/environment'
 import { SectionTask } from '@/models/section.model'
 import Vue from 'vue'
 

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { apiRoutes } from '@/environments/environment.dev'
+import { apiRoutes } from '@/environment'
 import { DailyTask } from '@/models/daily-task.model'
 
 const getDailyTaskSummary = (page: number, size = 21) => {

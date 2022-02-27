@@ -1,4 +1,4 @@
-import { apiRoutes } from '@/environments/environment.dev'
+import { apiRoutes } from '@/environment'
 import Vue from 'vue'
 import { Collection } from '@/models/collection.model'
 

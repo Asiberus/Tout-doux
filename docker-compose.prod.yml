@@ -3,25 +3,26 @@ version: "3.9"
 services:
   frontend:
     container_name: ${FRONTEND_NAME}
+    restart: always
     build:
       context: .
-      dockerfile: ./.conf/development/frontend/Dockerfile
+      dockerfile: .conf/production/frontend/Dockerfile
       args:
-        ARG_API_URL: http://${BACKEND_HOST}:${BACKEND_PORT}/api/
+        ARG_API_URL: ${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/api/
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_CONTAINER_PORT}
-    volumes:
-      - ./frontend:/frontend
+      - ${SERVER_PORT}:${FRONTEND_CONTAINER_PORT}
+    environment:
+      SERVER_HOST: ${SERVER_HOST}
+      SERVER_PORT: ${SERVER_PORT}
+      BACKEND_PROXY: ${BACKEND_NAME}:${BACKEND_PORT}
   backend:
     container_name: ${BACKEND_NAME}
+    restart: always
     build:
       context: .
-      dockerfile: ./.conf/development/backend/Dockerfile
-    command: >
-      sh -c "python manage.py wait_for_db &&
-             python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      dockerfile: ./.conf/production/backend/Dockerfile
     environment:
+      BACKEND_PORT: ${BACKEND_PORT}
       SECRET_KEY: ${BACKEND_SECRET_KEY}
       DEBUG: ${BACKEND_DEBUG}
       ALLOWED_HOSTS: ${BACKEND_ALLOWED_HOSTS}
@@ -32,13 +33,12 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
-    volumes:
-      - ./backend:/backend
     depends_on:
       - db
   db:
     image: postgres:${DB_POSTGRES_VERSION}
     container_name: ${DB_HOST}
+    restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
