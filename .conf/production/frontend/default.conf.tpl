@@ -1,8 +1,10 @@
 server {
-    listen       ${SERVER_PORT};
-    listen  [::]:${SERVER_PORT};
-    server_name  ${SERVER_HOST};
+    listen          ${SERVER_PORT};
+    listen     [::]:${SERVER_PORT};
+    server_name     ${SERVER_HOST};
 
+    access_log      /var/log/nginx/access.log;
+    error_log       /var/log/nginx/error.log warn;
 
     location / {
         root                    /usr/share/nginx/html;
