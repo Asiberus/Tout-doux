@@ -1,3 +1,6 @@
 import { getConfigValue } from '@/config/config.loader'
 
-export const config = { API_URL: getConfigValue('API_URL') }
+export const config = {
+    VERSION: getConfigValue('VERSION'),
+    API_URL: getConfigValue('API_URL'),
+}

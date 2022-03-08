@@ -8,6 +8,7 @@ services:
       context: .
       dockerfile: .conf/production/frontend/Dockerfile
       args:
+        ARG_VERSION: ${VERSION}
         ARG_API_URL: ${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/api/
     ports:
       - ${SERVER_PORT}:${FRONTEND_CONTAINER_PORT}

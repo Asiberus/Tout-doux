@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: ./.conf/development/frontend/Dockerfile
       args:
+        ARG_VERSION: ${VERSION}
         ARG_API_URL: http://${BACKEND_HOST}:${BACKEND_PORT}/api/
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_CONTAINER_PORT}
