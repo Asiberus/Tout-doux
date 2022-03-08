@@ -30,6 +30,11 @@ COPY --from=build-stage /frontend/dist /usr/share/nginx/html
 COPY ./.conf/production/frontend/default.conf.tpl /etc/nginx/templates/default.conf.tpl
 COPY ./.conf/production/frontend/uwsgi_params /etc/nginx/uwsgi_params
 
+USER root
+
+RUN mkdir -p /vol/static && \
+    chmod 755 /vol/static
+
 USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]

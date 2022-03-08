@@ -17,5 +17,9 @@ server {
         include                 /etc/nginx/uwsgi_params;
         client_max_body_size    10M;
     }
+
+    location /api/static {
+        alias /vol/static;
+    }
 }
 

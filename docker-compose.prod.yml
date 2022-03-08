@@ -16,6 +16,8 @@ services:
       SERVER_HOST: ${SERVER_HOST}
       SERVER_PORT: ${SERVER_PORT}
       BACKEND_PROXY: ${BACKEND_NAME}:${BACKEND_PORT}
+    volumes:
+      - td_static_files:/vol/static
   backend:
     container_name: ${BACKEND_NAME}
     restart: always
@@ -34,6 +36,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
+    volumes:
+      - td_static_files:/vol/web
     depends_on:
       - db
   db:
@@ -51,3 +55,5 @@ services:
 volumes:
   td_db:
     name: td_db
+  td_static_files:
+    name: td_static_files

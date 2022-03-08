@@ -15,6 +15,9 @@ RUN apk add --update --no-cache postgresql-client && \
     pip install -r requirements.txt && \
     apk del .tmp-deps && \
     adduser --disabled-password --no-create-home backend && \
+    mkdir -p /vol/web/static && \
+    chown -R backend:backend /vol && \
+    chmod -R 755 /vol && \
     chmod -R +x /scripts
 
 COPY ./backend .
