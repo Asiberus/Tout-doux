@@ -2,8 +2,6 @@
 node_modules
 /dist
 
-# Database
-db
 
 /tests/e2e/reports/
 selenium-debug.log
@@ -91,7 +89,6 @@ local_settings.py
 .venv
 venv/
 ENV/
-.vscode
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -146,4 +143,4 @@ media/
 
 .idea/
 
- assets/
+assets/

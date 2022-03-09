@@ -3,11 +3,12 @@ import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from tout_doux.models.daily_task import DailyTask
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.daily_task import DailyTaskSerializer
+from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 from tout_doux.utils import daterange
 
 
@@ -21,12 +22,12 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.date != datetime.date.today():
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied('The daily task is not related to the current day')
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False)
-    def overview(self, request):
+    def summary(self, request):
         data = list()
         size = int(request.query_params.get('size', 20))
         page = int(request.query_params.get('page', 1))

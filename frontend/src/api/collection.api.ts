@@ -1,25 +1,30 @@
-import {environment} from "@/environments/environment.dev";
-import Vue from "vue";
-import {CollectionModel} from "@/models/collection.model";
+import { apiRoutes } from '@/api-routes'
+import Vue from 'vue'
+import { Collection } from '@/models/collection.model'
 
 const getCollectionList = (params = {}) => {
-    return Vue.http.get(environment.collection, {params});
-};
+    return Vue.http.get(apiRoutes.collection, { params: { size: 0, ...params } })
+}
 
 const getCollectionById = (collectionId: number) => {
-    return Vue.http.get(environment.collectionById.replace(':collectionId', collectionId.toString()));
+    return Vue.http.get(apiRoutes.collectionById.replace(':collectionId', collectionId.toString()))
 }
 
-const createCollection = (collectionForm: Partial<CollectionModel>) => {
-    return Vue.http.post(environment.collection, collectionForm);
+const createCollection = (collectionForm: Partial<Collection>) => {
+    return Vue.http.post(apiRoutes.collection, collectionForm)
 }
 
-const updateCollection = (collectionId: number, collectionForm: Partial<CollectionModel>) => {
-    return Vue.http.patch(environment.collectionById.replace(':collectionId', collectionId.toString()), collectionForm);
+const updateCollection = (collectionId: number, collectionForm: Partial<Collection>) => {
+    return Vue.http.patch(
+        apiRoutes.collectionById.replace(':collectionId', collectionId.toString()),
+        collectionForm
+    )
 }
 
 const deleteCollection = (collectionId: number) => {
-    return Vue.http.delete(environment.collectionById.replace(':collectionId', collectionId.toString()));
+    return Vue.http.delete(
+        apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+    )
 }
 
 export const collectionService = {
@@ -27,5 +32,5 @@ export const collectionService = {
     getCollectionById,
     createCollection,
     updateCollection,
-    deleteCollection
-};
+    deleteCollection,
+}

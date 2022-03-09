@@ -1,25 +1,28 @@
-import {environment} from "@/environments/environment.dev";
-import Vue from "vue";
-import {ProjectModel} from "@/models/project.model";
+import { apiRoutes } from '@/api-routes'
+import Vue from 'vue'
+import { Project } from '@/models/project.model'
 
 const getProjectList = (params = {}) => {
-    return Vue.http.get(environment.project, {params});
-};
+    return Vue.http.get(apiRoutes.project, { params: { size: 0, ...params } })
+}
 
 const getProjectById = (projectId: number) => {
-    return Vue.http.get(environment.projectById.replace(':projectId', projectId.toString()));
-};
+    return Vue.http.get(apiRoutes.projectById.replace(':projectId', projectId.toString()))
+}
 
-const createProject = (project: Partial<ProjectModel>) => {
-    return Vue.http.post(environment.project, project);
-};
+const createProject = (project: Partial<Project>) => {
+    return Vue.http.post(apiRoutes.project, project)
+}
 
-const updateProject = (projectId: number, project: Partial<ProjectModel>) => {
-    return Vue.http.patch(environment.projectById.replace(':projectId', projectId.toString()), project);
-};
+const updateProject = (projectId: number, project: Partial<Project>) => {
+    return Vue.http.patch(
+        apiRoutes.projectById.replace(':projectId', projectId.toString()),
+        project
+    )
+}
 
 const deleteProject = (projectId: number) => {
-    return Vue.http.delete(environment.projectById.replace(':projectId', projectId.toString()));
+    return Vue.http.delete(apiRoutes.projectById.replace(':projectId', projectId.toString()))
 }
 
 export const projectService = {
@@ -27,5 +30,5 @@ export const projectService = {
     getProjectById,
     createProject,
     updateProject,
-    deleteProject
-};
+    deleteProject,
+}
