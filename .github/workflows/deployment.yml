@@ -1,0 +1,22 @@
+name: Continuous Deployment
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "develop"
+jobs:
+  deploy:
+    name: Build and run docker images
+    runs-on: [self-hosted, server]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Build images
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env build
+      - name: Stop already running containers
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env down
+        continue-on-error: true
+      - name: Start containers
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env up
+      - name: Prune unused images
+        run: docker system prune -af
