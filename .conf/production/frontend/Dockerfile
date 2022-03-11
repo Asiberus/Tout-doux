@@ -1,10 +1,9 @@
-FROM node:14.18.1-alpine as build-stage
+FROM node:14.18.1-alpine3.12 as build-stage
 
 ARG ARG_VERSION
 ARG ARG_API_URL
 ENV VERSION=$ARG_VERSION
 ENV API_URL=$ARG_API_URL
-ENV NODE_ENV=production
 
 WORKDIR  /frontend
 

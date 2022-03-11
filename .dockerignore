@@ -3,11 +3,11 @@
 .gitignore
 
 # Node
-node_modules
 npm-debug.log
-dist
-.husky
-tests
+**/node_modules
+**/dist
+**/.husky
+**/tests
 
 # Docker
 docker-compose*.yml
