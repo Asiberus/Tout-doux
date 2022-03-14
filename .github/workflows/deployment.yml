@@ -12,11 +12,11 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
       - name: Build images
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env build
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build
       - name: Stop already running containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env down
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env down
         continue-on-error: true
       - name: Start containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.local.env up
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env up -d
       - name: Prune unused images
         run: docker system prune -af
