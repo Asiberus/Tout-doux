@@ -10,9 +10,11 @@ WORKDIR  /frontend
 COPY --chown=node:node ./.conf/production/frontend/setup-config.sh ./setup-config.sh
 
 RUN chown node:node /frontend && \
-    mkdir -p /frontend/node_modules &&  \
+    mkdir -p /frontend/node_modules && \
     chown -R node:node /frontend && \
-    chmod +x ./setup-config.sh
+    chmod +x ./setup-config.sh && \
+    apk add --update python3 make g++ && \
+    rm -rf /var/cache/apk/*
 
 USER node
 COPY --chown=node:node ./frontend/package.json ./frontend/package-lock.json ./
