@@ -11,12 +11,17 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+      - name: Configure Secrets
+        env:
+          SECRET_DB_PASSWORD: ${{ secrets.SECRET_DB_PASSWORD }}
+          SECRET_DJANGO_KEY: ${{ secrets.SECRET_DJANGO_KEY }}
+        run: envsubst < "./.conf/production/conf.github.env" | sponge "./.conf/production/conf.github.env"
       - name: Build images
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env build
       - name: Stop already running containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env down
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env down
         continue-on-error: true
       - name: Start containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env up -d
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env up -d
       - name: Prune unused images
         run: docker system prune -af
