@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "develop"
+      - "master"
 jobs:
   deploy:
     name: Build and run docker images
@@ -15,13 +15,13 @@ jobs:
         env:
           SECRET_DB_PASSWORD: ${{ secrets.SECRET_DB_PASSWORD }}
           SECRET_DJANGO_KEY: ${{ secrets.SECRET_DJANGO_KEY }}
-        run: envsubst < "./.conf/production/conf.github.env" | sponge "./.conf/production/conf.github.env"
+        run: envsubst < "./.conf/production/conf.server.env" | sponge "./.conf/production/conf.server.env"
       - name: Build images
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env build
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build
       - name: Stop already running containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env down
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env down
         continue-on-error: true
       - name: Start containers
-        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.github.env up -d
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env up -d
       - name: Prune unused images
         run: docker system prune -af

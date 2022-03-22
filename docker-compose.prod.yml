@@ -9,15 +9,20 @@ services:
       dockerfile: .conf/production/frontend/Dockerfile
       args:
         ARG_VERSION: ${VERSION}
-        ARG_API_URL: ${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/api/
+        ARG_API_URL: ${SERVER_PROTOCOL}://${API_HOST}/
     ports:
-      - ${SERVER_PORT}:${FRONTEND_CONTAINER_PORT}
+      - ${SERVER_HTTP_PORT}:${FRONTEND_CONTAINER_HTTP_PORT}
+      - ${SERVER_HTTPS_PORT}:${FRONTEND_CONTAINER_HTTPS_PORT}
     environment:
+      CERTBOT_EMAIL: raphael.beekmann@gmail.com
       SERVER_HOST: ${SERVER_HOST}
-      SERVER_PORT: ${SERVER_PORT}
+      API_HOST: ${API_HOST}
+      SERVER_HTTP_PORT: ${SERVER_HTTP_PORT}
+      SERVER_HTTPS_PORT: ${SERVER_HTTPS_PORT}
       BACKEND_PROXY: ${BACKEND_NAME}:${BACKEND_PORT}
     volumes:
       - td_static_files:/vol/static
+      - nginx-secret:/etc/letsencrypt
   backend:
     container_name: ${BACKEND_NAME}
     restart: always
@@ -57,3 +62,5 @@ volumes:
     name: td_db
   td_static_files:
     name: td_static_files
+  nginx-secret:
+    name: nginx-secret

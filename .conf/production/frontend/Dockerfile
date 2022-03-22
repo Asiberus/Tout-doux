@@ -24,18 +24,22 @@ COPY --chown=node:node ./frontend .
 RUN ./setup-config.sh && \
     npm run build
 
-FROM nginxinc/nginx-unprivileged:1-alpine as production-stage
+FROM jonasal/nginx-certbot:3.1.2-nginx1.21.6-alpine as production-stage
 ENV NGINX_ENVSUBST_TEMPLATE_SUFFIX=.tpl
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/user_conf.d
 
 COPY --from=build-stage /frontend/dist /usr/share/nginx/html
 COPY ./.conf/production/frontend/default.conf.tpl /etc/nginx/templates/default.conf.tpl
 COPY ./.conf/production/frontend/uwsgi_params /etc/nginx/uwsgi_params
 
-USER root
-
 RUN mkdir -p /vol/static && \
-    chmod 755 /vol/static
+    chmod 755 /vol/static && \
+    mkdir -p /var/log/nginx/front && \
+    mkdir -p /var/log/nginx/api && \
+    touch /var/log/nginx/front/access.log && \
+    touch /var/log/nginx/front/error.log && \
+    touch /var/log/nginx/api/access.log && \
+    touch /var/log/nginx/api/error.log
 
-USER nginx
-
-CMD ["nginx", "-g", "daemon off;"]
+# Command provided by jonasal/nginx-cerbot image
+CMD [ "/scripts/start_nginx_certbot.sh" ]
