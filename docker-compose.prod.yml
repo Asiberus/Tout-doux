@@ -22,7 +22,7 @@ services:
       BACKEND_PROXY: ${BACKEND_NAME}:${BACKEND_PORT}
     volumes:
       - td_static_files:/vol/static
-      - nginx-secret:/etc/letsencrypt
+      - td_nginx_secret:/etc/letsencrypt
   backend:
     container_name: ${BACKEND_NAME}
     restart: always
@@ -62,5 +62,5 @@ volumes:
     name: td_db
   td_static_files:
     name: td_static_files
-  nginx-secret:
-    name: nginx-secret
+  td_nginx_secret:
+    name: td_nginx_secret
