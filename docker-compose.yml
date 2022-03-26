@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: ${FRONTEND_NAME}
+    build:
+      context: .
+      dockerfile: ./.conf/development/frontend/Dockerfile
+      args:
+        ARG_VERSION: ${VERSION}
+        ARG_API_URL: http://${BACKEND_HOST}:${BACKEND_PORT}/api/
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_CONTAINER_PORT}
+    volumes:
+      - ./frontend:/frontend
+  backend:
+    container_name: ${BACKEND_NAME}
+    build:
+      context: .
+      dockerfile: ./.conf/development/backend/Dockerfile
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      SECRET_KEY: ${BACKEND_SECRET_KEY}
+      DEBUG: ${BACKEND_DEBUG}
+      ALLOWED_HOSTS: ${BACKEND_ALLOWED_HOSTS}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - db
+  db:
+    image: postgres:${DB_POSTGRES_VERSION}
+    container_name: ${DB_HOST}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:${DB_CONTAINER_PORT}
+    volumes:
+      - td_db:/var/lib/postgresql/data
+volumes:
+  td_db:
+    name: td_db

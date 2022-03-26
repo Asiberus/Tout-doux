@@ -1,21 +1,21 @@
-import Vue from "vue";
-import {environment} from "@/environments/environment.dev";
-import {TaskModel} from "@/models/task.model";
+import Vue from 'vue'
+import { apiRoutes } from '@/api-routes'
+import { Task } from '@/models/task.model'
 
-const createTask = (task: Partial<TaskModel>) => {
-    return Vue.http.post(environment.task, task);
+const createTask = (task: Partial<Task>) => {
+    return Vue.http.post(apiRoutes.task, task)
 }
 
-const updateTaskById = (taskId: number, task: Partial<TaskModel>) => {
-    return Vue.http.patch(environment.taskById.replace(':taskId', taskId.toString()), task);
-};
+const updateTaskById = (taskId: number, task: Partial<Task>) => {
+    return Vue.http.patch(apiRoutes.taskById.replace(':taskId', taskId.toString()), task)
+}
 
 const deleteTaskById = (taskId: number) => {
-    return Vue.http.delete(environment.taskById.replace(':taskId', taskId.toString()));
-};
+    return Vue.http.delete(apiRoutes.taskById.replace(':taskId', taskId.toString()))
+}
 
 export const taskService = {
     createTask,
     updateTaskById,
-    deleteTaskById
-};
+    deleteTaskById,
+}

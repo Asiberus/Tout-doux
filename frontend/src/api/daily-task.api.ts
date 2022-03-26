@@ -1,36 +1,39 @@
-import Vue from "vue";
-import {environment} from "@/environments/environment.dev";
-import {DailyTaskModel} from "@/models/daily-task.model";
+import Vue from 'vue'
+import { apiRoutes } from '@/api-routes'
+import { DailyTask } from '@/models/daily-task.model'
 
-const getDailyTaskOverview = (page: number, size = 21) => {
+const getDailyTaskSummary = (page: number, size = 21) => {
     const params = {
         page: page.toString(),
-        size: size.toString()
+        size: size.toString(),
     }
-    return Vue.http.get(environment.dailyTaskOverview, {params});
-};
+    return Vue.http.get(apiRoutes.dailyTaskSummary, { params })
+}
 
 const getDailyTasksByDate = (date: string) => {
-    const params = {date};
-    return Vue.http.get(environment.dailyTask, {params});
+    const params = { date, size: 0 }
+    return Vue.http.get(apiRoutes.dailyTask, { params })
 }
 
-const createDailyTask = (dailyTaskForm: Partial<DailyTaskModel>) => {
-    return Vue.http.post(environment.dailyTask, dailyTaskForm);
+const createDailyTask = (dailyTaskForm: Partial<DailyTask>) => {
+    return Vue.http.post(apiRoutes.dailyTask, dailyTaskForm)
 }
 
-const updateDailyTask = (dailyTaskId: number, dailyTaskForm: Partial<DailyTaskModel>) => {
-    return Vue.http.patch(environment.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()), dailyTaskForm);
+const updateDailyTask = (dailyTaskId: number, dailyTaskForm: Partial<DailyTask>) => {
+    return Vue.http.patch(
+        apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()),
+        dailyTaskForm
+    )
 }
 
 const deleteDailyTask = (dailyTaskId: number) => {
-    return Vue.http.delete(environment.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()));
+    return Vue.http.delete(apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()))
 }
 
 export const dailyTaskService = {
-    getDailyTaskOverview,
+    getDailyTaskSummary,
     getDailyTasksByDate,
     createDailyTask,
     updateDailyTask,
-    deleteDailyTask
+    deleteDailyTask,
 }

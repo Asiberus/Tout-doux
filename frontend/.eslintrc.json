@@ -1,0 +1,64 @@
+{
+    "root": true,
+    "env": {
+        "node": true
+    },
+    "ignorePatterns": ["**/*"],
+    "plugins": ["prettier", "@typescript-eslint"],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": ["tsconfig.eslint.json"]
+    },
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.vue"],
+            "extends": [
+                "prettier",
+                "eslint:recommended",
+                "@vue/typescript/recommended",
+                "plugin:vue/recommended",
+                "plugin:@typescript-eslint/recommended",
+                "plugin:prettier/recommended"
+            ],
+            "rules": {
+                "@typescript-eslint/explicit-function-return-type": "warn",
+                "@typescript-eslint/no-invalid-this": ["error"],
+                "@typescript-eslint/no-shadow": "error",
+                "@typescript-eslint/no-unused-expressions": "error",
+                "@typescript-eslint/no-unused-vars": "off",
+                "@typescript-eslint/no-unused-vars-experimental": ["error"],
+                "@typescript-eslint/prefer-for-of": "error",
+                "@typescript-eslint/prefer-nullish-coalescing": "error",
+                "@typescript-eslint/prefer-optional-chain": "error",
+                "@typescript-eslint/prefer-readonly": "error",
+                "@typescript-eslint/prefer-ts-expect-error": "error",
+                "@typescript-eslint/switch-exhaustiveness-check": "error",
+                "comma-dangle": "off",
+                "consistent-return": "error",
+                "eqeqeq": "error",
+                "no-await-in-loop": "warn",
+                "no-fallthrough": "error",
+                "no-invalid-this": "off",
+                "no-param-reassign": "error",
+                "no-use-before-define": "error",
+                "no-nested-ternary": "error",
+                "prefer-template": "warn",
+                "@typescript-eslint/no-magic-numbers": [
+                    "warn",
+                    {
+                        "ignore": [0, 1, -1],
+                        "ignoreEnums": true,
+                        "ignoreNumericLiteralTypes": true,
+                        "ignoreReadonlyClassProperties": true
+                    }
+                ]
+            }
+        },
+        {
+            "files": ["**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)"],
+            "env": {
+                "jest": true
+            }
+        }
+    ]
+}

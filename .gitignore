@@ -2,8 +2,6 @@
 node_modules
 /dist
 
-# Database
-db
 
 /tests/e2e/reports/
 selenium-debug.log
@@ -32,6 +30,7 @@ pnpm-debug.log*
 
 # Byte-compiled / optimized / DLL files
  __pycache__/
+ *.pyc
  *.py[cod]
  *$py.class
 
@@ -86,39 +85,10 @@ coverage.xml
 *.log
 local_settings.py
 
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
-# dotenv
-.env
-
 # virtualenv
 .venv
 venv/
 ENV/
-.vscode
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -132,7 +102,6 @@ ENV/
 # mypy
 .mypy_cache/
 
-.DS_Store
 *.sqlite3
 media/
 *.pyc
@@ -174,4 +143,4 @@ media/
 
 .idea/
 
- assets/
+assets/

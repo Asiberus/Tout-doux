@@ -1,13 +1,13 @@
-import {TaskDisplayModel} from "@/models/task.model";
+import { Task } from '@/models/task.model'
 
-export interface CollectionModel {
-    id: number;
-    name: string;
-    description: string;
-    tasks: TaskDisplayModel[];
-    created_at: string;
+export interface Collection {
+    id: number
+    name: string
+    description: string
+    created_at: string
+    archived: boolean
 }
 
-export interface DailyTaskCollectionDisplayModel extends CollectionModel {
-    selected: boolean;
+export interface CollectionTask extends Collection {
+    tasks: Task[]
 }

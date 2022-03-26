@@ -1,0 +1,28 @@
+name: Continuous Deployment
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+jobs:
+  deploy:
+    name: Build and run docker images
+    runs-on: [self-hosted, server]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Configure Secrets
+        env:
+          SECRET_DB_USER: ${{ secrets.SECRET_DB_USER }}
+          SECRET_DB_PASSWORD: ${{ secrets.SECRET_DB_PASSWORD }}
+          SECRET_DJANGO_KEY: ${{ secrets.SECRET_DJANGO_KEY }}
+        run: envsubst < "./.conf/production/conf.server.env" | sponge "./.conf/production/conf.server.env"
+      - name: Build images
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build
+      - name: Stop already running containers
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env down
+        continue-on-error: true
+      - name: Start containers
+        run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env up -d
+      - name: Prune unused images
+        run: docker system prune -af

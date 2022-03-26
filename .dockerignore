@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Node
+npm-debug.log
+**/node_modules
+**/dist
+**/.husky
+**/tests
+
+# Docker
+docker-compose*.yml
+Dockerfile
+
+# Python
+app/__pycache__/
+app/*/__pycache__/
+app/*/*/__pycache__/
+app/*/*/*/__pycache__/
+.env/
+.venv/
+venv/
+
+#IntelliJ
+.idea
