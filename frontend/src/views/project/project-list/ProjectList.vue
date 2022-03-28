@@ -31,7 +31,7 @@
             </v-row>
         </template>
         <template v-else>
-            <EmptyListDisplay class="mt-10">
+            <EmptyListDisplay>
                 <template #img>
                     <img
                         src="../../../assets/project.svg"
