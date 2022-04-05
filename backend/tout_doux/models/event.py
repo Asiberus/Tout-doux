@@ -11,3 +11,6 @@ class Event(models.Model):
     takes_whole_day = models.BooleanField(default=False)
     project = models.ForeignKey(Project, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
                                 related_name='events', null=True, blank=True)
+
+    class Meta:
+        ordering = ('start_date', 'end_date')
