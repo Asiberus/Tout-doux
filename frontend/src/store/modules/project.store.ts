@@ -1,5 +1,7 @@
+import { eventService } from '@/api/event.api'
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
+import { EventModel } from '@/models/event.model'
 import { SectionTask } from '@/models/section.model'
 import { Task } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
@@ -20,6 +22,11 @@ export const projectMutations = {
         editTask: 'PROJECT_EDIT_TASK',
         deleteTask: 'PROJECT_DELETE_TASK',
     },
+    event: {
+        addEvent: 'PROJECT_ADD_EVENT',
+        editEvent: 'PROJECT_EDIT_EVENT',
+        deleteEvent: 'PROJECT_DELETE_EVENT',
+    },
 }
 
 export const projectActions = {
@@ -34,6 +41,11 @@ export const projectActions = {
         addTask: 'projectAddTask',
         editTask: 'projectEditTask',
         deleteTask: 'projectDeleteTask',
+    },
+    event: {
+        addEvent: 'projectAddEvent',
+        editEvent: 'projectEditEvent',
+        deleteEvent: 'projectDeleteEvent',
     },
 }
 
@@ -138,6 +150,31 @@ export class ProjectModule extends VuexModule {
             const index = this.currentProject.tasks.findIndex(t => t.id === id)
             if (index !== -1) this.currentProject.tasks.splice(index, 1)
         }
+    }
+
+    @Mutation
+    private [projectMutations.event.addEvent](event: EventModel): void {
+        if (!this.currentProject) return
+
+        this.currentProject.events.push(event)
+    }
+
+    @Mutation
+    private [projectMutations.event.editEvent](event: EventModel): void {
+        if (!this.currentProject) return
+
+        const { events } = this.currentProject
+        const eventToUpdate = events.find(({ id }) => event.id === id)
+        if (eventToUpdate) Object.assign(eventToUpdate, event)
+    }
+
+    @Mutation
+    private [projectMutations.event.deleteEvent](id: number): void {
+        if (!this.currentProject) return
+
+        const { events } = this.currentProject
+        const index = events.findIndex(event => event.id === id)
+        if (index !== -1) events.splice(index, 1)
     }
 
     // Actions
@@ -269,6 +306,34 @@ export class ProjectModule extends VuexModule {
             (error: any) => {
                 console.error(error)
             }
+        )
+    }
+
+    @Action
+    async [projectActions.event.addEvent](event: Partial<EventModel>): Promise<void> {
+        await eventService.createEvent(event).then(
+            (response: any) => this.context.commit(projectMutations.event.addEvent, response.body),
+            (error: any) => console.error(error)
+        )
+    }
+
+    @Action
+    async [projectActions.event.editEvent](payload: {
+        id: number
+        data: Partial<EventModel>
+    }): Promise<void> {
+        const { id, data } = payload
+        await eventService.updateEventById(id, data).then(
+            (response: any) => this.context.commit(projectMutations.event.editEvent, response.body),
+            (error: any) => console.error(error)
+        )
+    }
+
+    @Action
+    async [projectActions.event.deleteEvent](id: number): Promise<void> {
+        await eventService.deleteEventById(id).then(
+            (response: any) => this.context.commit(projectMutations.event.deleteEvent, id),
+            (error: any) => console.error(error)
         )
     }
 }

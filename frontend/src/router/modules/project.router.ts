@@ -4,6 +4,7 @@ import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescr
 import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
 import ProjectList from '@/views/project/project-list/ProjectList.vue'
 import ProjectDetail from '@/views/project/project-detail/ProjectDetail.vue'
+import ProjectEvent from '@/views/project/project-detail/tabs/ProjectEvent.vue'
 import { RouteConfig } from 'vue-router'
 
 export const projectRoutes: Array<RouteConfig> = [
@@ -31,6 +32,11 @@ export const projectRoutes: Array<RouteConfig> = [
                 path: 'section',
                 name: 'project-detail-section',
                 component: ProjectSection,
+            },
+            {
+                path: 'event',
+                name: 'project-detail-event',
+                component: ProjectEvent,
             },
             {
                 path: 'completed-tasks',
