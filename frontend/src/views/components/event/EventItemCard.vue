@@ -12,18 +12,32 @@
                     </p>
                     <div class="d-flex flex-shrink-0">
                         <div title="Start date">
-                            <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-                            <span>{{ startDate }}</span>
+                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mr-1"
+                                >mdi-clock-outline</v-icon
+                            >
+                            <span
+                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }"
+                                >{{ startDate }}</span
+                            >
                         </div>
 
                         <div v-if="event.end_date" title="End date">
-                            <v-icon small class="mx-2">mdi-arrow-right</v-icon>
-                            <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-                            <span>{{ endDate }}</span>
+                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mx-2"
+                                >mdi-arrow-right</v-icon
+                            >
+                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mr-1"
+                                >mdi-clock-outline</v-icon
+                            >
+                            <span
+                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }"
+                                >{{ endDate }}</span
+                            >
                         </div>
 
                         <div v-if="event.takes_whole_day" class="ml-2" title="Takes whole day">
-                            <v-icon small>mdi-weather-sunset-up</v-icon>
+                            <v-icon small :color="isPassed ? 'orange lighten-1' : null"
+                                >mdi-weather-sunset-up</v-icon
+                            >
                         </div>
                     </div>
                 </div>
@@ -60,11 +74,18 @@ export default class EventItemCard extends Vue {
     eventDialog = false
 
     get startDate(): string {
-        return moment(this.event.start_date).format('D MMM. Y HH:mm')
+        const format = this.event.takes_whole_day ? 'D MMM. Y' : 'D MMM. Y HH:mm'
+        return moment(this.event.start_date).format(format)
     }
 
     get endDate(): string {
         return moment(this.event.end_date).format('D MMM. Y HH:mm')
+    }
+
+    get isPassed(): boolean {
+        if (this.event.end_date) return moment().isAfter(this.event.end_date)
+        if (this.event.takes_whole_day) return moment().isAfter(this.event.start_date, 'day')
+        return moment().isAfter(this.event.start_date)
     }
 
     openEventDialog(): void {
