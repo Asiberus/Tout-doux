@@ -7,7 +7,7 @@
                     <div class="flex-grow-1 flex-shrink-0 overflow-hidden pr-4">
                         <h2 class="white--text font-weight-regular mb-1">{{ event.name }}</h2>
                     </div>
-                    <p class="flex-shrink-1 text-ellipsis pr-10" :title="event.description">
+                    <p class="flex-shrink-1 text-ellipsis pr-10 mb-0" :title="event.description">
                         {{ event.description }}
                     </p>
                     <div class="d-flex flex-shrink-0">

@@ -38,6 +38,10 @@ export default Vue.extend({
     white-space: nowrap;
 }
 
+* {
+    scrollbar-width: thin;
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;
