@@ -21,7 +21,7 @@
                 </template>
 
                 <template v-else>
-                    <v-icon title="Takes whole day" class="mr-2">mdi-weather-sunset-up</v-icon>
+                    <v-icon title="Takes whole day" class="mr-2">mdi-white-balance-sunny</v-icon>
                     <span>{{ dateFormat(event.start_date, 'D MMMM Y') }}</span>
                 </template>
 

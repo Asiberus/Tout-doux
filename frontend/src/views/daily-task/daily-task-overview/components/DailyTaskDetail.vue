@@ -156,19 +156,13 @@
                                     icon="mdi-calendar-clock">
                                     <v-card
                                         :color="isEventPassed(event) ? 'orange darken-2' : null">
-                                        <v-card-text class="">
+                                        <v-card-text class="white--text">
                                             <div class="d-flex align-center">
                                                 <span
-                                                    class="
-                                                        flex-grow-1
-                                                        text-ellipsis
-                                                        pr-5
-                                                        white--text
-                                                    "
+                                                    class="flex-grow-1 text-ellipsis pr-5"
                                                     :title="event.name">
                                                     {{ event.name }}
                                                 </span>
-
                                                 <v-tooltip
                                                     v-if="event.description"
                                                     bottom
@@ -189,7 +183,7 @@
                                                     v-if="event.takes_whole_day"
                                                     class="mr-2"
                                                     title="Takes whole day">
-                                                    mdi-weather-sunset-up
+                                                    mdi-white-balance-sunny
                                                 </v-icon>
 
                                                 <div

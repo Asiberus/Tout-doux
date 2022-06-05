@@ -106,11 +106,13 @@ export default class ProjectEvent extends Vue {
     }
 
     get passedEvents(): EventModel[] {
-        return this.project.events.filter(({ start_date, end_date, takes_whole_day }) => {
-            if (end_date) return moment().isAfter(end_date)
-            if (takes_whole_day) return moment().isAfter(start_date, 'day')
-            return moment().isAfter(start_date)
-        })
+        return this.project.events
+            .filter(({ start_date, end_date, takes_whole_day }) => {
+                if (end_date) return moment().isAfter(end_date)
+                if (takes_whole_day) return moment().isAfter(start_date, 'day')
+                return moment().isAfter(start_date)
+            })
+            .reverse()
     }
 
     createEvent(event: Partial<EventModel>): void {

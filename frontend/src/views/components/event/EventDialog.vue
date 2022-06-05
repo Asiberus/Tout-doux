@@ -86,10 +86,12 @@
                                     v-bind="attrs"
                                     v-on="on"
                                     v-model="eventForm.data.startDateTime"
+                                    @click:clear="resetStartDateTime"
                                     @change="startDateTimePicker = false"
                                     :disabled="
                                         !eventForm.data.startDate || eventForm.data.takesWholeDay
                                     "
+                                    clearable
                                     readonly>
                                 </v-text-field>
                             </template>
@@ -180,7 +182,7 @@
                             <v-switch v-model="eventForm.data.takesWholeDay">
                                 <template #label>
                                     Takes whole day
-                                    <v-icon class="ml-2">mdi-weather-sunset-up</v-icon>
+                                    <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
                                 </template>
                             </v-switch>
                         </div>

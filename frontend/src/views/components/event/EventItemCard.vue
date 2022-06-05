@@ -1,52 +1,34 @@
 <template>
-    <div class="mb-3">
-        <v-card @click="openEventDialog" :disabled="disabled">
+    <div>
+        <v-card
+            @click="openEventDialog"
+            :color="isPassed ? 'orange darken-2' : null"
+            :disabled="disabled"
+            class="mb-3">
             <v-card-text class="pa-5">
                 <div class="d-flex">
-                    <v-icon class="mr-3"> mdi-calendar-clock</v-icon>
-                    <div class="flex-grow-1 flex-shrink-0 overflow-hidden pr-4">
+                    <v-icon class="mr-3">mdi-calendar-clock</v-icon>
+                    <div class="flex-shrink-0 overflow-hidden pr-4">
                         <h2 class="white--text font-weight-regular mb-1">{{ event.name }}</h2>
                     </div>
                     <p class="flex-shrink-1 text-ellipsis pr-10 mb-0" :title="event.description">
                         {{ event.description }}
                     </p>
-                    <div class="d-flex flex-shrink-0">
+                    <v-spacer></v-spacer>
+                    <div class="d-flex flex-shrink-0 white--text">
                         <div title="Start date">
-                            <v-icon
-                                small
-                                :color="isPassed ? 'orange lighten-1' : null"
-                                class="mr-1">
-                                mdi-clock-outline
-                            </v-icon>
-                            <span
-                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }">
-                                {{ startDate }}
-                            </span>
+                            <v-icon small class="mr-1">mdi-clock-outline</v-icon>
+                            <span>{{ startDate }}</span>
                         </div>
 
                         <div v-if="event.end_date" title="End date">
-                            <v-icon
-                                small
-                                :color="isPassed ? 'orange lighten-1' : null"
-                                class="mx-2">
-                                mdi-arrow-right
-                            </v-icon>
-                            <v-icon
-                                small
-                                :color="isPassed ? 'orange lighten-1' : null"
-                                class="mr-1">
-                                mdi-clock-outline
-                            </v-icon>
-                            <span
-                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }">
-                                {{ endDate }}
-                            </span>
+                            <v-icon small class="mx-2">mdi-arrow-right</v-icon>
+                            <v-icon small class="mr-1">mdi-clock-outline</v-icon>
+                            <span>{{ endDate }}</span>
                         </div>
 
                         <div v-if="event.takes_whole_day" class="ml-2" title="Takes whole day">
-                            <v-icon small :color="isPassed ? 'orange lighten-1' : null">
-                                mdi-weather-sunset-up
-                            </v-icon>
+                            <v-icon small>mdi-white-balance-sunny</v-icon>
                         </div>
                     </div>
                 </div>
