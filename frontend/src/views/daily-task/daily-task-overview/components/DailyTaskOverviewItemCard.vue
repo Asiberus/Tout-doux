@@ -1,14 +1,27 @@
 <template>
     <v-hover v-slot="{ hover }">
         <v-card
-            v-on="dailyTaskSummary.totalTask ? { click: () => openDailyTaskDetailDialog() } : {}"
+            v-on="
+                dailyTaskSummary.totalTask || dailyTaskSummary.totalEvent
+                    ? { click: () => openDailyTaskDetailDialog() }
+                    : {}
+            "
             :color="backgroundColor"
             :ripple="false">
             <v-card-text>
-                <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
-                <div class="d-flex justify-space-between">
-                    <p class="daily-task-date">{{ dailyTaskDateFormat }}</p>
-                    <div class="pr-2 flex-shrink-0" v-if="dailyTaskSummary.totalTask">
+                <div class="d-flex align-end">
+                    <div class="d-flex flex-column">
+                        <h1 class="white--text mb-2">{{ dailyTaskDayOfWeek }}</h1>
+                        <p class="daily-task-date">{{ dailyTaskDateFormat }}</p>
+                    </div>
+                    <v-spacer></v-spacer>
+                    <div v-if="dailyTaskSummary.totalEvent > 0" class="d-flex flex-shrink-0">
+                        <span class="daily-task-event mr-1">
+                            {{ dailyTaskSummary.totalEvent }}
+                        </span>
+                        <v-icon>mdi-calendar-clock</v-icon>
+                    </div>
+                    <div v-if="dailyTaskSummary.totalTask" class="flex-shrink-0 ml-6">
                         <span style="font-size: 3em" class="white--text">{{
                             dailyTaskSummary.totalTaskCompleted
                         }}</span>
@@ -81,7 +94,7 @@ export default class DailyTaskOverviewItemCard extends Vue {
     }
 
     get backgroundColor(): string | null {
-        if (!this.dailyTaskSummary.totalTask) return '#151515'
+        if (!this.dailyTaskSummary.totalTask && !this.dailyTaskSummary.totalEvent) return '#151515'
         else if (!this.dailyTaskSummary.totalTaskCompleted) return null
 
         return this.colorOfTaskCompleted
@@ -97,6 +110,11 @@ export default class DailyTaskOverviewItemCard extends Vue {
 .daily-task-date {
     font-size: 1rem;
     padding-left: 0.3rem;
+}
+
+.daily-task-event {
+    font-size: 1.8em;
+    color: white;
 }
 
 .card-action {

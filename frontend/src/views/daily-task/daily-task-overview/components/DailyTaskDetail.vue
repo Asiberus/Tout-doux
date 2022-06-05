@@ -9,7 +9,10 @@
             <div class="content">
                 <h1 class="text-h2 mb-10">{{ dateFormat(date, 'dddd DD MMMM Y') }}</h1>
                 <v-row class="pl-8">
-                    <v-col :cols="events.length > 0 ? 8 : 10" class="d-flex flex-column">
+                    <v-col
+                        v-if="dailyTaskList.length > 0"
+                        :cols="events.length > 0 ? 8 : 10"
+                        class="d-flex flex-column">
                         <h3 class="text-h4">Tasks</h3>
                         <p class="grey--text text--lighten-1 ml-2">
                             <template v-if="isToday(date)">
@@ -135,7 +138,7 @@
                             </v-timeline>
                         </div>
                     </v-col>
-                    <v-col cols="4" v-if="events.length > 0">
+                    <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 4 : 8">
                         <h3 class="text-h4">Events</h3>
                         <p class="grey--text text--lighten-1 ml-2">
                             <template v-if="isToday(date)"
