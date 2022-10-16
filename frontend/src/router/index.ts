@@ -1,3 +1,4 @@
+import Agenda from '@/views/agenga/Agenda.vue'
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import { projectRoutes } from '@/router/modules/project.router'
@@ -9,8 +10,13 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
     {
         path: '/',
-        name: 'Home',
+        name: 'home',
         redirect: { name: 'daily-task-overview' },
+    },
+    {
+        path: '/agenda',
+        name: 'agenda',
+        component: Agenda,
     },
 ]
 

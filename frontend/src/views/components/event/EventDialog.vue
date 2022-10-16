@@ -342,6 +342,8 @@ export default class EventDialog extends Vue {
         }
 
         this.$emit('submit', event)
+        if (this.event) this.$emit('update', { id: this.event.id, event })
+        else this.$emit('create', event)
     }
 
     emitDeleteEvent(): void {
@@ -350,7 +352,7 @@ export default class EventDialog extends Vue {
             return
         }
 
-        this.$emit('delete')
+        if (this.event) this.$emit('delete', this.event?.id)
     }
 
     emitCloseEvent(): void {

@@ -292,7 +292,7 @@
 </template>
 
 <script lang="ts">
-import { EventModel } from '@/models/event.model'
+import { EventExtended, EventModel } from '@/models/event.model'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
@@ -305,7 +305,7 @@ import { dateFormat } from '@/pipes'
 export default class DailyTaskDetail extends Vue {
     @Prop() date!: string
     dailyTaskList: DailyTask[] = []
-    events: EventModel[] = []
+    events: EventExtended[] = []
 
     get numberOfDailyTaskCompleted(): number {
         return this.dailyTaskList.filter(dailyTask => dailyTask.completed).length

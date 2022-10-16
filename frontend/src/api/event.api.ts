@@ -4,6 +4,8 @@ import { apiRoutes } from '@/api-routes'
 
 export interface EventQueryOptions {
     date?: string
+    month?: number
+    year?: number
 }
 
 const getEvents = (params: EventQueryOptions = {}) => {
