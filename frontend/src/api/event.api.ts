@@ -1,6 +1,6 @@
+import { apiRoutes } from '@/api-routes'
 import { EventModel } from '@/models/event.model'
 import Vue from 'vue'
-import { apiRoutes } from '@/api-routes'
 
 export interface EventQueryOptions {
     date?: string
@@ -8,16 +8,27 @@ export interface EventQueryOptions {
     year?: number
 }
 
+// Todo : rename
+interface EventOptions {
+    extended?: boolean
+}
+
 const getEvents = (params: EventQueryOptions = {}) => {
     return Vue.http.get(apiRoutes.event, { params })
 }
 
-const createEvent = (event: Partial<EventModel>) => {
-    return Vue.http.post(apiRoutes.event, event)
+const createEvent = (event: Partial<EventModel>, params: EventOptions = {}) => {
+    return Vue.http.post(apiRoutes.event, event, { params })
 }
 
-const updateEventById = (eventId: number, event: Partial<EventModel>) => {
-    return Vue.http.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event)
+const updateEventById = (
+    eventId: number,
+    event: Partial<EventModel>,
+    params: EventOptions = {}
+) => {
+    return Vue.http.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event, {
+        params,
+    })
 }
 
 const deleteEventById = (eventId: number) => {

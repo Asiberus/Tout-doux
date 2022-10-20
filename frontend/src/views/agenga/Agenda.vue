@@ -112,7 +112,7 @@ export default class Agenda extends Vue {
     }
 
     createEvent(event: Partial<EventModel>): void {
-        eventService.createEvent(event).then(
+        eventService.createEvent(event, { extended: true }).then(
             (response: any) => this.events.push(this.parseEvent(response.body)),
             (error: any) => console.error(error)
         )
@@ -120,7 +120,7 @@ export default class Agenda extends Vue {
     }
 
     updateEvent({ id, event }: { id: number; event: Partial<EventModel> }): void {
-        eventService.updateEventById(id, event).then(
+        eventService.updateEventById(id, event, { extended: true }).then(
             (response: any) => {
                 const eventIndex = this.events.findIndex(e => e.id === id)
                 if (eventIndex === -1) return
