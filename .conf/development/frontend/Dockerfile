@@ -23,4 +23,4 @@ RUN npm install
 COPY --chown=node:node ./frontend .
 RUN ./setup-config.sh
 
-CMD ["npm", "run", "serve", "--host=0.0.0.0"]
+CMD ["npm", "run", "serve"]
