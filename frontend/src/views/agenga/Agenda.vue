@@ -116,10 +116,12 @@ export default class Agenda extends Vue {
 
     createEvent(event: Partial<EventModel>): void {
         eventService.createEvent(event, { extended: true }).then(
-            (response: any) => this.events.push(this.parseEvent(response.body)),
+            (response: any) => {
+                this.events.push(this.parseEvent(response.body))
+                this.eventDialog = false
+            },
             (error: any) => console.error(error)
         )
-        this.eventDialog = false
     }
 
     updateEvent({ id, event }: { id: number; event: Partial<EventModel> }): void {
@@ -129,16 +131,23 @@ export default class Agenda extends Vue {
                 if (eventIndex === -1) return
 
                 this.events.splice(eventIndex, 1, this.parseEvent(response.body))
+                this.eventSelected = null
+                this.eventDialog = false
             },
             (error: any) => console.error(error)
         )
-        this.eventSelected = null
-        this.eventDialog = false
     }
 
     deleteEvent(id: number): void {
         eventService.deleteEventById(id).then(
-            (response: any) => console.log('Success', response),
+            () => {
+                const eventIndex = this.events.findIndex(event => event.id === id)
+                if (eventIndex === -1) return
+
+                this.events.splice(eventIndex, 1)
+                this.eventSelected = null
+                this.eventDialog = false
+            },
             (error: any) => console.error(error)
         )
     }

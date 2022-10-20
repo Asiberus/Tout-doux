@@ -3,7 +3,7 @@
         <v-toolbar>
             <v-toolbar-title :title="event.name">{{ event.name }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn @click="emitUpdateEvent()" icon>
+            <v-btn @click="emitUpdateEvent()" :disabled="isEditDisabled()" icon>
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </v-toolbar>
@@ -50,6 +50,10 @@ export default class EventTooltip extends Vue {
 
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
+    }
+
+    isEditDisabled(): boolean {
+        return this.event.project ? this.event.project.archived : false
     }
 
     emitUpdateEvent(): void {

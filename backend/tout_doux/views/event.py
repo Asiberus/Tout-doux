@@ -79,7 +79,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.project.archived:
+        if instance.project and instance.project.archived:
             raise PermissionDenied('This event is related to an archived project')
 
         self.perform_destroy(instance)
