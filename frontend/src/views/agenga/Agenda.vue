@@ -30,12 +30,15 @@
                         @click:event="selectEvent($event)">
                     </v-calendar>
                     <v-menu
-                        v-model="eventSelectedOpen"
+                        v-model="eventTooltip"
                         :close-on-content-click="false"
-                        :activator="selectedElement"
-                        offset-x>
-                        <template v-if="selectedEvent">
-                            <EventTooltip :event="selectedEvent" @update="eventDialog = true">
+                        :activator="elementSelected"
+                        offset-x
+                        min-width="30rem"
+                        max-width="40rem"
+                        :key="eventTooltipKey">
+                        <template v-if="eventSelected">
+                            <EventTooltip :event="eventSelected" @update="eventDialog = true">
                             </EventTooltip>
                         </template>
                     </v-menu>
@@ -46,7 +49,7 @@
         <v-dialog v-model="eventDialog" width="60%">
             <EventDialog
                 :is-dialog-open="eventDialog"
-                :event="selectedEvent"
+                :event="eventSelected"
                 @create="createEvent($event)"
                 @update="updateEvent($event)"
                 @delete="deleteEvent($event)"
@@ -69,16 +72,17 @@ import { Component, Vue } from 'vue-property-decorator'
     components: { EventDialog, EventTooltip },
 })
 export default class Agenda extends Vue {
+    events: EventExtended[] = []
+
     value = moment().format('YYYY-MM-DD')
     weekdays = [1, 2, 3, 4, 5, 6, 0]
 
     eventDialog = false
 
-    eventSelectedOpen = false
-    selectedEvent: EventExtended | null = null
-    selectedElement: EventTarget | null = null
-
-    events: EventExtended[] = []
+    eventTooltip = false
+    eventTooltipKey = 0
+    eventSelected: EventExtended | null = null
+    elementSelected: EventTarget | null = null
 
     get monthSelected(): string {
         return moment(this.value).format('MMMM YYYY')
@@ -97,7 +101,6 @@ export default class Agenda extends Vue {
         const year = moment(this.value).year()
         eventService.getEvents({ month, year }).then(
             (response: any) => (this.events = response.body.map(this.parseEvent)),
-            // (response: any) => (this.events = response.body),
             (error: any) => console.error(error)
         )
     }
@@ -129,7 +132,7 @@ export default class Agenda extends Vue {
             },
             (error: any) => console.error(error)
         )
-        this.selectedEvent = null
+        this.eventSelected = null
         this.eventDialog = false
     }
 
@@ -142,22 +145,10 @@ export default class Agenda extends Vue {
 
     selectEvent($event: { nativeEvent: Event; event: EventExtended }): void {
         const { nativeEvent, event } = $event
-        const open = () => {
-            this.selectedEvent = event
-            this.selectedElement = nativeEvent.target
-            requestAnimationFrame(() =>
-                requestAnimationFrame(() => (this.eventSelectedOpen = true))
-            )
-        }
-
-        if (this.eventSelectedOpen) {
-            this.eventSelectedOpen = false
-            requestAnimationFrame(() => requestAnimationFrame(() => open()))
-        } else {
-            open()
-        }
-
-        nativeEvent.stopPropagation()
+        this.eventTooltipKey += 1 // Hack to reload v-menu component
+        this.eventSelected = event
+        this.elementSelected = nativeEvent.target
+        if (!this.eventTooltip) this.eventTooltip = true
     }
 
     setCalendarToNow(): void {

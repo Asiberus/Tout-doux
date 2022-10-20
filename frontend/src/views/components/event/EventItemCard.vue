@@ -3,7 +3,7 @@
         <v-card @click="openEventDialog" :disabled="disabled">
             <v-card-text class="pa-5">
                 <div class="d-flex">
-                    <v-icon class="mr-3">mdi-calendar-clock</v-icon>
+                    <v-icon class="mr-3"> mdi-calendar-clock</v-icon>
                     <div class="flex-grow-1 flex-shrink-0 overflow-hidden pr-4">
                         <h2 class="white--text font-weight-regular mb-1">{{ event.name }}</h2>
                     </div>
@@ -12,32 +12,41 @@
                     </p>
                     <div class="d-flex flex-shrink-0">
                         <div title="Start date">
-                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mr-1"
-                                >mdi-clock-outline</v-icon
-                            >
+                            <v-icon
+                                small
+                                :color="isPassed ? 'orange lighten-1' : null"
+                                class="mr-1">
+                                mdi-clock-outline
+                            </v-icon>
                             <span
-                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }"
-                                >{{ startDate }}</span
-                            >
+                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }">
+                                {{ startDate }}
+                            </span>
                         </div>
 
                         <div v-if="event.end_date" title="End date">
-                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mx-2"
-                                >mdi-arrow-right</v-icon
-                            >
-                            <v-icon small :color="isPassed ? 'orange lighten-1' : null" class="mr-1"
-                                >mdi-clock-outline</v-icon
-                            >
+                            <v-icon
+                                small
+                                :color="isPassed ? 'orange lighten-1' : null"
+                                class="mx-2">
+                                mdi-arrow-right
+                            </v-icon>
+                            <v-icon
+                                small
+                                :color="isPassed ? 'orange lighten-1' : null"
+                                class="mr-1">
+                                mdi-clock-outline
+                            </v-icon>
                             <span
-                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }"
-                                >{{ endDate }}</span
-                            >
+                                :class="{ 'orange--text': isPassed, 'text--lighten-1': isPassed }">
+                                {{ endDate }}
+                            </span>
                         </div>
 
                         <div v-if="event.takes_whole_day" class="ml-2" title="Takes whole day">
-                            <v-icon small :color="isPassed ? 'orange lighten-1' : null"
-                                >mdi-weather-sunset-up</v-icon
-                            >
+                            <v-icon small :color="isPassed ? 'orange lighten-1' : null">
+                                mdi-weather-sunset-up
+                            </v-icon>
                         </div>
                     </div>
                 </div>
@@ -56,11 +65,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
 import { EventModel } from '@/models/event.model'
-import moment from 'moment'
-import EventDialog from '@/views/components/event/EventDialog.vue'
 import { Task } from '@/models/task.model'
+import EventDialog from '@/views/components/event/EventDialog.vue'
+import moment from 'moment'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
     components: {
