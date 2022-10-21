@@ -1,55 +1,69 @@
 <template>
     <div>
         <h1 class="flex-grow-1 text-h3 mb-5">Agenda</h1>
-        <div class="d-flex align-center">
-            <v-btn icon class="ma-2" @click="previousMonth()">
+        <div class="d-flex align-center mb-2">
+            <v-btn icon class="mx-2" @click="previousMonth()">
                 <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
             {{ monthSelected }}
-            <v-btn icon class="ma-2" @click="nextMonth()">
+            <v-btn icon class="mx-2" @click="nextMonth()">
                 <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
             <v-btn @click="setCalendarToNow()">now</v-btn>
             <v-spacer></v-spacer>
-            <v-btn @click="eventDialog = true">
+            <v-btn @click="openEventDialog()">
                 <v-icon left>mdi-plus</v-icon>
                 event
             </v-btn>
         </div>
-        <v-row>
-            <v-col cols="12">
-                <v-sheet rounded height="600" color="white">
-                    <v-calendar
-                        ref="calendar"
-                        v-model="value"
-                        :events="events"
-                        event-color="green"
-                        event-start="start_date"
-                        event-end="end_date"
-                        :weekdays="weekdays"
-                        @click:event="selectEvent($event)">
-                    </v-calendar>
-                    <v-menu
-                        v-model="eventTooltip"
-                        :close-on-content-click="false"
-                        :activator="elementSelected"
-                        offset-x
-                        min-width="30rem"
-                        max-width="40rem"
-                        :key="eventTooltipKey">
-                        <template v-if="eventSelected">
-                            <EventTooltip :event="eventSelected" @update="eventDialog = true">
-                            </EventTooltip>
-                        </template>
-                    </v-menu>
-                </v-sheet>
-            </v-col>
-        </v-row>
+
+        <v-sheet rounded height="640">
+            <v-calendar
+                ref="calendar"
+                v-model="value"
+                :events="events"
+                :event-color="getEventColor"
+                event-start="start_date"
+                event-end="end_date"
+                :event-more="true"
+                :event-margin-bottom="2"
+                event-overlap-mode="column"
+                :hide-header="false"
+                :weekdays="weekdays"
+                color="accent"
+                first-interval="8"
+                @click:event="selectEvent($event)">
+                <!--                        <template v-slot:day="{ past, date }">{{ date }}</template>-->
+                <template v-slot:day-label="{ day, present }">
+                    <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
+                </template>
+                <template v-slot:event="{ event }">
+                    <div class="pl-2">
+                        {{ event.name }}
+                    </div>
+                </template>
+                <!--                        <template v-slot:day-month>LALAL</template>-->
+                <!--                        <template v-slot:day-label>LALAL</template>-->
+            </v-calendar>
+            <v-menu
+                v-model="eventTooltip"
+                :close-on-content-click="false"
+                :activator="elementSelected"
+                :key="eventTooltipKey"
+                offset-x
+                min-width="30rem"
+                max-width="40rem">
+                <template v-if="eventSelected">
+                    <EventTooltip :event="eventSelected" @update="openEventDialog($event)">
+                    </EventTooltip>
+                </template>
+            </v-menu>
+        </v-sheet>
 
         <v-dialog v-model="eventDialog" width="60%">
             <EventDialog
                 :is-dialog-open="eventDialog"
-                :event="eventSelected"
+                :event="eventToUpdate"
                 @create="createEvent($event)"
                 @update="updateEvent($event)"
                 @delete="deleteEvent($event)"
@@ -78,6 +92,7 @@ export default class Agenda extends Vue {
     weekdays = [1, 2, 3, 4, 5, 6, 0]
 
     eventDialog = false
+    eventToUpdate: EventExtended | null = null
 
     eventTooltip = false
     eventTooltipKey = 0
@@ -109,12 +124,18 @@ export default class Agenda extends Vue {
     parseEvent(event: EventExtended): EventExtended {
         return {
             ...event,
-            start_date: dateFormat(event.start_date, 'YYYY-MM-DD hh:mm'),
-            end_date: event.end_date ? dateFormat(event.end_date, 'YYYY-MM-DD hh:mm') : undefined,
+            start_date: dateFormat(event.start_date, 'YYYY-MM-DD HH:mm'),
+            end_date: event.end_date ? dateFormat(event.end_date, 'YYYY-MM-DD HH:mm') : undefined,
         }
     }
 
+    openEventDialog(event: EventExtended | null = null): void {
+        this.eventToUpdate = event
+        this.eventDialog = true
+    }
+
     createEvent(event: Partial<EventModel>): void {
+        this.eventSelected = null
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
                 this.events.push(this.parseEvent(response.body))
@@ -173,6 +194,13 @@ export default class Agenda extends Vue {
     nextMonth(): void {
         this.calendar.next()
         this.retrieveEvents()
+    }
+
+    getEventColor(event: EventExtended): string {
+        const { project } = event
+        if (!project) return 'teal'
+        else if (project.archived) return 'accent'
+        else return 'project'
     }
 }
 </script>

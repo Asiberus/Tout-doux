@@ -17,5 +17,5 @@ export interface EventExtended {
     end_date?: string
     takes_whole_day: boolean
     description?: string
-    project: Project
+    project: Project | null
 }

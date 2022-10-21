@@ -42,6 +42,20 @@ export default Vue.extend({
     scrollbar-width: thin;
 }
 
+.v-calendar-weekly {
+    &__head-weekday {
+        margin-right: 0 !important;
+    }
+
+    &__day {
+        margin-right: 0 !important;
+    }
+
+    &__day-label {
+        cursor: default !important;
+    }
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

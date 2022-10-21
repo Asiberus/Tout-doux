@@ -1,9 +1,9 @@
 <template>
     <v-card>
-        <v-toolbar>
+        <v-toolbar :color="getEventColor">
             <v-toolbar-title :title="event.name">{{ event.name }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn @click="emitUpdateEvent()" :disabled="isEditDisabled()" icon>
+            <v-btn @click="emitUpdateEvent()" :disabled="isEditDisabled" icon>
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </v-toolbar>
@@ -27,8 +27,13 @@
 
                 <template v-if="event.project">
                     <v-spacer class="mr-3"></v-spacer>
-                    <v-chip label color="project" class="flex-shrink-0a">
-                        <span class="text-ellipsis" :title="event.project.name">
+                    <v-chip
+                        :to="{ name: 'project-detail', params: { id: event.project.id } }"
+                        label
+                        color="project"
+                        :title="projectTitle">
+                        <v-icon v-if="event.project.archived" small left> mdi-archive </v-icon>
+                        <span class="text-ellipsis">
                             {{ event.project.name }}
                         </span>
                     </v-chip>
@@ -48,16 +53,32 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 export default class EventTooltip extends Vue {
     @Prop({ required: true }) event!: EventExtended
 
+    get isEditDisabled(): boolean {
+        return this.event.project ? this.event.project.archived : false
+    }
+
+    get projectTitle(): string {
+        const { project } = this.event
+        if (!project) return ''
+
+        let title = project.name
+        if (project.archived) title += ' (Archived)'
+        return title
+    }
+
+    get getEventColor(): string {
+        const { project } = this.event
+        if (!project) return 'teal'
+        else if (project.archived) return 'accent'
+        else return 'project'
+    }
+
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
     }
 
-    isEditDisabled(): boolean {
-        return this.event.project ? this.event.project.archived : false
-    }
-
     emitUpdateEvent(): void {
-        this.$emit('update')
+        this.$emit('update', this.event)
     }
 }
 </script>

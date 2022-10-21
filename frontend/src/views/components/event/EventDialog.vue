@@ -209,8 +209,8 @@ import moment from 'moment'
 
 @Component
 export default class EventDialog extends Vue {
+    @Prop({ required: true }) isDialogOpen!: boolean
     @Prop() event?: EventModel
-    @Prop() isDialogOpen!: boolean
 
     confirmDelete = false
     eventForm = {
