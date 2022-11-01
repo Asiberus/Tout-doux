@@ -10,6 +10,7 @@ WORKDIR  /frontend
 
 COPY --chown=node:node ./.conf/development/frontend/setup-config.sh ./setup-config.sh
 
+# Todo : see if we can remove python3, make and g++ after npm install
 RUN chown node:node /frontend && \
     mkdir -p /frontend/node_modules &&  \
     chown -R node:node /frontend && \

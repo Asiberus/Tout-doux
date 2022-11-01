@@ -1,10 +1,6 @@
 <template>
     <div>
-        <v-card
-            @click="openEventDialog"
-            :color="isPassed ? 'orange darken-2' : null"
-            :disabled="disabled"
-            class="mb-3">
+        <v-card @click="openEventDialog" :color="cardColor" :disabled="disabled" class="mb-3">
             <v-card-text class="pa-5">
                 <div class="d-flex">
                     <v-icon class="mr-3">mdi-calendar-clock</v-icon>
@@ -47,20 +43,19 @@
 </template>
 
 <script lang="ts">
-import { EventModel } from '@/models/event.model'
+import { EventExtended, EventModel } from '@/models/event.model'
 import { Task } from '@/models/task.model'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Project } from '@/models/project.model'
 
-@Component({
-    components: {
-        EventDialog,
-    },
-})
+@Component({ components: { EventDialog } })
 export default class EventItemCard extends Vue {
-    @Prop({ required: true }) private event!: EventModel
-    @Prop({ default: false }) private disabled!: boolean
+    @Prop({ required: true }) event!: EventModel
+    @Prop({ default: false }) disabled!: boolean
+    @Prop({ default: null }) project!: Project | null
+    @Prop({ default: null }) color!: string | null
 
     eventDialog = false
 
@@ -79,6 +74,13 @@ export default class EventItemCard extends Vue {
         return moment().isAfter(this.event.start_date)
     }
 
+    get cardColor(): string | null {
+        if (this.color) return this.color
+        if (this.isPassed) return 'orange darken-2'
+
+        return null
+    }
+
     openEventDialog(): void {
         if (this.disabled) return
 
@@ -87,7 +89,7 @@ export default class EventItemCard extends Vue {
 
     emitUpdateEvent(data: Partial<Task>): void {
         this.eventDialog = false
-        this.$emit('update', this.event.id, data)
+        this.$emit('update', { id: this.event.id, data })
     }
 
     emitDeleteEvent(): void {

@@ -344,7 +344,7 @@ export default class EventDialog extends Vue {
         }
 
         this.$emit('submit', event)
-        if (this.event) this.$emit('update', { id: this.event.id, event })
+        if (this.event) this.$emit('update', { id: this.event.id, data: event })
         else this.$emit('create', event)
     }
 

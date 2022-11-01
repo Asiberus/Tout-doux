@@ -56,6 +56,22 @@ export default Vue.extend({
     }
 }
 
+.half-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100% !important;
+    max-height: 100% !important;
+    width: 40% !important;
+    left: 60% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+.gap-1 {
+    gap: 4px;
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

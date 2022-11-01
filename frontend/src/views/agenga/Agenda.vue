@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="flex-grow-1 text-h3 mb-5">Agenda</h1>
+        <h1 class="flex-grow-1 text-h3 mb-5">Agenda {{ eventTooltip }} | {{ eventDayDialog }}</h1>
         <div class="d-flex align-center mb-2">
             <v-btn icon class="mx-2" @click="previousMonth()">
                 <v-icon>mdi-chevron-left</v-icon>
@@ -22,34 +22,50 @@
                 ref="calendar"
                 v-model="value"
                 :events="events"
+                :weekdays="weekdays"
                 :event-color="getEventColor"
                 event-start="start_date"
                 event-end="end_date"
-                :event-more="true"
                 :event-margin-bottom="2"
-                event-overlap-mode="column"
-                :hide-header="false"
-                :weekdays="weekdays"
+                :event-ripple="false"
                 color="accent"
-                first-interval="8"
-                @click:event="selectEvent($event)">
-                <!--                        <template v-slot:day="{ past, date }">{{ date }}</template>-->
+                @click:event="selectEvent($event)"
+                @click:more="openDayDialog($event)">
                 <template v-slot:day-label="{ day, present }">
                     <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
                 </template>
-                <template v-slot:event="{ event }">
-                    <div class="pl-2">
-                        {{ event.name }}
+                <template v-slot:event="{ event, eventParsed }">
+                    <div class="d-flex gap-1 px-2">
+                        <template
+                            v-if="
+                                !event.takes_whole_day &&
+                                eventParsed.startIdentifier === eventParsed.endIdentifier
+                            ">
+                            <span class="font-weight-bold">{{ eventParsed.start.time }}</span>
+                        </template>
+                        <template v-if="event.takes_whole_day">
+                            <v-icon x-small>mdi-white-balance-sunny</v-icon>
+                        </template>
+
+                        <span class="text-ellipsis">{{ event.name }}</span>
+
+                        <template v-if="eventParsed.startIdentifier !== eventParsed.endIdentifier">
+                            <span class="font-weight-bold">
+                                {{ dateFormat(eventParsed.start.date, 'DD/MM') }}
+                            </span>
+                            <v-icon x-small>mdi-arrow-right</v-icon>
+                            <span class="font-weight-bold">
+                                {{ dateFormat(eventParsed.end.date, 'DD/MM') }}
+                            </span>
+                        </template>
                     </div>
                 </template>
-                <!--                        <template v-slot:day-month>LALAL</template>-->
-                <!--                        <template v-slot:day-label>LALAL</template>-->
             </v-calendar>
             <v-menu
                 v-model="eventTooltip"
                 :close-on-content-click="false"
-                :activator="elementSelected"
-                :key="eventTooltipKey"
+                :activator="eventTooltipElement"
+                :key="'event-info-' + eventTooltipKey"
                 offset-x
                 min-width="30rem"
                 max-width="40rem">
@@ -70,6 +86,14 @@
                 @close="eventDialog = false">
             </EventDialog>
         </v-dialog>
+
+        <EventDayDialog
+            v-model="eventDayDialog"
+            :date="eventDayDialogDate"
+            :events="eventDayDialogEvents"
+            @update="updateEvent($event)"
+            @delete="deleteEvent($event)">
+        </EventDayDialog>
     </div>
 </template>
 
@@ -81,14 +105,15 @@ import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
+import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 
 @Component({
-    components: { EventDialog, EventTooltip },
+    components: { EventDialog, EventTooltip, EventDayDialog },
 })
 export default class Agenda extends Vue {
     events: EventExtended[] = []
 
-    value = moment().format('YYYY-MM-DD')
+    value = moment('2022-10-25').format('YYYY-MM-DD')
     weekdays = [1, 2, 3, 4, 5, 6, 0]
 
     eventDialog = false
@@ -97,7 +122,11 @@ export default class Agenda extends Vue {
     eventTooltip = false
     eventTooltipKey = 0
     eventSelected: EventExtended | null = null
-    elementSelected: EventTarget | null = null
+    eventTooltipElement: EventTarget | null = null
+
+    eventDayDialog = false
+    eventDayDialogDate: string | null = null
+    eventDayDialogEvents: EventExtended[] = []
 
     get monthSelected(): string {
         return moment(this.value).format('MMMM YYYY')
@@ -145,15 +174,19 @@ export default class Agenda extends Vue {
         )
     }
 
-    updateEvent({ id, event }: { id: number; event: Partial<EventModel> }): void {
-        eventService.updateEventById(id, event, { extended: true }).then(
+    updateEvent({ id, data }: { id: number; data: Partial<EventModel> }): void {
+        eventService.updateEventById(id, data, { extended: true }).then(
             (response: any) => {
                 const eventIndex = this.events.findIndex(e => e.id === id)
                 if (eventIndex === -1) return
 
                 this.events.splice(eventIndex, 1, this.parseEvent(response.body))
-                this.eventSelected = null
-                this.eventDialog = false
+
+                if (this.eventDayDialog) this.setDayDialogEvents()
+                else {
+                    this.eventSelected = null
+                    this.eventDialog = false
+                }
             },
             (error: any) => console.error(error)
         )
@@ -166,19 +199,38 @@ export default class Agenda extends Vue {
                 if (eventIndex === -1) return
 
                 this.events.splice(eventIndex, 1)
-                this.eventSelected = null
-                this.eventDialog = false
+
+                if (this.eventDayDialog) this.setDayDialogEvents()
+                else {
+                    this.eventSelected = null
+                    this.eventDialog = false
+                }
             },
             (error: any) => console.error(error)
         )
     }
 
-    selectEvent($event: { nativeEvent: Event; event: EventExtended }): void {
+    selectEvent($event: { nativeEvent: MouseEvent; event: EventExtended }): void {
         const { nativeEvent, event } = $event
         this.eventTooltipKey += 1 // Hack to reload v-menu component
         this.eventSelected = event
-        this.elementSelected = nativeEvent.target
+        this.eventTooltipElement = nativeEvent.target
         if (!this.eventTooltip) this.eventTooltip = true
+    }
+
+    openDayDialog($event: { date: string; nativeEvent: MouseEvent }): void {
+        const { date } = $event
+        this.eventDayDialog = true
+        this.eventDayDialogDate = date
+        this.setDayDialogEvents()
+    }
+
+    // TODO : See if this can be optimized
+    setDayDialogEvents(): void {
+        this.eventDayDialogEvents = this.events.filter(({ start_date, end_date }) => {
+            if (!end_date) return moment(this.eventDayDialogDate).isSame(start_date, 'day')
+            return moment(this.eventDayDialogDate).isBetween(start_date, end_date, 'day', '[]')
+        })
     }
 
     setCalendarToNow(): void {
@@ -201,6 +253,10 @@ export default class Agenda extends Vue {
         if (!project) return 'teal'
         else if (project.archived) return 'accent'
         else return 'project'
+    }
+
+    dateFormat(date: string, format: string): string {
+        return dateFormat(date, format)
     }
 }
 </script>

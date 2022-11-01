@@ -121,8 +121,8 @@ export default class ProjectEvent extends Vue {
         this.$store.dispatch(projectActions.event.addEvent, event)
     }
 
-    updateEvent(id: number, data: Partial<EventModel>): void {
-        this.$store.dispatch(projectActions.event.editEvent, { id, data })
+    updateEvent(payload: { id: number; data: Partial<EventModel> }): void {
+        this.$store.dispatch(projectActions.event.editEvent, payload)
     }
 
     deleteEvent(id: number): void {
