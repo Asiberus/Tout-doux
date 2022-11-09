@@ -3,7 +3,7 @@
         <v-toolbar :color="getEventColor">
             <v-toolbar-title :title="event.name">{{ event.name }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn @click="emitUpdateEvent()" :disabled="isEditDisabled" icon>
+            <v-btn @click="emitUpdateEvent()" v-if="!isEditDisabled" icon>
                 <v-icon>mdi-pencil</v-icon>
             </v-btn>
         </v-toolbar>
@@ -14,7 +14,7 @@
                         <v-icon class="mr-2">mdi-calendar-clock</v-icon>
                         <span>{{ dateFormat(event.start_date, 'D MMMM Y HH:mm') }}</span>
                         <template v-if="event.end_date">
-                            <v-icon class="mx-2">mdi-arrow-right</v-icon>
+                            <v-icon small class="mx-2">mdi-arrow-right</v-icon>
                             <span>{{ dateFormat(event.end_date, 'D MMMM Y HH:mm') }}</span>
                         </template>
                     </div>
@@ -30,7 +30,7 @@
                     <v-chip
                         :to="{ name: 'project-detail', params: { id: event.project.id } }"
                         label
-                        color="project"
+                        :color="event.project.archived ? 'projectArchived' : 'project'"
                         :title="projectTitle">
                         <v-icon v-if="event.project.archived" small left> mdi-archive </v-icon>
                         <span class="text-ellipsis">
@@ -68,9 +68,8 @@ export default class EventTooltip extends Vue {
 
     get getEventColor(): string {
         const { project } = this.event
-        if (!project) return 'teal'
-        else if (project.archived) return 'accent'
-        else return 'project'
+        if (project) return 'project'
+        return 'teal'
     }
 
     dateFormat(date: string, format: string): string {

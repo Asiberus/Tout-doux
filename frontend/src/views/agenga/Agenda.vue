@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="flex-grow-1 text-h3 mb-5">Agenda {{ eventTooltip }} | {{ eventDayDialog }}</h1>
+        <h1 class="flex-grow-1 text-h3 mb-5">Agenda</h1>
         <div class="d-flex align-center mb-2">
             <v-btn icon class="mx-2" @click="previousMonth()">
                 <v-icon>mdi-chevron-left</v-icon>
@@ -111,7 +111,7 @@ import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
     components: { EventDialog, EventTooltip, EventDayDialog },
 })
 export default class Agenda extends Vue {
-    events: EventExtended[] = []
+    events: EventExtended[] = [] // TODO : think of using Set
 
     value = moment('2022-10-25').format('YYYY-MM-DD')
     weekdays = [1, 2, 3, 4, 5, 6, 0]
@@ -183,10 +183,7 @@ export default class Agenda extends Vue {
                 this.events.splice(eventIndex, 1, this.parseEvent(response.body))
 
                 if (this.eventDayDialog) this.setDayDialogEvents()
-                else {
-                    this.eventSelected = null
-                    this.eventDialog = false
-                }
+                else this.eventDialog = false
             },
             (error: any) => console.error(error)
         )
@@ -250,9 +247,8 @@ export default class Agenda extends Vue {
 
     getEventColor(event: EventExtended): string {
         const { project } = event
-        if (!project) return 'teal'
-        else if (project.archived) return 'accent'
-        else return 'project'
+        if (project) return 'project'
+        return 'teal'
     }
 
     dateFormat(date: string, format: string): string {

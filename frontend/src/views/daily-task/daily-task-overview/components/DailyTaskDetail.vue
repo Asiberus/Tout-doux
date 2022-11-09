@@ -154,127 +154,16 @@
                                     :color="isEventPassed(event) ? 'orange darken-2' : null"
                                     fill-dot
                                     icon="mdi-calendar-clock">
-                                    <v-card
-                                        :color="isEventPassed(event) ? 'orange darken-2' : null">
-                                        <v-card-text class="white--text">
-                                            <div class="d-flex align-center">
-                                                <span
-                                                    class="flex-grow-1 text-ellipsis pr-5"
-                                                    :title="event.name">
-                                                    {{ event.name }}
-                                                </span>
-                                                <v-tooltip
-                                                    v-if="event.description"
-                                                    bottom
-                                                    max-width="20rem"
-                                                    content-class="grey darken-3">
-                                                    <template v-slot:activator="{ attrs, on }">
-                                                        <v-icon
-                                                            v-bind="attrs"
-                                                            v-on="on"
-                                                            class="mr-2">
-                                                            mdi-text-box
-                                                        </v-icon>
-                                                    </template>
-                                                    {{ event.description }}
-                                                </v-tooltip>
-
-                                                <v-icon
-                                                    v-if="event.takes_whole_day"
-                                                    class="mr-2"
-                                                    title="Takes whole day">
-                                                    mdi-white-balance-sunny
-                                                </v-icon>
-
-                                                <div
-                                                    v-if="!event.takes_whole_day"
-                                                    class="flex-shrink-0 d-flex">
-                                                    <v-icon class="mr-2">
-                                                        mdi-clock-outline
-                                                    </v-icon>
-                                                    <template
-                                                        v-if="
-                                                            !event.end_date ||
-                                                            isDateEqual(
-                                                                event.start_date,
-                                                                event.end_date
-                                                            )
-                                                        ">
-                                                        <span title="Start date">
-                                                            {{
-                                                                dateFormat(
-                                                                    event.start_date,
-                                                                    'HH:mm'
-                                                                )
-                                                            }}
-                                                        </span>
-                                                    </template>
-                                                    <template v-else>
-                                                        <div
-                                                            class="d-flex flex-column"
-                                                            title="Start date">
-                                                            <span class="mb-n1">
-                                                                {{
-                                                                    dateFormat(
-                                                                        event.start_date,
-                                                                        'DD/MM'
-                                                                    )
-                                                                }}
-                                                            </span>
-                                                            <span>{{
-                                                                dateFormat(
-                                                                    event.start_date,
-                                                                    'HH:mm'
-                                                                )
-                                                            }}</span>
-                                                        </div>
-                                                    </template>
-
-                                                    <template v-if="event.end_date">
-                                                        <v-icon small class="mx-2">
-                                                            mdi-arrow-right
-                                                        </v-icon>
-                                                        <template
-                                                            v-if="
-                                                                isDateEqual(
-                                                                    event.start_date,
-                                                                    event.end_date
-                                                                )
-                                                            ">
-                                                            <span title="End date">
-                                                                {{
-                                                                    dateFormat(
-                                                                        event.end_date,
-                                                                        'HH:mm'
-                                                                    )
-                                                                }}
-                                                            </span>
-                                                        </template>
-                                                        <template v-else>
-                                                            <div
-                                                                class="d-flex flex-column"
-                                                                title="End date">
-                                                                <span class="mb-n1">
-                                                                    {{
-                                                                        dateFormat(
-                                                                            event.end_date,
-                                                                            'DD/MM'
-                                                                        )
-                                                                    }}
-                                                                </span>
-                                                                <span>{{
-                                                                    dateFormat(
-                                                                        event.end_date,
-                                                                        'HH:mm'
-                                                                    )
-                                                                }}</span>
-                                                            </div>
-                                                        </template>
-                                                    </template>
-                                                </div>
-                                            </div>
-                                        </v-card-text>
-                                    </v-card>
+                                    <EventItemCard
+                                        :event="event"
+                                        :project="event.project"
+                                        :compact="true"
+                                        :day-selected="true"
+                                        :clickable="false"
+                                        :ripple="true"
+                                        :caret="true"
+                                        :margin-bottom="false">
+                                    </EventItemCard>
                                 </v-timeline-item>
                             </v-timeline>
                         </div>

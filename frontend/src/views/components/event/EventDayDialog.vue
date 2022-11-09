@@ -13,8 +13,11 @@
                     <EventItemCard
                         :event="event"
                         :project="event.project"
-                        :disabled="event.project ? event.project.archived : false"
-                        :color="getEventColor(event)"
+                        :clickable="event.project ? !event.project.archived : true"
+                        :ripple="event.project ? !event.project.archived : true"
+                        :color="'teal'"
+                        :daySelected="true"
+                        :compact="true"
                         @update="$emit('update', $event)"
                         @delete="$emit('delete', $event)">
                     </EventItemCard>
