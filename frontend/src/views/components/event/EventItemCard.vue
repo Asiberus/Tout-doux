@@ -1,89 +1,172 @@
 <template>
     <div>
-        <v-card
-            @click="openEventDialog()"
-            :color="cardColor"
-            :disabled="disabled"
-            :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
-            <v-card-text class="d-flex align-center pa-5 white--text">
-                <v-icon class="mr-2">mdi-calendar-clock</v-icon>
-                <h3 class="text-ellipsis font-weight-regular mr-2" :title="event.name">
-                    {{ event.name }}
-                </h3>
+        <v-hover v-slot="{ hover }">
+            <v-card
+                @click="openEventDialog()"
+                :color="cardColor"
+                :disabled="disabled"
+                :ripple="ripple"
+                :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
+                <v-card-text class="d-flex align-center">
+                    <v-icon
+                        v-if="showIcon"
+                        :color="isPassed && changePassedTextColor ? 'grey' : 'white'"
+                        large
+                        class="mr-4">
+                        mdi-calendar-clock
+                    </v-icon>
 
-                <template v-if="project">
-                    <ProjectChip :project="project" class="mr-2"></ProjectChip>
-                </template>
-
-                <v-spacer></v-spacer>
-
-                <template v-if="event.description">
-                    <v-tooltip bottom max-width="20rem" content-class="grey darken-3">
-                        <template v-slot:activator="{ attrs, on }">
-                            <v-icon v-bind="attrs" v-on="on" class="mr-2"> mdi-text-box </v-icon>
-                        </template>
-                        {{ event.description }}
-                    </v-tooltip>
-                </template>
-
-                <div class="flex-shrink-0 d-flex align-center">
-                    <template v-if="event.takes_whole_day">
-                        <v-icon title="Takes whole day">mdi-white-balance-sunny</v-icon>
-                        <span v-if="!daySelected" class="ml-2" title="Start Date">
-                            {{ dateFormat(event.start_date, 'D MMMM Y') }}
-                        </span>
+                    <template v-if="dense && event.takes_whole_day">
+                        <v-icon
+                            :color="isPassed && changePassedTextColor ? 'grey' : 'white'"
+                            title="Takes whole day"
+                            class="mr-2">
+                            mdi-white-balance-sunny
+                        </v-icon>
                     </template>
-                    <template v-else>
-                        <v-icon class="mr-1">mdi-clock-outline</v-icon>
-                        <template
-                            v-if="
-                                daySelected &&
-                                (!event.end_date || isDateEqual(event.start_date, event.end_date))
-                            ">
-                            <span title="Start date">
-                                {{ dateFormat(event.start_date, 'HH:mm') }}
-                            </span>
-                        </template>
-                        <template v-else-if="compact">
-                            <div class="d-flex flex-column ml-1" title="Start date">
-                                <span class="mb-n1">
-                                    {{ dateFormat(event.start_date, 'DD/MM') }}
-                                </span>
-                                <span>{{ dateFormat(event.start_date, 'HH:mm') }}</span>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <span title="Start Date">
-                                {{ dateFormat(event.start_date, 'D MMMM Y HH:mm') }}
-                            </span>
-                        </template>
 
-                        <template v-if="event.end_date">
-                            <v-icon small class="mx-1">mdi-arrow-right</v-icon>
-                            <template
-                                v-if="daySelected && isDateEqual(event.start_date, event.end_date)">
-                                <span title="End date">
-                                    {{ dateFormat(event.end_date, 'HH:mm') }}
+                    <div class="flex-grow-1 d-flex flex-column overflow-hidden mr-4">
+                        <div
+                            class="d-flex align-center grey--text font-weight-bold"
+                            :class="{ 'text--lighten-3': !isPassed || !changePassedTextColor }">
+                            <template v-if="event.takes_whole_day && !daySelected">
+                                <span title="Date">
+                                    {{ dateFormat(event.start_date, 'DD/MM/YY') }}
                                 </span>
                             </template>
-                            <template v-else-if="compact">
-                                <div class="d-flex flex-column" title="End date">
-                                    <span class="mb-n1">
-                                        {{ dateFormat(event.end_date, 'DD/MM') }}
+                            <template v-if="!event.takes_whole_day && dense">
+                                <span title="Start date">
+                                    <template
+                                        v-if="
+                                            daySelected &&
+                                            (!event.end_date ||
+                                                isDateEqual(event.start_date, event.end_date))
+                                        ">
+                                        {{ dateFormat(event.start_date, 'HH:mm') }}
+                                    </template>
+                                    <template v-else-if="compact">
+                                        {{ dateFormat(event.start_date, 'DD/MM/YY HH:mm') }}
+                                    </template>
+                                    <template v-else>
+                                        {{ dateFormat(event.start_date, 'D MMMM Y HH:mm') }}
+                                    </template>
+                                </span>
+
+                                <template v-if="event.end_date">
+                                    <v-icon
+                                        :color="
+                                            isPassed && changePassedTextColor
+                                                ? 'grey'
+                                                : 'grey lighten-3'
+                                        "
+                                        small
+                                        class="mx-1">
+                                        mdi-arrow-right
+                                    </v-icon>
+                                    <span title="End date">
+                                        <template
+                                            v-if="isDateEqual(event.start_date, event.end_date)">
+                                            {{ dateFormat(event.end_date, 'HH:mm') }}
+                                        </template>
+                                        <template v-else-if="compact">
+                                            {{ dateFormat(event.end_date, 'DD/MM/YY HH:mm') }}
+                                        </template>
+                                        <template v-else>
+                                            {{ dateFormat(event.end_date, 'D MMMM Y HH:mm') }}
+                                        </template>
                                     </span>
-                                    <span>{{ dateFormat(event.end_date, 'HH:mm') }}</span>
-                                </div>
+                                </template>
                             </template>
-                            <template v-else>
-                                <span title="End Date">
-                                    {{ dateFormat(event.end_date, 'D MMMM Y HH:mm') }}
+                        </div>
+
+                        <h3
+                            class="text-ellipsis white--text"
+                            :class="{
+                                'white--text': !isPassed || !changePassedTextColor,
+                                'grey--text': isPassed && changePassedTextColor,
+                            }"
+                            :title="event.name">
+                            {{ event.name }}
+                        </h3>
+
+                        <span
+                            v-if="event.description"
+                            class="text-ellipsis grey--text"
+                            :class="{ 'text--lighten-2': !isPassed || !changePassedTextColor }"
+                            :title="event.description">
+                            {{ event.description }}
+                        </span>
+                    </div>
+
+                    <template v-if="!dense">
+                        <div
+                            class="flex-shrink-0 d-flex align-center grey--text font-weight-bold"
+                            :class="{ 'text--lighten-3': !isPassed || !changePassedTextColor }">
+                            <template v-if="event.takes_whole_day">
+                                <v-icon
+                                    :color="isPassed && changePassedTextColor ? 'grey' : 'white'"
+                                    title="Takes whole day"
+                                    class="mr-2">
+                                    mdi-white-balance-sunny
+                                </v-icon>
+                            </template>
+                            <template v-if="!event.takes_whole_day">
+                                <span title="Start date">
+                                    <template
+                                        v-if="
+                                            daySelected &&
+                                            (!event.end_date ||
+                                                isDateEqual(event.start_date, event.end_date))
+                                        ">
+                                        {{ dateFormat(event.start_date, 'HH:mm') }}
+                                    </template>
+                                    <template v-else-if="compact">
+                                        {{ dateFormat(event.start_date, 'DD/MM/YY HH:mm') }}
+                                    </template>
+                                    <template v-else>
+                                        {{ dateFormat(event.start_date, 'D MMMM Y HH:mm') }}
+                                    </template>
                                 </span>
+
+                                <template v-if="event.end_date">
+                                    <v-icon
+                                        :color="
+                                            isPassed && changePassedTextColor
+                                                ? 'grey'
+                                                : 'grey lighten-3'
+                                        "
+                                        small
+                                        class="mx-1">
+                                        mdi-arrow-right
+                                    </v-icon>
+                                    <span title="End date">
+                                        <template
+                                            v-if="
+                                                daySelected &&
+                                                isDateEqual(event.start_date, event.end_date)
+                                            ">
+                                            {{ dateFormat(event.end_date, 'HH:mm') }}
+                                        </template>
+                                        <template v-else-if="compact">
+                                            {{ dateFormat(event.end_date, 'DD/MM/YY HH:mm') }}
+                                        </template>
+                                        <template v-else>
+                                            {{ dateFormat(event.end_date, 'D MMMM Y HH:mm') }}
+                                        </template>
+                                    </span>
+                                </template>
                             </template>
-                        </template>
+                        </div>
                     </template>
-                </div>
-            </v-card-text>
-        </v-card>
+
+                    <template v-if="project">
+                        <router-link :to="{ name: 'project-detail', params: { id: project.id } }">
+                            <ProjectAvatar :project="project" :hover="hover"></ProjectAvatar>
+                        </router-link>
+                    </template>
+                </v-card-text>
+            </v-card>
+        </v-hover>
 
         <v-dialog v-model="eventDialog" width="60%">
             <EventDialog
@@ -97,25 +180,29 @@
 </template>
 
 <script lang="ts">
+import ProjectAvatar from '@/components/ProjectAvatar.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import { EventModel } from '@/models/event.model'
+import { Project } from '@/models/project.model'
 import { Task } from '@/models/task.model'
+import { dateFormat } from '@/pipes'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Project } from '@/models/project.model'
-import { dateFormat } from '@/pipes'
 
-@Component({ components: { EventDialog, ProjectChip } })
+@Component({ components: { EventDialog, ProjectChip, ProjectAvatar } })
 export default class EventItemCard extends Vue {
     @Prop({ required: true }) event!: EventModel
     @Prop({ default: null }) project!: Project | null
     @Prop({ default: null }) color!: string | null
+    @Prop({ default: true }) changePassedTextColor!: boolean
     @Prop({ default: false }) disabled!: boolean
     @Prop({ default: true }) clickable!: boolean
-    @Prop({ default: false }) daySelected!: boolean
-    @Prop({ default: false }) compact!: boolean
     @Prop({ default: true }) ripple!: boolean
+    @Prop({ default: false }) daySelected!: boolean
+    @Prop({ default: true }) compact!: boolean
+    @Prop({ default: true }) dense!: boolean
+    @Prop({ default: false }) showIcon!: boolean
     @Prop({ default: false }) caret!: boolean
     @Prop({ default: true }) marginBottom!: boolean
 
@@ -129,9 +216,9 @@ export default class EventItemCard extends Vue {
 
     get cardColor(): string | null {
         if (this.color) return this.color
-        if (this.isPassed) return 'orange darken-2'
+        if (this.isPassed) return 'null'
 
-        return null
+        return 'teal'
     }
 
     openEventDialog(): void {

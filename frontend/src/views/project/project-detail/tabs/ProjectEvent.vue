@@ -7,7 +7,7 @@
 
                     <v-chip
                         class="mr-3"
-                        :color="displayPassedEvent ? 'orange lighten-1' : 'grey darken-4'"
+                        :color="displayPassedEvent ? 'accent' : 'grey darken-4'"
                         @click="displayPassedEvent = !displayPassedEvent">
                         <v-icon small class="mr-1"> mdi-clock-check-outline </v-icon>
                         Passed
@@ -34,6 +34,8 @@
                             :key="event.id"
                             :event="event"
                             :disabled="project.archived"
+                            :caret="false"
+                            :show-icon="true"
                             @update="updateEvent"
                             @delete="deleteEvent">
                         </EventItemCard>
@@ -55,6 +57,8 @@
                             v-for="event of passedEvents"
                             :key="event.id"
                             :event="event"
+                            :show-icon="true"
+                            :caret="true"
                             :disabled="project.archived"
                             @update="updateEvent"
                             @delete="deleteEvent">
@@ -78,13 +82,13 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import { EventModel } from '@/models/event.model'
+import { ProjectTask } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
+import EventDialog from '@/views/components/event/EventDialog.vue'
+import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
-import { ProjectTask } from '@/models/project.model'
-import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { EventModel } from '@/models/event.model'
-import EventDialog from '@/views/components/event/EventDialog.vue'
 
 @Component({
     components: { EventDialog, EventItemCard, EmptyListDisplay },

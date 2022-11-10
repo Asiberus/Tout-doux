@@ -11,16 +11,17 @@
                 <v-row class="pl-8">
                     <v-col
                         v-if="dailyTaskList.length > 0"
-                        :cols="events.length > 0 ? 8 : 10"
+                        :cols="events.length > 0 ? 7 : 8"
                         class="d-flex flex-column">
-                        <h3 class="text-h4">Tasks</h3>
+                        <h4 class="text-h4">Tasks</h4>
                         <p class="grey--text text--lighten-1 ml-2">
                             <template v-if="isToday(date)">
                                 <template v-if="numberOfDailyTaskUncompleted">
-                                    You have {{ numberOfDailyTaskUncompleted }} tasks left to do
-                                    today!
+                                    You have {{ numberOfDailyTaskUncompleted }}
+                                    {{ numberOfDailyTaskUncompleted > 1 ? 'tasks' : 'task' }} left
+                                    to do today!
                                 </template>
-                                <template v-else>All tasks done for today !</template>
+                                <template v-else>All tasks done for today! :)</template>
                             </template>
                             <template v-else>
                                 <template
@@ -29,8 +30,8 @@
                                 </template>
                                 <template v-else-if="numberOfDailyTaskCompleted > 0">
                                     {{ numberOfDailyTaskCompleted }} on {{ dailyTaskList.length }}
-                                    {{ numberOfDailyTaskCompleted > 1 ? 'tasks' : 'task' }} were
-                                    completed that day.
+                                    {{ dailyTaskList.length > 1 ? 'tasks' : 'task' }} were completed
+                                    that day.
                                 </template>
                                 <template v-else> No tasks completed that day :(</template>
                             </template>
@@ -64,12 +65,7 @@
                                                     </h4>
                                                 </template>
                                                 <template v-else>
-                                                    <h4
-                                                        class="
-                                                            white--text
-                                                            font-weight-regular
-                                                            mr-3
-                                                        ">
+                                                    <h4 class="font-weight-regular mr-3">
                                                         {{ dailyTask.name }}
                                                     </h4>
                                                 </template>
@@ -138,29 +134,34 @@
                             </v-timeline>
                         </div>
                     </v-col>
-                    <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 4 : 8">
-                        <h3 class="text-h4">Events</h3>
+                    <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
+                        <h4 class="text-h4">Events</h4>
                         <p class="grey--text text--lighten-1 ml-2">
-                            <template v-if="isToday(date)"
-                                >You have {{ events.length }} events today!
+                            <template v-if="isToday(date)">
+                                You have {{ events.length }}
+                                {{ events.length > 1 ? 'events' : 'event' }} today!
                             </template>
-                            <template v-else>You had {{ events.length }} events that day!</template>
+                            <template v-else>
+                                You had {{ events.length }}
+                                {{ events.length > 1 ? 'events' : 'event' }} that day!
+                            </template>
                         </p>
                         <div class="event-wrapper">
                             <v-timeline dense>
                                 <v-timeline-item
-                                    v-for="event in events"
+                                    v-for="event of events"
                                     :key="event.id"
-                                    :color="isEventPassed(event) ? 'orange darken-2' : null"
-                                    fill-dot
-                                    icon="mdi-calendar-clock">
+                                    :color="isEventPassed(event) ? null : 'teal'"
+                                    :icon="
+                                        isEventPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'
+                                    "
+                                    :icon-color="isEventPassed(event) ? 'grey' : 'white'"
+                                    fill-dot>
                                     <EventItemCard
                                         :event="event"
                                         :project="event.project"
-                                        :compact="true"
                                         :day-selected="true"
                                         :clickable="false"
-                                        :ripple="true"
                                         :caret="true"
                                         :margin-bottom="false">
                                     </EventItemCard>
@@ -175,14 +176,14 @@
 </template>
 
 <script lang="ts">
-import { EventExtended, EventModel } from '@/models/event.model'
-import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
-import { DailyTaskActionEnum, DailyTask } from '@/models/daily-task.model'
-import moment from 'moment'
 import { eventService } from '@/api/event.api'
+import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
+import { EventExtended } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
+import EventItemCard from '@/views/components/event/EventItemCard.vue'
+import moment from 'moment'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({ components: { EventItemCard } })
 export default class DailyTaskDetail extends Vue {
@@ -213,7 +214,10 @@ export default class DailyTaskDetail extends Vue {
 
     private retrieveTodayEvents(): void {
         eventService.getEvents({ date: this.date }).then(
-            (response: any) => (this.events = response.body),
+            (response: any) =>
+                (this.events = response.body.sort((event: EventExtended) =>
+                    this.isEventPassed(event) ? -1 : 1
+                )),
             (error: any) => console.error(error)
         )
     }
@@ -277,11 +281,7 @@ export default class DailyTaskDetail extends Vue {
         return moment().isSame(date, 'day')
     }
 
-    isDateEqual(date1: string, date2: string): boolean {
-        return moment(date1).isSame(date2, 'day')
-    }
-
-    isEventPassed(event: EventModel): boolean {
+    isEventPassed(event: EventExtended): boolean {
         const { start_date, end_date, takes_whole_day } = event
         if (end_date) return moment().isAfter(end_date)
         if (takes_whole_day) return moment().isAfter(start_date, 'day')
@@ -313,7 +313,7 @@ export default class DailyTaskDetail extends Vue {
         height: 100%;
 
         .content {
-            width: 80%;
+            width: 90%;
             margin-top: 3rem;
 
             .task-wrapper,
@@ -327,7 +327,8 @@ export default class DailyTaskDetail extends Vue {
                 padding-top: 0;
 
                 &::before {
-                    top: 24px;
+                    top: 30px;
+                    height: calc(100% - 60px);
                 }
 
                 .v-timeline-item:last-child {

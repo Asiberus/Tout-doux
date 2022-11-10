@@ -35,21 +35,23 @@
                     <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
                 </template>
                 <template v-slot:event="{ event, eventParsed }">
-                    <div class="d-flex gap-1 px-2">
-                        <template
-                            v-if="
-                                !event.takes_whole_day &&
-                                eventParsed.startIdentifier === eventParsed.endIdentifier
-                            ">
-                            <span class="font-weight-bold">{{ eventParsed.start.time }}</span>
-                        </template>
+                    <div class="d-flex px-2">
                         <template v-if="event.takes_whole_day">
                             <v-icon x-small>mdi-white-balance-sunny</v-icon>
                         </template>
-
-                        <span class="text-ellipsis">{{ event.name }}</span>
-
-                        <template v-if="eventParsed.startIdentifier !== eventParsed.endIdentifier">
+                        <template
+                            v-else-if="eventParsed.startIdentifier === eventParsed.endIdentifier">
+                            <span class="font-weight-bold">{{ eventParsed.start.time }}</span>
+                            <template
+                                v-if="
+                                    eventParsed.startTimestampIdentifier !==
+                                    eventParsed.endTimestampIdentifier
+                                ">
+                                <v-icon x-small>mdi-arrow-right</v-icon>
+                                <span class="font-weight-bold">{{ eventParsed.end.time }}</span>
+                            </template>
+                        </template>
+                        <template v-else>
                             <span class="font-weight-bold">
                                 {{ dateFormat(eventParsed.start.date, 'DD/MM') }}
                             </span>
@@ -58,6 +60,8 @@
                                 {{ dateFormat(eventParsed.end.date, 'DD/MM') }}
                             </span>
                         </template>
+
+                        <span class="ml-1 text-ellipsis">{{ event.name }}</span>
                     </div>
                 </template>
             </v-calendar>
@@ -113,7 +117,7 @@ import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 export default class Agenda extends Vue {
     events: EventExtended[] = [] // TODO : think of using Set
 
-    value = moment('2022-10-25').format('YYYY-MM-DD')
+    value = moment().format('YYYY-MM-DD')
     weekdays = [1, 2, 3, 4, 5, 6, 0]
 
     eventDialog = false
@@ -198,10 +202,7 @@ export default class Agenda extends Vue {
                 this.events.splice(eventIndex, 1)
 
                 if (this.eventDayDialog) this.setDayDialogEvents()
-                else {
-                    this.eventSelected = null
-                    this.eventDialog = false
-                }
+                else this.eventDialog = false
             },
             (error: any) => console.error(error)
         )
