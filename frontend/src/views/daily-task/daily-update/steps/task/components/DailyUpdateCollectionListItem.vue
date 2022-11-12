@@ -78,7 +78,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CollectionTask } from '@/models/collection.model'
 
 @Component
-export default class DailyTaskUpdateCollectionListItem extends Vue {
+export default class DailyUpdateCollectionListItem extends Vue {
     @Prop() collection!: CollectionTask
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean

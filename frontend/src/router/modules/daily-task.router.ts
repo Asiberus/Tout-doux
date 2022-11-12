@@ -1,5 +1,5 @@
 import DailyTaskOverview from '@/views/daily-task/daily-task-overview/DailyTaskOverview.vue'
-import DailyTaskUpdate from '@/views/daily-task/daily-task-update/DailyTaskUpdate.vue'
+import DailyUpdate from '@/views/daily-task/daily-update/DailyUpdate.vue'
 import { RouteConfig } from 'vue-router'
 
 export const dailyTaskRoutes: Array<RouteConfig> = [
@@ -11,7 +11,7 @@ export const dailyTaskRoutes: Array<RouteConfig> = [
     {
         path: '/daily-task/:date/update',
         name: 'daily-task-update',
-        component: DailyTaskUpdate,
+        component: DailyUpdate,
         props: (route: any) => ({
             date: route.params.date,
         }),

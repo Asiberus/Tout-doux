@@ -102,7 +102,7 @@
                                     :message="`No task are related to ${section.name}`">
                                     <template #img>
                                         <img
-                                            src="../../../../assets/no_tasks.svg"
+                                            src="../../../../../../assets/no_tasks.svg"
                                             alt="No tasks"
                                             height="150" />
                                     </template>
@@ -130,7 +130,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
         ProgressCircular,
     },
 })
-export default class DailyTaskUpdateProjectListItem extends Vue {
+export default class DailyUpdateProjectListItem extends Vue {
     @Prop() project!: ProjectTask
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean

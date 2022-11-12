@@ -181,7 +181,7 @@
         <template v-else>
             <EmptyListDisplay message="You didn't add any task yet!">
                 <template #img>
-                    <img src="../../../../assets/no_tasks.svg" alt="No tasks" height="300" />
+                    <img src="../../../../../../assets/no_tasks.svg" alt="No tasks" height="300" />
                 </template>
             </EmptyListDisplay>
         </template>
@@ -199,7 +199,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
         EmptyListDisplay,
     },
 })
-export default class DailyTaskUpdateList extends Vue {
+export default class DailyUpdateTaskList extends Vue {
     @Prop() dailyTaskList!: DailyTaskDisplay[]
 
     createDailyTaskDisplayed = false

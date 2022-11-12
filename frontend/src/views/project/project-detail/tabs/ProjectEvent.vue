@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-row>
-            <v-col cols="10">
+            <v-col cols="12">
                 <div class="d-flex align-center mb-5">
                     <h3 class="flex-grow-1">Event related to the project</h3>
 
@@ -34,7 +34,7 @@
                             :key="event.id"
                             :event="event"
                             :disabled="project.archived"
-                            :caret="false"
+                            :caret="true"
                             :show-icon="true"
                             @update="updateEvent"
                             @delete="deleteEvent">
