@@ -2,7 +2,7 @@ import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
 import { DailyTask } from '@/models/daily-task.model'
 
-const getDailyTaskSummary = (page: number, size = 21) => {
+const getDailySummary = (page: number, size = 21) => {
     const params = {
         page: page.toString(),
         size: size.toString(),
@@ -31,7 +31,7 @@ const deleteDailyTask = (dailyTaskId: number) => {
 }
 
 export const dailyTaskService = {
-    getDailyTaskSummary,
+    getDailySummary,
     getDailyTasksByDate,
     createDailyTask,
     updateDailyTask,

@@ -40,7 +40,7 @@
                             <v-timeline dense>
                                 <v-timeline-item
                                     v-for="dailyTask in dailyTaskList"
-                                    :key="dailyTask.id"
+                                    :key="`task-${dailyTask.id}`"
                                     fill-dot
                                     :color="dailyTask.completed ? 'green' : null"
                                     :icon="dailyTask.completed ? 'mdi-check' : 'mdi-trophy'">
@@ -150,7 +150,7 @@
                             <v-timeline dense>
                                 <v-timeline-item
                                     v-for="event of events"
-                                    :key="event.id"
+                                    :key="`event-${event.id}`"
                                     :color="isEventPassed(event) ? null : 'teal'"
                                     :icon="
                                         isEventPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'
@@ -186,7 +186,7 @@ import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({ components: { EventItemCard } })
-export default class DailyTaskDetail extends Vue {
+export default class DailyDetail extends Vue {
     @Prop() date!: string
     dailyTaskList: DailyTask[] = []
     events: EventExtended[] = []

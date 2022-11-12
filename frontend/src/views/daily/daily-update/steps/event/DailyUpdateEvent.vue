@@ -18,19 +18,21 @@
         </div>
 
         <template v-if="eventList.length > 0">
-            <EventItemCard
-                v-for="event of eventList"
-                :key="`event-${event.id}`"
-                :event="event"
-                :project="event.project"
-                color="teal"
-                :caret="true"
-                :day-selected="true"
-                :show-icon="true"
-                :change-passed-text-color="false"
-                @update="updateEvent"
-                @delete="deleteEvent">
-            </EventItemCard>
+            <div class="pl-3">
+                <EventItemCard
+                    v-for="event of eventList"
+                    :key="`event-${event.id}`"
+                    :event="event"
+                    :project="event.project"
+                    color="teal"
+                    :caret="true"
+                    :day-selected="true"
+                    :show-icon="true"
+                    :change-passed-text-color="false"
+                    @update="updateEvent"
+                    @delete="deleteEvent">
+                </EventItemCard>
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay message="No event for today!" class="mt-10">

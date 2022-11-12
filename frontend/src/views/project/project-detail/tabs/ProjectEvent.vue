@@ -27,54 +27,56 @@
                         </EventDialog>
                     </v-dialog>
                 </div>
-                <template v-if="!displayPassedEvent">
-                    <template v-if="comingEvents.length > 0">
-                        <EventItemCard
-                            v-for="event of comingEvents"
-                            :key="event.id"
-                            :event="event"
-                            :disabled="project.archived"
-                            :caret="true"
-                            :show-icon="true"
-                            @update="updateEvent"
-                            @delete="deleteEvent">
-                        </EventItemCard>
+                <div class="pl-3">
+                    <template v-if="!displayPassedEvent">
+                        <template v-if="comingEvents.length > 0">
+                            <EventItemCard
+                                v-for="event of comingEvents"
+                                :key="event.id"
+                                :event="event"
+                                :disabled="project.archived"
+                                :caret="true"
+                                :show-icon="true"
+                                @update="updateEvent"
+                                @delete="deleteEvent">
+                            </EventItemCard>
+                        </template>
+                        <template v-else>
+                            <EmptyListDisplay message="This project has no coming events">
+                                <template #img>
+                                    <img
+                                        src="../../../../assets/no_events.svg"
+                                        width="300"
+                                        alt="No events" />
+                                </template>
+                            </EmptyListDisplay>
+                        </template>
                     </template>
                     <template v-else>
-                        <EmptyListDisplay message="This project has no coming events">
-                            <template #img>
-                                <img
-                                    src="../../../../assets/no_events.svg"
-                                    width="300"
-                                    alt="No events" />
-                            </template>
-                        </EmptyListDisplay>
+                        <template v-if="passedEvents.length > 0">
+                            <EventItemCard
+                                v-for="event of passedEvents"
+                                :key="event.id"
+                                :event="event"
+                                :show-icon="true"
+                                :caret="true"
+                                :disabled="project.archived"
+                                @update="updateEvent"
+                                @delete="deleteEvent">
+                            </EventItemCard>
+                        </template>
+                        <template v-else>
+                            <EmptyListDisplay message="This project has no coming events">
+                                <template #img>
+                                    <img
+                                        src="../../../../assets/no_events.svg"
+                                        width="300"
+                                        alt="No events" />
+                                </template>
+                            </EmptyListDisplay>
+                        </template>
                     </template>
-                </template>
-                <template v-else>
-                    <template v-if="passedEvents.length > 0">
-                        <EventItemCard
-                            v-for="event of passedEvents"
-                            :key="event.id"
-                            :event="event"
-                            :show-icon="true"
-                            :caret="true"
-                            :disabled="project.archived"
-                            @update="updateEvent"
-                            @delete="deleteEvent">
-                        </EventItemCard>
-                    </template>
-                    <template v-else>
-                        <EmptyListDisplay message="This project has no coming events">
-                            <template #img>
-                                <img
-                                    src="../../../../assets/no_events.svg"
-                                    width="300"
-                                    alt="No events" />
-                            </template>
-                        </EmptyListDisplay>
-                    </template>
-                </template>
+                </div>
             </v-col>
         </v-row>
     </div>
