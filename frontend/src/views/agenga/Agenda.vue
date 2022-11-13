@@ -61,7 +61,7 @@
                             </span>
                         </template>
 
-                        <span class="ml-1 text-ellipsis">{{ event.name }}</span>
+                        <span class="ml-1 text-ellipsis" :title="event.name">{{ event.name }}</span>
                     </div>
                 </template>
             </v-calendar>

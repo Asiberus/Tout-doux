@@ -7,7 +7,20 @@
         </div>
         <div class="content-wrapper">
             <div class="content">
-                <h1 class="text-h2 mb-10">{{ dateFormat(date, 'dddd DD MMMM Y') }}</h1>
+                <h1 class="text-h2 mb-10">
+                    {{ dateFormat(date, 'dddd DD MMMM Y') }}
+                    <v-hover v-slot="{ hover }" v-if="isToday">
+                        <v-btn
+                            :to="{ name: 'daily-update', params: { date, step: 'task' } }"
+                            icon
+                            large
+                            :color="hover ? 'grey lighten-1' : 'grey darken-3'"
+                            class="ml-1"
+                            title="Edit day">
+                            <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                    </v-hover>
+                </h1>
                 <v-row class="pl-8">
                     <v-col
                         v-if="dailyTaskList.length > 0"
@@ -15,7 +28,7 @@
                         class="d-flex flex-column">
                         <h4 class="text-h4">Tasks</h4>
                         <p class="grey--text text--lighten-1 ml-2">
-                            <template v-if="isToday(date)">
+                            <template v-if="isToday">
                                 <template v-if="numberOfDailyTaskUncompleted">
                                     You have {{ numberOfDailyTaskUncompleted }}
                                     {{ numberOfDailyTaskUncompleted > 1 ? 'tasks' : 'task' }} left
@@ -137,7 +150,7 @@
                     <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
                         <h4 class="text-h4">Events</h4>
                         <p class="grey--text text--lighten-1 ml-2">
-                            <template v-if="isToday(date)">
+                            <template v-if="isToday">
                                 You have {{ events.length }}
                                 {{ events.length > 1 ? 'events' : 'event' }} today!
                             </template>
@@ -197,6 +210,10 @@ export default class DailyDetail extends Vue {
 
     get numberOfDailyTaskUncompleted(): number {
         return this.dailyTaskList.filter(dailyTask => !dailyTask.completed).length
+    }
+
+    get isToday(): boolean {
+        return moment().isSame(this.date, 'day')
     }
 
     @Watch('date', { immediate: true })
@@ -275,10 +292,6 @@ export default class DailyDetail extends Vue {
 
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
-    }
-
-    isToday(date: string): boolean {
-        return moment().isSame(date, 'day')
     }
 
     isEventPassed(event: EventExtended): boolean {

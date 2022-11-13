@@ -31,7 +31,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import moment from 'moment'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
 import DailySummary from '@/models/daily-summary.model'
 import DailyOverviewItemCard from '@/views/daily/daily-overview/components/DailyOverviewItemCard.vue'
@@ -39,6 +40,7 @@ import DailyDetail from '@/views/daily/daily-overview/components/DailyDetail.vue
 
 @Component({ components: { DailyOverviewItemCard, DailyDetail } })
 export default class DailyOverview extends Vue {
+    @Prop() readonly openToDate?: string
     dailySummaryList: DailySummary[] = []
     dailyOverviewLoading = false
     page = 1
@@ -47,6 +49,12 @@ export default class DailyOverview extends Vue {
 
     created(): void {
         this.retrieveDailySummaryList()
+
+        const date = localStorage.getItem('openDailyDetailTo')
+        if (date && moment(date).isValid()) {
+            this.openDailyDetailDialog(date)
+            localStorage.removeItem('openDailyDetailTo')
+        }
     }
 
     private retrieveDailySummaryList(): void {

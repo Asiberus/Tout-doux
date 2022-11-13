@@ -1,8 +1,14 @@
 <template>
     <div>
-        <h2 class="text-h3 mb-4">
-            <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
-        </h2>
+        <div class="d-flex justify-space-between align-center mb-4">
+            <h2 class="text-h3">
+                <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
+            </h2>
+            <v-btn @click="goToDailyDetail()" color="accent" rounded class="mr-10">
+                Start day
+                <v-icon right>mdi-arrow-right</v-icon>
+            </v-btn>
+        </div>
 
         <v-stepper
             @change="onStepperChange($event)"
@@ -46,6 +52,11 @@ export default class DailyUpdate extends Vue {
     private beforeMount(): void {
         if (this.step === 'task') this.dailyStepper = 1
         else if (this.step === 'event') this.dailyStepper = 2
+    }
+
+    goToDailyDetail(): void {
+        localStorage.setItem('openDailyDetailTo', this.date)
+        this.$router.push({ name: 'daily-overview' })
     }
 
     onStepperChange(index: number): void {
