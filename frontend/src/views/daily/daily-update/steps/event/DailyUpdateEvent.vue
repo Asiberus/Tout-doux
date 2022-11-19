@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-center mb-2">
+        <div class="d-flex justify-space-between align-center mb-4">
             <h5 class="text-h5">Events of the day</h5>
             <v-dialog v-model="eventDialog" width="60%">
                 <template #activator="{ on, attrs }">
@@ -24,6 +24,8 @@
                     :key="`event-${event.id}`"
                     :event="event"
                     :project="event.project"
+                    :clickable="event.project ? !event.project.archived : true"
+                    :ripple="event.project ? !event.project.archived : true"
                     color="teal"
                     :caret="true"
                     :day-selected="true"
@@ -50,7 +52,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { EventExtended, EventModel } from '@/models/event.model'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { EventItemCard, EventDialog, EmptyListDisplay } })
 export default class DailyUpdateEvent extends Vue {
@@ -63,9 +65,17 @@ export default class DailyUpdateEvent extends Vue {
         this.retrieveEventList()
     }
 
+    @Emit('daily-event-count')
+    private emitDailyEventCount(): number {
+        return this.eventList.length
+    }
+
     private retrieveEventList(): void {
         eventService.getEvents({ date: this.date }).then(
-            (response: any) => (this.eventList = response.body),
+            (response: any) => {
+                this.eventList = response.body
+                this.emitDailyEventCount()
+            },
             (error: any) => console.error(error)
         )
     }
@@ -75,6 +85,7 @@ export default class DailyUpdateEvent extends Vue {
             (response: any) => {
                 this.eventList.push(response.body)
                 this.eventDialog = false
+                this.emitDailyEventCount()
             },
             (error: any) => console.error(error)
         )
@@ -101,6 +112,7 @@ export default class DailyUpdateEvent extends Vue {
 
                 this.eventList.splice(eventIndex, 1)
                 this.eventDialog = false
+                this.emitDailyEventCount()
             },
             (error: any) => console.error(error)
         )

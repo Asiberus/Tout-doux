@@ -4,7 +4,12 @@
             <h2 class="text-h3">
                 <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
             </h2>
-            <v-btn @click="goToDailyDetail()" color="accent" rounded class="mr-10">
+            <v-btn
+                @click="goToDailyDetail()"
+                :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
+                color="accent"
+                rounded
+                class="mr-10">
                 Start day
                 <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
@@ -25,10 +30,14 @@
             </v-stepper-header>
             <v-stepper-items>
                 <v-stepper-content :step="1">
-                    <DailyUpdateTask :date="date"></DailyUpdateTask>
+                    <DailyUpdateTask
+                        :date="date"
+                        @daily-task-count="dailyTaskCount = $event"></DailyUpdateTask>
                 </v-stepper-content>
                 <v-stepper-content :step="2">
-                    <DailyUpdateEvent :date="date"></DailyUpdateEvent>
+                    <DailyUpdateEvent
+                        :date="date"
+                        @daily-event-count="dailyEventCount = $event"></DailyUpdateEvent>
                 </v-stepper-content>
             </v-stepper-items>
         </v-stepper>
@@ -48,6 +57,8 @@ export default class DailyUpdate extends Vue {
     readonly step!: 'task' | 'event'
 
     dailyStepper = 1
+    dailyTaskCount = 0
+    dailyEventCount = 0
 
     private beforeMount(): void {
         if (this.step === 'task') this.dailyStepper = 1

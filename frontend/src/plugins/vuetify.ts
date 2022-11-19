@@ -40,6 +40,7 @@ export default new Vuetify({
                 antiProjectArchived: '#d9e7ff',
                 collection: '#827717',
                 passedEvent: '#191919',
+                event: '#009688', // Teal
             },
         },
     },

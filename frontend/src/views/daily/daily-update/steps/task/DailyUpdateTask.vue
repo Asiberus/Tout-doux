@@ -116,7 +116,7 @@ import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
 import moment from 'moment'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
 
 // Todo : add btn to create project in no project svg
 // Todo : add btn to create collection in no collection svg
@@ -149,6 +149,11 @@ export default class DailyUpdateTask extends Vue {
         this.collectionList.forEach(p => (p.selected = false))
     }
 
+    @Emit('daily-task-count')
+    private emitDailyTaskCount(): number {
+        return this.dailyTaskList.length
+    }
+
     private retrieveDailyTaskList(): void {
         const date = moment().format('Y-MM-DD')
         dailyTaskService.getDailyTasksByDate(date).then(
@@ -157,6 +162,7 @@ export default class DailyUpdateTask extends Vue {
                 this.dailyTaskList.forEach((dailyTask: DailyTaskDisplay) => {
                     this.$set(dailyTask, 'editMode', false)
                 })
+                this.emitDailyTaskCount()
             },
             (error: any) => {
                 console.error(error)
@@ -196,6 +202,7 @@ export default class DailyUpdateTask extends Vue {
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
                 this.dailyTaskList.push(response.body)
+                this.emitDailyTaskCount()
             },
             (error: any) => {
                 console.error(error)
@@ -225,6 +232,7 @@ export default class DailyUpdateTask extends Vue {
                 )
                 if (dailyTaskIndex !== -1) {
                     this.dailyTaskList.splice(dailyTaskIndex, 1)
+                    this.emitDailyTaskCount()
                 }
             },
             (error: any) => {

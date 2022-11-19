@@ -66,7 +66,7 @@
                             </EventItemCard>
                         </template>
                         <template v-else>
-                            <EmptyListDisplay message="This project has no coming events">
+                            <EmptyListDisplay message="This project has no past events">
                                 <template #img>
                                     <img
                                         src="../../../../assets/no_events.svg"

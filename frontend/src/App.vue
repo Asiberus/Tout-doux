@@ -38,6 +38,10 @@ export default Vue.extend({
     white-space: nowrap;
 }
 
+.opacity-60 {
+    opacity: 0.6;
+}
+
 * {
     scrollbar-width: thin;
 }

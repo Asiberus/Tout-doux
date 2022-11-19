@@ -1,15 +1,19 @@
 <template>
     <div>
-        <h1 class="flex-grow-1 text-h3 mb-5">Agenda</h1>
+        <h3 class="flex-grow-1 text-h3 mb-5">Agenda</h3>
         <div class="d-flex align-center mb-2">
-            <v-btn icon class="mx-2" @click="previousMonth()">
+            <v-btn @click="setCalendarToNow()" :disabled="isCurrentMonthSelected" class="mr-2">
+                now
+            </v-btn>
+            <v-btn icon class="" @click="previousMonth()">
                 <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
-            {{ monthSelected }}
-            <v-btn icon class="mx-2" @click="nextMonth()">
+            <v-btn icon class="mr-2" @click="nextMonth()">
                 <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
-            <v-btn @click="setCalendarToNow()">now</v-btn>
+
+            <h4 class="text-h5">{{ monthSelected }}</h4>
+
             <v-spacer></v-spacer>
             <v-btn @click="openEventDialog()">
                 <v-icon left>mdi-plus</v-icon>
@@ -23,7 +27,7 @@
                 v-model="value"
                 :events="events"
                 :weekdays="weekdays"
-                :event-color="getEventColor"
+                event-color="event"
                 event-start="start_date"
                 event-end="end_date"
                 :event-margin-bottom="2"
@@ -35,7 +39,13 @@
                     <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
                 </template>
                 <template v-slot:event="{ event, eventParsed }">
-                    <div class="d-flex px-2">
+                    <div class="d-flex align-center px-2">
+                        <template v-if="event.project">
+                            <v-avatar
+                                :color="event.project.archived ? 'projectArchived' : 'project'"
+                                size="10"
+                                class="mr-1"></v-avatar>
+                        </template>
                         <template v-if="event.takes_whole_day">
                             <v-icon x-small>mdi-white-balance-sunny</v-icon>
                         </template>
@@ -136,6 +146,10 @@ export default class Agenda extends Vue {
         return moment(this.value).format('MMMM YYYY')
     }
 
+    get isCurrentMonthSelected(): boolean {
+        return moment(this.value).isSame(moment(), 'month')
+    }
+
     get calendar(): Vue & { next: () => void; prev: () => void } {
         return this.$refs.calendar as Vue & { next: () => void; prev: () => void }
     }
@@ -210,7 +224,7 @@ export default class Agenda extends Vue {
 
     selectEvent($event: { nativeEvent: MouseEvent; event: EventExtended }): void {
         const { nativeEvent, event } = $event
-        this.eventTooltipKey += 1 // Hack to reload v-menu component
+        this.eventTooltipKey += 1 // Hack to re-render v-menu component
         this.eventSelected = event
         this.eventTooltipElement = nativeEvent.target
         if (!this.eventTooltip) this.eventTooltip = true
@@ -244,12 +258,6 @@ export default class Agenda extends Vue {
     nextMonth(): void {
         this.calendar.next()
         this.retrieveEvents()
-    }
-
-    getEventColor(event: EventExtended): string {
-        const { project } = event
-        if (project) return 'project'
-        return 'teal'
     }
 
     dateFormat(date: string, format: string): string {

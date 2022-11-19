@@ -1,6 +1,6 @@
 <template>
     <v-card>
-        <v-toolbar :color="getEventColor">
+        <v-toolbar color="event">
             <v-toolbar-title :title="event.name"> {{ event.name }} </v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn @click="emitUpdateEvent()" v-if="!isEditDisabled" icon>
@@ -32,16 +32,7 @@
 
                 <template v-if="event.project">
                     <v-spacer class="mr-3"></v-spacer>
-                    <v-chip
-                        :to="{ name: 'project-detail', params: { id: event.project.id } }"
-                        label
-                        :color="event.project.archived ? 'projectArchived' : 'project'"
-                        :title="projectTitle">
-                        <v-icon v-if="event.project.archived" small left> mdi-archive </v-icon>
-                        <span class="text-ellipsis">
-                            {{ event.project.name }}
-                        </span>
-                    </v-chip>
+                    <ProjectChip :project="event.project"></ProjectChip>
                 </template>
             </div>
             <p v-if="event.description">{{ event.description }}</p>
@@ -50,32 +41,18 @@
 </template>
 
 <script lang="ts">
+import ProjectChip from '@/components/ProjectChip.vue'
 import { EventExtended } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
-@Component
+@Component({ components: { ProjectChip } })
 export default class EventTooltip extends Vue {
     @Prop({ required: true }) event!: EventExtended
 
     get isEditDisabled(): boolean {
         return this.event.project ? this.event.project.archived : false
-    }
-
-    get projectTitle(): string {
-        const { project } = this.event
-        if (!project) return ''
-
-        let title = project.name
-        if (project.archived) title += ' (Archived)'
-        return title
-    }
-
-    get getEventColor(): string {
-        const { project } = this.event
-        if (project) return 'project'
-        return 'teal'
     }
 
     isDateEqual(date1: string, date2: string): boolean {

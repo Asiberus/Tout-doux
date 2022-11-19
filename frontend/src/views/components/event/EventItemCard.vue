@@ -8,19 +8,15 @@
                 :ripple="ripple"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
                 <v-card-text class="d-flex align-center">
-                    <v-icon
-                        v-if="showIcon"
-                        :color="isPassed && changePassedTextColor ? 'grey' : 'white'"
-                        large
-                        class="mr-4">
+                    <v-icon v-if="showIcon" :class="[getTextColor('icon')]" large class="mr-4">
                         mdi-calendar-clock
                     </v-icon>
 
                     <template v-if="event.takes_whole_day">
                         <v-icon
-                            :color="isPassed && changePassedTextColor ? 'grey' : 'white'"
                             title="Takes whole day"
-                            class="mr-2">
+                            class="mr-2"
+                            :class="[getTextColor('icon')]">
                             mdi-white-balance-sunny
                         </v-icon>
                     </template>
@@ -28,7 +24,7 @@
                     <div class="flex-grow-1 d-flex flex-column overflow-hidden mr-4">
                         <div
                             class="d-flex align-center grey--text font-weight-bold"
-                            :class="{ 'text--lighten-3': !isPassed || !changePassedTextColor }">
+                            :class="[getTextColor('date')]">
                             <template v-if="event.takes_whole_day && !daySelected">
                                 <span title="Date">
                                     {{ dateFormat(event.start_date, 'DD/MM/YY') }}
@@ -50,14 +46,7 @@
                                 </span>
 
                                 <template v-if="event.end_date">
-                                    <v-icon
-                                        :color="
-                                            isPassed && changePassedTextColor
-                                                ? 'grey'
-                                                : 'grey lighten-3'
-                                        "
-                                        small
-                                        class="mx-1">
+                                    <v-icon :class="[getTextColor('date')]" small class="mx-1">
                                         mdi-arrow-right
                                     </v-icon>
                                     <span title="End date">
@@ -75,18 +64,15 @@
 
                         <h3
                             class="text-ellipsis white--text"
-                            :class="{
-                                'white--text': !isPassed || !changePassedTextColor,
-                                'grey--text': isPassed && changePassedTextColor,
-                            }"
+                            :class="[getTextColor('name')]"
                             :title="event.name">
                             {{ event.name }}
                         </h3>
 
                         <span
                             v-if="event.description"
-                            class="text-ellipsis grey--text"
-                            :class="{ 'text--lighten-2': !isPassed || !changePassedTextColor }"
+                            class="text-ellipsis"
+                            :class="[getTextColor('description')]"
                             :title="event.description">
                             {{ event.description }}
                         </span>
@@ -166,6 +152,22 @@ export default class EventItemCard extends Vue {
     emitDeleteEvent(): void {
         this.eventDialog = false
         this.$emit('delete', this.event.id)
+    }
+
+    getTextColor(section: 'icon' | 'date' | 'name' | 'description'): string {
+        const colorConfig = {
+            icon: 'white--text',
+            date: 'grey--text text--lighten-3',
+            name: 'white--text',
+            description: 'grey-text text--lighten-2',
+        }
+
+        let color: string
+        if (this.isPassed && this.changePassedTextColor) color = 'grey--text'
+        else color = colorConfig[section]
+
+        if (this.project?.archived) color += ' opacity-60'
+        return color
     }
 
     isDateEqual(date1: string, date2: string): boolean {
