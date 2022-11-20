@@ -51,11 +51,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Task } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 
-@Component({
-    components: {
-        TaskDialog,
-    },
-})
+@Component({ components: { TaskDialog } })
 export default class TaskItemCard extends Vue {
     @Prop() private task!: Task
     @Prop({ default: false }) private disabled!: boolean

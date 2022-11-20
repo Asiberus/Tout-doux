@@ -36,6 +36,7 @@ export default class ProgressCircular extends Vue {
     @Prop({ default: true }) displayText?: boolean
 
     get percentage(): number {
+        if (this.max === 0) return 0
         return (this.value / this.max) * 100
     }
 

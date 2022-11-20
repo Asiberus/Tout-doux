@@ -14,7 +14,6 @@
             <v-tab :to="{ name: 'project-detail' }" exact>Description</v-tab>
             <v-tab :to="{ name: 'project-detail-section' }" exact>Section</v-tab>
             <v-tab :to="{ name: 'project-detail-event' }" exact>Event</v-tab>
-            <v-tab :to="{ name: 'project-detail-completed-tasks' }" exact>Completed Task</v-tab>
             <v-tab exact disabled>Historic</v-tab>
             <v-tab :to="{ name: 'project-detail-configuration' }" exact>Configuration</v-tab>
         </v-tabs>

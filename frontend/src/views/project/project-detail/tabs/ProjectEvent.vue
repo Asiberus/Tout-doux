@@ -9,7 +9,7 @@
                         class="mr-3"
                         :color="displayPassedEvent ? 'accent' : 'grey darken-4'"
                         @click="displayPassedEvent = !displayPassedEvent">
-                        <v-icon small class="mr-1"> mdi-clock-check-outline </v-icon>
+                        <v-icon small class="mr-1">mdi-clock-check-outline</v-icon>
                         Passed
                     </v-chip>
 

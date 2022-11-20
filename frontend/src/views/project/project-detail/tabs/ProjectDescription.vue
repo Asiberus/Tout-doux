@@ -15,60 +15,96 @@
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
-                    <ProgressCircular :value="allTasksCompleted.length" :max="allTasks.length">
+                    <ProgressCircular :value="allCompletedTasks.length" :max="allTasks.length">
                     </ProgressCircular>
                 </div>
             </v-col>
         </v-row>
 
-        <div class="d-flex align-center mt-12 mb-5">
-            <h3 class="flex-grow-1">General Tasks</h3>
-            <div>
-                <v-dialog v-model="taskDialog" width="60%">
-                    <template #activator="{ on, attrs }">
-                        <v-btn v-bind="attrs" v-on="on" icon :disabled="project.archived">
-                            <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <TaskDialog
-                        :is-dialog-open="taskDialog"
-                        @submit="createTask"
-                        @close="taskDialog = false">
-                    </TaskDialog>
-                </v-dialog>
-            </div>
+        <div class="d-flex align-center mt-10 mb-2">
+            <h3>General Tasks</h3>
+            <v-spacer></v-spacer>
+            <v-chip
+                v-if="project.tasks.length > 0"
+                @click="displayCompletedTask = !displayCompletedTask"
+                :color="displayCompletedTask ? 'green' : 'grey darken-4'"
+                class="mr-3">
+                <v-icon v-if="displayCompletedTask" small class="mr-1">mdi-trophy</v-icon>
+                <v-icon v-else small class="mr-1">mdi-checkbox-blank-outline</v-icon>
+                Completed
+            </v-chip>
+            <v-dialog v-model="taskDialog" width="60%">
+                <template #activator="{ on, attrs }">
+                    <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
+                        <v-icon left>mdi-plus</v-icon>
+                        task
+                    </v-btn>
+                </template>
+                <TaskDialog
+                    :is-dialog-open="taskDialog"
+                    @submit="createTask"
+                    @close="taskDialog = false">
+                </TaskDialog>
+            </v-dialog>
         </div>
 
-        <template v-if="taskUncompleted.length > 0">
-            <v-row no-gutters>
-                <v-col v-for="task in taskUncompleted" :key="task.id" cols="6" class="px-2">
-                    <TaskItemCard
-                        :task="task"
-                        :disabled="project.archived"
-                        @toggle-state="toggleTaskState"
-                        @update="updateTask"
-                        @delete="deleteTask">
-                    </TaskItemCard>
-                </v-col>
-            </v-row>
-        </template>
-        <template
-            v-else-if="project.tasks.length > 0 && project.tasks.length === taskCompleted.length">
-            <EmptyListDisplay message="You completed all general tasks of this project !">
-                <template #img>
-                    <img
-                        src="../../../../assets/all_task_completed.svg"
-                        width="300"
-                        alt="All tasks completed" />
-                </template>
-            </EmptyListDisplay>
+        <template v-if="!displayCompletedTask">
+            <template v-if="uncompletedTasks.length > 0">
+                <v-row no-gutters>
+                    <v-col v-for="task of uncompletedTasks" :key="task.id" cols="6" class="px-2">
+                        <TaskItemCard
+                            :task="task"
+                            :disabled="project.archived"
+                            @toggle-state="toggleTaskState"
+                            @update="updateTask"
+                            @delete="deleteTask">
+                        </TaskItemCard>
+                    </v-col>
+                </v-row>
+            </template>
+            <template
+                v-else-if="
+                    project.tasks.length > 0 && project.tasks.length === completedTasks.length
+                ">
+                <EmptyListDisplay message="You completed all general tasks of this project !">
+                    <template #img>
+                        <img
+                            src="../../../../assets/all_task_completed.svg"
+                            width="300"
+                            alt="All tasks completed" />
+                    </template>
+                </EmptyListDisplay>
+            </template>
+            <template v-else>
+                <EmptyListDisplay message="This project has no general task">
+                    <template #img>
+                        <img src="../../../../assets/no_tasks.svg" width="300" alt="No tasks" />
+                    </template>
+                </EmptyListDisplay>
+            </template>
         </template>
         <template v-else>
-            <EmptyListDisplay message="This project has no general task yet">
-                <template #img>
-                    <img src="../../../../assets/no_tasks.svg" width="300" alt="No tasks" />
-                </template>
-            </EmptyListDisplay>
+            <template v-if="completedTasks.length > 0">
+                <v-row no-gutters>
+                    <v-col v-for="task of completedTasks" :key="task.id" cols="6" class="px-2">
+                        <TaskItemCard
+                            :task="task"
+                            :disabled="project.archived"
+                            @toggle-state="toggleTaskState">
+                        </TaskItemCard>
+                    </v-col>
+                </v-row>
+            </template>
+            <template v-else>
+                <EmptyListDisplay message="You didn't completed any general tasks yet !">
+                    <template #img>
+                        <img
+                            src="../../../../assets/no_tasks.svg"
+                            width="200"
+                            alt="No tasks completed" />
+                    </template>
+                </EmptyListDisplay>
+            </template>
         </template>
     </div>
 </template>
@@ -94,6 +130,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 })
 export default class ProjectDescription extends Vue {
     taskDialog = false
+    displayCompletedTask = false
 
     get project(): ProjectTask {
         return this.$store.state.project.currentProject
@@ -103,20 +140,20 @@ export default class ProjectDescription extends Vue {
         return moment(this.project.created_at).format('D MMM. Y')
     }
 
-    get taskUncompleted(): Task[] {
-        return this.project.tasks.filter((task: Task) => !task.completed)
+    get uncompletedTasks(): Task[] {
+        return this.project.tasks.filter(({ completed }) => !completed)
     }
 
-    get taskCompleted(): Task[] {
-        return this.project.tasks.filter((task: Task) => task.completed)
+    get completedTasks(): Task[] {
+        return this.project.tasks.filter(({ completed }) => completed)
     }
 
     get allTasks(): Task[] {
-        return this.project.tasks.concat(...this.project.sections.map(section => section.tasks))
+        return this.project.tasks.concat(...this.project.sections.map(({ tasks }) => tasks))
     }
 
-    get allTasksCompleted(): Task[] {
-        return this.allTasks.filter(task => task.completed)
+    get allCompletedTasks(): Task[] {
+        return this.allTasks.filter(({ completed }) => completed)
     }
 
     createTask(task: Partial<Task>): void {

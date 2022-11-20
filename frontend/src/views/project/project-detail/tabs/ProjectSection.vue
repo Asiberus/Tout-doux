@@ -36,7 +36,8 @@
 
             <v-tabs-items v-model="sectionTabs" class="transparent pa-3">
                 <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
-                    <ProjectSectionItem :section="section"> </ProjectSectionItem>
+                    <ProjectSectionItem :section="section" :disabled="project.archived">
+                    </ProjectSectionItem>
                 </v-tab-item>
             </v-tabs-items>
         </template>
