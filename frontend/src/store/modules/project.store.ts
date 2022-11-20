@@ -4,6 +4,7 @@ import { taskService } from '@/api/task.api'
 import { EventModel } from '@/models/event.model'
 import { SectionTask } from '@/models/section.model'
 import { Task } from '@/models/task.model'
+import { sortEvents } from '@/utils/event.util'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { Project, ProjectTask } from '@/models/project.model'
@@ -157,6 +158,7 @@ export class ProjectModule extends VuexModule {
         if (!this.currentProject) return
 
         this.currentProject.events.push(event)
+        this.currentProject.events.sort((event1, event2) => sortEvents(event1, event2))
     }
 
     @Mutation
@@ -165,7 +167,10 @@ export class ProjectModule extends VuexModule {
 
         const { events } = this.currentProject
         const eventToUpdate = events.find(({ id }) => event.id === id)
-        if (eventToUpdate) Object.assign(eventToUpdate, event)
+        if (eventToUpdate) {
+            Object.assign(eventToUpdate, event)
+            events.sort((event1, event2) => sortEvents(event1, event2))
+        }
     }
 
     @Mutation

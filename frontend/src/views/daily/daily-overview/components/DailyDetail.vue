@@ -164,7 +164,7 @@
                                 <v-timeline-item
                                     v-for="event of events"
                                     :key="`event-${event.id}`"
-                                    :color="isEventPassed(event) ? null : 'teal'"
+                                    :color="isEventPassed(event) ? null : 'event'"
                                     :icon="
                                         isEventPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'
                                     "
@@ -194,6 +194,7 @@ import { eventService } from '@/api/event.api'
 import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
 import { EventExtended } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
+import { isPassed, sortEvents } from '@/utils/event.util'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
@@ -232,8 +233,8 @@ export default class DailyDetail extends Vue {
     private retrieveTodayEvents(): void {
         eventService.getEvents({ date: this.date }).then(
             (response: any) =>
-                (this.events = response.body.sort((event: EventExtended) =>
-                    this.isEventPassed(event) ? -1 : 1
+                (this.events = response.body.sort((a: EventExtended, b: EventExtended) =>
+                    sortEvents(a, b, { handlePassedEvent: true })
                 )),
             (error: any) => console.error(error)
         )
@@ -295,10 +296,7 @@ export default class DailyDetail extends Vue {
     }
 
     isEventPassed(event: EventExtended): boolean {
-        const { start_date, end_date, takes_whole_day } = event
-        if (end_date) return moment().isAfter(end_date)
-        if (takes_whole_day) return moment().isAfter(start_date, 'day')
-        return moment().isAfter(start_date)
+        return isPassed(event)
     }
 }
 </script>

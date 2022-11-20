@@ -105,6 +105,7 @@ import { EventModel } from '@/models/event.model'
 import { Project } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { dateFormat } from '@/pipes'
+import { isPassed } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
@@ -125,17 +126,11 @@ export default class EventItemCard extends Vue {
 
     eventDialog = false
 
-    get isPassed(): boolean {
-        if (this.event.end_date) return moment().isAfter(this.event.end_date)
-        if (this.event.takes_whole_day) return moment().isAfter(this.event.start_date, 'day')
-        return moment().isAfter(this.event.start_date)
-    }
-
     get cardColor(): string | null {
         if (this.color) return this.color
-        if (this.isPassed) return 'null'
+        if (isPassed(this.event)) return 'null'
 
-        return 'teal'
+        return 'event'
     }
 
     openEventDialog(): void {
@@ -163,7 +158,7 @@ export default class EventItemCard extends Vue {
         }
 
         let color: string
-        if (this.isPassed && this.changePassedTextColor) color = 'grey--text'
+        if (isPassed(this.event) && this.changePassedTextColor) color = 'grey--text'
         else color = colorConfig[section]
 
         if (this.project?.archived) color += ' opacity-60'

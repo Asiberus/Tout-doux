@@ -87,6 +87,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { EventModel } from '@/models/event.model'
 import { ProjectTask } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
+import { isPassed } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
@@ -104,21 +105,11 @@ export default class ProjectEvent extends Vue {
     }
 
     get comingEvents(): EventModel[] {
-        return this.project.events.filter(({ start_date, end_date, takes_whole_day }) => {
-            if (end_date) return moment().isSameOrBefore(end_date)
-            if (takes_whole_day) return moment().isSameOrBefore(start_date, 'day')
-            return moment().isSameOrBefore(start_date)
-        })
+        return this.project.events.filter(event => !isPassed(event))
     }
 
     get passedEvents(): EventModel[] {
-        return this.project.events
-            .filter(({ start_date, end_date, takes_whole_day }) => {
-                if (end_date) return moment().isAfter(end_date)
-                if (takes_whole_day) return moment().isAfter(start_date, 'day')
-                return moment().isAfter(start_date)
-            })
-            .reverse()
+        return this.project.events.filter(event => isPassed(event))
     }
 
     createEvent(event: Partial<EventModel>): void {

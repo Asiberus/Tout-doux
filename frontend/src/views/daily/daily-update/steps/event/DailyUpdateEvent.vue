@@ -26,7 +26,7 @@
                     :project="event.project"
                     :clickable="event.project ? !event.project.archived : true"
                     :ripple="event.project ? !event.project.archived : true"
-                    color="teal"
+                    color="event"
                     :caret="true"
                     :day-selected="true"
                     :show-icon="true"
@@ -50,8 +50,10 @@
 import { eventService } from '@/api/event.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { EventExtended, EventModel } from '@/models/event.model'
+import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
+import moment from 'moment'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { EventItemCard, EventDialog, EmptyListDisplay } })
@@ -74,30 +76,49 @@ export default class DailyUpdateEvent extends Vue {
         eventService.getEvents({ date: this.date }).then(
             (response: any) => {
                 this.eventList = response.body
+                this.sortEventList()
                 this.emitDailyEventCount()
             },
             (error: any) => console.error(error)
         )
     }
 
+    private sortEventList(): void {
+        this.eventList.sort((event1, event2) => sortEvents(event1, event2))
+    }
+
+    // TODO : See if we block the creation of event non related to date
     createEvent(event: Partial<EventModel>): void {
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
-                this.eventList.push(response.body)
+                const event = response.body
+                if (isEventRelatedToDate(event, this.date)) {
+                    this.eventList.push(response.body)
+                    this.sortEventList()
+                    this.emitDailyEventCount()
+                }
                 this.eventDialog = false
-                this.emitDailyEventCount()
             },
             (error: any) => console.error(error)
         )
     }
 
+    // TODO : See if we block the update of event non related to date
     updateEvent({ id, data }: { id: number; data: Partial<EventModel> }): void {
         eventService.updateEventById(id, data, { extended: true }).then(
             (response: any) => {
                 const eventIndex = this.eventList.findIndex(e => e.id === id)
                 if (eventIndex === -1) return
 
-                this.eventList.splice(eventIndex, 1, response.body)
+                const event = response.body
+                if (isEventRelatedToDate(event, this.date)) {
+                    this.eventList.splice(eventIndex, 1, response.body)
+                    this.sortEventList()
+                } else {
+                    this.eventList.splice(eventIndex, 1)
+                    this.emitDailyEventCount()
+                }
+
                 this.eventDialog = false
             },
             (error: any) => console.error(error)

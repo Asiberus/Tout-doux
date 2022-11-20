@@ -33,7 +33,7 @@
                 :event-margin-bottom="2"
                 :event-ripple="false"
                 color="accent"
-                @click:event="selectEvent($event)"
+                @click:event="openEventTooltip($event)"
                 @click:more="openDayDialog($event)">
                 <template v-slot:day-label="{ day, present }">
                     <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
@@ -115,6 +115,7 @@
 import { eventService } from '@/api/event.api'
 import { EventExtended, EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
+import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
@@ -168,7 +169,7 @@ export default class Agenda extends Vue {
     }
 
     // Parse start and end date
-    parseEvent(event: EventExtended): EventExtended {
+    private parseEvent(event: EventExtended): EventExtended {
         return {
             ...event,
             start_date: dateFormat(event.start_date, 'YYYY-MM-DD HH:mm'),
@@ -215,14 +216,14 @@ export default class Agenda extends Vue {
 
                 this.events.splice(eventIndex, 1)
 
-                if (this.eventDayDialog) this.setDayDialogEvents()
+                if (this.eventDayDialog) this.setDayDialogEvents({ sort: false })
                 else this.eventDialog = false
             },
             (error: any) => console.error(error)
         )
     }
 
-    selectEvent($event: { nativeEvent: MouseEvent; event: EventExtended }): void {
+    openEventTooltip($event: { nativeEvent: MouseEvent; event: EventExtended }): void {
         const { nativeEvent, event } = $event
         this.eventTooltipKey += 1 // Hack to re-render v-menu component
         this.eventSelected = event
@@ -238,11 +239,14 @@ export default class Agenda extends Vue {
     }
 
     // TODO : See if this can be optimized
-    setDayDialogEvents(): void {
-        this.eventDayDialogEvents = this.events.filter(({ start_date, end_date }) => {
-            if (!end_date) return moment(this.eventDayDialogDate).isSame(start_date, 'day')
-            return moment(this.eventDayDialogDate).isBetween(start_date, end_date, 'day', '[]')
-        })
+    private setDayDialogEvents(options: { sort: boolean } = { sort: true }): void {
+        if (!this.eventDayDialogDate) return
+
+        this.eventDayDialogEvents = this.events.filter(
+            event => isEventRelatedToDate(event, <string>this.eventDayDialogDate) // We have tested that date is not null before
+        )
+        if (options.sort)
+            this.eventDayDialogEvents.sort((event1, event2) => sortEvents(event1, event2))
     }
 
     setCalendarToNow(): void {
