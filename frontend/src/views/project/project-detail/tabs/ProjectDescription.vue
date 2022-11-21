@@ -24,15 +24,14 @@
         <div class="d-flex align-center mt-10 mb-2">
             <h3>General Tasks</h3>
             <v-spacer></v-spacer>
-            <v-chip
+            <FilterChip
                 v-if="project.tasks.length > 0"
-                @click="displayCompletedTask = !displayCompletedTask"
-                :color="displayCompletedTask ? 'green' : 'grey darken-4'"
+                v-model="displayCompletedTask"
+                color="green"
+                icon="mdi-trophy"
                 class="mr-3">
-                <v-icon v-if="displayCompletedTask" small class="mr-1">mdi-trophy</v-icon>
-                <v-icon v-else small class="mr-1">mdi-checkbox-blank-outline</v-icon>
                 Completed
-            </v-chip>
+            </FilterChip>
             <v-dialog v-model="taskDialog" width="60%">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
@@ -110,15 +109,16 @@
 </template>
 
 <script lang="ts">
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { projectActions } from '@/store/modules/project.store'
-import moment from 'moment'
-import { Component, Vue } from 'vue-property-decorator'
 import { ProjectTask } from '@/models/project.model'
 import { Task } from '@/models/task.model'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import moment from 'moment'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
     components: {
@@ -126,6 +126,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
         TaskDialog,
         ProgressCircular,
         EmptyListDisplay,
+        FilterChip,
     },
 })
 export default class ProjectDescription extends Vue {

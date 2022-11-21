@@ -3,11 +3,15 @@
         <div class="d-flex justify-end align-end mb-4">
             <h1 class="flex-grow-1 text-h3 mb-3">Collections</h1>
 
-            <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
-                <v-icon v-if="archived" small class="mr-1"> mdi-archive </v-icon>
-                <v-icon v-else small class="mr-1"> mdi-checkbox-blank-outline </v-icon>
+            <FilterChip
+                :value="archived"
+                @input="toggleArchivedProject()"
+                color="accent"
+                icon="mdi-archive"
+                class="mr-3">
                 Archived
-            </v-chip>
+            </FilterChip>
+
             <v-dialog v-model="collectionDialog" width="60%">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
@@ -54,18 +58,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { collectionService } from '@/api/collection.api'
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
+import { Collection, CollectionTask } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
-import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { Collection, CollectionTask } from '@/models/collection.model'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
     components: {
         CollectionFormDialog,
         CollectionItemCard,
         EmptyListDisplay,
+        FilterChip,
     },
 })
 export default class CollectionList extends Vue {

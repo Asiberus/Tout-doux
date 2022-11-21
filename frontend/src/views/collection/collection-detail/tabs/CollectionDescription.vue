@@ -16,14 +16,13 @@
                     </TaskDialog>
                 </v-dialog>
 
-                <v-chip
+                <FilterChip
                     v-if="collection.tasks.length > 0"
-                    @click="displayCompletedTask = !displayCompletedTask"
-                    :color="displayCompletedTask ? 'green' : 'grey darken-4'">
-                    <v-icon v-if="displayCompletedTask" small class="mr-1">mdi-trophy</v-icon>
-                    <v-icon v-else small class="mr-1">mdi-checkbox-blank-outline</v-icon>
+                    v-model="displayCompletedTask"
+                    color="green"
+                    icon="mdi-trophy">
                     Completed
-                </v-chip>
+                </FilterChip>
             </div>
 
             <template v-if="!displayCompletedTask">
@@ -99,6 +98,7 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { CollectionTask } from '@/models/collection.model'
 import { Task } from '@/models/task.model'
@@ -114,6 +114,7 @@ import { Component, Vue } from 'vue-property-decorator'
         TaskItemCard,
         EmptyListDisplay,
         ProgressCircular,
+        FilterChip,
     },
 })
 export default class CollectionDescription extends Vue {

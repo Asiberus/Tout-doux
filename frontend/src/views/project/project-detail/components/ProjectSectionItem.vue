@@ -21,15 +21,14 @@
 
                     <v-spacer></v-spacer>
 
-                    <v-chip
+                    <FilterChip
                         v-if="section.tasks.length > 0"
-                        @click="displayCompletedTask = !displayCompletedTask"
-                        :color="displayCompletedTask ? 'green' : 'grey darken-4'"
+                        v-model="displayCompletedTask"
+                        color="green"
+                        icon="mdi-trophy"
                         class="mr-3">
-                        <v-icon v-if="displayCompletedTask" small class="mr-1">mdi-trophy</v-icon>
-                        <v-icon v-else small class="mr-1">mdi-checkbox-blank-outline</v-icon>
                         Completed
-                    </v-chip>
+                    </FilterChip>
 
                     <v-dialog v-model="taskDialog" width="60%">
                         <template #activator="{ attrs, on }">
@@ -123,6 +122,7 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { SectionTask } from '@/models/section.model'
 import { Task } from '@/models/task.model'
@@ -139,6 +139,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
         TaskDialog,
         ProgressCircular,
         EmptyListDisplay,
+        FilterChip,
     },
 })
 export default class ProjectSectionItem extends Vue {

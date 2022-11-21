@@ -5,13 +5,14 @@
                 <div class="d-flex align-center mb-5">
                     <h3 class="flex-grow-1">Event related to the project</h3>
 
-                    <v-chip
-                        class="mr-3"
-                        :color="displayPassedEvent ? 'accent' : 'grey darken-4'"
-                        @click="displayPassedEvent = !displayPassedEvent">
-                        <v-icon small class="mr-1">mdi-clock-check-outline</v-icon>
+                    <FilterChip
+                        v-if="project.events.length > 0"
+                        v-model="displayPassedEvent"
+                        color="event"
+                        icon="mdi-clock-check-outline"
+                        class="mr-3">
                         Passed
-                    </v-chip>
+                    </FilterChip>
 
                     <v-dialog v-model="eventDialog" width="60%">
                         <template #activator="{ on, attrs }">
@@ -84,17 +85,17 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
 import { EventModel } from '@/models/event.model'
 import { ProjectTask } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { isPassed } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
-    components: { EventDialog, EventItemCard, EmptyListDisplay },
+    components: { EventDialog, EventItemCard, EmptyListDisplay, FilterChip },
 })
 export default class ProjectEvent extends Vue {
     eventDialog = false
