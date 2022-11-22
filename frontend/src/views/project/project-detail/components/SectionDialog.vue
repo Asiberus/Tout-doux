@@ -5,7 +5,7 @@
             <div v-if="section">
                 <v-hover v-slot="{ hover }">
                     <v-btn
-                        @click="emitDeleteSection"
+                        @click="emitDeleteSection()"
                         :color="hover || confirmDelete ? 'error' : null">
                         {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
                     </v-btn>
@@ -13,7 +13,7 @@
             </div>
         </v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="sectionForm.valid" @submit.prevent="emitSubmitEvent">
+            <v-form ref="form" v-model="sectionForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
                     <v-col>
                         <v-text-field
@@ -28,14 +28,10 @@
                     </v-col>
                 </v-row>
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn
-                        color="success"
-                        text
-                        :disabled="!sectionForm.valid"
-                        @click="emitSubmitEvent">
+                    <v-btn color="success" text type="submit" :disabled="!sectionForm.valid">
                         {{ section ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent">cancel</v-btn>
+                    <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>

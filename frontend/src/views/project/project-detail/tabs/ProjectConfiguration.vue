@@ -37,7 +37,7 @@
                             </template>
                             <ConfirmDialog
                                 color="accent"
-                                @confirm="toggleProjectArchiveState"
+                                @confirm="toggleProjectArchiveState()"
                                 @cancel="archiveProjectDialog = false">
                                 <template #icon>
                                     <v-icon x-large>mdi-archive</v-icon>
@@ -59,7 +59,7 @@
                                 </template>
                                 <ConfirmDialog
                                     color="error"
-                                    @confirm="deleteProject"
+                                    @confirm="deleteProject()"
                                     @cancel="deleteProjectDialog = false">
                                     <template #icon>
                                         <v-icon x-large>mdi-trash-can</v-icon>
@@ -74,7 +74,7 @@
                     </div>
                     <v-row>
                         <v-col cols="10">
-                            <v-form v-model="projectForm.valid" @submit.prevent="updateProject">
+                            <v-form v-model="projectForm.valid" @submit.prevent="updateProject()">
                                 <v-text-field
                                     v-model="projectForm.data.name"
                                     :rules="projectForm.rules.name"
@@ -88,7 +88,7 @@
                                     v-model="projectForm.data.description"
                                     :rules="projectForm.rules.description"
                                     :disabled="project.archived"
-                                    @keyup.enter.ctrl="updateProject"
+                                    @keyup.enter.ctrl="updateProject()"
                                     label="Description"
                                     counter="500"
                                     maxlength="500"
@@ -100,8 +100,8 @@
                                 <div v-if="!project.archived" class="float-right mt-5">
                                     <v-btn
                                         color="success"
-                                        :disabled="!projectForm.valid || isFormUntouched"
-                                        @click="updateProject">
+                                        type="submit"
+                                        :disabled="!projectForm.valid || isFormUntouched">
                                         update
                                     </v-btn>
                                 </div>

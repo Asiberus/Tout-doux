@@ -23,7 +23,7 @@
                         </template>
                         <EventDialog
                             :is-dialog-open="eventDialog"
-                            @submit="createEvent"
+                            @submit="createEvent($event)"
                             @close="eventDialog = false">
                         </EventDialog>
                     </v-dialog>
@@ -38,8 +38,8 @@
                                 :disabled="project.archived"
                                 :caret="true"
                                 :show-icon="true"
-                                @update="updateEvent"
-                                @delete="deleteEvent">
+                                @update="updateEvent($event)"
+                                @delete="deleteEvent($event)">
                             </EventItemCard>
                         </template>
                         <template v-else>
@@ -62,8 +62,8 @@
                                 :show-icon="true"
                                 :caret="true"
                                 :disabled="project.archived"
-                                @update="updateEvent"
-                                @delete="deleteEvent">
+                                @update="updateEvent($event)"
+                                @delete="deleteEvent($event)">
                             </EventItemCard>
                         </template>
                         <template v-else>
@@ -110,7 +110,7 @@ export default class ProjectEvent extends Vue {
     }
 
     get passedEvents(): EventModel[] {
-        return this.project.events.filter(event => isPassed(event))
+        return this.project.events.filter(event => isPassed(event)).reverse()
     }
 
     createEvent(event: Partial<EventModel>): void {

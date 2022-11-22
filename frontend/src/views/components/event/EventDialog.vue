@@ -4,10 +4,11 @@
             <h2>
                 {{ event ? 'Update Event' : 'New Event' }}
             </h2>
+            <div>{{ eventForm.valid }}</div>
             <div v-if="event">
                 <v-hover v-slot="{ hover }">
                     <v-btn
-                        @click="emitDeleteEvent"
+                        @click="emitDeleteEvent()"
                         :color="hover || confirmDelete ? 'error' : null">
                         {{ confirmDelete ? 'Are you sure ?' : 'Delete Event' }}
                     </v-btn>
@@ -15,7 +16,7 @@
             </div>
         </div>
         <v-card-text>
-            <v-form ref="form" v-model="eventForm.valid" @submit.prevent="emitSubmitEvent">
+            <v-form ref="form" v-model="eventForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
                     <v-col>
                         <v-text-field
@@ -34,6 +35,7 @@
                         <v-textarea
                             v-model="eventForm.data.description"
                             :rules="eventForm.rules.description"
+                            @keyup.enter.ctrl="emitSubmitEvent()"
                             label="Description"
                             counter="150"
                             maxlength="150"
@@ -86,7 +88,7 @@
                                     v-bind="attrs"
                                     v-on="on"
                                     v-model="eventForm.data.startDateTime"
-                                    @click:clear="resetStartDateTime"
+                                    @click:clear="resetStartDateTime()"
                                     @change="startDateTimePicker = false"
                                     :disabled="
                                         !eventForm.data.startDate || eventForm.data.takesWholeDay
@@ -118,7 +120,7 @@
                                 <v-text-field
                                     v-bind="attrs"
                                     v-on="on"
-                                    @click:clear="resetEndDate"
+                                    @click:clear="resetEndDate()"
                                     :value="formattedDate(eventForm.data.endDate)"
                                     :rules="eventForm.rules.endDate"
                                     :disabled="
@@ -178,26 +180,20 @@
 
                 <v-row>
                     <v-col>
-                        <div class="d-inline-block">
-                            <v-switch v-model="eventForm.data.takesWholeDay">
-                                <template #label>
-                                    Takes whole day
-                                    <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
-                                </template>
-                            </v-switch>
-                        </div>
+                        <v-switch v-model="eventForm.data.takesWholeDay">
+                            <template #label>
+                                Takes whole day
+                                <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
+                            </template>
+                        </v-switch>
                     </v-col>
                 </v-row>
 
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn
-                        color="success"
-                        text
-                        :disabled="!eventForm.valid"
-                        @click="emitSubmitEvent">
+                    <v-btn color="success" text type="submit" :disabled="!eventForm.valid">
                         {{ event ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent">cancel</v-btn>
+                    <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>
@@ -205,9 +201,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { EventModel } from '@/models/event.model'
 import moment from 'moment'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component
 export default class EventDialog extends Vue {

@@ -65,7 +65,7 @@
         <v-dialog v-model="sectionDialog" width="60%">
             <SectionDialog
                 :is-dialog-open="sectionDialog"
-                @submit="createSection"
+                @submit="createSection($event)"
                 @close="sectionDialog = false">
             </SectionDialog>
         </v-dialog>

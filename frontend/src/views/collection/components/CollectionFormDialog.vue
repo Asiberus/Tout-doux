@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title>New collection</v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent">
+            <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
                     <v-col>
                         <v-text-field
@@ -21,7 +21,7 @@
                         <v-textarea
                             v-model="collectionForm.data.description"
                             :rules="collectionForm.rules.description"
-                            @keyup.enter.ctrl="emitSubmitEvent"
+                            @keyup.enter.ctrl="emitSubmitEvent()"
                             label="Description"
                             counter="500"
                             maxlength="500"
@@ -32,14 +32,10 @@
                     </v-col>
                 </v-row>
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn
-                        color="success"
-                        text
-                        :disabled="!collectionForm.valid"
-                        @click="emitSubmitEvent">
+                    <v-btn color="success" text type="submit" :disabled="!collectionForm.valid">
                         create
                     </v-btn>
-                    <v-btn plain class="ml-1" @click="emitCloseEvent"> cancel </v-btn>
+                    <v-btn plain class="ml-1" @click="emitCloseEvent()"> cancel </v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>
