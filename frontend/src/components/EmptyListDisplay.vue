@@ -23,7 +23,6 @@ export default class EmptyListDisplay extends Vue {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: 1.5rem;
 
     img {
         max-width: 350px;

@@ -35,8 +35,20 @@
                 color="accent"
                 @click:event="openEventTooltip($event)"
                 @click:more="openDayDialog($event)">
-                <template v-slot:day-label="{ day, present }">
-                    <span :class="{ 'accent--text text--lighten-1': present }">{{ day }}</span>
+                <template v-slot:day-label="{ day, present, date }">
+                    <v-hover v-slot="{ hover }">
+                        <span
+                            class="cursor-pointer"
+                            :class="{
+                                'accent--text': present,
+                                'grey--text text--lighten-1': !hover,
+                                'white--text': hover,
+                                'text--lighten-3': present && hover,
+                            }"
+                            @click="openDayDialog({ date })">
+                            {{ day }}
+                        </span>
+                    </v-hover>
                 </template>
                 <template v-slot:event="{ event, eventParsed }">
                     <div class="d-flex align-center px-2">
@@ -199,9 +211,10 @@ export default class Agenda extends Vue {
                 const eventIndex = this.events.findIndex(e => e.id === id)
                 if (eventIndex === -1) return
 
-                this.events.splice(eventIndex, 1, this.parseEvent(response.body))
-
-                if (this.eventDayDialog) this.setDayDialogEvents()
+                const updatedEvent = this.parseEvent(response.body)
+                this.events.splice(eventIndex, 1, updatedEvent)
+                if (this.eventSelected?.id === updatedEvent.id) this.eventSelected = updatedEvent
+                if (this.eventDayDialog) this.setDayDialogEventList()
                 else this.eventDialog = false
             },
             (error: any) => console.error(error)
@@ -216,7 +229,7 @@ export default class Agenda extends Vue {
 
                 this.events.splice(eventIndex, 1)
 
-                if (this.eventDayDialog) this.setDayDialogEvents({ sort: false })
+                if (this.eventDayDialog) this.setDayDialogEventList({ sort: false })
                 else this.eventDialog = false
             },
             (error: any) => console.error(error)
@@ -231,15 +244,15 @@ export default class Agenda extends Vue {
         if (!this.eventTooltip) this.eventTooltip = true
     }
 
-    openDayDialog($event: { date: string; nativeEvent: MouseEvent }): void {
+    openDayDialog($event: { date: string }): void {
         const { date } = $event
         this.eventDayDialog = true
         this.eventDayDialogDate = date
-        this.setDayDialogEvents()
+        this.setDayDialogEventList()
     }
 
     // TODO : See if this can be optimized
-    private setDayDialogEvents(options: { sort: boolean } = { sort: true }): void {
+    private setDayDialogEventList(options: { sort: boolean } = { sort: true }): void {
         if (!this.eventDayDialogDate) return
 
         this.eventDayDialogEvents = this.events.filter(

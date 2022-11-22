@@ -53,6 +53,14 @@ export default Vue.extend({
 
     &__day {
         margin-right: 0 !important;
+
+        &.v-present {
+            background-color: #424242;
+
+            .v-event-more {
+                background-color: #424242 !important;
+            }
+        }
     }
 
     &__day-label {

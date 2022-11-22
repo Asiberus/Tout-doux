@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts">
-import moment from 'moment'
-import { Component, Prop, Vue } from 'vue-property-decorator'
 import { dailyTaskService } from '@/api/daily-task.api'
 import DailySummary from '@/models/daily-summary.model'
-import DailyOverviewItemCard from '@/views/daily/daily-overview/components/DailyOverviewItemCard.vue'
 import DailyDetail from '@/views/daily/daily-overview/components/DailyDetail.vue'
+import DailyOverviewItemCard from '@/views/daily/daily-overview/components/DailyOverviewItemCard.vue'
+import moment from 'moment'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { DailyOverviewItemCard, DailyDetail } })
 export default class DailyOverview extends Vue {
@@ -49,7 +49,9 @@ export default class DailyOverview extends Vue {
 
     created(): void {
         this.retrieveDailySummaryList()
+    }
 
+    mounted(): void {
         const date = localStorage.getItem('openDailyDetailTo')
         if (date && moment(date).isValid()) {
             this.openDailyDetailDialog(date)
