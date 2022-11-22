@@ -4,7 +4,7 @@ export interface EventModel {
     id: number
     name: string
     start_date: string
-    end_date?: string
+    end_date: string | null
     takes_whole_day: boolean
     description?: string
     projectId?: number
@@ -14,7 +14,7 @@ export interface EventExtended {
     id: number
     name: string
     start_date: string
-    end_date?: string
+    end_date: string | null
     takes_whole_day: boolean
     description?: string
     project: Project | null
