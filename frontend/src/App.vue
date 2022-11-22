@@ -84,6 +84,10 @@ export default Vue.extend({
     gap: 4px;
 }
 
+.hide-scroll {
+    overflow-y: hidden !important;
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

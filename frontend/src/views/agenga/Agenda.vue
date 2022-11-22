@@ -185,7 +185,7 @@ export default class Agenda extends Vue {
         return {
             ...event,
             start_date: dateFormat(event.start_date, 'YYYY-MM-DD HH:mm'),
-            end_date: event.end_date ? dateFormat(event.end_date, 'YYYY-MM-DD HH:mm') : undefined,
+            end_date: event.end_date ? dateFormat(event.end_date, 'YYYY-MM-DD HH:mm') : null,
         }
     }
 
