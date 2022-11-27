@@ -88,6 +88,12 @@ export default Vue.extend({
     overflow-y: hidden !important;
 }
 
+.two-row-error.v-input {
+    .v-messages {
+        min-height: 26px;
+    }
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

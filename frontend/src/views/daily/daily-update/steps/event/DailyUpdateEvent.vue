@@ -27,7 +27,6 @@
                     :clickable="event.project ? !event.project.archived : true"
                     :ripple="event.project ? !event.project.archived : true"
                     color="event"
-                    :caret="true"
                     :day-selected="true"
                     :show-icon="true"
                     :change-passed-text-color="false"

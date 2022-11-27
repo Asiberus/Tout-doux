@@ -40,7 +40,8 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
                 'date': date,
                 'totalTask': DailyTask.objects.filter(date=date).count(),
                 'totalTaskCompleted': DailyTask.objects.filter(date=date, completed=True).count(),
-                'totalEvent': Event.objects.filter(Q(start_date__date=date) | Q(start_date__date__lte=date, end_date__date__gte=date)).count()
+                'totalEvent': Event.objects.filter(
+                    Q(start_date=date) | Q(start_date__lte=date, end_date__gte=date)).count()
             }
             data.append(daily_overview)
 

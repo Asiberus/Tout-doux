@@ -36,7 +36,6 @@
                                 :key="event.id"
                                 :event="event"
                                 :disabled="project.archived"
-                                :caret="true"
                                 :show-icon="true"
                                 @update="updateEvent($event)"
                                 @delete="deleteEvent($event)">
@@ -60,7 +59,6 @@
                                 :key="event.id"
                                 :event="event"
                                 :show-icon="true"
-                                :caret="true"
                                 :disabled="project.archived"
                                 @update="updateEvent($event)"
                                 @delete="deleteEvent($event)">

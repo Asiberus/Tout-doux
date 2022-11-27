@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from rest_framework import serializers
 
 from tout_doux.models.event import Event
@@ -6,11 +8,16 @@ from tout_doux.utils import get_or_raise_error
 
 
 class EventSerializer(serializers.ModelSerializer):
+    start_time = serializers.TimeField(format='%H:%M', input_formats=['%H:%M'], allow_null=True)
+    end_time = serializers.TimeField(format='%H:%M', input_formats=['%H:%M'], allow_null=True)
     projectId = serializers.ModelField(model_field=Event()._meta.get_field('project'), required=False, allow_null=True)
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'start_date', 'end_date', 'description', 'takes_whole_day', 'projectId')
+        fields = (
+            'id', 'name', 'start_date', 'start_time', 'end_date', 'end_time',
+            'description', 'takes_whole_day', 'projectId'
+        )
 
     def validate(self, data):
         # Map projectId to project
@@ -23,10 +30,12 @@ class EventSerializer(serializers.ModelSerializer):
             data['project'] = project
 
         if data.get('takes_whole_day'):
+            data['start_time'] = None
             data['end_date'] = None
+            data['end_time'] = None
 
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
+        if 'end_date' in data and data.get('end_date') is None:
+            data['end_time'] = None
 
         if self.instance:
             if self.instance.project:
@@ -36,18 +45,34 @@ class EventSerializer(serializers.ModelSerializer):
                 if 'project' in data:
                     raise serializers.ValidationError('This event is already link to a project')
 
-            if self.instance.takes_whole_day and data.get('end_date') and 'takes_whole_day' not in data:
-                raise serializers.ValidationError('You can\' add an end date to an event that takes whole day')
+            start_date = data.get('start_date') or self.instance.start_date
+            start_time = data.get('start_time') if 'start_time' in data else self.instance.start_time
+            end_date = data.get('end_date') if 'end_date' in data else self.instance.end_date
+            end_time = data.get('end_time') if 'end_time' in data else self.instance.end_time
 
-            if data.get('end_date') and not data.get('start_date'):
-                start_date = self.instance.start_date
-                end_date = data.get('end_date')
+            if self.instance.takes_whole_day \
+                    and data.get('takes_whole_day') is not False \
+                    and (start_time or end_date or end_time):
+                raise serializers.ValidationError(
+                    'You can\'t add a start time or end date or end time to an event that takes whole day')
 
-            if self.instance.end_date and data.get('start_date') and not data.get('end_date'):
-                start_date = data.get('start_date')
-                end_date = self.instance.end_date
+        else:
+            start_date = data.get('start_date')
+            start_time = data.get('start_time')
+            end_date = data.get('end_date')
+            end_time = data.get('end_time')
 
-        if end_date and start_date >= end_date:
+            if end_time and not end_date:
+                raise serializers.ValidationError("You can't add an end time without an end date")
+
+        start = datetime.combine(start_date, start_time or time.min)
+        end = datetime.combine(end_date, end_time or time.min) if end_date else None
+
+        if start_date == end_date and (not start_time or not end_time):
+            raise serializers.ValidationError(
+                'You must provide a start and end time to an event that start and end the same day')
+
+        if end and end <= start:
             raise serializers.ValidationError('You can\'t set the end date before the start date')
 
         return data

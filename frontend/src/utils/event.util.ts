@@ -6,10 +6,13 @@ export interface SortEventOptions {
 }
 
 export function isPassed(event: EventExtended | EventModel): boolean {
-    const { start_date, end_date, takes_whole_day } = event
-    if (end_date) return moment().isAfter(end_date)
-    if (takes_whole_day) return moment().isAfter(start_date, 'day')
-    return moment().isAfter(start_date)
+    const { start_date, start_time, end_date, end_time, takes_whole_day } = event
+    const start = moment(`${start_date}${start_time ? `T${start_time}` : ''}`)
+    const end = end_date ? moment(`${end_date}${end_time ? `T${end_time}` : ''}`) : null
+
+    if (end) return moment().isAfter(end, end_time ? 'minute' : 'day')
+    if (takes_whole_day) return moment().isAfter(start, 'day')
+    return moment().isAfter(start, start_time ? 'minute' : 'day')
 }
 
 export function isEventRelatedToDate(
@@ -17,8 +20,8 @@ export function isEventRelatedToDate(
     date: string | Date | Moment
 ): boolean {
     const { start_date, end_date } = event
-    if (!end_date) return moment(date).isSame(start_date, 'day')
-    return moment(date).isBetween(start_date, end_date, 'day', '[]')
+    if (end_date) return moment(date).isBetween(start_date, end_date, 'day', '[]')
+    else return moment(date).isSame(start_date, 'day')
 }
 
 export function sortEvents(
@@ -28,10 +31,10 @@ export function sortEvents(
 ): number {
     const { handlePassedEvent } = options
     const [start1, start2, end1, end2] = [
-        moment(event1.start_date),
-        moment(event2.start_date),
-        event1.end_date ? moment(event1.end_date) : undefined,
-        event2.end_date ? moment(event2.end_date) : undefined,
+        moment(`${event1.start_date}T${event1.start_time ?? '00:00'}`),
+        moment(`${event2.start_date}T${event2.start_time ?? '00:00'}`),
+        event1.end_date ? moment(`${event1.end_date}T${event1.end_time ?? '00:00'}`) : undefined,
+        event2.end_date ? moment(`${event2.end_date}T${event2.end_time ?? '00:00'}`) : undefined,
     ]
 
     if (handlePassedEvent) {

@@ -175,7 +175,6 @@
                                         :project="event.project"
                                         :day-selected="true"
                                         :clickable="false"
-                                        :caret="true"
                                         :margin-bottom="false">
                                     </EventItemCard>
                                 </v-timeline-item>

@@ -58,6 +58,9 @@ export class ProjectModule extends VuexModule {
     // Mutations
     @Mutation
     private [projectMutations.setCurrentProject](project: ProjectTask | undefined): void {
+        if (project?.events)
+            project.events = project.events.sort((event1, event2) => sortEvents(event1, event2))
+
         // Due to Vue reactivity lack with undefined properties we need to call the Vue.set function
         Vue.set(this, 'currentProject', project)
     }

@@ -45,7 +45,16 @@
                 </v-row>
 
                 <v-row>
-                    <v-col>
+                    <v-col class="pb-1 pr-6">
+                        <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">Start</h6>
+                    </v-col>
+                    <v-col class="pb-1 pl-6">
+                        <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">End</h6>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col class="pr-0 pt-0">
                         <v-menu
                             v-model="startDatePicker"
                             :close-on-content-click="false"
@@ -57,8 +66,8 @@
                                     :value="formattedDate(eventForm.data.startDate)"
                                     :rules="eventForm.rules.startDate"
                                     required
-                                    label="Start date"
-                                    prepend-icon="mdi-calendar"
+                                    label="Date"
+                                    prepend-icon="mdi-calendar-today"
                                     readonly
                                     v-bind="attrs"
                                     v-on="on">
@@ -74,10 +83,10 @@
                         </v-menu>
                     </v-col>
 
-                    <v-col>
+                    <v-col class="pr-6 pt-0">
                         <v-menu
                             ref="startDateTimeMenu"
-                            v-model="startDateTimePicker"
+                            v-model="startTimePicker"
                             :close-on-content-click="false"
                             transition="scale-transition"
                             offset-y
@@ -86,29 +95,29 @@
                                 <v-text-field
                                     v-bind="attrs"
                                     v-on="on"
-                                    v-model="eventForm.data.startDateTime"
-                                    @click:clear="resetStartDateTime()"
-                                    @change="startDateTimePicker = false"
-                                    :disabled="
-                                        !eventForm.data.startDate || eventForm.data.takesWholeDay
-                                    "
+                                    v-model="eventForm.data.startTime"
+                                    @change="startTimePicker = false"
+                                    :disabled="eventForm.data.takesWholeDay"
+                                    :error-messages="startTimeErrorMessage"
+                                    label="Time"
                                     clearable
-                                    readonly>
+                                    readonly
+                                    class="two-row-error">
                                 </v-text-field>
                             </template>
                             <v-time-picker
-                                v-if="startDateTimePicker"
-                                v-model="eventForm.data.startDateTime"
+                                v-if="startTimePicker"
+                                v-model="eventForm.data.startTime"
                                 format="24hr"
                                 :allowed-minutes="allowedMinutes"
                                 @click:minute="
-                                    $refs.startDateTimeMenu.save(eventForm.data.startDateTime)
+                                    $refs.startDateTimeMenu.save(eventForm.data.startTime)
                                 ">
                             </v-time-picker>
                         </v-menu>
                     </v-col>
 
-                    <v-col>
+                    <v-col class="pl-6 pr-0 pt-0">
                         <v-menu
                             v-model="endDatePicker"
                             :close-on-content-click="false"
@@ -121,23 +130,21 @@
                                     v-on="on"
                                     @click:clear="resetEndDate()"
                                     :value="formattedDate(eventForm.data.endDate)"
-                                    :disabled="
-                                        !eventForm.data.startDate || eventForm.data.takesWholeDay
-                                    "
-                                    :error="showDateError"
+                                    :disabled="eventForm.data.takesWholeDay"
                                     :error-messages="dateErrorMessage"
                                     required
-                                    label="End date"
+                                    label="Date"
                                     prepend-icon="mdi-calendar"
                                     readonly
-                                    clearable>
+                                    clearable
+                                    class="two-row-error">
                                 </v-text-field>
                             </template>
                             <v-date-picker
                                 v-model="eventForm.data.endDate"
                                 @change="
                                     endDatePicker = false
-                                    endDateTimePicker = true
+                                    endTimePicker = true
                                 "
                                 no-title
                                 scrollable
@@ -146,10 +153,10 @@
                         </v-menu>
                     </v-col>
 
-                    <v-col>
+                    <v-col class="pt-0">
                         <v-menu
                             ref="endDateTimeMenu"
-                            v-model="endDateTimePicker"
+                            v-model="endTimePicker"
                             :close-on-content-click="false"
                             transition="scale-transition"
                             offset-y
@@ -158,25 +165,25 @@
                                 <v-text-field
                                     v-bind="attrs"
                                     v-on="on"
-                                    v-model="eventForm.data.endDateTime"
-                                    @change="endDateTimePicker = false"
-                                    @click:clear="resetEndDateTime()"
-                                    :error="showDateError && !!eventForm.data.endDateTime"
+                                    v-model="eventForm.data.endTime"
+                                    @change="endTimePicker = false"
+                                    :error="showDateError && !!eventForm.data.endTime"
+                                    :error-messages="endTimeErrorMessage"
                                     :disabled="
                                         !eventForm.data.endDate || eventForm.data.takesWholeDay
                                     "
+                                    label="Time"
                                     clearable
-                                    readonly>
+                                    readonly
+                                    class="two-row-error">
                                 </v-text-field>
                             </template>
                             <v-time-picker
-                                v-if="endDateTimePicker"
-                                v-model="eventForm.data.endDateTime"
+                                v-if="endTimePicker"
+                                v-model="eventForm.data.endTime"
                                 format="24hr"
                                 :allowed-minutes="allowedMinutes"
-                                @click:minute="
-                                    $refs.endDateTimeMenu.save(eventForm.data.endDateTime)
-                                ">
+                                @click:minute="$refs.endDateTimeMenu.save(eventForm.data.endTime)">
                             </v-time-picker>
                         </v-menu>
                     </v-col>
@@ -223,9 +230,9 @@ export default class EventDialog extends Vue {
             name: '',
             description: '',
             startDate: moment().format('YYYY-MM-DD'),
-            startDateTime: '',
+            startTime: '',
             endDate: '',
-            endDateTime: '',
+            endTime: '',
             takesWholeDay: false,
         },
         rules: {
@@ -239,11 +246,13 @@ export default class EventDialog extends Vue {
     }
 
     dateError = false
+    startTimeError = false
+    endTimeError = false
 
     startDatePicker = false
-    startDateTimePicker = false
+    startTimePicker = false
     endDatePicker = false
-    endDateTimePicker = false
+    endTimePicker = false
 
     get form(): Vue & { resetValidation: () => void } {
         return this.$refs.form as Vue & { resetValidation: () => void }
@@ -253,20 +262,38 @@ export default class EventDialog extends Vue {
         return date => (date ? moment(date).format('D MMM. Y') : '')
     }
 
-    get showDateError(): boolean {
+    get isPickerOpen(): boolean {
         return (
-            this.dateError &&
-            !(
-                this.startDatePicker ||
-                this.startDateTimePicker ||
-                this.endDatePicker ||
-                this.endDateTimePicker
-            )
+            this.startDatePicker || this.startTimePicker || this.endDatePicker || this.endTimePicker
         )
     }
 
+    get showDateError(): boolean {
+        return this.dateError && !this.isPickerOpen
+    }
+
+    get showStartTimeError(): boolean {
+        return this.startTimeError && !this.isPickerOpen
+    }
+
+    get showEndTimeError(): boolean {
+        return this.endTimeError && !this.isPickerOpen
+    }
+
     get dateErrorMessage(): string | null {
-        return this.showDateError ? 'End date must after the start date' : null
+        return this.showDateError ? 'End date must be set after the start date' : null
+    }
+
+    get startTimeErrorMessage(): string | null {
+        return this.showStartTimeError
+            ? 'Start time must be provided for event that occur within a day'
+            : null
+    }
+
+    get endTimeErrorMessage(): string | null {
+        return this.showEndTimeError
+            ? 'End time must be provided for event that occur within a day'
+            : null
     }
 
     beforeMount(): void {
@@ -287,38 +314,32 @@ export default class EventDialog extends Vue {
         const { data } = this.eventForm
 
         if (data.takesWholeDay) {
-            this.resetStartDateTime()
+            this.resetStartTime()
             this.resetEndDate()
         }
-        if (data.startDate && data.endDate) this.validateEndDate()
+        if (data.startDate && data.endDate) this.validateDate()
     }
 
-    private validateEndDate(): void {
+    private validateDate(): void {
         const { data } = this.eventForm
 
-        const startDate = moment(
-            `${data.startDate}T${data.startDateTime ? data.startDateTime : '00:00'}`
-        )
-        const endDate = moment(`${data.endDate}T${data.endDateTime ? data.endDateTime : '00:00'}`)
+        const startDate = moment(`${data.startDate}T${data.startTime ? data.startTime : '00:00'}`)
+        const endDate = moment(`${data.endDate}T${data.endTime ? data.endTime : '00:00'}`)
 
         this.dateError = endDate.isSameOrBefore(startDate)
+        this.startTimeError = data.startDate === data.endDate && !data.startTime
+        this.endTimeError = data.startDate === data.endDate && !data.endTime
     }
 
     private populateForm(event?: EventModel): void {
         if (event) {
-            let endDate = ''
-            let endDateTime = ''
-            if (event.end_date) {
-                endDate = moment(event.end_date).format('YYYY-MM-DD')
-                endDateTime = moment(event.end_date).format('HH:mm')
-            }
             this.eventForm.data = {
                 name: event.name,
                 description: event.description ?? '',
-                startDate: moment(event.start_date).format('YYYY-MM-DD'),
-                startDateTime: moment(event.start_date).format('HH:mm'),
-                endDate,
-                endDateTime,
+                startDate: event.start_date,
+                startTime: event.start_time ?? '',
+                endDate: event.end_date ?? '',
+                endTime: event.end_time ?? '',
                 takesWholeDay: event.takes_whole_day,
             }
         } else
@@ -326,9 +347,9 @@ export default class EventDialog extends Vue {
                 name: '',
                 description: '',
                 startDate: moment().format('YYYY-MM-DD'),
-                startDateTime: '',
+                startTime: '',
                 endDate: '',
-                endDateTime: '',
+                endTime: '',
                 takesWholeDay: false,
             }
     }
@@ -337,19 +358,13 @@ export default class EventDialog extends Vue {
         if (!this.eventForm.valid) return
 
         const { data } = this.eventForm
-
-        const description = data.description || undefined
-        const start_date = `${data.startDate}T${data.startDateTime || '00:00'}`
-
-        let end_date
-        if (data.endDate) end_date = `${data.endDate}T${data.endDateTime || '00:00'}`
-        else end_date = null
-
         const event: Partial<EventModel> = {
             name: data.name,
-            description,
-            start_date,
-            end_date,
+            description: data.description || null,
+            start_date: data.startDate,
+            start_time: data.startTime || null,
+            end_date: data.endDate || null,
+            end_time: data.endTime || null,
             takes_whole_day: data.takesWholeDay,
         }
 
@@ -371,18 +386,17 @@ export default class EventDialog extends Vue {
         this.$emit('close')
     }
 
-    resetStartDateTime(): void {
-        this.eventForm.data.startDateTime = ''
+    resetStartTime(): void {
+        this.eventForm.data.startTime = ''
+        this.startTimeError = false
     }
 
     resetEndDate(): void {
         this.eventForm.data.endDate = ''
-        this.eventForm.data.endDateTime = ''
+        this.eventForm.data.endTime = ''
         this.dateError = false
-    }
-
-    resetEndDateTime(): void {
-        this.eventForm.data.endDateTime = ''
+        this.startTimeError = false
+        this.endTimeError = false
     }
 
     allowedMinutes(value: number): boolean {

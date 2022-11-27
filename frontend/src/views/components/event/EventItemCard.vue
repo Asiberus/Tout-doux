@@ -30,18 +30,19 @@
                                     {{ dateFormat(event.start_date, 'DD/MM/YY') }}
                                 </span>
                             </template>
+
                             <template v-if="!event.takes_whole_day">
                                 <span title="Start date">
                                     <template
                                         v-if="
-                                            daySelected &&
-                                            (!event.end_date ||
-                                                isDateEqual(event.start_date, event.end_date))
+                                            !daySelected ||
+                                            (event.end_date &&
+                                                !isDateEqual(event.start_date, event.end_date))
                                         ">
-                                        {{ dateFormat(event.start_date, 'HH:mm') }}
+                                        {{ dateFormat(event.start_date, 'DD/MM/YY') }}
                                     </template>
-                                    <template v-else>
-                                        {{ dateFormat(event.start_date, 'DD/MM/YY HH:mm') }}
+                                    <template v-if="event.start_time">
+                                        {{ event.start_time }}
                                     </template>
                                 </span>
 
@@ -51,11 +52,11 @@
                                     </v-icon>
                                     <span title="End date">
                                         <template
-                                            v-if="isDateEqual(event.start_date, event.end_date)">
-                                            {{ dateFormat(event.end_date, 'HH:mm') }}
+                                            v-if="!isDateEqual(event.start_date, event.end_date)">
+                                            {{ dateFormat(event.end_date, 'DD/MM/YY') }}
                                         </template>
-                                        <template v-else>
-                                            {{ dateFormat(event.end_date, 'DD/MM/YY HH:mm') }}
+                                        <template v-if="event.end_time">
+                                            {{ event.end_time }}
                                         </template>
                                     </span>
                                 </template>
@@ -121,7 +122,7 @@ export default class EventItemCard extends Vue {
     @Prop({ default: true }) ripple!: boolean
     @Prop({ default: false }) daySelected!: boolean
     @Prop({ default: false }) showIcon!: boolean
-    @Prop({ default: false }) caret!: boolean
+    @Prop({ default: true }) caret!: boolean
     @Prop({ default: true }) marginBottom!: boolean
 
     eventDialog = false

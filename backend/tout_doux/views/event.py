@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, MINYEAR, MAXYEAR
 
 from django.db.models import Q
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
 from tout_doux.models.event import Event
@@ -13,8 +12,6 @@ from tout_doux.serializers.event.event_extended import EventExtendedSerializer
 
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ('project',)
 
     def get_serializer_class(self):
         if hasattr(self, 'action'):
@@ -31,15 +28,21 @@ class EventViewSet(viewsets.ModelViewSet):
             try:
                 date = datetime.strptime(self.request.query_params.get('date'), '%Y-%m-%d')
             except ValueError:
-                raise ValidationError('Date is not valid.')
-            queryset = queryset.filter(
-                Q(start_date__date=date) | Q(start_date__date__lte=date, end_date__date__gte=date))
+                raise ParseError('Date is not valid.')
 
-        if 'month' in self.request.query_params:
-            param = self.request.query_params.get('month')
-            if param.isdigit() and 1 <= int(param) <= 12:
-                month = int(param)
-                queryset = queryset.filter(Q(start_date__month=month) | Q(end_date__month=month))
+            queryset = queryset.filter(
+                Q(start_date=date) | Q(start_date__lte=date, end_date__gte=date))
+
+        if 'year' in self.request.query_params and 'month' in self.request.query_params:
+            year = self.request.query_params.get('year')
+            month = self.request.query_params.get('month')
+            if year.isdigit() and MINYEAR <= int(year) <= MAXYEAR and month.isdigit() and 1 <= int(month) <= 12:
+                year = int(year)
+                month = int(month)
+                queryset = queryset.filter(
+                    Q(start_date__year=year, start_date__month=month) | Q(end_date__year=year, end_date__month=month))
+            else:
+                raise ParseError('Month and/or year parameters are incorrect')
 
         return queryset
 
@@ -48,7 +51,7 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         instance = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        
+
         if request.query_params.get('extended', False):
             data = EventExtendedSerializer(instance).data
         else:

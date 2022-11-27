@@ -50,37 +50,34 @@
                         </span>
                     </v-hover>
                 </template>
-                <template v-slot:event="{ event, eventParsed }">
+                <template v-slot:event="{ event }">
                     <div class="d-flex align-center px-2">
                         <template v-if="event.project">
                             <v-avatar
                                 :color="event.project.archived ? 'projectArchived' : 'project'"
                                 size="10"
-                                class="mr-1"></v-avatar>
+                                class="mr-1">
+                            </v-avatar>
                         </template>
+
                         <template v-if="event.takes_whole_day">
                             <v-icon x-small>mdi-white-balance-sunny</v-icon>
                         </template>
-                        <template
-                            v-else-if="eventParsed.startIdentifier === eventParsed.endIdentifier">
-                            <span class="font-weight-bold">{{ eventParsed.start.time }}</span>
-                            <template
-                                v-if="
-                                    eventParsed.startTimestampIdentifier !==
-                                    eventParsed.endTimestampIdentifier
-                                ">
-                                <v-icon x-small>mdi-arrow-right</v-icon>
-                                <span class="font-weight-bold">{{ eventParsed.end.time }}</span>
-                            </template>
-                        </template>
                         <template v-else>
-                            <span class="font-weight-bold">
-                                {{ dateFormat(eventParsed.start.date, 'DD/MM') }}
-                            </span>
-                            <v-icon x-small>mdi-arrow-right</v-icon>
-                            <span class="font-weight-bold">
-                                {{ dateFormat(eventParsed.end.date, 'DD/MM') }}
-                            </span>
+                            <template v-if="event.start_date !== event.end_date">
+                                <span class="font-weight-bold">
+                                    {{ dateFormat(event.start_date, 'DD/MM') }}
+                                </span>
+                                <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
+                                <span class="font-weight-bold">
+                                    {{ dateFormat(event.end_date, 'DD/MM') }}
+                                </span>
+                            </template>
+                            <template v-else>
+                                <span class="font-weight-bold">{{ event.start_time }}</span>
+                                <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
+                                <span class="font-weight-bold">{{ event.end_time }}</span>
+                            </template>
                         </template>
 
                         <span class="ml-1 text-ellipsis" :title="event.name">{{ event.name }}</span>
@@ -128,11 +125,11 @@ import { eventService } from '@/api/event.api'
 import { EventExtended, EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
+import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
-import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 
 @Component({
     components: { EventDialog, EventTooltip, EventDayDialog },
@@ -175,18 +172,9 @@ export default class Agenda extends Vue {
         const month = moment(this.value).month() + 1 // Month count start at 0
         const year = moment(this.value).year()
         eventService.getEvents({ month, year }).then(
-            (response: any) => (this.events = response.body.map(this.parseEvent)),
+            (response: any) => (this.events = response.body),
             (error: any) => console.error(error)
         )
-    }
-
-    // Parse start and end date
-    private parseEvent(event: EventExtended): EventExtended {
-        return {
-            ...event,
-            start_date: dateFormat(event.start_date, 'YYYY-MM-DD HH:mm'),
-            end_date: event.end_date ? dateFormat(event.end_date, 'YYYY-MM-DD HH:mm') : null,
-        }
     }
 
     openEventDialog(event: EventExtended | null = null): void {
@@ -198,7 +186,7 @@ export default class Agenda extends Vue {
         this.eventSelected = null
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
-                this.events.push(this.parseEvent(response.body))
+                this.events.push(response.boduy)
                 this.eventDialog = false
             },
             (error: any) => console.error(error)
@@ -211,7 +199,7 @@ export default class Agenda extends Vue {
                 const eventIndex = this.events.findIndex(e => e.id === id)
                 if (eventIndex === -1) return
 
-                const updatedEvent = this.parseEvent(response.body)
+                const updatedEvent = response.body
                 this.events.splice(eventIndex, 1, updatedEvent)
                 if (this.eventSelected?.id === updatedEvent.id) this.eventSelected = updatedEvent
                 if (this.eventDayDialog) this.setDayDialogEventList()
@@ -283,4 +271,9 @@ export default class Agenda extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.calendar-arrow {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+</style>

@@ -20,7 +20,6 @@
                             :ripple="event.project ? !event.project.archived : true"
                             color="event"
                             :daySelected="true"
-                            :caret="true"
                             :change-passed-text-color="false"
                             @update="$emit('update', $event)"
                             @delete="$emit('delete', $event)">
