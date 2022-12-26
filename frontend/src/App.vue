@@ -24,6 +24,11 @@ export default Vue.extend({
 }
 
 // Todo : move to a generic scss file
+
+body {
+    background: #121212; // Background color of vuetify dark theme
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
