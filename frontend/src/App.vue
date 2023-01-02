@@ -51,6 +51,10 @@ body {
     scrollbar-width: thin;
 }
 
+.v-card--link:focus::before {
+    opacity: 0 !important;
+}
+
 .v-calendar-weekly {
     &__head-weekday {
         margin-right: 0 !important;
