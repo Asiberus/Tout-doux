@@ -2,17 +2,17 @@
     <v-card>
         <v-card-text>
             <div class="d-flex flex-column justify-center align-center">
-                <div class="icon-wrapper">
+                <div class="icon-wrapper white--text">
                     <span class="icon-content">
                         <slot name="icon">!</slot>
                     </span>
                 </div>
-                <div class="dialog-message">
+                <div class="dialog-message white--text">
                     <slot></slot>
                 </div>
                 <div class="d-flex justify-center mb-3">
-                    <v-btn color="success" class="mr-2" @click="confirm">Confirm</v-btn>
-                    <v-btn color="error" @click="cancel">Cancel</v-btn>
+                    <v-btn color="success" class="mr-2" @click="$emit('confirm')">Confirm</v-btn>
+                    <v-btn color="error" @click="$emit('cancel')">Cancel</v-btn>
                 </div>
             </div>
         </v-card-text>
@@ -20,20 +20,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class ConfirmDialog extends Vue {
-    @Prop() color!: string
-
-    confirm(): void {
-        this.$emit('confirm')
-    }
-
-    cancel(): void {
-        this.$emit('cancel')
-    }
-}
+export default class ConfirmDialog extends Vue {}
 </script>
 
 <style scoped lang="scss">
