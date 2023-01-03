@@ -1,7 +1,17 @@
 <template>
     <v-row>
         <v-col cols="8">
-            <div class="d-flex justify-space-between align-center mb-2">
+            <div class="d-flex align-center mb-2">
+                <h3>Tasks</h3>
+                <v-spacer></v-spacer>
+                <FilterChip
+                    v-if="collection.tasks.length > 0"
+                    v-model="displayCompletedTask"
+                    color="green"
+                    icon="mdi-trophy"
+                    class="mr-3">
+                    Completed
+                </FilterChip>
                 <v-dialog v-model="taskDialog" width="60%">
                     <template #activator="{ on, attrs }">
                         <v-btn v-bind="attrs" v-on="on" :disabled="collection.archived">
@@ -15,14 +25,6 @@
                         @close="taskDialog = false">
                     </TaskDialog>
                 </v-dialog>
-
-                <FilterChip
-                    v-if="collection.tasks.length > 0"
-                    v-model="displayCompletedTask"
-                    color="green"
-                    icon="mdi-trophy">
-                    Completed
-                </FilterChip>
             </div>
 
             <template v-if="!displayCompletedTask">
