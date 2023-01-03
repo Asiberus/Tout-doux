@@ -204,7 +204,7 @@ export default class DailyUpdateTask extends Vue {
     createDailyTask(dailyTask: Partial<DailyTask>): void {
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
-                this.dailyTaskList.push(response.body)
+                this.dailyTaskList.push({ ...response.body, editMode: false })
                 this.emitDailyTaskCount()
             },
             (error: any) => {
