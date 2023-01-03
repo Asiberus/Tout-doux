@@ -69,7 +69,7 @@
                     <template #img>
                         <img
                             src="../../../../assets/all_task_completed.svg"
-                            width="300"
+                            width="270"
                             alt="All tasks completed" />
                     </template>
                 </EmptyListDisplay>
@@ -77,7 +77,7 @@
             <template v-else>
                 <EmptyListDisplay message="This project has no general task">
                     <template #img>
-                        <img src="../../../../assets/no_tasks.svg" width="300" alt="No tasks" />
+                        <img src="../../../../assets/no_tasks.svg" width="270" alt="No tasks" />
                     </template>
                 </EmptyListDisplay>
             </template>

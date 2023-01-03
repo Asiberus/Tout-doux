@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h3 class="flex-grow-1 text-h3 mb-5">Agenda</h3>
+    <div class="fill-height d-flex flex-column">
+        <h3 class="text-h3 mb-5">Agenda</h3>
         <div class="d-flex align-center mb-2">
             <v-btn @click="setCalendarToNow()" :disabled="isCurrentMonthSelected" class="mr-2">
                 now
@@ -21,7 +21,7 @@
             </v-btn>
         </div>
 
-        <v-sheet rounded height="640">
+        <v-sheet rounded class="flex-grow-1" min-height="500px">
             <v-calendar
                 ref="calendar"
                 v-model="value"
