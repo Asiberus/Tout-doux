@@ -17,6 +17,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="sectionForm.data.name"
                             label="Name"
                             counter="50"
@@ -66,6 +67,10 @@ export default class SectionDialog extends Vue {
         return this.$refs.form as Vue & { resetValidation: () => void }
     }
 
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
     beforeMount(): void {
         if (this.section) this.populateForm(this.section.name)
     }
@@ -77,6 +82,7 @@ export default class SectionDialog extends Vue {
             this.form.resetValidation()
             if (this.section) this.populateForm(this.section.name)
             else this.populateForm('')
+            this.inputName.focus()
         }
     }
 

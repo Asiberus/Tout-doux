@@ -19,6 +19,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="taskForm.data.name"
                             label="Name"
                             counter="50"
@@ -67,6 +68,10 @@ export default class TaskDialog extends Vue {
         return this.$refs.form as Vue & { resetValidation: () => void }
     }
 
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
     beforeMount(): void {
         if (this.task) this.populateForm(this.task)
     }
@@ -78,6 +83,7 @@ export default class TaskDialog extends Vue {
             this.form.resetValidation()
             if (this.task) this.populateForm(this.task)
             else this.populateForm({ name: '' } as Task)
+            this.inputName.focus()
         }
     }
 

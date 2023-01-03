@@ -6,6 +6,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="collectionForm.data.name"
                             :rules="collectionForm.rules.name"
                             label="Name"
@@ -71,12 +72,17 @@ export default class CollectionFormDialog extends Vue {
         return this.$refs.form as Vue & { resetValidation: () => void }
     }
 
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
     @Watch('isDialogOpen')
     private onIsDialogOpenChanges(value: boolean): void {
-        if (value) {
-            this.form.resetValidation()
-            this.collectionForm.data = { name: '', description: '' }
-        }
+        if (!value) return
+
+        this.form.resetValidation()
+        this.collectionForm.data = { name: '', description: '' }
+        this.inputName.focus()
     }
 
     private emitSubmitEvent(): void {

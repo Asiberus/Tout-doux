@@ -19,6 +19,7 @@
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="eventForm.data.name"
                             :rules="eventForm.rules.name"
                             label="Name"
@@ -258,6 +259,10 @@ export default class EventDialog extends Vue {
         return this.$refs.form as Vue & { resetValidation: () => void }
     }
 
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
     get formattedDate(): (value: string) => string {
         return date => (date ? moment(date).format('D MMM. Y') : '')
     }
@@ -307,6 +312,7 @@ export default class EventDialog extends Vue {
         this.confirmDelete = false
         this.form.resetValidation()
         this.populateForm(this.event)
+        this.inputName.focus()
     }
 
     @Watch('eventForm.data', { deep: true })
