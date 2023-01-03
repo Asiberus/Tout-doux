@@ -41,8 +41,7 @@ export default class SectionChip extends Vue {
         if (!this.navigateToDetail) return
         return {
             name: 'project-detail-section',
-            params: { id: `${this.project.id}` },
-            query: { id: `${this.section.id}` },
+            params: { id: `${this.project.id}`, sectionId: `${this.section.id}` },
         }
     }
 

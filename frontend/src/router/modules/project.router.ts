@@ -28,9 +28,10 @@ export const projectRoutes: Array<RouteConfig> = [
                 component: ProjectDescription,
             },
             {
-                path: 'section',
+                path: 'section/:sectionId?',
                 name: 'project-detail-section',
                 component: ProjectSection,
+                props: (route: any) => ({ sectionId: parseInt(route.params.sectionId) }),
             },
             {
                 path: 'event',
