@@ -1,7 +1,11 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-center mb-4">
-            <h5 class="text-h5">Events of the day</h5>
+        <div class="d-flex align-center mb-4">
+            <h5 class="text-h5 mr-2">Events of the day</h5>
+            <v-chip v-if="eventList.length > 0" small color="">
+                {{ eventList.length }}
+            </v-chip>
+            <v-spacer></v-spacer>
             <v-dialog v-model="eventDialog" width="60%">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">

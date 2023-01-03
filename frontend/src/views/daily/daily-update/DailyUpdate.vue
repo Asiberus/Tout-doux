@@ -10,7 +10,7 @@
                 color="accent"
                 rounded
                 class="mr-10">
-                Start day
+                Start the day
                 <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
         </div>
@@ -23,9 +23,9 @@
             class="daily-stepper">
             <v-stepper-header>
                 <v-divider></v-divider>
-                <v-stepper-step :step="1" editable color="accent"> Task </v-stepper-step>
+                <v-stepper-step :step="1" editable color="accent">Task</v-stepper-step>
                 <v-divider></v-divider>
-                <v-stepper-step :step="2" editable color="accent"> Event </v-stepper-step>
+                <v-stepper-step :step="2" editable color="accent">Event</v-stepper-step>
                 <v-divider></v-divider>
             </v-stepper-header>
             <v-stepper-items>

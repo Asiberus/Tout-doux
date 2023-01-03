@@ -1,7 +1,11 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-center mb-3">
-            <h2 class="text-h5">Tasks of the day</h2>
+        <div class="d-flex align-center mb-3">
+            <h2 class="text-h5 mr-2">Tasks of the day</h2>
+            <v-chip v-if="dailyTaskList.length > 0" small color="">
+                {{ dailyTaskList.length }}
+            </v-chip>
+            <v-spacer></v-spacer>
             <v-btn
                 @click="createDailyTaskDisplayed = !createDailyTaskDisplayed"
                 icon
@@ -110,7 +114,7 @@
                                         </template>
                                     </template>
 
-                                    <span class="flex-grow-1"></span>
+                                    <v-spacer></v-spacer>
 
                                     <div
                                         class="daily-actions flex-shrink-0"
