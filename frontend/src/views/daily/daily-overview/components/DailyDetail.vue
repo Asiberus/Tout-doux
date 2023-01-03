@@ -55,8 +55,16 @@
                                     v-for="dailyTask in dailyTaskList"
                                     :key="`task-${dailyTask.id}`"
                                     fill-dot
-                                    :color="dailyTask.completed ? 'green' : null"
-                                    :icon="dailyTask.completed ? 'mdi-check' : 'mdi-trophy'">
+                                    :color="dailyTask.completed ? 'green' : null">
+                                    <template #icon>
+                                        <div
+                                            v-ripple
+                                            @click="toggleDailyTaskCompleteState(dailyTask)"
+                                            class="icon-wrapper">
+                                            <v-icon v-if="dailyTask.completed">mdi-check</v-icon>
+                                            <v-icon v-else>mdi-trophy</v-icon>
+                                        </div>
+                                    </template>
                                     <v-card
                                         @click="toggleDailyTaskCompleteState(dailyTask)"
                                         :color="dailyTask.completed ? 'green darken-4' : null">
@@ -302,6 +310,16 @@ export default class DailyDetail extends Vue {
 
                 .v-timeline-item:last-child {
                     padding-bottom: 0;
+                }
+
+                .icon-wrapper {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                 }
 
                 .task-content {
