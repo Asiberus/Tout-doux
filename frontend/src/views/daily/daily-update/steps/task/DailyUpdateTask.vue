@@ -97,7 +97,7 @@
         </v-col>
         <v-col cols="4">
             <DailyUpdateTaskList
-                :dailyTaskList="dailyTaskList"
+                :dailyTaskList.sync="dailyTaskList"
                 @create-daily-task="createDailyTask"
                 @update-daily-task="updateDailyTask"
                 @delete-daily-task="deleteDailyTask"

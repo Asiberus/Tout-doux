@@ -2,7 +2,7 @@
     <div>
         <div class="d-flex align-center mb-3">
             <h2 class="text-h5 mr-2">Tasks of the day</h2>
-            <v-chip v-if="dailyTaskList.length > 0" small color="">
+            <v-chip v-if="dailyTaskList.length > 0" small>
                 {{ dailyTaskList.length }}
             </v-chip>
             <v-spacer></v-spacer>
@@ -131,8 +131,8 @@
                                         <v-btn
                                             @click="deleteDailyTask(dailyTask.id)"
                                             icon
-                                            color="error"
                                             small
+                                            color="error"
                                             class="ml-3">
                                             <v-icon>mdi-trash-can</v-icon>
                                         </v-btn>
@@ -211,9 +211,7 @@ export default class DailyUpdateTaskList extends Vue {
     createDailyTaskDisplayed = false
     dailyTaskForm = {
         valid: false,
-        data: {
-            name: '',
-        },
+        data: { name: '' },
         rules: {
             name: [
                 (value: string) => !!value || 'Daily task name is required',
@@ -250,9 +248,11 @@ export default class DailyUpdateTaskList extends Vue {
             this.dailyTaskList.push(newDailyTask)
             this.toggleDailyTaskEditMode(newDailyTask, true)
         } else {
-            if (!this.dailyTaskList[this.dailyTaskList.length - 1].id) {
-                this.dailyTaskList.pop()
-            }
+            // TODO : We should handle create daily task card differently : as a whole different object, and not a item at the end the dailyTaskList.
+            this.$emit(
+                'update:dailyTaskList',
+                this.dailyTaskList.filter(({ id }) => id != undefined)
+            )
         }
     }
 
@@ -322,10 +322,6 @@ export default class DailyUpdateTaskList extends Vue {
 </script>
 
 <style scoped lang="scss">
-.chip-divider {
-    border-width: 1px;
-}
-
 .daily-task-chip {
     max-width: 15rem;
     flex-shrink: 2;
