@@ -2,39 +2,39 @@
     <v-chip
         :to="detailLocation"
         label
-        :color="project.archived ? 'projectArchived' : 'project'"
+        :color="collection.archived ? 'projectArchived' : 'collection'"
         :ripple="ripple"
         :small="small"
         :title="title">
-        <v-icon v-if="project.archived" small left>mdi-archive</v-icon>
+        <v-icon v-if="collection.archived" small left>mdi-archive</v-icon>
 
         <div class="text-ellipsis">
-            {{ project.name }}
+            {{ collection.name }}
         </div>
     </v-chip>
 </template>
 
 <script lang="ts">
-import { Project } from 'src/models/project.model'
+import { CollectionTask } from '@/models/collection.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Location } from 'vue-router'
 
 @Component
-export default class ProjectChip extends Vue {
-    @Prop({ required: true }) project!: Project
+export default class CollectionChip extends Vue {
+    @Prop({ required: true }) collection!: CollectionTask
     @Prop({ default: false }) ripple!: boolean
     @Prop({ default: false }) small!: boolean
     @Prop({ default: true }) navigateToDetail!: boolean
 
     get title(): string {
-        let title = `Go to : ${this.project.name}`
-        if (this.project.archived) title += ' (Archived)'
+        let title = `Go to : ${this.collection.name}`
+        if (this.collection.archived) title += ' (Archived)'
         return title
     }
 
     get detailLocation(): Location | undefined {
         if (!this.navigateToDetail) return
-        return { name: 'project-detail', params: { id: `${this.project.id}` } }
+        return { name: 'collection-detail', params: { id: `${this.collection.id}` } }
     }
 }
 </script>

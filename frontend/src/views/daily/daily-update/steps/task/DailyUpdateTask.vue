@@ -2,10 +2,11 @@
     <v-row dense>
         <v-col cols="8" class="d-flex">
             <v-tabs
-                v-model="projectCollectionTab"
+                v-model="tab"
                 background-color="transparent"
                 color="accent variant-1"
                 vertical
+                @change="resetSelectedItem()"
                 class="flex-grow-0 w-auto mb-3">
                 <v-tab>
                     <v-icon>mdi-briefcase-variant</v-icon>
@@ -23,7 +24,7 @@
                     <v-icon>mdi-timeline</v-icon>
                 </v-tab>
             </v-tabs>
-            <v-tabs-items v-model="projectCollectionTab" class="transparent flex-grow-1">
+            <v-tabs-items v-model="tab" class="transparent flex-grow-1">
                 <v-tab-item :transition="false">
                     <h5 class="text-h5 ml-2">Project</h5>
                     <template v-if="projectList.length">
@@ -36,6 +37,7 @@
                                     :project="project.content"
                                     :daily-task-list="dailyTaskList"
                                     :selected.sync="project.selected"
+                                    :section-selected="projectSectionSelected"
                                     @select-task="createDailyTask"
                                     @unselect="project.selected = false">
                                 </DailyUpdateProjectListItem>
@@ -98,7 +100,8 @@
                 :dailyTaskList="dailyTaskList"
                 @create-daily-task="createDailyTask"
                 @update-daily-task="updateDailyTask"
-                @delete-daily-task="deleteDailyTask">
+                @delete-daily-task="deleteDailyTask"
+                @select="select">
             </DailyUpdateTaskList>
         </v-col>
     </v-row>
@@ -110,13 +113,18 @@ import { dailyTaskService } from '@/api/daily-task.api'
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { CollectionTask } from '@/models/collection.model'
-import { DailyTask, DailyTaskDisplay, DailyTaskDisplayWrapper } from '@/models/daily-task.model'
+import {
+    DailyTask,
+    DailyTaskDisplay,
+    DailyTaskDisplayWrapper,
+    DailyUpdateTaskTab,
+} from '@/models/daily-task.model'
 import { ProjectTask } from '@/models/project.model'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
 import moment from 'moment'
-import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 // Todo : add btn to create project in no project svg
 // Todo : add btn to create collection in no collection svg
@@ -135,18 +143,13 @@ export default class DailyUpdateTask extends Vue {
     projectList: DailyTaskDisplayWrapper<ProjectTask>[] = []
     collectionList: DailyTaskDisplayWrapper<CollectionTask>[] = []
 
-    projectCollectionTab = 0
+    tab: DailyUpdateTaskTab = DailyUpdateTaskTab.Project
+    projectSectionSelected: number = 0
 
     created(): void {
         this.retrieveDailyTaskList()
         this.retrieveProjectList()
         this.retrieveCollectionList()
-    }
-
-    @Watch('projectCollectionTab')
-    onProjectCollectionTabChanges(): void {
-        this.projectList.forEach(p => (p.selected = false))
-        this.collectionList.forEach(p => (p.selected = false))
     }
 
     @Emit('daily-task-count')
@@ -239,6 +242,29 @@ export default class DailyUpdateTask extends Vue {
                 console.error(error)
             }
         )
+    }
+
+    select(tab: DailyUpdateTaskTab, id: number, sectionId: number): void {
+        this.tab = tab
+        this.resetSelectedItem()
+
+        if (tab === DailyUpdateTaskTab.Project) {
+            this.projectList = this.projectList.map(({ content }) => ({
+                content,
+                selected: content.id === id,
+            }))
+            this.projectSectionSelected = sectionId ?? 0
+        } else {
+            this.collectionList = this.collectionList.map(({ content }) => ({
+                content,
+                selected: content.id === id,
+            }))
+        }
+    }
+
+    resetSelectedItem(): void {
+        this.projectList = this.projectList.map(item => ({ ...item, selected: false }))
+        this.collectionList = this.collectionList.map(item => ({ ...item, selected: false }))
     }
 }
 </script>

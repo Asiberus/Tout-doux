@@ -122,18 +122,14 @@ import ProgressCircular from '@/components/ProgressCircular.vue'
 import { DailyTask } from '@/models/daily-task.model'
 import { ProjectTask } from '@/models/project.model'
 import { Task } from '@/models/task.model'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({
-    components: {
-        EmptyListDisplay,
-        ProgressCircular,
-    },
-})
+@Component({ components: { EmptyListDisplay, ProgressCircular } })
 export default class DailyUpdateProjectListItem extends Vue {
     @Prop() project!: ProjectTask
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
+    @Prop({ default: 0 }) sectionSelected!: number
 
     sectionTab = 0
 
@@ -178,6 +174,11 @@ export default class DailyUpdateProjectListItem extends Vue {
 
     get percentageOfTaskCompleted(): number {
         return (this.allTasksCompleted.length / this.allTasks.length) * 100
+    }
+
+    @Watch('sectionSelected')
+    onSectionSelectedChanges(value: number): void {
+        this.sectionTab = this.taskBySection.findIndex(({ id }) => id === value) ?? 0
     }
 
     selectProject(): void {

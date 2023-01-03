@@ -101,7 +101,6 @@
 
 <script lang="ts">
 import ProjectAvatar from '@/components/ProjectAvatar.vue'
-import ProjectChip from '@/components/ProjectChip.vue'
 import { EventModel } from '@/models/event.model'
 import { Project } from '@/models/project.model'
 import { Task } from '@/models/task.model'
@@ -111,7 +110,7 @@ import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
-@Component({ components: { EventDialog, ProjectChip, ProjectAvatar } })
+@Component({ components: { EventDialog, ProjectAvatar } })
 export default class EventItemCard extends Vue {
     @Prop({ required: true }) event!: EventModel
     @Prop({ default: null }) project!: Project | null

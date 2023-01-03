@@ -61,11 +61,11 @@
                                         @click="toggleDailyTaskCompleteState(dailyTask)"
                                         :color="dailyTask.completed ? 'green darken-4' : null">
                                         <v-card-text class="white--text">
-                                            <div class="d-flex align-center">
+                                            <div class="task-content">
                                                 <v-chip
                                                     v-if="dailyTask.action"
-                                                    class="mr-3"
-                                                    :color="getActionChipColor(dailyTask.action)">
+                                                    :color="getActionChipColor(dailyTask.action)"
+                                                    class="task-content__action">
                                                     {{
                                                         getLiteralFormOfDailyActionEnum(
                                                             dailyTask.action
@@ -73,72 +73,35 @@
                                                     }}
                                                 </v-chip>
                                                 <template v-if="dailyTask.task">
-                                                    <h4 class="font-weight-regular mr-3">
+                                                    <h4 class="task-content__name">
                                                         {{ dailyTask.task.name }}
                                                     </h4>
                                                 </template>
                                                 <template v-else>
-                                                    <h4 class="font-weight-regular mr-3">
+                                                    <h4 class="task-content__name">
                                                         {{ dailyTask.name }}
                                                     </h4>
                                                 </template>
 
                                                 <template v-if="dailyTask.task">
-                                                    <v-chip
-                                                        @click.stop=""
-                                                        :ripple="false"
-                                                        label
-                                                        small
-                                                        :color="getTagColor(dailyTask)"
-                                                        class="daily-chip">
-                                                        <template v-if="dailyTask.task.project">
-                                                            <span
-                                                                :title="
-                                                                    'Project : ' +
-                                                                    dailyTask.task.project.name
-                                                                "
-                                                                >{{
-                                                                    dailyTask.task.project.name
-                                                                }}</span
-                                                            >
-                                                        </template>
-                                                        <template
-                                                            v-else-if="dailyTask.task.section">
-                                                            <span
-                                                                :title="
-                                                                    'Project : ' +
-                                                                    dailyTask.task.section.project
-                                                                        .name
-                                                                "
-                                                                >{{
-                                                                    dailyTask.task.section.project
-                                                                        .name
-                                                                }}</span
-                                                            >
-                                                            <span class="mx-1">•</span>
-                                                            <span
-                                                                :title="
-                                                                    'Section : ' +
-                                                                    dailyTask.task.section.name
-                                                                "
-                                                                >{{
-                                                                    dailyTask.task.section.name
-                                                                }}</span
-                                                            >
-                                                        </template>
-                                                        <template
-                                                            v-else-if="dailyTask.task.collection">
-                                                            <span
-                                                                :title="
-                                                                    'Collection : ' +
-                                                                    dailyTask.task.collection.name
-                                                                "
-                                                                >{{
-                                                                    dailyTask.task.collection.name
-                                                                }}</span
-                                                            >
-                                                        </template>
-                                                    </v-chip>
+                                                    <ProjectChip
+                                                        v-if="dailyTask.task.project"
+                                                        :project="dailyTask.task.project"
+                                                        @click.native.stop
+                                                        class="task-content__chip">
+                                                    </ProjectChip>
+                                                    <SectionChip
+                                                        v-if="dailyTask.task.section"
+                                                        :section="dailyTask.task.section"
+                                                        @click.native.stop
+                                                        class="task-content__chip">
+                                                    </SectionChip>
+                                                    <CollectionChip
+                                                        v-if="dailyTask.task.collection"
+                                                        :collection="dailyTask.task.collection"
+                                                        @click.native.stop
+                                                        class="task-content__chip">
+                                                    </CollectionChip>
                                                 </template>
                                             </div>
                                         </v-card-text>
@@ -190,6 +153,9 @@
 <script lang="ts">
 import { dailyTaskService } from '@/api/daily-task.api'
 import { eventService } from '@/api/event.api'
+import CollectionChip from '@/components/CollectionChip.vue'
+import ProjectChip from '@/components/ProjectChip.vue'
+import SectionChip from '@/components/SectionChip.vue'
 import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
 import { EventExtended } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
@@ -198,7 +164,7 @@ import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({ components: { EventItemCard } })
+@Component({ components: { EventItemCard, ProjectChip, SectionChip, CollectionChip } })
 export default class DailyDetail extends Vue {
     @Prop() date!: string
     dailyTaskList: DailyTask[] = []
@@ -247,13 +213,6 @@ export default class DailyDetail extends Vue {
             },
             (error: any) => console.error(error)
         )
-    }
-
-    getTagColor(dailyTask: DailyTask): string | undefined {
-        if (dailyTask.task) {
-            if (dailyTask.task.project || dailyTask.task.section) return 'project'
-            else if (dailyTask.task.collection) return 'collection'
-        }
     }
 
     // Todo : move this function to a better place
@@ -344,24 +303,23 @@ export default class DailyDetail extends Vue {
                 .v-timeline-item:last-child {
                     padding-bottom: 0;
                 }
-            }
 
-            .v-card--link:focus::before {
-                opacity: 0;
-            }
+                .task-content {
+                    display: flex;
+                    align-items: center;
+                    column-gap: 1rem;
 
-            .daily-chip {
-                cursor: default !important;
+                    &__action {
+                        flex-shrink: 0;
+                    }
 
-                span {
-                    max-width: 5rem;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+                    &__name {
+                        flex-shrink: 0;
+                    }
 
-                .chip-divider {
-                    border-width: 1px;
+                    &__chip {
+                        max-width: 15rem;
+                    }
                 }
             }
         }

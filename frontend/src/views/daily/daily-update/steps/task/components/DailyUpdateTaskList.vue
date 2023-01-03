@@ -58,13 +58,7 @@
                                     </v-menu>
 
                                     <h4
-                                        class="
-                                            white--text
-                                            font-weight-regular
-                                            flex-shrink-1
-                                            text-ellipsis
-                                            mr-3
-                                        "
+                                        class="white--text font-weight-regular text-ellipsis mr-3"
                                         :title="
                                             dailyTask.task ? dailyTask.task.name : dailyTask.name
                                         ">
@@ -72,50 +66,55 @@
                                     </h4>
 
                                     <template v-if="dailyTask.task">
-                                        <v-chip small label :color="getTagColor(dailyTask)">
-                                            <template v-if="dailyTask.task.project">
-                                                <span
-                                                    class="text-ellipsis"
-                                                    :title="
-                                                        'Project : ' + dailyTask.task.project.name
-                                                    "
-                                                    >{{ dailyTask.task.project.name }}</span
-                                                >
-                                            </template>
-                                            <template v-else-if="dailyTask.task.section">
-                                                <span
-                                                    class="text-ellipsis"
-                                                    :title="
-                                                        'Project : ' +
-                                                        dailyTask.task.section.project.name
-                                                    "
-                                                    >{{ dailyTask.task.section.project.name }}</span
-                                                >
-                                                <span class="mx-1">•</span>
-                                                <span
-                                                    class="text-ellipsis"
-                                                    :title="
-                                                        'Section : ' + dailyTask.task.section.name
-                                                    "
-                                                    >{{ dailyTask.task.section.name }}</span
-                                                >
-                                            </template>
-                                            <template v-else-if="dailyTask.task.collection">
-                                                <span
-                                                    class="text-ellipsis"
-                                                    :title="
-                                                        'Collection : ' +
-                                                        dailyTask.task.collection.name
-                                                    "
-                                                    >{{ dailyTask.task.collection.name }}</span
-                                                >
-                                            </template>
-                                        </v-chip>
+                                        <template v-if="dailyTask.task">
+                                            <ProjectChip
+                                                v-if="dailyTask.task.project"
+                                                :project="dailyTask.task.project"
+                                                :small="true"
+                                                :navigate-to-detail="false"
+                                                @click.native="
+                                                    select(
+                                                        dailyTaskUpdateTabEnum.Project,
+                                                        dailyTask.task.project.id
+                                                    )
+                                                "
+                                                class="daily-task-chip">
+                                            </ProjectChip>
+                                            <SectionChip
+                                                v-if="dailyTask.task.section"
+                                                :section="dailyTask.task.section"
+                                                :small="true"
+                                                :navigate-to-detail="false"
+                                                @click.native="
+                                                    select(
+                                                        dailyTaskUpdateTabEnum.Project,
+                                                        dailyTask.task.section.project.id,
+                                                        dailyTask.task.section.id
+                                                    )
+                                                "
+                                                class="daily-task-chip">
+                                            </SectionChip>
+                                            <CollectionChip
+                                                v-if="dailyTask.task.collection"
+                                                :collection="dailyTask.task.collection"
+                                                :small="true"
+                                                :navigate-to-detail="false"
+                                                @click.native="
+                                                    select(
+                                                        dailyTaskUpdateTabEnum.Collection,
+                                                        dailyTask.task.collection.id
+                                                    )
+                                                "
+                                                class="daily-task-chip">
+                                            </CollectionChip>
+                                        </template>
                                     </template>
 
                                     <span class="flex-grow-1"></span>
 
-                                    <div class="daily-actions" :class="{ 'is-hover': hover }">
+                                    <div
+                                        class="daily-actions flex-shrink-0"
+                                        :class="{ 'is-hover': hover }">
                                         <v-btn
                                             v-if="!dailyTask.taskId"
                                             @click="toggleDailyTaskEditMode(dailyTask, true)"
@@ -189,16 +188,19 @@
 </template>
 
 <script lang="ts">
+import CollectionChip from '@/components/CollectionChip.vue'
+import ProjectChip from '@/components/ProjectChip.vue'
+import SectionChip from '@/components/SectionChip.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { DailyTaskActionEnum, DailyTaskDisplay } from '@/models/daily-task.model'
+import {
+    DailyTaskActionEnum,
+    DailyTaskDisplay,
+    DailyUpdateTaskTab,
+} from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 
 // todo : maybe change v-hover on daily task card
-@Component({
-    components: {
-        EmptyListDisplay,
-    },
-})
+@Component({ components: { EmptyListDisplay, ProjectChip, SectionChip, CollectionChip } })
 export default class DailyUpdateTaskList extends Vue {
     @Prop() dailyTaskList!: DailyTaskDisplay[]
 
@@ -217,6 +219,7 @@ export default class DailyUpdateTaskList extends Vue {
     }
 
     private dailyTaskActionEnum = DailyTaskActionEnum
+    dailyTaskUpdateTabEnum = DailyUpdateTaskTab
 
     get dailyTaskActionItems(): { value: DailyTaskActionEnum | null; text: string }[] {
         return [
@@ -273,13 +276,6 @@ export default class DailyUpdateTaskList extends Vue {
         }
     }
 
-    getTagColor(dailyTask: DailyTaskDisplay): string | undefined {
-        if (dailyTask.task) {
-            if (dailyTask.task.project || dailyTask.task.section) return 'project'
-            else if (dailyTask.task.collection) return 'collection'
-        }
-    }
-
     toggleDailyTaskEditMode(dailyTask: DailyTaskDisplay, value: boolean): void {
         this.dailyTaskList.forEach((d: DailyTaskDisplay) => (d.editMode = false))
         if (!dailyTask.id) {
@@ -314,12 +310,22 @@ export default class DailyUpdateTaskList extends Vue {
     deleteDailyTask(dailyTaskId: number): void {
         this.$emit('delete-daily-task', dailyTaskId)
     }
+
+    select(type: DailyUpdateTaskTab, id: number, sectionId?: number): void {
+        this.$emit('select', type, id, sectionId)
+    }
 }
 </script>
 
 <style scoped lang="scss">
 .chip-divider {
     border-width: 1px;
+}
+
+.daily-task-chip {
+    max-width: 15rem;
+    flex-shrink: 2;
+    cursor: pointer;
 }
 
 .daily-actions {
