@@ -60,6 +60,11 @@ export default class DailyOverview extends Vue {
         }
     }
 
+    destroyed(): void {
+        // Scroll is reset whenever the user change route.
+        showScroll()
+    }
+
     @Watch('dailyDetailDialog')
     private onDailyDetailDialogChanges(value: boolean): void {
         if (value) hideScroll()
@@ -96,5 +101,3 @@ export default class DailyOverview extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>
