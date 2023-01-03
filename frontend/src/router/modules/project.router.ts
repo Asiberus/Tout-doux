@@ -11,16 +11,12 @@ export const projectRoutes: Array<RouteConfig> = [
         path: '/project',
         name: 'project-list',
         component: ProjectList,
-        props: (route: any) => ({
-            archived: route.query.archived === 'true',
-        }),
+        props: (route: any) => ({ archived: route.query.archived === 'true' }),
     },
     {
         path: '/project/:id',
         component: ProjectDetail,
-        props: (route: any) => ({
-            projectId: parseInt(route.params.id),
-        }),
+        props: (route: any) => ({ projectId: parseInt(route.params.id) }),
         children: [
             {
                 path: '',

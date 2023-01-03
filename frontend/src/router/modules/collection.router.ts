@@ -9,16 +9,12 @@ export const collectionRoutes: Array<RouteConfig> = [
         path: '/collection',
         name: 'collection-list',
         component: CollectionList,
-        props: (route: any) => ({
-            archived: route.query.archived === 'true',
-        }),
+        props: (route: any) => ({ archived: route.query.archived === 'true' }),
     },
     {
         path: '/collection/:id',
         component: CollectionDetail,
-        props: (route: any) => ({
-            collectionId: parseInt(route.params.id),
-        }),
+        props: (route: any) => ({ collectionId: parseInt(route.params.id) }),
         children: [
             {
                 path: '',

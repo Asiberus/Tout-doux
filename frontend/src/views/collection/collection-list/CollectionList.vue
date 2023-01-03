@@ -75,7 +75,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
     },
 })
 export default class CollectionList extends Vue {
-    @Prop() archived: boolean = false
+    @Prop({ default: false }) archived!: boolean
+
     collectionList: CollectionTask[] = []
     collectionDialog = false
 
@@ -103,7 +104,6 @@ export default class CollectionList extends Vue {
         this.collectionDialog = false
         collectionService.createCollection(collectionForm).then(
             (response: any) => {
-                // Add router push to collection detail
                 this.$router.push({ name: 'collection-detail', params: { id: response.body.id } })
             },
             (error: any) => {
@@ -117,5 +117,3 @@ export default class CollectionList extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

@@ -119,11 +119,8 @@ export default class ProjectSection extends Vue {
 
     changeRouteParam(index: number): void {
         this.$router.replace({
-            name: 'project-detail-section',
             params: { ...this.$route.params, sectionId: `${this.sections[index].id}` },
         })
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

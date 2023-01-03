@@ -76,7 +76,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
     components: { ProjectItemCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
 })
 export default class ProjectList extends Vue {
-    @Prop() archived: boolean = false
+    @Prop({ default: false }) archived!: boolean
 
     projectList: ProjectTask[] = []
     projectDialog = false
@@ -118,5 +118,3 @@ export default class ProjectList extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>
