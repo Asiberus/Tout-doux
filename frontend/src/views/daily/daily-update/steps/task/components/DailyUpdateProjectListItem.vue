@@ -47,19 +47,19 @@
                             <v-tab v-for="section of taskBySection" :key="`tab-${section.id}`">
                                 <span class="text-ellipsis" :title="section.name">
                                     {{ section.name }}
-                                    <ProgressCircular
-                                        v-if="section.tasks.length > 0"
-                                        :value="section.tasks.filter(t => t.completed).length"
-                                        :max="section.tasks.length"
-                                        :size="16"
-                                        :width="8"
-                                        :display-text="false"
-                                        class="ml-1"
-                                        :title="`${
-                                            section.tasks.filter(t => t.completed).length
-                                        } of ${section.tasks.length} tasks completed`">
-                                    </ProgressCircular>
                                 </span>
+                                <ProgressCircular
+                                    v-if="section.tasks.length > 0"
+                                    :value="section.tasks.filter(t => t.completed).length"
+                                    :max="section.tasks.length"
+                                    :size="16"
+                                    :width="8"
+                                    :display-text="false"
+                                    class="ml-1 flex-shrink-0"
+                                    :title="`${section.tasks.filter(t => t.completed).length} of ${
+                                        section.tasks.length
+                                    } tasks completed`">
+                                </ProgressCircular>
                             </v-tab>
                         </v-tabs>
                         <v-btn @click.stop="unselectProject" color="red" icon>

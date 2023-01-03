@@ -18,7 +18,7 @@
                             :size="16"
                             :width="8"
                             :display-text="false"
-                            class="ml-1"
+                            class="ml-1 flex-shrink-0"
                             :title="`${section.tasks.filter(t => t.completed).length} of ${
                                 section.tasks.length
                             } tasks completed`">
