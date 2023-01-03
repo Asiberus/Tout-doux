@@ -43,10 +43,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component
 export default class ProjectFormDialog extends Vue {
+    @Prop() isDialogOpen!: boolean
+
     private projectForm = {
         valid: false,
         data: {
@@ -63,6 +65,18 @@ export default class ProjectFormDialog extends Vue {
                 (value: string) => value.length <= 500 || 'Max 500 characters',
             ],
         },
+    }
+
+    get form(): Vue & { resetValidation: () => void } {
+        return this.$refs.form as Vue & { resetValidation: () => void }
+    }
+
+    @Watch('isDialogOpen')
+    private onIsDialogOpenChanges(value: boolean): void {
+        if (value) {
+            this.form.resetValidation()
+            this.projectForm.data = { name: '', description: '' }
+        }
     }
 
     private emitSubmitEvent(): void {
