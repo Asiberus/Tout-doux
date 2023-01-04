@@ -16,6 +16,8 @@ jobs:
           SECRET_DB_USER: ${{ secrets.SECRET_DB_USER }}
           SECRET_DB_PASSWORD: ${{ secrets.SECRET_DB_PASSWORD }}
           SECRET_DJANGO_KEY: ${{ secrets.SECRET_DJANGO_KEY }}
+          SECRET_SERVER_HOST: ${{ secrets.SECRET_SERVER_HOST }}
+          SECRET_API_HOST: ${{ secrets.SECRET_API_HOST }}
         run: envsubst < "./.conf/production/conf.server.env" | sponge "./.conf/production/conf.server.env"
       - name: Build images
         run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build
