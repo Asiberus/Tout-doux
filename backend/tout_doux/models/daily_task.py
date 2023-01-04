@@ -14,7 +14,7 @@ class DailyTask(models.Model):
     )
 
     date = models.DateField(auto_now_add=True)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, limit_choices_to={'completed': False},
+    task = models.ForeignKey(Task, on_delete=models.SET_NULL, limit_choices_to={'completed': False},
                              related_name='daily_tasks', null=True, blank=True)
     name = models.CharField(max_length=50, null=True, blank=True)
     action = models.CharField(max_length=2, choices=ACTION_CHOICES, null=True, blank=True)

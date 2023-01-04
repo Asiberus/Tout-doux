@@ -4,7 +4,7 @@
             @click.stop="onCardClick"
             :disabled="disabled"
             :color="task.completed ? 'green' : null"
-            :class="{ 'cursor-default': task.completed }">
+            :title="task.completed ? 'Uncomplete task' : null">
             <v-card-text>
                 <v-row align-content="center">
                     <v-col cols="11" class="d-flex align-center">
@@ -25,9 +25,7 @@
                             </v-checkbox>
                         </template>
                         <template v-else>
-                            <v-btn @click="emitToggleStateEvent" title="Uncomplete task" icon small>
-                                <v-icon>mdi-check-circle</v-icon>
-                            </v-btn>
+                            <v-icon>mdi-check-circle</v-icon>
                         </template>
                     </v-col>
                 </v-row>
@@ -43,24 +41,31 @@
                 @close="taskDialog = false">
             </TaskDialog>
         </v-dialog>
+
+        <v-dialog v-model="confirmDialog" width="50%">
+            <ConfirmDialog @confirm="emitToggleStateEvent()" @cancel="confirmDialog = false">
+                <template #icon>
+                    <v-icon x-large>mdi-trophy</v-icon>
+                </template>
+                <p>Are you sure to uncomplete this task ?</p>
+            </ConfirmDialog>
+        </v-dialog>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-@Component({
-    components: {
-        TaskDialog,
-    },
-})
+@Component({ components: { TaskDialog, ConfirmDialog } })
 export default class TaskItemCard extends Vue {
     @Prop() private task!: Task
     @Prop({ default: false }) private disabled!: boolean
 
     private taskDialog = false
+    private confirmDialog = false
 
     get backgroundColor(): string | null {
         if (this.task.completed) {
@@ -70,9 +75,10 @@ export default class TaskItemCard extends Vue {
     }
 
     onCardClick(): void {
-        if (this.disabled || this.task.completed) return
+        if (this.disabled) return
 
-        this.taskDialog = true
+        if (!this.task.completed) this.taskDialog = true
+        else this.confirmDialog = true
     }
 
     emitToggleStateEvent(): void {

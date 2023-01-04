@@ -4,6 +4,7 @@
             <div class="d-flex align-center mb-2">
                 <v-tabs
                     v-model="sectionTabs"
+                    @change="changeRouteParam($event)"
                     color="accent"
                     hide-slider
                     show-arrows
@@ -17,7 +18,7 @@
                             :size="16"
                             :width="8"
                             :display-text="false"
-                            class="ml-1"
+                            class="ml-1 flex-shrink-0"
                             :title="`${section.tasks.filter(t => t.completed).length} of ${
                                 section.tasks.length
                             } tasks completed`">
@@ -36,7 +37,8 @@
 
             <v-tabs-items v-model="sectionTabs" class="transparent pa-3">
                 <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
-                    <ProjectSectionItem :section="section"> </ProjectSectionItem>
+                    <ProjectSectionItem :section="section" :disabled="project.archived">
+                    </ProjectSectionItem>
                 </v-tab-item>
             </v-tabs-items>
         </template>
@@ -64,7 +66,7 @@
         <v-dialog v-model="sectionDialog" width="60%">
             <SectionDialog
                 :is-dialog-open="sectionDialog"
-                @submit="createSection"
+                @submit="createSection($event)"
                 @close="sectionDialog = false">
             </SectionDialog>
         </v-dialog>
@@ -79,17 +81,14 @@ import { SectionTask } from '@/models/section.model'
 import { projectActions } from '@/store/modules/project.store'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
-    components: {
-        ProjectSectionItem,
-        SectionDialog,
-        EmptyListDisplay,
-        ProgressCircular,
-    },
+    components: { ProjectSectionItem, SectionDialog, EmptyListDisplay, ProgressCircular },
 })
 export default class ProjectSection extends Vue {
+    @Prop({ default: 0 }) sectionId!: number
+
     sectionDialog = false
     sectionTabs = 0
 
@@ -99,6 +98,11 @@ export default class ProjectSection extends Vue {
 
     get sections(): SectionTask[] {
         return this.project.sections
+    }
+
+    @Watch('sectionId', { immediate: true })
+    onSectionIdChanges(value: number): void {
+        this.sectionTabs = this.sections.findIndex(({ id }) => id === value) ?? 0
     }
 
     createSection(data: { name: string }): void {
@@ -112,7 +116,11 @@ export default class ProjectSection extends Vue {
                 this.sectionTabs = this.sections.length - 1
             })
     }
+
+    changeRouteParam(index: number): void {
+        this.$router.replace({
+            params: { ...this.$route.params, sectionId: `${this.sections[index].id}` },
+        })
+    }
 }
 </script>
-
-<style scoped lang="scss"></style>

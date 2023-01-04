@@ -2,7 +2,8 @@
     <v-card
         rounded
         :to="{ name: 'collection-detail', params: { id: collection.id } }"
-        :color="collection.archived ? 'collectionArchived' : null">
+        :color="collection.archived ? 'collectionArchived' : null"
+        :ripple="false">
         <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">

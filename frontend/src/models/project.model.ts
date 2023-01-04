@@ -1,3 +1,4 @@
+import { EventModel } from '@/models/event.model'
 import { Task } from '@/models/task.model'
 import { SectionTask } from '@/models/section.model'
 
@@ -12,4 +13,5 @@ export interface Project {
 export interface ProjectTask extends Project {
     sections: SectionTask[]
     tasks: Task[]
+    events: EventModel[]
 }

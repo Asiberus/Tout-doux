@@ -16,7 +16,7 @@
                     </template>
                     <ConfirmDialog
                         color="accent"
-                        @confirm="toggleCollectionArchiveState"
+                        @confirm="toggleCollectionArchiveState()"
                         @cancel="archiveProjectDialog = false">
                         <template #icon>
                             <v-icon x-large>mdi-archive</v-icon>
@@ -38,7 +38,7 @@
                         </template>
                         <ConfirmDialog
                             color="error"
-                            @confirm="deleteCollection"
+                            @confirm="deleteCollection()"
                             @cancel="deleteCollectionDialog = false">
                             <template #icon>
                                 <v-icon x-large>mdi-trash-can</v-icon>
@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        <v-form v-model="collectionForm.valid" @submit.prevent="updateCollection" class="px-3">
+        <v-form v-model="collectionForm.valid" @submit.prevent="updateCollection()" class="px-3">
             <v-row>
                 <v-col>
                     <v-text-field
@@ -74,7 +74,7 @@
                         v-model="collectionForm.data.description"
                         :rules="collectionForm.rules.description"
                         :disabled="collection.archived"
-                        @keyup.enter.ctrl="updateCollection"
+                        @keyup.enter.ctrl="updateCollection()"
                         label="Description"
                         counter="500"
                         maxlength="500"
@@ -87,8 +87,8 @@
             <div v-if="!collection.archived" class="float-right mt-5">
                 <v-btn
                     color="success"
-                    :disabled="!collectionForm.valid || isFormUntouched"
-                    @click="updateCollection">
+                    type="submit"
+                    :disabled="!collectionForm.valid || isFormUntouched">
                     update
                 </v-btn>
             </div>

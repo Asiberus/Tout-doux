@@ -2,10 +2,11 @@
     <v-card>
         <v-card-title>New collection</v-card-title>
         <v-card-text>
-            <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent">
+            <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="collectionForm.data.name"
                             :rules="collectionForm.rules.name"
                             label="Name"
@@ -21,7 +22,7 @@
                         <v-textarea
                             v-model="collectionForm.data.description"
                             :rules="collectionForm.rules.description"
-                            @keyup.enter.ctrl="emitSubmitEvent"
+                            @keyup.enter.ctrl="emitSubmitEvent()"
                             label="Description"
                             counter="500"
                             maxlength="500"
@@ -32,14 +33,10 @@
                     </v-col>
                 </v-row>
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn
-                        color="success"
-                        text
-                        :disabled="!collectionForm.valid"
-                        @click="emitSubmitEvent">
+                    <v-btn color="success" text type="submit" :disabled="!collectionForm.valid">
                         create
                     </v-btn>
-                    <v-btn plain class="ml-1" @click="emitCloseEvent"> cancel </v-btn>
+                    <v-btn plain class="ml-1" @click="emitCloseEvent()"> cancel </v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>
@@ -47,10 +44,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component
 export default class CollectionFormDialog extends Vue {
+    @Prop() isDialogOpen!: boolean
+
     private collectionForm = {
         valid: false,
         data: {
@@ -67,6 +66,23 @@ export default class CollectionFormDialog extends Vue {
                 (value: string) => value.length <= 500 || 'Max 500 characters',
             ],
         },
+    }
+
+    get form(): Vue & { resetValidation: () => void } {
+        return this.$refs.form as Vue & { resetValidation: () => void }
+    }
+
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
+    @Watch('isDialogOpen')
+    private onIsDialogOpenChanges(value: boolean): void {
+        if (!value) return
+
+        this.form.resetValidation()
+        this.collectionForm.data = { name: '', description: '' }
+        this.inputName.focus()
     }
 
     private emitSubmitEvent(): void {

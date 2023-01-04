@@ -3,11 +3,15 @@
         <div class="d-flex justify-end align-end mb-4">
             <h1 class="flex-grow-1 text-h3 mb-3">Projects</h1>
 
-            <v-chip class="mr-3" :color="archived ? 'accent' : null" @click="toggleArchivedProject">
-                <v-icon v-if="archived" small class="mr-1"> mdi-archive </v-icon>
-                <v-icon v-else small class="mr-1"> mdi-checkbox-blank-outline </v-icon>
+            <FilterChip
+                :value="archived"
+                @input="toggleArchivedProject()"
+                color="accent"
+                icon="mdi-archive"
+                class="mr-3">
                 Archived
-            </v-chip>
+            </FilterChip>
+
             <v-dialog v-model="projectDialog" width="60%">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
@@ -31,7 +35,7 @@
             </v-row>
         </template>
         <template v-else>
-            <EmptyListDisplay class="mt-10">
+            <EmptyListDisplay>
                 <template #img>
                     <img
                         src="../../../assets/project.svg"
@@ -60,22 +64,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { projectService } from '@/api/project.api'
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
+import { Project, ProjectTask } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectItemCard from '@/views/project/components/ProjectItemCard.vue'
-import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { Project, ProjectTask } from '@/models/project.model'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
-    components: {
-        ProjectItemCard,
-        ProjectFormDialog,
-        EmptyListDisplay,
-    },
+    components: { ProjectItemCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
 })
 export default class ProjectList extends Vue {
-    @Prop() archived: boolean = false
+    @Prop({ default: false }) archived!: boolean
 
     projectList: ProjectTask[] = []
     projectDialog = false
@@ -117,5 +118,3 @@ export default class ProjectList extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

@@ -24,6 +24,11 @@ export default Vue.extend({
 }
 
 // Todo : move to a generic scss file
+
+body {
+    background: #121212; // Background color of vuetify dark theme
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -36,6 +41,66 @@ export default Vue.extend({
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.opacity-60 {
+    opacity: 0.6;
+}
+
+* {
+    scrollbar-width: thin;
+}
+
+.v-card--link:focus::before {
+    opacity: 0 !important;
+}
+
+.v-calendar-weekly {
+    &__head-weekday {
+        margin-right: 0 !important;
+    }
+
+    &__day {
+        margin-right: 0 !important;
+
+        &.v-present {
+            background-color: #424242;
+
+            .v-event-more {
+                background-color: #424242 !important;
+            }
+        }
+    }
+
+    &__day-label {
+        cursor: default !important;
+    }
+}
+
+.half-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100% !important;
+    max-height: 100% !important;
+    width: 40% !important;
+    left: 60% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+.gap-1 {
+    gap: 4px;
+}
+
+.hide-scroll {
+    overflow-y: hidden !important;
+}
+
+.two-row-error.v-input {
+    .v-messages {
+        min-height: 26px;
+    }
 }
 
 // TODO : fix scroll bar design
