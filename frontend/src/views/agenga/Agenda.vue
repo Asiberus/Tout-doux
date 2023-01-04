@@ -5,7 +5,7 @@
             <v-btn @click="setCalendarToNow()" :disabled="isCurrentMonthSelected" class="mr-2">
                 now
             </v-btn>
-            <v-btn icon class="" @click="previousMonth()">
+            <v-btn icon @click="previousMonth()">
                 <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
             <v-btn icon class="mr-2" @click="nextMonth()">
@@ -37,8 +37,8 @@
                 @click:more="openDayDialog($event)">
                 <template v-slot:day-label="{ day, present, date }">
                     <v-hover v-slot="{ hover }">
-                        <span
-                            class="cursor-pointer"
+                        <div
+                            class="day-label"
                             :class="{
                                 'accent--text': present,
                                 'grey--text text--lighten-1': !hover,
@@ -47,7 +47,7 @@
                             }"
                             @click="openDayDialog({ date })">
                             {{ day }}
-                        </span>
+                        </div>
                     </v-hover>
                 </template>
                 <template v-slot:event="{ event }">
@@ -64,7 +64,12 @@
                             <v-icon x-small>mdi-white-balance-sunny</v-icon>
                         </template>
                         <template v-else>
-                            <template v-if="event.start_date !== event.end_date">
+                            <template v-if="event.start_date === event.end_date">
+                                <span class="font-weight-bold">{{ event.start_time }}</span>
+                                <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
+                                <span class="font-weight-bold">{{ event.end_time }}</span>
+                            </template>
+                            <template v-else-if="event.end_date">
                                 <span class="font-weight-bold">
                                     {{ dateFormat(event.start_date, 'DD/MM') }}
                                 </span>
@@ -73,10 +78,8 @@
                                     {{ dateFormat(event.end_date, 'DD/MM') }}
                                 </span>
                             </template>
-                            <template v-else>
+                            <template v-else-if="event.start_time">
                                 <span class="font-weight-bold">{{ event.start_time }}</span>
-                                <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
-                                <span class="font-weight-bold">{{ event.end_time }}</span>
                             </template>
                         </template>
 
@@ -275,5 +278,11 @@ export default class Agenda extends Vue {
 .calendar-arrow {
     margin-left: 1px;
     margin-right: 1px;
+}
+
+.day-label {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
 </style>
