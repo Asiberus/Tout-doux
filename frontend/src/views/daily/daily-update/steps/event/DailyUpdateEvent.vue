@@ -2,7 +2,7 @@
     <div>
         <div class="d-flex align-center mb-4">
             <h5 class="text-h5 mr-2">Events of the day</h5>
-            <v-chip v-if="eventList.length > 0" small color="">
+            <v-chip v-if="eventList.length > 0" small>
                 {{ eventList.length }}
             </v-chip>
             <v-spacer></v-spacer>
@@ -15,6 +15,7 @@
                 </template>
                 <EventDialog
                     :is-dialog-open="eventDialog"
+                    :related-to-date="date"
                     @submit="createEvent"
                     @close="eventDialog = false">
                 </EventDialog>
@@ -34,6 +35,7 @@
                     :day-selected="true"
                     :show-icon="true"
                     :change-passed-text-color="false"
+                    :related-to-date="date"
                     @update="updateEvent"
                     @delete="deleteEvent">
                 </EventItemCard>

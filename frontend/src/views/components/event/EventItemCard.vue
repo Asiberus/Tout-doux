@@ -92,6 +92,7 @@
             <EventDialog
                 :event="event"
                 :is-dialog-open="eventDialog"
+                :related-to-date="relatedToDate"
                 @submit="emitUpdateEvent"
                 @delete="emitDeleteEvent"
                 @close="eventDialog = false"></EventDialog>
@@ -123,6 +124,7 @@ export default class EventItemCard extends Vue {
     @Prop({ default: false }) showIcon!: boolean
     @Prop({ default: true }) caret!: boolean
     @Prop({ default: true }) marginBottom!: boolean
+    @Prop({ required: false }) relatedToDate?: string
 
     eventDialog = false
 

@@ -2,7 +2,12 @@
     <v-card>
         <div class="d-flex justify-space-between align-center pa-4">
             <h2>
-                {{ event ? 'Update Event' : 'New Event' }}
+                <template v-if="event"> Update Event </template>
+                <template v-else> New Event </template>
+
+                <template v-if="relatedToDate">
+                    for the {{ dateFormat(relatedToDate, 'DD MMMM Y') }}
+                </template>
             </h2>
             <div v-if="event">
                 <v-hover v-slot="{ hover }">
@@ -203,8 +208,23 @@
                     </v-col>
                 </v-row>
 
-                <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn color="success" text type="submit" :disabled="!eventForm.valid">
+                <v-card-actions class="d-flex mt-3">
+                    <v-fade-transition>
+                        <div
+                            v-if="relatedToDate && relatedToDateError"
+                            class="d-flex align-center text-body-2 orange--text">
+                            <v-icon class="mr-2" color="orange">mdi-calendar-alert</v-icon>
+                            Event must be related to the
+                            {{ dateFormat(relatedToDate, 'DD MMMM Y') }}.
+                        </div>
+                    </v-fade-transition>
+
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="success"
+                        text
+                        type="submit"
+                        :disabled="!eventForm.valid || relatedToDateError">
                         {{ event ? 'update' : 'create' }}
                     </v-btn>
                     <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
@@ -216,13 +236,16 @@
 
 <script lang="ts">
 import { EventModel } from '@/models/event.model'
+import { dateFormat } from '@/pipes'
+import { isEventRelatedToDate } from '@/utils/event.util'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component
 export default class EventDialog extends Vue {
     @Prop({ required: true }) isDialogOpen!: boolean
-    @Prop() event?: EventModel
+    @Prop({ required: false }) event?: EventModel
+    @Prop({ required: false }) relatedToDate?: string
 
     confirmDelete = false
     eventForm = {
@@ -249,6 +272,7 @@ export default class EventDialog extends Vue {
     dateError = false
     startTimeError = false
     endTimeError = false
+    relatedToDateError = false
 
     startDatePicker = false
     startTimePicker = false
@@ -324,6 +348,11 @@ export default class EventDialog extends Vue {
             this.resetEndDate()
         }
         if (data.startDate && data.endDate) this.validateDate()
+        if (this.relatedToDate) {
+            // TODO : optimize this line when api send back data in camelCase
+            const tempEvent = <EventModel>{ start_date: data.startDate, end_date: data.endDate }
+            this.relatedToDateError = !isEventRelatedToDate(tempEvent, this.relatedToDate)
+        }
     }
 
     private validateDate(): void {
@@ -361,7 +390,7 @@ export default class EventDialog extends Vue {
     }
 
     emitSubmitEvent(): void {
-        if (!this.eventForm.valid) return
+        if (!this.eventForm.valid || this.relatedToDateError) return
 
         const { data } = this.eventForm
         const event: Partial<EventModel> = {
@@ -407,6 +436,10 @@ export default class EventDialog extends Vue {
 
     allowedMinutes(value: number): boolean {
         return value % 5 === 0
+    }
+
+    dateFormat(date: string, format: string): string {
+        return dateFormat(date, format)
     }
 }
 </script>
