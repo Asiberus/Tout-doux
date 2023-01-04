@@ -189,7 +189,7 @@ export default class Agenda extends Vue {
         this.eventSelected = null
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
-                this.events.push(response.boduy)
+                this.events.push(response.body)
                 this.eventDialog = false
             },
             (error: any) => console.error(error)
