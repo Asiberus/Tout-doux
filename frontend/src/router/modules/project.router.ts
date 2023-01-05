@@ -1,9 +1,9 @@
-import ProjectCompletedTasks from '@/views/project/project-detail/tabs/ProjectCompletedTasks.vue'
+import ProjectDetail from '@/views/project/project-detail/ProjectDetail.vue'
 import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectConfiguration.vue'
 import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue'
+import ProjectEvent from '@/views/project/project-detail/tabs/ProjectEvent.vue'
 import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
 import ProjectList from '@/views/project/project-list/ProjectList.vue'
-import ProjectDetail from '@/views/project/project-detail/ProjectDetail.vue'
 import { RouteConfig } from 'vue-router'
 
 export const projectRoutes: Array<RouteConfig> = [
@@ -11,16 +11,12 @@ export const projectRoutes: Array<RouteConfig> = [
         path: '/project',
         name: 'project-list',
         component: ProjectList,
-        props: (route: any) => ({
-            archived: route.query.archived === 'true',
-        }),
+        props: (route: any) => ({ archived: route.query.archived === 'true' }),
     },
     {
         path: '/project/:id',
         component: ProjectDetail,
-        props: (route: any) => ({
-            projectId: parseInt(route.params.id),
-        }),
+        props: (route: any) => ({ projectId: parseInt(route.params.id) }),
         children: [
             {
                 path: '',
@@ -28,14 +24,15 @@ export const projectRoutes: Array<RouteConfig> = [
                 component: ProjectDescription,
             },
             {
-                path: 'section',
+                path: 'section/:sectionId?',
                 name: 'project-detail-section',
                 component: ProjectSection,
+                props: (route: any) => ({ sectionId: parseInt(route.params.sectionId) }),
             },
             {
-                path: 'completed-tasks',
-                name: 'project-detail-completed-tasks',
-                component: ProjectCompletedTasks,
+                path: 'event',
+                name: 'project-detail-event',
+                component: ProjectEvent,
             },
             {
                 path: 'configuration',

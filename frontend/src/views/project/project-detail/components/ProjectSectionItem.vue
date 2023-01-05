@@ -1,76 +1,114 @@
 <template>
     <div>
-        <div class="d-flex align-center mb-3">
-            <v-dialog v-model="sectionDialog" width="60%">
-                <template #activator="{ attrs, on }">
-                    <v-btn v-bind="attrs" v-on="on" :disabled="disabled" class="mr-1">
-                        <v-icon left>mdi-pencil</v-icon>
-                        edit section
-                    </v-btn>
-                </template>
-                <SectionDialog
-                    :section="section"
-                    :is-dialog-open="sectionDialog"
-                    @submit="updateSection"
-                    @delete="deleteSection"
-                    @close="sectionDialog = false">
-                </SectionDialog>
-            </v-dialog>
-
-            <v-dialog v-model="taskDialog" width="60%">
-                <template #activator="{ attrs, on }">
-                    <v-btn v-bind="attrs" v-on="on" :disabled="disabled">
-                        <v-icon left>mdi-plus</v-icon>
-                        task
-                    </v-btn>
-                </template>
-                <TaskDialog
-                    :is-dialog-open="taskDialog"
-                    @submit="createTask"
-                    @close="taskDialog = false">
-                </TaskDialog>
-            </v-dialog>
-        </div>
-
-        <v-row class="mb-3">
+        <v-row>
             <v-col cols="9">
-                <template v-if="taskUncompleted.length > 0">
-                    <TaskItemCard
-                        v-for="task in taskUncompleted"
-                        :key="task.id"
-                        :task="task"
-                        :disabled="disabled"
-                        @toggle-state="toggleTaskState"
-                        @update="updateTask"
-                        @delete="deleteTask">
-                    </TaskItemCard>
-                </template>
-                <template
-                    v-else-if="
-                        section.tasks.length > 0 && section.tasks.length === taskCompletedLength
-                    ">
-                    <EmptyListDisplay message="You completed all tasks of this section !">
-                        <template #img>
-                            <img
-                                src="../../../../assets/all_task_completed.svg"
-                                width="200"
-                                alt="All tasks completed" />
+                <div class="d-flex align-center mb-2">
+                    <v-dialog v-model="sectionDialog" width="60%">
+                        <template #activator="{ attrs, on }">
+                            <v-btn v-bind="attrs" v-on="on" :disabled="disabled" class="mr-1">
+                                <v-icon left>mdi-pencil</v-icon>
+                                edit section
+                            </v-btn>
                         </template>
-                    </EmptyListDisplay>
+                        <SectionDialog
+                            :section="section"
+                            :is-dialog-open="sectionDialog"
+                            @submit="updateSection"
+                            @delete="deleteSection"
+                            @close="sectionDialog = false">
+                        </SectionDialog>
+                    </v-dialog>
+
+                    <v-spacer></v-spacer>
+
+                    <FilterChip
+                        v-if="section.tasks.length > 0"
+                        v-model="displayCompletedTask"
+                        color="green"
+                        icon="mdi-trophy"
+                        class="mr-3">
+                        Completed
+                    </FilterChip>
+
+                    <v-dialog v-model="taskDialog" width="60%">
+                        <template #activator="{ attrs, on }">
+                            <v-btn v-bind="attrs" v-on="on" :disabled="disabled">
+                                <v-icon left>mdi-plus</v-icon>
+                                task
+                            </v-btn>
+                        </template>
+                        <TaskDialog
+                            :is-dialog-open="taskDialog"
+                            @submit="createTask"
+                            @close="taskDialog = false">
+                        </TaskDialog>
+                    </v-dialog>
+                </div>
+
+                <template v-if="!displayCompletedTask">
+                    <template v-if="uncompletedTasks.length > 0">
+                        <TaskItemCard
+                            v-for="task of uncompletedTasks"
+                            :key="task.id"
+                            :task="task"
+                            :disabled="disabled"
+                            @toggle-state="toggleTaskState"
+                            @update="updateTask"
+                            @delete="deleteTask">
+                        </TaskItemCard>
+                    </template>
+                    <template
+                        v-else-if="
+                            section.tasks.length > 0 &&
+                            section.tasks.length === completedTasks.length
+                        ">
+                        <EmptyListDisplay message="You completed all tasks of this section !">
+                            <template #img>
+                                <img
+                                    src="../../../../assets/all_task_completed.svg"
+                                    width="200"
+                                    alt="All tasks completed" />
+                            </template>
+                        </EmptyListDisplay>
+                    </template>
+                    <template v-else>
+                        <EmptyListDisplay message="This section has no task yet">
+                            <template #img>
+                                <img
+                                    src="../../../../assets/no_tasks.svg"
+                                    width="200"
+                                    alt="No tasks" />
+                            </template>
+                        </EmptyListDisplay>
+                    </template>
                 </template>
                 <template v-else>
-                    <EmptyListDisplay message="This section has no task yet">
-                        <template #img>
-                            <img src="../../../../assets/no_tasks.svg" width="200" alt="No tasks" />
-                        </template>
-                    </EmptyListDisplay>
+                    <template v-if="completedTasks.length > 0">
+                        <TaskItemCard
+                            v-for="task of completedTasks"
+                            :key="task.id"
+                            :task="task"
+                            :disabled="disabled"
+                            @toggle-state="toggleTaskState">
+                        </TaskItemCard>
+                    </template>
+                    <template v-else>
+                        <EmptyListDisplay message="You didn't completed any tasks yet !">
+                            <template #img>
+                                <img
+                                    src="../../../../assets/no_tasks.svg"
+                                    width="200"
+                                    alt="No tasks completed" />
+                            </template>
+                        </EmptyListDisplay>
+                    </template>
                 </template>
             </v-col>
             <v-col cols="3">
                 <v-scale-transition origin="center">
                     <div class="d-flex align-center justify-center" v-if="section.tasks.length > 0">
                         <ProgressCircular
-                            :value="taskCompletedLength"
+                            :value="completedTasks.length"
                             :max="section.tasks.length"
                             :size="180"
                             :width="15">
@@ -83,8 +121,8 @@
 </template>
 
 <script lang="ts">
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { SectionTask } from '@/models/section.model'
 import { Task } from '@/models/task.model'
@@ -101,7 +139,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
         TaskDialog,
         ProgressCircular,
         EmptyListDisplay,
-        ConfirmDialog,
+        FilterChip,
     },
 })
 export default class ProjectSectionItem extends Vue {
@@ -110,13 +148,14 @@ export default class ProjectSectionItem extends Vue {
 
     taskDialog = false
     sectionDialog = false
+    displayCompletedTask = false
 
-    get taskCompletedLength(): number {
-        return this.section.tasks.filter((task: Task) => task.completed).length
+    get completedTasks(): Task[] {
+        return this.section.tasks.filter(({ completed }) => completed)
     }
 
-    get taskUncompleted(): Task[] {
-        return this.section.tasks.filter((task: Task) => !task.completed)
+    get uncompletedTasks(): Task[] {
+        return this.section.tasks.filter(({ completed }) => !completed)
     }
 
     updateSection({ name }: { name: string }): void {

@@ -26,3 +26,8 @@ export interface DailyTaskDisplayWrapper<T> {
     content: T
     selected: boolean
 }
+
+export enum DailyUpdateTaskTab {
+    Project,
+    Collection,
+}

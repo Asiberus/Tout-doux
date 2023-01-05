@@ -6,17 +6,20 @@
             </h2>
             <div v-if="task">
                 <v-hover v-slot="{ hover }">
-                    <v-btn @click="emitDeleteTask" :color="hover || confirmDelete ? 'error' : null">
+                    <v-btn
+                        @click="emitDeleteTask()"
+                        :color="hover || confirmDelete ? 'error' : null">
                         {{ confirmDelete ? 'Are you sure ?' : 'Delete Task' }}
                     </v-btn>
                 </v-hover>
             </div>
         </div>
         <v-card-text>
-            <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent">
+            <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
                     <v-col>
                         <v-text-field
+                            ref="name"
                             v-model="taskForm.data.name"
                             label="Name"
                             counter="50"
@@ -28,14 +31,10 @@
                     </v-col>
                 </v-row>
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn
-                        color="success"
-                        text
-                        :disabled="!taskForm.valid"
-                        @click="emitSubmitEvent">
+                    <v-btn color="success" text type="submit" :disabled="!taskForm.valid">
                         {{ task ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent"> cancel </v-btn>
+                    <v-btn plain class="ml-2" @click="emitCloseEvent()"> cancel </v-btn>
                 </v-card-actions>
             </v-form>
         </v-card-text>
@@ -69,6 +68,10 @@ export default class TaskDialog extends Vue {
         return this.$refs.form as Vue & { resetValidation: () => void }
     }
 
+    get inputName(): Vue & { focus: () => void } {
+        return this.$refs.name as Vue & { focus: () => void }
+    }
+
     beforeMount(): void {
         if (this.task) this.populateForm(this.task)
     }
@@ -80,6 +83,7 @@ export default class TaskDialog extends Vue {
             this.form.resetValidation()
             if (this.task) this.populateForm(this.task)
             else this.populateForm({ name: '' } as Task)
+            this.inputName.focus()
         }
     }
 

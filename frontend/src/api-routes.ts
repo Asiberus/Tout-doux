@@ -6,6 +6,8 @@ export const apiRoutes = {
     sectionById: 'section/:sectionId/',
     task: 'task/',
     taskById: 'task/:taskId/',
+    event: 'event/',
+    eventById: 'event/:eventId/',
     collection: 'collection/',
     collectionById: 'collection/:collectionId/',
     dailyTask: 'daily-task/',

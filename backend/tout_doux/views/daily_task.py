@@ -1,5 +1,6 @@
 import datetime
 
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -7,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from tout_doux.models.daily_task import DailyTask
+from tout_doux.models.event import Event
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 from tout_doux.utils import daterange
@@ -37,7 +39,9 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             daily_overview = {
                 'date': date,
                 'totalTask': DailyTask.objects.filter(date=date).count(),
-                'totalTaskCompleted': DailyTask.objects.filter(date=date, completed=True).count()
+                'totalTaskCompleted': DailyTask.objects.filter(date=date, completed=True).count(),
+                'totalEvent': Event.objects.filter(
+                    Q(start_date=date) | Q(start_date__lte=date, end_date__gte=date)).count()
             }
             data.append(daily_overview)
 
