@@ -8,8 +8,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         backup = io.StringIO()
         call_command('dumpdata',
-                     exclude=['contenttypes', 'sessions.session', 'admin.logentry'],
+                     all=True,
                      format='json',
+                     natural_foreign=True,
+                     natural_primary=True,
                      stdout=backup)
 
         self.stdout.write(backup.getvalue())
