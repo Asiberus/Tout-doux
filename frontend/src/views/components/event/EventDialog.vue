@@ -84,7 +84,8 @@
                                 @change="startDatePicker = false"
                                 no-title
                                 scrollable
-                                show-adjacent-months>
+                                show-adjacent-months
+                                :first-day-of-week="1">
                             </v-date-picker>
                         </v-menu>
                     </v-col>
@@ -154,7 +155,8 @@
                                 "
                                 no-title
                                 scrollable
-                                show-adjacent-months>
+                                show-adjacent-months
+                                :first-day-of-week="1">
                             </v-date-picker>
                         </v-menu>
                     </v-col>
