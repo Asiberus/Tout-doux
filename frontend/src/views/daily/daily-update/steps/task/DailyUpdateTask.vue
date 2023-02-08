@@ -15,13 +15,13 @@
                     <v-icon>mdi-list-box</v-icon>
                 </v-tab>
                 <v-tab disabled>
+                    <v-icon>mdi-timeline</v-icon>
+                </v-tab>
+                <v-tab disabled>
                     <v-icon>mdi-calendar-range</v-icon>
                 </v-tab>
                 <v-tab disabled>
                     <v-icon>mdi-calendar-month</v-icon>
-                </v-tab>
-                <v-tab disabled>
-                    <v-icon>mdi-timeline</v-icon>
                 </v-tab>
             </v-tabs>
             <v-tabs-items v-model="tab" class="transparent flex-grow-1">
