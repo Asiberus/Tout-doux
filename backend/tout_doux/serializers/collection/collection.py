@@ -13,8 +13,7 @@ class CollectionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('You can\'t create a archived collection')
 
         if self.instance and self.instance.archived:
-            if 'name' in data or 'description' in data:
+            if 'archived' not in data or data.get('archived') is True:
                 raise serializers.ValidationError('You can\'t edit an archived collection')
 
         return data
-

@@ -5,10 +5,15 @@ from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
 from tout_doux.models.section import Section
 from tout_doux.models.task import Task
+from tout_doux.models.task_tag import TaskTag
+from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
 from tout_doux.utils import get_or_raise_error
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    tags = TaskTagSerializer(read_only=True, many=True)
+    tagIds = serializers.PrimaryKeyRelatedField(write_only=True, source='tags', queryset=TaskTag.objects.all(),
+                                                many=True, required=False, allow_null=True)
     projectId = serializers.ModelField(model_field=Task()._meta.get_field('project'), required=False, allow_null=True)
     sectionId = serializers.ModelField(model_field=Task()._meta.get_field('section'), required=False, allow_null=True)
     collectionId = serializers.ModelField(model_field=Task()._meta.get_field('collection'), required=False,
@@ -16,7 +21,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'completed', 'created_at', 'completed_at', 'projectId', 'sectionId', 'collectionId')
+        fields = ('id', 'name', 'tags', 'tagIds', 'completed', 'created_at', 'completed_at', 'projectId', 'sectionId',
+                  'collectionId')
 
     def update(self, instance, validated_data):
         if 'completed' in validated_data:

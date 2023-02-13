@@ -4,10 +4,12 @@ from django.dispatch import receiver
 from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
 from tout_doux.models.section import Section
+from tout_doux.models.task_tag import TaskTag
 
 
 class Task(models.Model):
     name = models.CharField(max_length=50)
+    tags = models.ManyToManyField(TaskTag, related_name='tasks', blank=True)
     completed = models.BooleanField(default=False)
     project = models.ForeignKey(Project, limit_choices_to={'archived': False}, on_delete=models.CASCADE,
                                 related_name='tasks', null=True, blank=True)
@@ -27,7 +29,6 @@ class Task(models.Model):
 
 @receiver(models.signals.pre_delete, sender=Task)
 def feed_daily_task_name(sender, instance, **kwargs):
-    print(instance.daily_tasks.all(), instance.name)
     for daily_task in instance.daily_tasks.all():
         daily_task.name = instance.name
         daily_task.save()
