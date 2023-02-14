@@ -4,7 +4,7 @@ export interface Collection {
     id: number
     name: string
     description: string
-    createdAt: string
+    createdOn: string
     archived: boolean
 }
 

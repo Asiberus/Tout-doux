@@ -6,7 +6,7 @@
                 <v-card>
                     <v-card-text>
                         {{ project.description }}
-                        <div class="d-flex justify-end align-center mt-2" title="Created at">
+                        <div class="d-flex justify-end align-center mt-2" title="Created on">
                             <v-icon small>mdi-clock</v-icon>
                             <span class="font-italic ml-1">{{ createdDate }}</span>
                         </div>
@@ -138,7 +138,7 @@ export default class ProjectDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.project.createdAt).format('D MMM. Y')
+        return moment(this.project.createdOn).format('D MMM. Y')
     }
 
     get uncompletedTasks(): Task[] {

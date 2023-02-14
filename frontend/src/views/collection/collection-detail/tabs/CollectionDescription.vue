@@ -88,7 +88,7 @@
                 <v-card-title>Description</v-card-title>
                 <v-card-text>
                     {{ collection.description }}
-                    <div class="d-flex justify-end align-center mt-2" title="Created at">
+                    <div class="d-flex justify-end align-center mt-2" title="Created on">
                         <v-icon small>mdi-clock</v-icon>
                         <span class="font-italic ml-1">{{ createdDate }}</span>
                     </div>
@@ -128,7 +128,7 @@ export default class CollectionDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.collection.createdAt).format('D MMM. Y')
+        return moment(this.collection.createdOn).format('D MMM. Y')
     }
 
     get uncompletedTasks(): Task[] {

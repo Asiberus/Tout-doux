@@ -8,7 +8,7 @@ class Project(models.Model):
     description = models.CharField(max_length=500)
     tags = models.ManyToManyField(ProjectTag, related_name='projects', blank=True)
     archived = models.BooleanField(default=False)
-    created_at = models.DateField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name

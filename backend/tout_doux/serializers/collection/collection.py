@@ -4,11 +4,11 @@ from tout_doux.models.collection import Collection
 
 
 class CollectionSerializer(serializers.ModelSerializer):
-    createdAt = serializers.DateField(read_only=True, source='created_at')
+    createdOn = serializers.DateField(read_only=True, source='created_on')
 
     class Meta:
         model = Collection
-        fields = ('id', 'name', 'description', 'createdAt', 'archived')
+        fields = ('id', 'name', 'description', 'createdOn', 'archived')
 
     def validate(self, data):
         if not self.instance and data.get('archived'):
