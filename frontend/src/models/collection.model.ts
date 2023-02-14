@@ -11,3 +11,13 @@ export interface Collection {
 export interface CollectionTask extends Collection {
     tasks: Task[]
 }
+
+export interface CollectionListModel {
+    id: number
+    name: string
+    description: string
+    archived: boolean
+    createdOn: string
+    taskCount: number
+    completedTaskCount: number
+}

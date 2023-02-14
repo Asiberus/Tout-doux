@@ -15,3 +15,13 @@ export interface ProjectTask extends Project {
     tasks: Task[]
     events: EventModel[]
 }
+
+export interface ProjectListModel {
+    id: number
+    name: string
+    description: string
+    archived: boolean
+    createdOn: string
+    taskCount: number
+    completedTaskCount: number
+}

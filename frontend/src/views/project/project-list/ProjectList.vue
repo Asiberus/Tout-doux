@@ -67,7 +67,7 @@
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { Project, ProjectTask } from '@/models/project.model'
+import { Project, ProjectListModel, ProjectTask } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectItemCard from '@/views/project/components/ProjectItemCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
@@ -78,7 +78,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 export default class ProjectList extends Vue {
     @Prop({ default: false }) archived!: boolean
 
-    projectList: ProjectTask[] = []
+    projectList: ProjectListModel[] = []
     projectDialog = false
 
     created(): void {

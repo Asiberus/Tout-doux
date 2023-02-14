@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from tout_doux.models.section import Section
-from tout_doux.serializers.project.project import ProjectSerializer
+from tout_doux.serializers.project import ProjectSerializer
 
 
 class SectionExtendedSerializer(serializers.ModelSerializer):

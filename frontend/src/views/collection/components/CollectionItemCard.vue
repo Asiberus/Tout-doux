@@ -4,7 +4,7 @@
         :to="{ name: 'collection-detail', params: { id: collection.id } }"
         :color="collection.archived ? 'collectionArchived' : null"
         :ripple="false">
-        <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="6">
+        <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
             <div class="flex-shrink-1 overflow-hidden">
@@ -19,10 +19,12 @@
             </div>
 
             <div class="px-3 flex-shrink-0">
-                <span style="font-size: 2.5em" class="white--text">{{ tasksCompleted }}</span>
+                <span style="font-size: 2.5em" class="white--text">{{
+                    collection.completedTaskCount
+                }}</span>
                 /
                 <span style="font-size: 1.5em; transform: translateY(0.3em); display: inline-block">
-                    {{ collection.tasks.length }}
+                    {{ collection.taskCount }}
                 </span>
             </div>
         </v-card-text>
@@ -32,18 +34,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Task } from '@/models/task.model'
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionListModel, CollectionTask } from '@/models/collection.model'
 
 @Component
 export default class CollectionItemCard extends Vue {
-    @Prop() private collection!: CollectionTask
+    @Prop() private collection!: CollectionListModel
 
-    get tasksCompleted(): number {
-        return this.collection.tasks.filter((task: Task) => task.completed).length
-    }
-
-    get percentageOfTaskCompleted(): number {
-        return (this.tasksCompleted / this.collection.tasks.length) * 100
+    get percentageOfCompletedTask(): number {
+        return (this.collection.completedTaskCount / this.collection.taskCount) * 100
     }
 }
 </script>

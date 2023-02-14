@@ -3,8 +3,7 @@ from rest_framework import viewsets
 
 from tout_doux.models.collection import Collection
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.collection.collection import CollectionSerializer
-from tout_doux.serializers.collection.collection_task import CollectionTaskSerializer
+from tout_doux.serializers.collection import CollectionListSerializer, CollectionTaskSerializer, CollectionSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -22,7 +21,9 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if hasattr(self, 'action'):
-            if self.action == 'list' or self.action == 'retrieve':
+            if self.action == 'list':
+                return CollectionListSerializer
+            elif self.action == 'retrieve':
                 return CollectionTaskSerializer
 
         # Case for create, update, partial_update and destroy
