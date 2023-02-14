@@ -31,4 +31,5 @@ class Task(models.Model):
 def feed_daily_task_name(sender, instance, **kwargs):
     for daily_task in instance.daily_tasks.all():
         daily_task.name = instance.name
+        daily_task.tags.add(*instance.tags.all())
         daily_task.save()
