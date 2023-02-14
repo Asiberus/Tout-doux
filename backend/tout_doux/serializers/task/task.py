@@ -7,17 +7,19 @@ from tout_doux.models.section import Section
 from tout_doux.models.task import Task
 from tout_doux.models.task_tag import TaskTag
 from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
-from tout_doux.utils import get_or_raise_error
 
 
 class TaskSerializer(serializers.ModelSerializer):
     tags = TaskTagSerializer(read_only=True, many=True)
     tagIds = serializers.PrimaryKeyRelatedField(write_only=True, source='tags', queryset=TaskTag.objects.all(),
                                                 many=True, required=False, allow_null=True)
-    projectId = serializers.ModelField(model_field=Task()._meta.get_field('project'), required=False, allow_null=True)
-    sectionId = serializers.ModelField(model_field=Task()._meta.get_field('section'), required=False, allow_null=True)
-    collectionId = serializers.ModelField(model_field=Task()._meta.get_field('collection'), required=False,
-                                          allow_null=True)
+    projectId = serializers.PrimaryKeyRelatedField(source='project', queryset=Project.objects.all(),
+                                                   required=False, allow_null=True)
+    sectionId = serializers.PrimaryKeyRelatedField(source='section', queryset=Section.objects.all(),
+                                                   required=False, allow_null=True)
+    collectionId = serializers.PrimaryKeyRelatedField(source='collection', queryset=Collection.objects.all(),
+                                                      required=False, allow_null=True)
+
     createdAt = serializers.DateTimeField(read_only=True, source='created_at')
     completedAt = serializers.DateTimeField(read_only=True, source='completed_at')
 
@@ -35,31 +37,34 @@ class TaskSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
+    def validate_projectId(self, project):
+        if project.archived:
+            raise serializers.ValidationError('You can\'t create a task to an archived project')
+
+        return project
+
+    def validate_sectionId(self, section):
+        if section.project.archived:
+            raise serializers.ValidationError('You can\'t create a task to an archived project')
+
+        return section
+
+    def validate_collectionId(self, collection):
+        if collection.archived:
+            raise serializers.ValidationError('You can\'t create a task to an archived collection')
+
+        return collection
+
     def validate(self, data):
-        # Map collectionId to collection
-        if 'collectionId' in data:
-            data['collection'] = get_or_raise_error(Collection, id=data.pop('collectionId'),
-                                                    error=serializers.ValidationError('This collection doesn\'t exist'))
-
-        # Map projectId to project
-        if 'projectId' in data:
-            data['project'] = get_or_raise_error(Project, id=data.pop('projectId'),
-                                                 error=serializers.ValidationError('This project doesn\'t exist'))
-
-        # Map projectId to project
-        if 'sectionId' in data:
-            data['section'] = get_or_raise_error(Section, id=data.pop('sectionId'),
-                                                 error=serializers.ValidationError('This section doesn\'t exist'))
-
         if self.instance:
             if self.instance.project:
                 if self.instance.project.archived:
-                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+                    raise serializers.ValidationError('You can\'t edit a task related to an archived project')
                 if 'project' in data or 'section' in data or 'collection' in data:
                     raise serializers.ValidationError('This task is already linked to a project')
             if self.instance.section:
                 if self.instance.section.project.archived:
-                    raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
+                    raise serializers.ValidationError('You can\'t edit a task related to an archived project')
                 if 'project' in data or 'section' in data or 'collection' in data:
                     raise serializers.ValidationError('This task is already linked to a section')
             if self.instance.collection:
@@ -69,20 +74,10 @@ class TaskSerializer(serializers.ModelSerializer):
                 if 'project' in data or 'section' in data or 'collection' in data:
                     raise serializers.ValidationError('This task is already linked to a collection')
         else:
-            if 'project' not in data and 'section' not in data and 'collection' not in data:
+            if len([key for key in list(data) if key in ['project', 'section', 'collection']]) == 0:
                 raise serializers.ValidationError('You must link a task to either a project, a section or a collection')
 
-            # Archived
-            if (data.get('project') and data.get('project').archived) or (
-                    data.get('section') and data.get('section').project.archived):
-                raise serializers.ValidationError('You can\'t create or edit a task related to an archived project')
-            if data.get('collection') and data.get('collection').archived:
-                raise serializers.ValidationError('You can\'t create or edit a task related to an archived collection')
-
-            # Link
-            if ('project' in data and 'section' in data) \
-                    or ('project' in data and 'collection' in data) \
-                    or ('section' in data and 'collection' in data):
+            if len([key for key in list(data) if key in ['project', 'section', 'collection']]) > 1:
                 raise serializers.ValidationError(
                     'You can\'t create a task related to a project, a section and collection')
 

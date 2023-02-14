@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from tout_doux.models.event import Event
 from tout_doux.models.project import Project
-from tout_doux.utils import get_or_raise_error
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -13,7 +12,8 @@ class EventSerializer(serializers.ModelSerializer):
     endDate = serializers.DateField(source='end_date', required=False, allow_null=True)
     endTime = serializers.TimeField(source='end_time', format='%H:%M', input_formats=['%H:%M'], allow_null=True)
     takesWholeDay = serializers.BooleanField(source='takes_whole_day')
-    projectId = serializers.ModelField(model_field=Event()._meta.get_field('project'), required=False, allow_null=True)
+    projectId = serializers.PrimaryKeyRelatedField(source='project', queryset=Project.objects.all(),
+                                                   required=False, allow_null=True)
 
     class Meta:
         model = Event
@@ -22,16 +22,13 @@ class EventSerializer(serializers.ModelSerializer):
             'description', 'takesWholeDay', 'projectId'
         )
 
+    def validate_projectId(self, project):
+        if project.archived:
+            raise serializers.ValidationError('You can\'t create an event related to an archived project')
+
+        return project
+
     def validate(self, data):
-        # Map projectId to project
-        if 'projectId' in data:
-            project = get_or_raise_error(Project, id=data.pop('projectId'),
-                                         error=serializers.ValidationError('This project doesn\'t exist'))
-            if project.archived:
-                raise serializers.ValidationError('You can\'t create or edit an event related to an archived project')
-
-            data['project'] = project
-
         if data.get('takes_whole_day'):
             data['start_time'] = None
             data['end_date'] = None
@@ -44,7 +41,7 @@ class EventSerializer(serializers.ModelSerializer):
             if self.instance.project:
                 if self.instance.project.archived:
                     raise serializers.ValidationError(
-                        'You can\'t create or edit an event related to an archived project')
+                        'You can\'t edit an event related to an archived project')
                 if 'project' in data:
                     raise serializers.ValidationError('This event is already link to a project')
 

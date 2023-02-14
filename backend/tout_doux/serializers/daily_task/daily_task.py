@@ -46,6 +46,19 @@ class DailyTaskSerializer(serializers.ModelSerializer):
 
         return instance_updated
 
+    def validate_taskId(self, task):
+        # Test that the task is not related to an archived project/collection
+        if task.completed:
+            raise serializers.ValidationError('You can\'t link a completed task to a daily task')
+        if (task.project and task.project.archived) or (task.section and task.section.project.archived):
+            raise serializers.ValidationError(
+                'You can\'t create a daily task with a task related to an archived project')
+        if task.collection and task.collection.archived:
+            raise serializers.ValidationError(
+                'You can\'t create a daily task with a task related to an archived collection')
+
+        return task
+
     def validate(self, data):
         if self.instance:
             if self.instance.date != date.today() and list(data) != ['completed']:
@@ -67,17 +80,5 @@ class DailyTaskSerializer(serializers.ModelSerializer):
             if not any([key in ['task', 'common_task', 'name'] for key in list(data)]):
                 raise serializers.ValidationError(
                     'You must provide a name or a task id or a common task id to create a daily task')
-
-            # Test that the task is not related to an archived project/collection
-            if 'task' in data:
-                task = data.get('task')
-                if task.completed:
-                    raise serializers.ValidationError('You can\'t link a completed task to a daily task')
-                if (task.project and task.project.archived) or (task.section and task.section.project.archived):
-                    raise serializers.ValidationError(
-                        'You can\'t create a daily task with a task related to an archived project')
-                if task.collection and task.collection.archived:
-                    raise serializers.ValidationError(
-                        'You can\'t create a daily task with a task related to an archived collection')
 
         return data
