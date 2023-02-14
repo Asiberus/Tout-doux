@@ -36,7 +36,7 @@
             <TaskDialog
                 :task="task"
                 :is-dialog-open="taskDialog"
-                @submit="emitUpdateEvent"
+                @update="emitUpdateEvent"
                 @delete="emitDeleteEvent"
                 @close="taskDialog = false">
             </TaskDialog>
@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { Task } from '@/models/task.model'
+import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
@@ -85,7 +85,7 @@ export default class TaskItemCard extends Vue {
         this.$emit('toggle-state', this.task.id, !this.task.completed)
     }
 
-    emitUpdateEvent(data: Partial<Task>): void {
+    emitUpdateEvent(data: TaskPatch): void {
         this.taskDialog = false
         this.$emit('update', this.task.id, data)
     }

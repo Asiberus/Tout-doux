@@ -39,7 +39,7 @@
                         </template>
                         <TaskDialog
                             :is-dialog-open="taskDialog"
-                            @submit="createTask"
+                            @create="createTask"
                             @close="taskDialog = false">
                         </TaskDialog>
                     </v-dialog>
@@ -125,7 +125,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { SectionTask } from '@/models/section.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -168,7 +168,7 @@ export default class ProjectSectionItem extends Vue {
         this.$store.dispatch(projectActions.section.deleteSection, this.section.id)
     }
 
-    createTask(task: Partial<Task>): void {
+    createTask(task: TaskPost): void {
         this.taskDialog = false
         task.sectionId = this.section.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -182,7 +182,7 @@ export default class ProjectSectionItem extends Vue {
         })
     }
 
-    updateTask(id: number, data: Partial<Task>): void {
+    updateTask(id: number, data: TaskPatch): void {
         this.$store.dispatch(projectActions.task.editTask, { id, data, sectionId: this.section.id })
     }
 

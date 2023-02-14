@@ -21,7 +21,7 @@
                     </template>
                     <TaskDialog
                         :is-dialog-open="taskDialog"
-                        @submit="createTask"
+                        @create="createTask"
                         @close="taskDialog = false">
                     </TaskDialog>
                 </v-dialog>
@@ -103,7 +103,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { CollectionDetail } from '@/models/collection.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
@@ -139,7 +139,7 @@ export default class CollectionDescription extends Vue {
         return this.collection.tasks.filter(({ completed }) => completed)
     }
 
-    createTask(task: Partial<Task>): void {
+    createTask(task: TaskPost): void {
         this.taskDialog = false
         task.collectionId = this.collection.id
         this.$store.dispatch(collectionActions.task.addTask, task)
@@ -149,7 +149,7 @@ export default class CollectionDescription extends Vue {
         this.$store.dispatch(collectionActions.task.editTask, { id, data: { completed } })
     }
 
-    updateTask(id: number, data: Partial<Task>): void {
+    updateTask(id: number, data: TaskPatch): void {
         this.$store.dispatch(collectionActions.task.editTask, { id, data })
     }
 

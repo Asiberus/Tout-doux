@@ -1,7 +1,7 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
 import { Collection, CollectionDetail } from '@/models/collection.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 
@@ -110,7 +110,7 @@ export class CollectionModule extends VuexModule {
     }
 
     @Action
-    async [collectionActions.task.addTask](task: Partial<Task>): Promise<void> {
+    async [collectionActions.task.addTask](task: TaskPost): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(collectionMutations.task.addTask, response.body)
@@ -124,7 +124,7 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.task.editTask](payload: {
         id: number
-        data: Partial<Task>
+        data: TaskPatch
     }): Promise<void> {
         const { id, data } = payload
         await taskService.updateTaskById(id, data).then(

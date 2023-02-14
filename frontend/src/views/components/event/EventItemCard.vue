@@ -95,7 +95,8 @@
                 :related-to-date="relatedToDate"
                 @submit="emitUpdateEvent"
                 @delete="emitDeleteEvent"
-                @close="eventDialog = false"></EventDialog>
+                @close="eventDialog = false">
+            </EventDialog>
         </v-dialog>
     </div>
 </template>
@@ -141,7 +142,7 @@ export default class EventItemCard extends Vue {
         this.eventDialog = true
     }
 
-    emitUpdateEvent(data: Partial<Task>): void {
+    emitUpdateEvent(data: Partial<EventModel>): void {
         this.eventDialog = false
         this.$emit('update', { id: this.event.id, data })
     }

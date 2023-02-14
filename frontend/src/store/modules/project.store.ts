@@ -3,7 +3,7 @@ import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
 import { EventModel } from '@/models/event.model'
 import { SectionTask } from '@/models/section.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { sortEvents } from '@/utils/event.util'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
@@ -265,7 +265,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.task.addTask](task: Partial<Task>): Promise<void> {
+    async [projectActions.task.addTask](task: TaskPost): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(projectMutations.task.addTask, {
@@ -283,7 +283,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.task.editTask](payload: {
         id: number
-        data: Partial<Task>
+        data: TaskPatch
         projectId?: number
         sectionId?: number
     }): Promise<void> {

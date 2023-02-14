@@ -8,13 +8,23 @@ from tout_doux.serializers.task_tag import TaskTagSerializer
 
 
 class TaskExtendedSerializer(serializers.ModelSerializer):
-    tags = TaskTagSerializer(read_only=True, many=True)
-    project = ProjectSerializer(read_only=True)
-    section = SectionExtendedSerializer(read_only=True)
-    collection = CollectionSerializer(read_only=True)
-    createdAt = serializers.DateTimeField(read_only=True, source='created_at')
-    completedAt = serializers.DateTimeField(read_only=True, source='completed_at')
+    tags = TaskTagSerializer(many=True)
+    project = ProjectSerializer()
+    section = SectionExtendedSerializer()
+    collection = CollectionSerializer()
+    createdAt = serializers.DateTimeField(source='created_at')
+    completedAt = serializers.DateTimeField(source='completed_at')
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'tags', 'completed', 'project', 'section', 'collection', 'createdAt', 'completedAt')
+        fields = (
+            'id',
+            'name',
+            'tags',
+            'completed',
+            'project',
+            'section',
+            'collection',
+            'createdAt',
+            'completedAt'
+        )

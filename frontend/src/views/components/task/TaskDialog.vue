@@ -94,6 +94,9 @@ export default class TaskDialog extends Vue {
     emitSubmitEvent(): void {
         if (!this.taskForm.valid) return
 
+        if (this.task) this.$emit('update', this.taskForm.data)
+        else this.$emit('create', this.taskForm.data)
+        // Todo : to delete
         this.$emit('submit', this.taskForm.data)
     }
 
