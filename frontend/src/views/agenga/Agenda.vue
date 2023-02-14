@@ -28,8 +28,8 @@
                 :events="events"
                 :weekdays="weekdays"
                 event-color="event"
-                event-start="start_date"
-                event-end="end_date"
+                event-start="startDate"
+                event-end="endDate"
                 :event-margin-bottom="2"
                 :event-ripple="false"
                 color="accent"
@@ -60,26 +60,26 @@
                             </v-avatar>
                         </template>
 
-                        <template v-if="event.takes_whole_day">
+                        <template v-if="event.takesWholeDay">
                             <v-icon x-small>mdi-white-balance-sunny</v-icon>
                         </template>
                         <template v-else>
-                            <template v-if="event.start_date === event.end_date">
-                                <span class="font-weight-bold">{{ event.start_time }}</span>
+                            <template v-if="event.startDate === event.endDate">
+                                <span class="font-weight-bold">{{ event.startTime }}</span>
                                 <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
-                                <span class="font-weight-bold">{{ event.end_time }}</span>
+                                <span class="font-weight-bold">{{ event.endTime }}</span>
                             </template>
-                            <template v-else-if="event.end_date">
+                            <template v-else-if="event.endDate">
                                 <span class="font-weight-bold">
-                                    {{ dateFormat(event.start_date, 'DD/MM') }}
+                                    {{ dateFormat(event.startDate, 'DD/MM') }}
                                 </span>
                                 <v-icon x-small class="calendar-arrow">mdi-arrow-right</v-icon>
                                 <span class="font-weight-bold">
-                                    {{ dateFormat(event.end_date, 'DD/MM') }}
+                                    {{ dateFormat(event.endDate, 'DD/MM') }}
                                 </span>
                             </template>
-                            <template v-else-if="event.start_time">
-                                <span class="font-weight-bold">{{ event.start_time }}</span>
+                            <template v-else-if="event.startTime">
+                                <span class="font-weight-bold">{{ event.startTime }}</span>
                             </template>
                         </template>
 

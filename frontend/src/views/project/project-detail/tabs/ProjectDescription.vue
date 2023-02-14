@@ -138,7 +138,7 @@ export default class ProjectDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.project.created_at).format('D MMM. Y')
+        return moment(this.project.createdAt).format('D MMM. Y')
     }
 
     get uncompletedTasks(): Task[] {

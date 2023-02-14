@@ -18,10 +18,12 @@ class TaskSerializer(serializers.ModelSerializer):
     sectionId = serializers.ModelField(model_field=Task()._meta.get_field('section'), required=False, allow_null=True)
     collectionId = serializers.ModelField(model_field=Task()._meta.get_field('collection'), required=False,
                                           allow_null=True)
+    createdAt = serializers.DateTimeField(read_only=True, source='created_at')
+    completedAt = serializers.DateTimeField(read_only=True, source='completed_at')
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'tags', 'tagIds', 'completed', 'created_at', 'completed_at', 'projectId', 'sectionId',
+        fields = ('id', 'name', 'tags', 'tagIds', 'completed', 'createdAt', 'completedAt', 'projectId', 'sectionId',
                   'collectionId')
 
     def update(self, instance, validated_data):

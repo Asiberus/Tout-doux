@@ -10,29 +10,26 @@ from tout_doux.models.task_tag import TaskTag
 from tout_doux.serializers.common_task.common_task import CommonTaskSerializer
 from tout_doux.serializers.task.task_extended import TaskExtendedSerializer
 from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
-from tout_doux.utils import get_or_raise_error
 
 
 class DailyTaskSerializer(serializers.ModelSerializer):
-    taskId = serializers.ModelField(model_field=DailyTask()._meta.get_field('task'), required=False, allow_null=True)
-    commonTaskId = serializers.PrimaryKeyRelatedField(write_only=True, source='common_task',
-                                                      queryset=CommonTask.objects.all(), required=False,
-                                                      allow_null=True)
+    taskId = serializers.PrimaryKeyRelatedField(write_only=True, source='task', queryset=Task.objects.all(),
+                                                required=False, allow_null=True)
+    task = TaskExtendedSerializer(read_only=True)
+
+    commonTaskId = serializers.PrimaryKeyRelatedField(write_only=True, queryset=CommonTask.objects.all(),
+                                                      source='common_task', required=False, allow_null=True)
     commonTask = CommonTaskSerializer(read_only=True, source='common_task')
+
     tags = TaskTagSerializer(read_only=True, many=True)
     tagIds = serializers.PrimaryKeyRelatedField(write_only=True, source='tags', queryset=TaskTag.objects.all(),
                                                 many=True, required=False, allow_null=True)
 
     class Meta:
         model = DailyTask
-        fields = ('id', 'date', 'taskId', 'commonTask', 'commonTaskId', 'name', 'tags', 'tagIds', 'action', 'completed')
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        if rep.get('taskId'):
-            rep['task'] = TaskExtendedSerializer(instance.task).data
-
-        return rep
+        fields = (
+            'id', 'date', 'task', 'taskId', 'commonTask', 'commonTaskId',
+            'name', 'tags', 'tagIds', 'action', 'completed')
 
     def update(self, instance, validated_data):
         if instance.task and 'completed' in validated_data and (
@@ -50,11 +47,6 @@ class DailyTaskSerializer(serializers.ModelSerializer):
         return instance_updated
 
     def validate(self, data):
-        # Map taskId to task
-        if 'taskId' in data:
-            data['task'] = get_or_raise_error(Task, id=data.pop('taskId'),
-                                              error=serializers.ValidationError('This task doesn\'t exist'))
-
         if self.instance:
             if self.instance.date != date.today() and list(data) != ['completed']:
                 raise serializers.ValidationError('You can\'t edit a closed daily task')

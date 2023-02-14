@@ -5,8 +5,9 @@ from tout_doux.serializers.task.task import TaskSerializer
 
 
 class CollectionTaskSerializer(serializers.ModelSerializer):
-    tasks = TaskSerializer(many=True, read_only=True)
+    createdAt = serializers.DateField(read_only=True, source='created_at')
+    tasks = TaskSerializer(read_only=True, many=True)
 
     class Meta:
         model = Collection
-        fields = ('id', 'name', 'description', 'created_at', 'archived', 'tasks')
+        fields = ('id', 'name', 'description', 'createdAt', 'archived', 'tasks')

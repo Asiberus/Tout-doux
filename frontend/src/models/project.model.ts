@@ -7,7 +7,7 @@ export interface Project {
     name: string
     description: string
     archived: boolean
-    created_at: string
+    createdAt: string
 }
 
 export interface ProjectTask extends Project {

@@ -12,7 +12,9 @@ class TaskExtendedSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(read_only=True)
     section = SectionExtendedSerializer(read_only=True)
     collection = CollectionSerializer(read_only=True)
+    createdAt = serializers.DateTimeField(read_only=True, source='created_at')
+    completedAt = serializers.DateTimeField(read_only=True, source='completed_at')
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'tags', 'completed', 'project', 'section', 'collection', 'created_at')
+        fields = ('id', 'name', 'tags', 'completed', 'project', 'section', 'collection', 'createdAt', 'completedAt')

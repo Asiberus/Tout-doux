@@ -6,8 +6,8 @@ export interface Task {
     id: number
     name: string
     completed: boolean
-    created_at: string
-    completed_at: string
+    createdAt: string
+    completedAt: string
     projectId?: number
     sectionId?: number
     collectionId?: number
@@ -17,8 +17,8 @@ export interface TaskExtended {
     id: number
     name: string
     completed: boolean
-    created_at: string
-    completed_at: string
+    createdAt: string
+    completedAt: string
     project?: ProjectTask
     section?: SectionExtended
     collection?: CollectionTask

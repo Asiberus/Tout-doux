@@ -6,13 +6,14 @@ from tout_doux.serializers.project_tag.project_tag import ProjectTagSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    createdAt = serializers.DateField(read_only=True, source='created_at')
     tags = ProjectTagSerializer(read_only=True, many=True)
     tagIds = serializers.PrimaryKeyRelatedField(write_only=True, source='tags', queryset=ProjectTag.objects.all(),
                                                 many=True, required=False, allow_null=True)
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'tags', 'tagIds', 'archived', 'created_at')
+        fields = ('id', 'name', 'description', 'tags', 'tagIds', 'archived', 'createdAt')
 
     def validate(self, data):
         if not self.instance and data.get('archived'):

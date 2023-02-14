@@ -6,22 +6,22 @@ export interface SortEventOptions {
 }
 
 export function isPassed(event: EventExtended | EventModel): boolean {
-    const { start_date, start_time, end_date, end_time, takes_whole_day } = event
-    const start = moment(`${start_date}${start_time ? `T${start_time}` : ''}`)
-    const end = end_date ? moment(`${end_date}${end_time ? `T${end_time}` : ''}`) : null
+    const { startDate, startTime, endDate, endTime, takesWholeDay } = event
+    const start = moment(`${startDate}${startTime ? `T${startTime}` : ''}`)
+    const end = endDate ? moment(`${endDate}${endTime ? `T${endTime}` : ''}`) : null
 
-    if (end) return moment().isAfter(end, end_time ? 'minute' : 'day')
-    if (takes_whole_day) return moment().isAfter(start, 'day')
-    return moment().isAfter(start, start_time ? 'minute' : 'day')
+    if (end) return moment().isAfter(end, endTime ? 'minute' : 'day')
+    if (takesWholeDay) return moment().isAfter(start, 'day')
+    return moment().isAfter(start, startTime ? 'minute' : 'day')
 }
 
 export function isEventRelatedToDate(
     event: EventExtended | EventModel,
     date: string | Date | Moment
 ): boolean {
-    const { start_date, end_date } = event
-    if (end_date) return moment(date).isBetween(start_date, end_date, 'day', '[]')
-    else return moment(date).isSame(start_date, 'day')
+    const { startDate, endDate } = event
+    if (endDate) return moment(date).isBetween(startDate, endDate, 'day', '[]')
+    else return moment(date).isSame(startDate, 'day')
 }
 
 export function sortEvents(
@@ -31,10 +31,10 @@ export function sortEvents(
 ): number {
     const { handlePassedEvent } = options
     const [start1, start2, end1, end2] = [
-        moment(`${event1.start_date}T${event1.start_time ?? '00:00'}`),
-        moment(`${event2.start_date}T${event2.start_time ?? '00:00'}`),
-        event1.end_date ? moment(`${event1.end_date}T${event1.end_time ?? '00:00'}`) : undefined,
-        event2.end_date ? moment(`${event2.end_date}T${event2.end_time ?? '00:00'}`) : undefined,
+        moment(`${event1.startDate}T${event1.startTime ?? '00:00'}`),
+        moment(`${event2.startDate}T${event2.startTime ?? '00:00'}`),
+        event1.endDate ? moment(`${event1.endDate}T${event1.endTime ?? '00:00'}`) : undefined,
+        event2.endDate ? moment(`${event2.endDate}T${event2.endTime ?? '00:00'}`) : undefined,
     ]
 
     if (handlePassedEvent) {
@@ -47,8 +47,8 @@ export function sortEvents(
         else if (end1 && !end2) return 1
         else if (!end1 && end2) return -1
         else {
-            if (event1.takes_whole_day && !event2.takes_whole_day) return -1
-            else if (!event1.takes_whole_day && event2.takes_whole_day) return 1
+            if (event1.takesWholeDay && !event2.takesWholeDay) return -1
+            else if (!event1.takesWholeDay && event2.takesWholeDay) return 1
         }
     } else return start1.isBefore(start2) ? -1 : 1
 

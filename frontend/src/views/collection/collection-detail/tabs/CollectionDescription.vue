@@ -128,7 +128,7 @@ export default class CollectionDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.collection.created_at).format('D MMM. Y')
+        return moment(this.collection.createdAt).format('D MMM. Y')
     }
 
     get uncompletedTasks(): Task[] {

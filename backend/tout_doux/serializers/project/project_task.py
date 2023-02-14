@@ -8,6 +8,7 @@ from tout_doux.serializers.task.task import TaskSerializer
 
 
 class ProjectTaskSerializer(serializers.ModelSerializer):
+    createdAt = serializers.DateField(read_only=True, source='created_at')
     tags = ProjectTagSerializer(read_only=True, many=True)
     sections = SectionSerializer(read_only=True, many=True)
     tasks = TaskSerializer(read_only=True, many=True)
@@ -15,4 +16,4 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'tags', 'archived', 'sections', 'tasks', 'events', 'created_at')
+        fields = ('id', 'name', 'description', 'tags', 'archived', 'sections', 'tasks', 'events', 'createdAt')

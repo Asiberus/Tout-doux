@@ -12,7 +12,7 @@
                         mdi-calendar-clock
                     </v-icon>
 
-                    <template v-if="event.takes_whole_day">
+                    <template v-if="event.takesWholeDay">
                         <v-icon
                             title="Takes whole day"
                             class="mr-2"
@@ -25,38 +25,38 @@
                         <div
                             class="d-flex align-center grey--text font-weight-bold"
                             :class="[getTextColor('date')]">
-                            <template v-if="event.takes_whole_day && !daySelected">
+                            <template v-if="event.takesWholeDay && !daySelected">
                                 <span title="Date">
-                                    {{ dateFormat(event.start_date, 'DD/MM/YY') }}
+                                    {{ dateFormat(event.startDate, 'DD/MM/YY') }}
                                 </span>
                             </template>
 
-                            <template v-if="!event.takes_whole_day">
+                            <template v-if="!event.takesWholeDay">
                                 <span title="Start date">
                                     <template
                                         v-if="
                                             !daySelected ||
-                                            (event.end_date &&
-                                                !isDateEqual(event.start_date, event.end_date))
+                                            (event.endDate &&
+                                                !isDateEqual(event.startDate, event.endDate))
                                         ">
-                                        {{ dateFormat(event.start_date, 'DD/MM/YY') }}
+                                        {{ dateFormat(event.startDate, 'DD/MM/YY') }}
                                     </template>
-                                    <template v-if="event.start_time">
-                                        {{ event.start_time }}
+                                    <template v-if="event.startTime">
+                                        {{ event.startTime }}
                                     </template>
                                 </span>
 
-                                <template v-if="event.end_date">
+                                <template v-if="event.endDate">
                                     <v-icon :class="[getTextColor('date')]" small class="mx-1">
                                         mdi-arrow-right
                                     </v-icon>
                                     <span title="End date">
                                         <template
-                                            v-if="!isDateEqual(event.start_date, event.end_date)">
-                                            {{ dateFormat(event.end_date, 'DD/MM/YY') }}
+                                            v-if="!isDateEqual(event.startDate, event.endDate)">
+                                            {{ dateFormat(event.endDate, 'DD/MM/YY') }}
                                         </template>
-                                        <template v-if="event.end_time">
-                                            {{ event.end_time }}
+                                        <template v-if="event.endTime">
+                                            {{ event.endTime }}
                                         </template>
                                     </span>
                                 </template>

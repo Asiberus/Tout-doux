@@ -8,15 +8,18 @@ from tout_doux.utils import get_or_raise_error
 
 
 class EventSerializer(serializers.ModelSerializer):
-    start_time = serializers.TimeField(format='%H:%M', input_formats=['%H:%M'], allow_null=True)
-    end_time = serializers.TimeField(format='%H:%M', input_formats=['%H:%M'], allow_null=True)
+    startDate = serializers.DateField(source='start_date')
+    startTime = serializers.TimeField(source='start_time', format='%H:%M', input_formats=['%H:%M'], allow_null=True)
+    endDate = serializers.DateField(source='end_date', required=False, allow_null=True)
+    endTime = serializers.TimeField(source='end_time', format='%H:%M', input_formats=['%H:%M'], allow_null=True)
+    takesWholeDay = serializers.BooleanField(source='takes_whole_day')
     projectId = serializers.ModelField(model_field=Event()._meta.get_field('project'), required=False, allow_null=True)
 
     class Meta:
         model = Event
         fields = (
-            'id', 'name', 'start_date', 'start_time', 'end_date', 'end_time',
-            'description', 'takes_whole_day', 'projectId'
+            'id', 'name', 'startDate', 'startTime', 'endDate', 'endTime',
+            'description', 'takesWholeDay', 'projectId'
         )
 
     def validate(self, data):

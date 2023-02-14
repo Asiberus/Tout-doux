@@ -352,7 +352,7 @@ export default class EventDialog extends Vue {
         if (data.startDate && data.endDate) this.validateDate()
         if (this.relatedToDate) {
             // TODO : optimize this line when api send back data in camelCase
-            const tempEvent = <EventModel>{ start_date: data.startDate, end_date: data.endDate }
+            const tempEvent = <EventModel>{ startDate: data.startDate, endDate: data.endDate }
             this.relatedToDateError = !isEventRelatedToDate(tempEvent, this.relatedToDate)
         }
     }
@@ -373,11 +373,11 @@ export default class EventDialog extends Vue {
             this.eventForm.data = {
                 name: event.name,
                 description: event.description ?? '',
-                startDate: event.start_date,
-                startTime: event.start_time ?? '',
-                endDate: event.end_date ?? '',
-                endTime: event.end_time ?? '',
-                takesWholeDay: event.takes_whole_day,
+                startDate: event.startDate,
+                startTime: event.startTime ?? '',
+                endDate: event.endDate ?? '',
+                endTime: event.endTime ?? '',
+                takesWholeDay: event.takesWholeDay,
             }
         } else
             this.eventForm.data = {
@@ -398,11 +398,11 @@ export default class EventDialog extends Vue {
         const event: Partial<EventModel> = {
             name: data.name,
             description: data.description || null,
-            start_date: data.startDate,
-            start_time: data.startTime || null,
-            end_date: data.endDate || null,
-            end_time: data.endTime || null,
-            takes_whole_day: data.takesWholeDay,
+            startDate: data.startDate,
+            startTime: data.startTime || null,
+            endDate: data.endDate || null,
+            endTime: data.endTime || null,
+            takesWholeDay: data.takesWholeDay,
         }
 
         this.$emit('submit', event)
