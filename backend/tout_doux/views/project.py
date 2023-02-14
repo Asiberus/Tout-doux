@@ -2,10 +2,9 @@ from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
-from tout_doux.models.project import Project
+from tout_doux.models import Project
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.project import ProjectSerializer, ProjectListSerializer
-from tout_doux.serializers.project.project_task import ProjectTaskSerializer
+from tout_doux.serializers.project import ProjectSerializer, ProjectListSerializer, ProjectDetailSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -26,7 +25,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             if self.action == 'list':
                 return ProjectListSerializer
             elif self.action == 'retrieve':
-                return ProjectTaskSerializer
+                return ProjectDetailSerializer
 
         # Case for create, update, partial_update and destroy
         return ProjectSerializer

@@ -1,8 +1,7 @@
 from django.db.models import Q
 from rest_framework import serializers
 
-from tout_doux.models.project import Project
-from tout_doux.models.task import Task
+from tout_doux.models import Project, Task
 
 
 class ProjectListSerializer(serializers.ModelSerializer):

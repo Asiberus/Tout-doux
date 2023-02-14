@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tout_doux.models.collection import Collection
+from tout_doux.models import Collection
 
 
 class CollectionListSerializer(serializers.ModelSerializer):

@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from tout_doux.models.common_task import CommonTask
-from tout_doux.serializers.common_task.common_task import CommonTaskSerializer
+from tout_doux.models import CommonTask
+from tout_doux.serializers.common_task import CommonTaskSerializer
 
 
 class CommonTaskViewSet(viewsets.ModelViewSet):

@@ -2,8 +2,8 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from tout_doux.models.task import Task
-from tout_doux.serializers.task.task import TaskSerializer
+from tout_doux.models import Task
+from tout_doux.serializers.task import TaskSerializer
 
 
 class TaskViewSet(mixins.CreateModelMixin,

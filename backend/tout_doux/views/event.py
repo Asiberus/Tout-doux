@@ -5,9 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
-from tout_doux.models.event import Event
-from tout_doux.serializers.event.event import EventSerializer
-from tout_doux.serializers.event.event_extended import EventExtendedSerializer
+from tout_doux.models import Event
+from tout_doux.serializers.event import EventSerializer, EventExtendedSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):

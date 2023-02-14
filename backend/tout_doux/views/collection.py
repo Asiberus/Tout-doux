@@ -1,9 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
-from tout_doux.models.collection import Collection
+from tout_doux.models import Collection
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.collection import CollectionListSerializer, CollectionTaskSerializer, CollectionSerializer
+from tout_doux.serializers.collection import CollectionListSerializer, CollectionDetailSerializer, CollectionSerializer
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -24,7 +24,7 @@ class CollectionViewSet(viewsets.ModelViewSet):
             if self.action == 'list':
                 return CollectionListSerializer
             elif self.action == 'retrieve':
-                return CollectionTaskSerializer
+                return CollectionDetailSerializer
 
         # Case for create, update, partial_update and destroy
         return CollectionSerializer

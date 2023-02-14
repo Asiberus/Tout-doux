@@ -3,13 +3,10 @@ from datetime import date
 from django.utils import timezone
 from rest_framework import serializers
 
-from tout_doux.models.common_task import CommonTask
-from tout_doux.models.daily_task import DailyTask
-from tout_doux.models.task import Task
-from tout_doux.models.task_tag import TaskTag
-from tout_doux.serializers.common_task.common_task import CommonTaskSerializer
-from tout_doux.serializers.task.task_extended import TaskExtendedSerializer
-from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
+from tout_doux.models import CommonTask, DailyTask, Task, TaskTag
+from tout_doux.serializers.common_task import CommonTaskSerializer
+from tout_doux.serializers.task import TaskExtendedSerializer
+from tout_doux.serializers.task_tag import TaskTagSerializer
 
 
 class DailyTaskSerializer(serializers.ModelSerializer):

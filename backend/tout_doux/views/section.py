@@ -2,8 +2,8 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from tout_doux.models.section import Section
-from tout_doux.serializers.section.section import SectionSerializer
+from tout_doux.models import Section
+from tout_doux.serializers.section import SectionSerializer
 
 
 class SectionViewSet(mixins.CreateModelMixin,

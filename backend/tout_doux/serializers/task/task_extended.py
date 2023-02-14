@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from tout_doux.models.task import Task
+from tout_doux.models import Task
 from tout_doux.serializers.collection import CollectionSerializer
 from tout_doux.serializers.project import ProjectSerializer
-from tout_doux.serializers.section.section_extended import SectionExtendedSerializer
-from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
+from tout_doux.serializers.section import SectionExtendedSerializer
+from tout_doux.serializers.task_tag import TaskTagSerializer
 
 
 class TaskExtendedSerializer(serializers.ModelSerializer):

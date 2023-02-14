@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from tout_doux.models.project import Project
-from tout_doux.models.section import Section
-from tout_doux.serializers.task.task import TaskSerializer
+from tout_doux.models import Project, Section
+from tout_doux.serializers.task import TaskSerializer
 
 
 class SectionSerializer(serializers.ModelSerializer):

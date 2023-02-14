@@ -2,7 +2,7 @@ import re
 
 from rest_framework import serializers
 
-from tout_doux.models.task_tag import TaskTag
+from tout_doux.models import TaskTag
 
 
 class TaskTagSerializer(serializers.ModelSerializer):

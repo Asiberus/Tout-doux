@@ -1,12 +1,8 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from tout_doux.models.collection import Collection
-from tout_doux.models.project import Project
-from tout_doux.models.section import Section
-from tout_doux.models.task import Task
-from tout_doux.models.task_tag import TaskTag
-from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
+from tout_doux.models import Collection, Project, Section, Task, TaskTag
+from tout_doux.serializers.task_tag import TaskTagSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):

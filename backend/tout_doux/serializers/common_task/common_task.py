@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from tout_doux.models.common_task import CommonTask
-from tout_doux.models.task_tag import TaskTag
-from tout_doux.serializers.task_tag.task_tag import TaskTagSerializer
+from tout_doux.models import TaskTag, CommonTask
+from tout_doux.serializers.task_tag import TaskTagSerializer
 
 
 class CommonTaskSerializer(serializers.ModelSerializer):

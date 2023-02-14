@@ -1,3 +1,3 @@
 from .collection import CollectionSerializer
+from .collection_detail import CollectionDetailSerializer
 from .collection_list import CollectionListSerializer
-from .collection_task import CollectionTaskSerializer

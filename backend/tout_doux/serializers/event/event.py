@@ -2,8 +2,7 @@ from datetime import datetime, time
 
 from rest_framework import serializers
 
-from tout_doux.models.event import Event
-from tout_doux.models.project import Project
+from tout_doux.models import Event, Project
 
 
 class EventSerializer(serializers.ModelSerializer):
