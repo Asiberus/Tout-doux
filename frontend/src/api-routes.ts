@@ -1,5 +1,6 @@
 export const apiRoutes = {
     project: 'project/',
+    projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',
     projectSections: 'project/:projectId/sections/',
     section: 'section/',
@@ -9,6 +10,7 @@ export const apiRoutes = {
     event: 'event/',
     eventById: 'event/:eventId/',
     collection: 'collection/',
+    collectionDetailed: 'collection/detailed',
     collectionById: 'collection/:collectionId/',
     dailyTask: 'daily-task/',
     dailyTaskSummary: 'daily-task/summary/',

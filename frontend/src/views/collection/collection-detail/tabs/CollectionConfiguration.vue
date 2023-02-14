@@ -99,7 +99,7 @@
 <script lang="ts">
 import { collectionService } from '@/api/collection.api'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -129,7 +129,7 @@ export default class CollectionConfiguration extends Vue {
         },
     }
 
-    get collection(): CollectionTask {
+    get collection(): CollectionDetail {
         return this.$store.state.collection.currentCollection
     }
 

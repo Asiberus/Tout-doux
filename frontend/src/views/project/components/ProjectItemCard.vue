@@ -33,7 +33,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Task } from '@/models/task.model'
-import { ProjectListModel, ProjectTask } from '@/models/project.model'
+import { ProjectListModel, ProjectDetail } from '@/models/project.model'
 
 @Component
 export default class ProjectItemCard extends Vue {

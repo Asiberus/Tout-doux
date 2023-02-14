@@ -120,13 +120,13 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { DailyTask } from '@/models/daily-task.model'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({ components: { EmptyListDisplay, ProgressCircular } })
 export default class DailyUpdateProjectListItem extends Vue {
-    @Prop() project!: ProjectTask
+    @Prop() project!: ProjectDetail
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
     @Prop({ default: 0 }) sectionSelected!: number
@@ -136,7 +136,7 @@ export default class DailyUpdateProjectListItem extends Vue {
     // todo : change color of task selected
     get isTaskSelected(): (task: Task) => boolean {
         return (task: Task) =>
-            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.taskId)
+            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
     }
 
     get taskBySection(): { id: number; name: string; tasks: Task[] }[] {

@@ -75,18 +75,18 @@
 import { DailyTask } from '@/models/daily-task.model'
 import { Task } from '@/models/task.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 
 @Component
 export default class DailyUpdateCollectionListItem extends Vue {
-    @Prop() collection!: CollectionTask
+    @Prop() collection!: CollectionDetail
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
 
     // todo : change color of task selected
     get isTaskSelected(): (task: Task) => boolean {
         return (task: Task) =>
-            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.taskId)
+            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
     }
 
     get tasks(): Task[] {

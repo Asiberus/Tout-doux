@@ -15,13 +15,13 @@
 </template>
 
 <script lang="ts">
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Location } from 'vue-router'
 
 @Component
 export default class CollectionChip extends Vue {
-    @Prop({ required: true }) collection!: CollectionTask
+    @Prop({ required: true }) collection!: CollectionDetail
     @Prop({ default: false }) ripple!: boolean
     @Prop({ default: false }) small!: boolean
     @Prop({ default: true }) navigateToDetail!: boolean

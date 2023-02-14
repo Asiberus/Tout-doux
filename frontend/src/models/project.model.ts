@@ -10,7 +10,7 @@ export interface Project {
     createdOn: string
 }
 
-export interface ProjectTask extends Project {
+export interface ProjectDetail extends Project {
     sections: SectionTask[]
     tasks: Task[]
     events: EventModel[]

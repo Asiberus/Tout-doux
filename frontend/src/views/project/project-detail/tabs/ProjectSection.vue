@@ -76,7 +76,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import { SectionTask } from '@/models/section.model'
 import { projectActions } from '@/store/modules/project.store'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
@@ -92,7 +92,7 @@ export default class ProjectSection extends Vue {
     sectionDialog = false
     sectionTabs = 0
 
-    get project(): ProjectTask {
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 

@@ -6,6 +6,10 @@ const getProjectList = (params = {}) => {
     return Vue.http.get(apiRoutes.project, { params: { size: 0, ...params } })
 }
 
+const getProjectListDetailed = (params = {}) => {
+    return Vue.http.get(apiRoutes.projectDetailed, { params: { size: 0, ...params } })
+}
+
 const getProjectById = (projectId: number) => {
     return Vue.http.get(apiRoutes.projectById.replace(':projectId', projectId.toString()))
 }
@@ -27,6 +31,7 @@ const deleteProject = (projectId: number) => {
 
 export const projectService = {
     getProjectList,
+    getProjectListDetailed,
     getProjectById,
     createProject,
     updateProject,

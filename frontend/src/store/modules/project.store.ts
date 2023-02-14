@@ -7,7 +7,7 @@ import { Task } from '@/models/task.model'
 import { sortEvents } from '@/utils/event.util'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
-import { Project, ProjectTask } from '@/models/project.model'
+import { Project, ProjectDetail } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
 
 export const projectMutations = {
@@ -53,11 +53,11 @@ export const projectActions = {
 @Module
 export class ProjectModule extends VuexModule {
     // State
-    currentProject?: ProjectTask
+    currentProject?: ProjectDetail
 
     // Mutations
     @Mutation
-    private [projectMutations.setCurrentProject](project: ProjectTask | undefined): void {
+    private [projectMutations.setCurrentProject](project: ProjectDetail | undefined): void {
         if (project?.events)
             project.events = project.events.sort((event1, event2) => sortEvents(event1, event2))
 

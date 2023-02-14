@@ -112,7 +112,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
@@ -133,7 +133,7 @@ export default class ProjectDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get project(): ProjectTask {
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 

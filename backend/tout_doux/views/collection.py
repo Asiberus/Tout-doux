@@ -1,5 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from tout_doux.models import Collection
 from tout_doux.pagination import ExtendedPageNumberPagination
@@ -28,3 +30,15 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
         # Case for create, update, partial_update and destroy
         return CollectionSerializer
+
+    @action(detail=False)
+    def detailed(self, _request):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = CollectionDetailSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = CollectionDetailSerializer(queryset, many=True)
+        return Response(serializer.data)

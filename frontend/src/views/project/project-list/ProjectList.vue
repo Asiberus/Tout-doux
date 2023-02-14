@@ -67,7 +67,7 @@
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { Project, ProjectListModel, ProjectTask } from '@/models/project.model'
+import { Project, ProjectListModel, ProjectDetail } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectItemCard from '@/views/project/components/ProjectItemCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'

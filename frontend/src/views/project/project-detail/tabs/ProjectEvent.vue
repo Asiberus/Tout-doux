@@ -85,7 +85,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import { EventModel } from '@/models/event.model'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { isPassed } from '@/utils/event.util'
 import EventDialog from '@/views/components/event/EventDialog.vue'
@@ -99,7 +99,7 @@ export default class ProjectEvent extends Vue {
     eventDialog = false
     displayPassedEvent = false
 
-    get project(): ProjectTask {
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 

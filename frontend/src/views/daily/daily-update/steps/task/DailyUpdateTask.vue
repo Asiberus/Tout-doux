@@ -112,14 +112,14 @@ import { collectionService } from '@/api/collection.api'
 import { dailyTaskService } from '@/api/daily-task.api'
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import {
     DailyTask,
     DailyTaskDisplay,
     DailyTaskDisplayWrapper,
     DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
@@ -140,8 +140,8 @@ export default class DailyUpdateTask extends Vue {
     @Prop({ required: true }) private date!: string
 
     dailyTaskList: DailyTaskDisplay[] = []
-    projectList: DailyTaskDisplayWrapper<ProjectTask>[] = []
-    collectionList: DailyTaskDisplayWrapper<CollectionTask>[] = []
+    projectList: DailyTaskDisplayWrapper<ProjectDetail>[] = []
+    collectionList: DailyTaskDisplayWrapper<CollectionDetail>[] = []
 
     tab: DailyUpdateTaskTab = DailyUpdateTaskTab.Project
     projectSectionSelected: number = 0
@@ -174,9 +174,9 @@ export default class DailyUpdateTask extends Vue {
     }
 
     private retrieveProjectList(): void {
-        projectService.getProjectList({ archived: false, has_uncompleted_task: true }).then(
+        projectService.getProjectListDetailed({ archived: false, has_uncompleted_task: true }).then(
             (response: any) => {
-                this.projectList = response.body.content.map((project: ProjectTask) => ({
+                this.projectList = response.body.content.map((project: ProjectDetail) => ({
                     content: project,
                     selected: false,
                 }))
@@ -188,17 +188,21 @@ export default class DailyUpdateTask extends Vue {
     }
 
     private retrieveCollectionList(): void {
-        collectionService.getCollectionList({ archived: false, has_uncompleted_task: true }).then(
-            (response: any) => {
-                this.collectionList = response.body.content.map((collection: CollectionTask) => ({
-                    content: collection,
-                    selected: false,
-                }))
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
+        collectionService
+            .getCollectionListDetailed({ archived: false, has_uncompleted_task: true })
+            .then(
+                (response: any) => {
+                    this.collectionList = response.body.content.map(
+                        (collection: CollectionDetail) => ({
+                            content: collection,
+                            selected: false,
+                        })
+                    )
+                },
+                (error: any) => {
+                    console.error(error)
+                }
+            )
     }
 
     createDailyTask(dailyTask: Partial<DailyTask>): void {

@@ -1,6 +1,6 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
-import { Collection, CollectionTask } from '@/models/collection.model'
+import { Collection, CollectionDetail } from '@/models/collection.model'
 import { Task } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
@@ -28,12 +28,12 @@ export const collectionActions = {
 @Module
 export class CollectionModule extends VuexModule {
     // State
-    currentCollection?: CollectionTask
+    currentCollection?: CollectionDetail
 
     // Mutations
     @Mutation
     private [collectionMutations.setCurrentCollection](
-        collection: CollectionTask | undefined
+        collection: CollectionDetail | undefined
     ): void {
         // Due to Vue reactivity lack with undefined properties with need to call the Vue.set function
         Vue.set(this, 'currentCollection', collection)

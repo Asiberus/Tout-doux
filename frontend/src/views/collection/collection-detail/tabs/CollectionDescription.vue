@@ -102,7 +102,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import { Task } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
@@ -123,7 +123,7 @@ export default class CollectionDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get collection(): CollectionTask {
+    get collection(): CollectionDetail {
         return this.$store.state.collection.currentCollection
     }
 

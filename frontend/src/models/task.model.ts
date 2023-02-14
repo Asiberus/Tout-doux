@@ -1,6 +1,6 @@
-import { ProjectTask } from '@/models/project.model'
+import { Project, ProjectDetail } from '@/models/project.model'
 import { SectionExtended } from '@/models/section.model'
-import { CollectionTask } from '@/models/collection.model'
+import { Collection, CollectionDetail } from '@/models/collection.model'
 
 export interface Task {
     id: number
@@ -19,7 +19,7 @@ export interface TaskExtended {
     completed: boolean
     createdAt: string
     completedAt: string
-    project?: ProjectTask
+    project?: Project
     section?: SectionExtended
-    collection?: CollectionTask
+    collection?: Collection
 }

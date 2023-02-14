@@ -8,7 +8,7 @@ export interface Collection {
     archived: boolean
 }
 
-export interface CollectionTask extends Collection {
+export interface CollectionDetail extends Collection {
     tasks: Task[]
 }
 

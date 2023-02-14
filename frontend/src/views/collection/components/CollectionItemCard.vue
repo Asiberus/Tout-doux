@@ -34,7 +34,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Task } from '@/models/task.model'
-import { CollectionListModel, CollectionTask } from '@/models/collection.model'
+import { CollectionListModel, CollectionDetail } from '@/models/collection.model'
 
 @Component
 export default class CollectionItemCard extends Vue {

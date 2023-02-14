@@ -61,7 +61,7 @@
 import { collectionService } from '@/api/collection.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { Collection, CollectionListModel, CollectionTask } from '@/models/collection.model'
+import { Collection, CollectionListModel, CollectionDetail } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'

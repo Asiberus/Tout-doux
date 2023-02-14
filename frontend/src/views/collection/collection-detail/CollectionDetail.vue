@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
@@ -32,7 +32,7 @@ export default class CollectionDetail extends Vue {
 
     collectionTab = 'description'
 
-    get collection(): CollectionTask | undefined {
+    get collection(): CollectionDetail | undefined {
         return this.$store.state.collection.currentCollection
     }
 

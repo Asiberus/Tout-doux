@@ -6,6 +6,10 @@ const getCollectionList = (params = {}) => {
     return Vue.http.get(apiRoutes.collection, { params: { size: 0, ...params } })
 }
 
+const getCollectionListDetailed = (params = {}) => {
+    return Vue.http.get(apiRoutes.collectionDetailed, { params: { size: 0, ...params } })
+}
+
 const getCollectionById = (collectionId: number) => {
     return Vue.http.get(apiRoutes.collectionById.replace(':collectionId', collectionId.toString()))
 }
@@ -29,6 +33,7 @@ const deleteCollection = (collectionId: number) => {
 
 export const collectionService = {
     getCollectionList,
+    getCollectionListDetailed,
     getCollectionById,
     createCollection,
     updateCollection,
