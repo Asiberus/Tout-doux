@@ -120,7 +120,7 @@
                                         class="daily-actions flex-shrink-0"
                                         :class="{ 'is-hover': hover }">
                                         <v-btn
-                                            v-if="!dailyTask.taskId"
+                                            v-if="!dailyTask.task"
                                             @click="toggleDailyTaskEditMode(dailyTask, true)"
                                             icon
                                             small
