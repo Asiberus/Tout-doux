@@ -2,7 +2,7 @@ import { eventService } from '@/api/event.api'
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
 import { EventModel, EventPostOrPatch } from '@/models/event.model'
-import { SectionTask } from '@/models/section.model'
+import { SectionPost, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { sortEvents } from '@/utils/event.util'
 import { Vue } from 'vue-property-decorator'
@@ -222,7 +222,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.section.addSection](section: Partial<SectionTask>): Promise<void> {
+    async [projectActions.section.addSection](section: SectionPost): Promise<void> {
         await sectionService.createSection(section).then(
             (response: any) => {
                 this.context.commit(projectMutations.section.addSection, response.body)

@@ -18,13 +18,13 @@
 
 <script lang="ts">
 import { Project } from 'src/models/project.model'
-import { SectionExtended } from 'src/models/section.model'
+import { Section } from 'src/models/section.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Location, Route } from 'vue-router'
 
 @Component
 export default class SectionChip extends Vue {
-    @Prop({ required: true }) section!: SectionExtended
+    @Prop({ required: true }) section!: Section
     @Prop({ default: false }) ripple!: boolean
     @Prop({ default: false }) small!: boolean
     @Prop({ default: true }) navigateToDetail!: boolean

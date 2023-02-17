@@ -1,5 +1,5 @@
 import { Project, ProjectDetail } from '@/models/project.model'
-import { SectionExtended } from '@/models/section.model'
+import { Section } from '@/models/section.model'
 import { Collection, CollectionDetail } from '@/models/collection.model'
 
 export interface TaskPost {
@@ -29,6 +29,6 @@ export interface TaskExtended {
     createdAt: string
     completedAt: string
     project?: Project
-    section?: SectionExtended
+    section?: Section
     collection?: Collection
 }

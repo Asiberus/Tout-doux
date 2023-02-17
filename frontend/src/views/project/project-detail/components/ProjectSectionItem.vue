@@ -124,7 +124,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
-import { SectionTask } from '@/models/section.model'
+import { SectionPatch, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
@@ -158,7 +158,7 @@ export default class ProjectSectionItem extends Vue {
         return this.section.tasks.filter(({ completed }) => !completed)
     }
 
-    updateSection({ name }: { name: string }): void {
+    updateSection({ name }: SectionPatch): void {
         this.sectionDialog = false
         this.$store.dispatch(projectActions.section.editSection, { id: this.section.id, name })
     }

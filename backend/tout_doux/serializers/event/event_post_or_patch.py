@@ -13,6 +13,7 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
         source='start_time',
         format='%H:%M',
         input_formats=['%H:%M'],
+        required=False,
         allow_null=True
     )
     endDate = serializers.DateField(
@@ -24,6 +25,7 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
         source='end_time',
         format='%H:%M',
         input_formats=['%H:%M'],
+        required=False,
         allow_null=True
     )
     takesWholeDay = serializers.BooleanField(source='takes_whole_day')
