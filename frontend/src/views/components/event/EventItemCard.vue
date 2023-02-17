@@ -103,7 +103,7 @@
 
 <script lang="ts">
 import ProjectAvatar from '@/components/ProjectAvatar.vue'
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { Project } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { dateFormat } from '@/pipes'
@@ -142,7 +142,7 @@ export default class EventItemCard extends Vue {
         this.eventDialog = true
     }
 
-    emitUpdateEvent(data: Partial<EventModel>): void {
+    emitUpdateEvent(data: EventPostOrPatch): void {
         this.eventDialog = false
         this.$emit('update', { id: this.event.id, data })
     }

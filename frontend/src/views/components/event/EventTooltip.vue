@@ -44,21 +44,21 @@
 
 <script lang="ts">
 import ProjectChip from '@/components/ProjectChip.vue'
-import { EventExtended } from '@/models/event.model'
+import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import moment from 'moment'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { ProjectChip } })
 export default class EventTooltip extends Vue {
-    @Prop({ required: true }) event!: EventExtended
+    @Prop({ required: true }) event!: EventModel
 
     get isEditDisabled(): boolean {
         return this.event.project ? this.event.project.archived : false
     }
 
     @Emit('update')
-    emitUpdateEvent(): EventExtended {
+    emitUpdateEvent(): EventModel {
         return this.event
     }
 

@@ -165,7 +165,7 @@ import CollectionChip from '@/components/CollectionChip.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
 import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
-import { EventExtended } from '@/models/event.model'
+import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isPassed, sortEvents } from '@/utils/event.util'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
@@ -176,7 +176,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 export default class DailyDetail extends Vue {
     @Prop() date!: string
     dailyTaskList: DailyTask[] = []
-    events: EventExtended[] = []
+    events: EventModel[] = []
 
     get numberOfDailyTaskCompleted(): number {
         return this.dailyTaskList.filter(dailyTask => dailyTask.completed).length
@@ -206,7 +206,7 @@ export default class DailyDetail extends Vue {
     private retrieveTodayEvents(): void {
         eventService.getEvents({ date: this.date }).then(
             (response: any) =>
-                (this.events = response.body.sort((a: EventExtended, b: EventExtended) =>
+                (this.events = response.body.sort((a: EventModel, b: EventModel) =>
                     sortEvents(a, b, { handlePassedEvent: true })
                 )),
             (error: any) => console.error(error)
@@ -261,7 +261,7 @@ export default class DailyDetail extends Vue {
         return dateFormat(date, format)
     }
 
-    isEventPassed(event: EventExtended): boolean {
+    isEventPassed(event: EventModel): boolean {
         return isPassed(event)
     }
 }

@@ -125,7 +125,7 @@
 
 <script lang="ts">
 import { eventService } from '@/api/event.api'
-import { EventExtended, EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
 import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
@@ -138,22 +138,22 @@ import { Component, Vue } from 'vue-property-decorator'
     components: { EventDialog, EventTooltip, EventDayDialog },
 })
 export default class Agenda extends Vue {
-    events: EventExtended[] = [] // TODO : think of using Set
+    events: EventModel[] = [] // TODO : think of using Set
 
     value = moment().format('YYYY-MM-DD')
     weekdays = [1, 2, 3, 4, 5, 6, 0]
 
     eventDialog = false
-    eventToUpdate: EventExtended | null = null
+    eventToUpdate: EventModel | null = null
 
     eventTooltip = false
     eventTooltipKey = 0
-    eventSelected: EventExtended | null = null
+    eventSelected: EventModel | null = null
     eventTooltipElement: EventTarget | null = null
 
     eventDayDialog = false
     eventDayDialogDate: string | null = null
-    eventDayDialogEvents: EventExtended[] = []
+    eventDayDialogEvents: EventModel[] = []
 
     get monthSelected(): string {
         return moment(this.value).format('MMMM YYYY')
@@ -180,12 +180,12 @@ export default class Agenda extends Vue {
         )
     }
 
-    openEventDialog(event: EventExtended | null = null): void {
+    openEventDialog(event: EventModel | null = null): void {
         this.eventToUpdate = event
         this.eventDialog = true
     }
 
-    createEvent(event: Partial<EventModel>): void {
+    createEvent(event: EventPostOrPatch): void {
         this.eventSelected = null
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
@@ -196,7 +196,7 @@ export default class Agenda extends Vue {
         )
     }
 
-    updateEvent({ id, data }: { id: number; data: Partial<EventModel> }): void {
+    updateEvent({ id, data }: { id: number; data: EventPostOrPatch }): void {
         eventService.updateEventById(id, data, { extended: true }).then(
             (response: any) => {
                 const eventIndex = this.events.findIndex(e => e.id === id)
@@ -227,7 +227,7 @@ export default class Agenda extends Vue {
         )
     }
 
-    openEventTooltip($event: { nativeEvent: MouseEvent; event: EventExtended }): void {
+    openEventTooltip($event: { nativeEvent: MouseEvent; event: EventModel }): void {
         const { nativeEvent, event } = $event
         this.eventTooltipKey += 1 // Hack to re-render v-menu component
         this.eventSelected = event

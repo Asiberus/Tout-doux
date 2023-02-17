@@ -1,11 +1,11 @@
-import { EventExtended, EventModel } from '@/models/event.model'
+import { EventModel } from '@/models/event.model'
 import moment, { Moment } from 'moment'
 
 export interface SortEventOptions {
     handlePassedEvent: boolean
 }
 
-export function isPassed(event: EventExtended | EventModel): boolean {
+export function isPassed(event: EventModel): boolean {
     const { startDate, startTime, endDate, endTime, takesWholeDay } = event
     const start = moment(`${startDate}${startTime ? `T${startTime}` : ''}`)
     const end = endDate ? moment(`${endDate}${endTime ? `T${endTime}` : ''}`) : null
@@ -15,18 +15,15 @@ export function isPassed(event: EventExtended | EventModel): boolean {
     return moment().isAfter(start, startTime ? 'minute' : 'day')
 }
 
-export function isEventRelatedToDate(
-    event: EventExtended | EventModel,
-    date: string | Date | Moment
-): boolean {
+export function isEventRelatedToDate(event: EventModel, date: string | Date | Moment): boolean {
     const { startDate, endDate } = event
     if (endDate) return moment(date).isBetween(startDate, endDate, 'day', '[]')
     else return moment(date).isSame(startDate, 'day')
 }
 
 export function sortEvents(
-    event1: EventExtended | EventModel,
-    event2: EventExtended | EventModel,
+    event1: EventModel,
+    event2: EventModel,
     options: SortEventOptions = { handlePassedEvent: false }
 ): number {
     const { handlePassedEvent } = options

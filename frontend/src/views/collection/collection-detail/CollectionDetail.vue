@@ -27,7 +27,7 @@ import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
-export default class CollectionDetail extends Vue {
+export default class CollectionDetailComponent extends Vue {
     @Prop() collectionId!: number
 
     collectionTab = 'description'

@@ -30,7 +30,7 @@ import { projectActions } from '@/store/modules/project.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
-export default class ProjectDetail extends Vue {
+export default class ProjectDetailComponent extends Vue {
     @Prop() private projectId!: number
 
     projectTab = 'description'

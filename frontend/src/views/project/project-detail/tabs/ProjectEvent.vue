@@ -84,7 +84,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { ProjectDetail } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { isPassed } from '@/utils/event.util'
@@ -111,13 +111,13 @@ export default class ProjectEvent extends Vue {
         return this.project.events.filter(event => isPassed(event)).reverse()
     }
 
-    createEvent(event: Partial<EventModel>): void {
+    createEvent(event: EventPostOrPatch): void {
         this.eventDialog = false
         event.projectId = this.project.id
         this.$store.dispatch(projectActions.event.addEvent, event)
     }
 
-    updateEvent(payload: { id: number; data: Partial<EventModel> }): void {
+    updateEvent(payload: { id: number; data: EventPostOrPatch }): void {
         this.$store.dispatch(projectActions.event.editEvent, payload)
     }
 

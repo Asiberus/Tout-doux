@@ -1,4 +1,4 @@
-import CollectionDetail from '@/views/collection/collection-detail/CollectionDetail.vue'
+import CollectionDetailComponent from '@/views/collection/collection-detail/CollectionDetail.vue'
 import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue'
 import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue'
 import CollectionList from '@/views/collection/collection-list/CollectionList.vue'
@@ -13,7 +13,7 @@ export const collectionRoutes: Array<RouteConfig> = [
     },
     {
         path: '/collection/:id',
-        component: CollectionDetail,
+        component: CollectionDetailComponent,
         props: (route: any) => ({ collectionId: parseInt(route.params.id) }),
         children: [
             {

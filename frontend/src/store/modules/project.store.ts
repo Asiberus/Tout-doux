@@ -1,7 +1,7 @@
 import { eventService } from '@/api/event.api'
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { sortEvents } from '@/utils/event.util'
@@ -318,7 +318,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.event.addEvent](event: Partial<EventModel>): Promise<void> {
+    async [projectActions.event.addEvent](event: EventPostOrPatch): Promise<void> {
         await eventService.createEvent(event).then(
             (response: any) => this.context.commit(projectMutations.event.addEvent, response.body),
             (error: any) => console.error(error)
@@ -328,7 +328,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.event.editEvent](payload: {
         id: number
-        data: Partial<EventModel>
+        data: EventPostOrPatch
     }): Promise<void> {
         const { id, data } = payload
         await eventService.updateEventById(id, data).then(

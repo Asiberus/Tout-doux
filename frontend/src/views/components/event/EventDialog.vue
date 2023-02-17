@@ -237,7 +237,7 @@
 </template>
 
 <script lang="ts">
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate } from '@/utils/event.util'
 import moment from 'moment'
@@ -343,16 +343,15 @@ export default class EventDialog extends Vue {
 
     @Watch('eventForm.data', { deep: true })
     private onEventFormChanges(): void {
-        const { data } = this.eventForm
+        const { startDate, endDate, takesWholeDay } = this.eventForm.data
 
-        if (data.takesWholeDay) {
+        if (takesWholeDay) {
             this.resetStartTime()
             this.resetEndDate()
         }
-        if (data.startDate && data.endDate) this.validateDate()
+        if (startDate && endDate) this.validateDate()
         if (this.relatedToDate) {
-            // TODO : optimize this line when api send back data in camelCase
-            const tempEvent = <EventModel>{ startDate: data.startDate, endDate: data.endDate }
+            const tempEvent = <EventModel>{ startDate, endDate }
             this.relatedToDateError = !isEventRelatedToDate(tempEvent, this.relatedToDate)
         }
     }
@@ -395,7 +394,7 @@ export default class EventDialog extends Vue {
         if (!this.eventForm.valid || this.relatedToDateError) return
 
         const { data } = this.eventForm
-        const event: Partial<EventModel> = {
+        const event: EventPostOrPatch = {
             name: data.name,
             description: data.description || null,
             startDate: data.startDate,
