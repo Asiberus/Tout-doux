@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { DailyTask } from '@/models/daily-task.model'
+import { DailyTaskPatch, DailyTaskPost } from '@/models/daily-task.model'
 
 const getDailySummary = (page: number, size = 21) => {
     const params = {
@@ -15,11 +15,11 @@ const getDailyTasksByDate = (date: string) => {
     return Vue.http.get(apiRoutes.dailyTask, { params })
 }
 
-const createDailyTask = (dailyTaskForm: Partial<DailyTask>) => {
+const createDailyTask = (dailyTaskForm: DailyTaskPost) => {
     return Vue.http.post(apiRoutes.dailyTask, dailyTaskForm)
 }
 
-const updateDailyTask = (dailyTaskId: number, dailyTaskForm: Partial<DailyTask>) => {
+const updateDailyTask = (dailyTaskId: number, dailyTaskForm: DailyTaskPatch) => {
     return Vue.http.patch(
         apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()),
         dailyTaskForm

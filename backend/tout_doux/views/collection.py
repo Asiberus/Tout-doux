@@ -24,10 +24,9 @@ class CollectionViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return CollectionListSerializer
-        elif self.action == 'detailed' or self.action == 'retrieve':
+        elif self.action in ['detailed', 'retrieve']:
             return CollectionDetailSerializer
-        elif self.action == 'create' or self.action == 'partial_update':
-            # Case for create, update, partial_update
+        elif self.action in ['create', 'partial_update', 'update']:
             return CollectionPostOrPatchSerializer
         else:
             return CollectionSerializer

@@ -7,14 +7,26 @@ export enum DailyTaskActionEnum {
     FINISH = 'FI',
 }
 
+export interface DailyTaskPost {
+    name?: string
+    taskId?: number
+    commonTaskId?: number
+    action?: DailyTaskActionEnum
+}
+
+export interface DailyTaskPatch {
+    name?: string
+    action?: DailyTaskActionEnum
+    completed?: boolean
+}
+
 export interface DailyTask {
     id: number
     date: string
-    completed: boolean
-    action?: DailyTaskActionEnum
-    taskId?: number
-    task?: TaskExtended
     name?: string
+    task?: TaskExtended
+    action?: DailyTaskActionEnum
+    completed: boolean
 }
 
 export interface DailyTaskDisplay extends DailyTask {

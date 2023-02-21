@@ -25,10 +25,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return ProjectListSerializer
-        elif self.action == 'detailed' or self.action == 'retrieve':
+        elif self.action in ['detailed', 'retrieve']:
             return ProjectDetailSerializer
-        elif self.action == 'create' or self.action == 'partial_update':
-            # Case for create, update, partial_update
+        elif self.action in ['create', 'partial_update', 'update']:
             return ProjectPostOrPatchSerializer
         else:
             return ProjectSerializer

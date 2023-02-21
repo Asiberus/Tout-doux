@@ -114,9 +114,10 @@ import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { CollectionDetail } from '@/models/collection.model'
 import {
-    DailyTask,
     DailyTaskDisplay,
     DailyTaskDisplayWrapper,
+    DailyTaskPatch,
+    DailyTaskPost,
     DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
@@ -205,7 +206,7 @@ export default class DailyUpdateTask extends Vue {
             )
     }
 
-    createDailyTask(dailyTask: Partial<DailyTask>): void {
+    createDailyTask(dailyTask: DailyTaskPost): void {
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
                 this.dailyTaskList.push({ ...response.body, editMode: false })
@@ -217,7 +218,7 @@ export default class DailyUpdateTask extends Vue {
         )
     }
 
-    updateDailyTask(dailyTaskId: number, dailyTaskForm: Partial<DailyTask>): void {
+    updateDailyTask(dailyTaskId: number, dailyTaskForm: DailyTaskPatch): void {
         dailyTaskService.updateDailyTask(dailyTaskId, dailyTaskForm).then(
             (response: any) => {
                 const dailyTask = this.dailyTaskList.find(

@@ -15,7 +15,7 @@ class TaskViewSet(mixins.CreateModelMixin,
     def get_serializer_class(self):
         if self.action == 'create':
             return TaskPostSerializer
-        elif self.action == 'partial_update':
+        elif self.action in ['partial_update', 'update']:
             return TaskPatchSerializer
         else:
             return TaskSerializer

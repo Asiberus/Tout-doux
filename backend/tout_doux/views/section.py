@@ -15,7 +15,7 @@ class SectionViewSet(mixins.CreateModelMixin,
     def get_serializer_class(self):
         if self.action == 'create':
             return SectionPostSerializer
-        elif self.action == 'partial_update':
+        elif self.action in ['partial_update', 'update']:
             return SectionPatchSerializer
         else:
             return SectionSerializer

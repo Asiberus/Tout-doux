@@ -9,16 +9,23 @@ from rest_framework.response import Response
 
 from tout_doux.models import DailyTask, Event
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.daily_task import DailyTaskSerializer
+from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer
 from tout_doux.utils import daterange
 
 
 class DailyTaskViewSet(viewsets.ModelViewSet):
     queryset = DailyTask.objects.all()
-    serializer_class = DailyTaskSerializer
     pagination_class = ExtendedPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ('date',)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return DailyTaskPostSerializer
+        elif self.action in ['partial_update', 'update']:
+            return DailyTaskPatchSerializer
+        else:
+            return DailyTaskSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

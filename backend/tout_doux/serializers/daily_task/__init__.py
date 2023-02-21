@@ -1,1 +1,3 @@
 from .daily_task import DailyTaskSerializer
+from .daily_task_patch import DailyTaskPatchSerializer
+from .daily_task_post import DailyTaskPostSerializer
