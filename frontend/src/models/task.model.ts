@@ -22,12 +22,7 @@ export interface Task {
     completedAt: string
 }
 
-export interface TaskExtended {
-    id: number
-    name: string
-    completed: boolean
-    createdAt: string
-    completedAt: string
+export interface TaskExtended extends Task {
     project?: Project
     section?: Section
     collection?: Collection

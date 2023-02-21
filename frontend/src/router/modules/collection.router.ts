@@ -1,14 +1,14 @@
 import CollectionDetailComponent from '@/views/collection/collection-detail/CollectionDetail.vue'
 import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue'
 import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue'
-import CollectionList from '@/views/collection/collection-list/CollectionList.vue'
+import CollectionListComponent from '@/views/collection/collection-list/CollectionList.vue'
 import { RouteConfig } from 'vue-router'
 
 export const collectionRoutes: Array<RouteConfig> = [
     {
         path: '/collection',
         name: 'collection-list',
-        component: CollectionList,
+        component: CollectionListComponent,
         props: (route: any) => ({ archived: route.query.archived === 'true' }),
     },
     {

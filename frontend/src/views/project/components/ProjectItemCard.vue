@@ -32,12 +32,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Task } from '@/models/task.model'
-import { ProjectListModel, ProjectDetail } from '@/models/project.model'
+import { ProjectList } from '@/models/project.model'
 
 @Component
 export default class ProjectItemCard extends Vue {
-    @Prop() private project!: ProjectListModel
+    @Prop() private project!: ProjectList
 
     get percentageOfCompletedTask(): number {
         return (this.project.completedTaskCount / this.project.taskCount) * 100

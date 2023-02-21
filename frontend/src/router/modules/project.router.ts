@@ -3,14 +3,14 @@ import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectCon
 import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue'
 import ProjectEvent from '@/views/project/project-detail/tabs/ProjectEvent.vue'
 import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
-import ProjectList from '@/views/project/project-list/ProjectList.vue'
+import ProjectListComponent from '@/views/project/project-list/ProjectList.vue'
 import { RouteConfig } from 'vue-router'
 
 export const projectRoutes: Array<RouteConfig> = [
     {
         path: '/project',
         name: 'project-list',
-        component: ProjectList,
+        component: ProjectListComponent,
         props: (route: any) => ({ archived: route.query.archived === 'true' }),
     },
     {

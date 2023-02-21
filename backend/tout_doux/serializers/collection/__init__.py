@@ -1,3 +1,4 @@
 from .collection import CollectionSerializer
 from .collection_detail import CollectionDetailSerializer
 from .collection_list import CollectionListSerializer
+from .collection_post_or_patch import CollectionPostOrPatchSerializer

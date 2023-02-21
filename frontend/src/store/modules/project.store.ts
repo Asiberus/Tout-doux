@@ -7,7 +7,7 @@ import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { sortEvents } from '@/utils/event.util'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
-import { Project, ProjectDetail } from '@/models/project.model'
+import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
 
 export const projectMutations = {
@@ -203,7 +203,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.updateProperties](payload: {
         id: number
-        data: Partial<Project>
+        data: ProjectPostOrPatch
     }): Promise<void> {
         const { id, data } = payload
         projectService.updateProject(id, data).then(

@@ -1,6 +1,6 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
-import { Collection, CollectionDetail } from '@/models/collection.model'
+import { CollectionDetail, CollectionPostOrPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
@@ -91,7 +91,7 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.updateProperties](payload: {
         id: number
-        data: Partial<Collection>
+        data: CollectionPostOrPatch
     }): Promise<void> {
         const { id, data } = payload
         collectionService.updateCollection(id, data).then(

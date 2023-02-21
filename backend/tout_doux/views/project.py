@@ -2,11 +2,11 @@ from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 
 from tout_doux.models import Project
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.serializers.project import ProjectSerializer, ProjectListSerializer, ProjectDetailSerializer
+from tout_doux.serializers.project import ProjectListSerializer, ProjectDetailSerializer, ProjectPostOrPatchSerializer, \
+    ProjectSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -23,23 +23,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if hasattr(self, 'action'):
-            if self.action == 'list':
-                return ProjectListSerializer
-            elif self.action == 'retrieve':
-                return ProjectDetailSerializer
-
-        # Case for create, update, partial_update and destroy
-        return ProjectSerializer
+        if self.action == 'list':
+            return ProjectListSerializer
+        elif self.action == 'detailed' or self.action == 'retrieve':
+            return ProjectDetailSerializer
+        elif self.action == 'create' or self.action == 'partial_update':
+            # Case for create, update, partial_update
+            return ProjectPostOrPatchSerializer
+        else:
+            return ProjectSerializer
 
     @action(detail=False)
-    def detailed(self, _request):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = ProjectDetailSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = ProjectDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def detailed(self, request):
+        return self.list(request)

@@ -5,7 +5,7 @@ from tout_doux.serializers.project import ProjectSerializer
 
 
 class SectionSerializer(serializers.ModelSerializer):
-    project = ProjectSerializer(read_only=True)
+    project = ProjectSerializer()
 
     class Meta:
         model = Section
