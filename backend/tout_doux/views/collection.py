@@ -16,7 +16,7 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        if self.request.query_params.get('has_uncompleted_task'):
+        if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
             queryset = queryset.filter(tasks__completed=False).distinct()
 
         return queryset
