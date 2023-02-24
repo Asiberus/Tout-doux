@@ -67,7 +67,7 @@ export default class DailyUpdate extends Vue {
 
     goToDailyDetail(): void {
         localStorage.setItem('openDailyDetailTo', this.date)
-        this.$router.push({ name: 'daily-overview' })
+        this.$router.push({ name: 'daily-summary' })
     }
 
     onStepperChange(index: number): void {

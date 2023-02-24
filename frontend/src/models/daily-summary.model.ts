@@ -1,4 +1,4 @@
-export default interface DailySummary {
+export interface DailySummary {
     date: string
     totalTask: number
     totalTaskCompleted: number

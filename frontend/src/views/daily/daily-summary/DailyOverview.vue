@@ -1,12 +1,12 @@
 <template>
     <div>
-        <h1 class="text-h3 mb-6">Daily Overview</h1>
+        <h1 class="text-h3 mb-6">Daily Summary</h1>
         <v-row>
-            <v-col v-for="(dailyOverview, index) in dailySummaryList" :key="index" cols="3">
-                <DailyOverviewItemCard
-                    :dailySummary="dailyOverview"
-                    @open-daily-detail="openDailyDetailDialog(dailyOverview.date)">
-                </DailyOverviewItemCard>
+            <v-col v-for="dailySummary in dailySummaryList" :key="dailySummary.date" cols="3">
+                <DailySummaryItemComponent
+                    :dailySummary="dailySummary"
+                    @open-daily-detail="openDailyDetailDialog(dailySummary.date)">
+                </DailySummaryItemComponent>
             </v-col>
         </v-row>
         <div class="mt-5 d-flex justify-center" v-if="dailySummaryList.length">
@@ -32,24 +32,28 @@
 
 <script lang="ts">
 import { dailyTaskService } from '@/api/daily-task.api'
-import DailySummary from '@/models/daily-summary.model'
+import { DailySummary } from '@/models/daily-summary.model'
 import { hideScroll, showScroll } from '@/utils/document.utils'
-import DailyDetail from '@/views/daily/daily-overview/components/DailyDetail.vue'
-import DailyOverviewItemCard from '@/views/daily/daily-overview/components/DailyOverviewItemCard.vue'
+import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
+import DailySummaryItemComponent from '@/views/daily/daily-summary/components/DailyOverviewItemCard.vue'
 import moment from 'moment'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 
-@Component({ components: { DailyOverviewItemCard, DailyDetail } })
-export default class DailyOverview extends Vue {
-    @Prop() readonly openToDate?: string
+@Component({ components: { DailySummaryItemComponent, DailyDetail } })
+export default class DailySummaryComponent extends Vue {
     dailySummaryList: DailySummary[] = []
     dailyOverviewLoading = false
-    page = 1
     dailyDetailDialog = false
     dateSelected = ''
 
+    DAYS_PER_PAGE = 21
+
     created(): void {
-        this.retrieveDailySummaryList()
+        const startDate = moment().format('YYYY-MM-DD')
+        const endDate = moment()
+            .subtract(this.DAYS_PER_PAGE - 1, 'days')
+            .format('YYYY-MM-DD')
+        this.retrieveDailySummaryList(startDate, endDate)
     }
 
     mounted(): void {
@@ -71,11 +75,11 @@ export default class DailyOverview extends Vue {
         else showScroll()
     }
 
-    private retrieveDailySummaryList(): void {
+    private retrieveDailySummaryList(startDate: string, endDate: string): void {
         this.dailyOverviewLoading = true
-        dailyTaskService.getDailySummary(this.page).then(
+        dailyTaskService.getDailySummary(startDate, endDate).then(
             (response: any) => {
-                this.dailySummaryList = this.dailySummaryList.concat(response.body.content)
+                this.dailySummaryList = this.dailySummaryList.concat(response.body)
                 this.dailyOverviewLoading = false
             },
             (error: any) => {
@@ -86,8 +90,15 @@ export default class DailyOverview extends Vue {
     }
 
     loadNextPage(): void {
-        this.page += 1
-        this.retrieveDailySummaryList()
+        const lastDailySummary = this.dailySummaryList.at(-1)
+        if (!lastDailySummary) return
+
+        const startDate = moment(lastDailySummary.date).subtract(1, 'days').format('YYYY-MM-DD')
+        const endDate = moment(lastDailySummary.date)
+            .subtract(this.DAYS_PER_PAGE, 'days')
+            .format('YYYY-MM-DD')
+
+        this.retrieveDailySummaryList(startDate, endDate)
     }
 
     openDailyDetailDialog(date: string): void {

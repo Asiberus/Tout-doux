@@ -1,4 +1,4 @@
-import DailyOverview from '@/views/daily/daily-overview/DailyOverview.vue'
+import DailySummaryComponent from '@/views/daily/daily-summary/DailyOverview.vue'
 import DailyUpdate from '@/views/daily/daily-update/DailyUpdate.vue'
 import moment from 'moment'
 import { RouteConfig } from 'vue-router'
@@ -6,8 +6,8 @@ import { RouteConfig } from 'vue-router'
 export const dailyRoutes: Array<RouteConfig> = [
     {
         path: '/daily',
-        name: 'daily-overview',
-        component: DailyOverview,
+        name: 'daily-summary',
+        component: DailySummaryComponent,
     },
     {
         path: '/daily/:date/update/:step(task|event)',

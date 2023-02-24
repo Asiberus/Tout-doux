@@ -12,7 +12,7 @@ const routes: Array<RouteConfig> = [
     {
         path: '/',
         name: 'home',
-        redirect: { name: 'daily-overview' },
+        redirect: { name: 'daily-summary' },
     },
     {
         path: '/agenda',

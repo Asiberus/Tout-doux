@@ -63,10 +63,10 @@
 import { dateFormat } from '@/pipes'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import DailySummary from 'src/models/daily-summary.model'
+import { DailySummary } from 'src/models/daily-summary.model'
 
 @Component
-export default class DailyOverviewItemCard extends Vue {
+export default class DailySummaryItemComponent extends Vue {
     @Prop({ required: true }) dailySummary!: DailySummary
 
     get isToday(): boolean {

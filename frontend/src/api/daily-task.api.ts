@@ -2,10 +2,10 @@ import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
 import { DailyTaskPatch, DailyTaskPost } from '@/models/daily-task.model'
 
-const getDailySummary = (page: number, size = 21) => {
+const getDailySummary = (startDate: string, endDate: string) => {
     const params = {
-        page: page.toString(),
-        size: size.toString(),
+        start_date: startDate,
+        end_date: endDate,
     }
     return Vue.http.get(apiRoutes.dailyTaskSummary, { params })
 }
