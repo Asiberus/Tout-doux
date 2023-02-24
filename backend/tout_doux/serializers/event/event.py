@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from tout_doux.models import Event
+from tout_doux.serializers.common import ReadOnlyModelSerializer
 
 
-class EventSerializer(serializers.ModelSerializer):
+class EventSerializer(ReadOnlyModelSerializer):
     startDate = serializers.DateField(source='start_date')
     startTime = serializers.TimeField(source='start_time', format='%H:%M')
     endDate = serializers.DateField(source='end_date')

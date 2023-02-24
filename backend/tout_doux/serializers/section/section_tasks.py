@@ -1,10 +1,9 @@
-from rest_framework import serializers
-
 from tout_doux.models import Section
+from tout_doux.serializers.common import ReadOnlyModelSerializer
 from tout_doux.serializers.task import TaskSerializer
 
 
-class SectionTasksSerializer(serializers.ModelSerializer):
+class SectionTasksSerializer(ReadOnlyModelSerializer):
     tasks = TaskSerializer(many=True)
 
     class Meta:

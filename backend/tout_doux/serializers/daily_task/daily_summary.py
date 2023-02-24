@@ -2,9 +2,10 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from tout_doux.models import DailyTask, Event
+from tout_doux.serializers.common import ReadOnlySerializer
 
 
-class DailySummarySerializer(serializers.Serializer):
+class DailySummarySerializer(ReadOnlySerializer):
     date = serializers.DateField()
     totalTask = serializers.SerializerMethodField(method_name='get_total_task')
     totalTaskCompleted = serializers.SerializerMethodField(method_name='get_total_task_completed')
