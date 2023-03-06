@@ -1,10 +1,7 @@
 <template>
     <v-card>
         <div class="d-flex justify-space-between align-center pa-4">
-            <h2>
-                {{ tag ? 'Update Tag' : 'New Tag' }}
-            </h2>
-            {{ type }}
+            <h2 class="text-capitalize">{{ title }}</h2>
             <div v-if="tag">
                 <v-hover v-slot="{ hover }">
                     <v-btn
@@ -15,7 +12,6 @@
                 </v-hover>
             </div>
         </div>
-        {{ tagForm.data }}
         <v-card-text>
             <v-form ref="form" v-model="tagForm.valid" @submit.prevent="emitSubmitEvent()">
                 <div class="d-flex align-center">
@@ -123,8 +119,12 @@ export default class TagDialog extends Vue {
         return this.$refs.name as Vue & { focus: () => void }
     }
 
+    get title(): string {
+        return `${this.tag ? 'Update' : 'Create'} ${this.type} tag`
+    }
+
     beforeMount(): void {
-        this.populateForm(this.tag)
+        this.populateForm()
     }
 
     @Watch('isDialogOpen')
@@ -132,14 +132,14 @@ export default class TagDialog extends Vue {
         if (value) {
             this.confirmDelete = false
             this.form.resetValidation()
-            this.populateForm(this.tag)
+            this.populateForm()
             this.inputName.focus()
         }
     }
 
-    private populateForm(tag?: Tag): void {
-        if (tag) {
-            const { type, name, color } = tag
+    private populateForm(): void {
+        if (this.tag) {
+            const { type, name, color } = this.tag
             this.tagForm.data.type = type
             this.tagForm.data.name = name
             this.tagForm.data.color = color

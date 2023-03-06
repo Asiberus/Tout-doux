@@ -3,17 +3,17 @@
         <h4 class="text-h4 mb-4">Tags</h4>
         <p class="text-body-1 mb-3">
             Tags are useful to group or filter items. Two types of tag are available : project tag
-            or task tag. task tag can be used in Task, Daily Task or Common Task.
+            and task tag. Task tag can be used in Task, Daily Task or Common Task.
         </p>
 
         <div class="d-flex justify-space-between align-center mb-2">
-            <v-chip-group v-model="tab" mandatory active-class="accent--text">
+            <v-chip-group v-model="tab" mandatory active-class="active">
                 <v-chip
                     v-for="type of tagTypes"
                     :key="type"
                     :value="type"
-                    outlined
-                    class="px-6 py-3 text-overline">
+                    :ripple="false"
+                    class="px-6 py-3 text-overline outlined">
                     {{ type }}
                 </v-chip>
             </v-chip-group>
@@ -64,5 +64,20 @@ export default class SettingsTags extends Vue {
 <style scoped lang="scss">
 .v-chip {
     text-transform: capitalize;
+}
+
+.outlined {
+    background-color: transparent !important;
+    border-width: thin;
+    border-style: solid;
+}
+
+.active {
+    background-color: white !important;
+    color: #212121 !important;
+
+    &::before {
+        opacity: 0 !important;
+    }
 }
 </style>
