@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from tout_doux.models import Task, TaskTag, Project, Section, Collection
+from tout_doux.models import Task, Project, Section, Collection, Tag
 from tout_doux.serializers.task.task import TaskSerializer
 
 
 class TaskPostSerializer(serializers.ModelSerializer):
     tagIds = serializers.PrimaryKeyRelatedField(
         source='tags',
-        queryset=TaskTag.objects.all(),
+        queryset=Tag.objects.filter(type=Tag.Type.TASK),
         many=True,
         required=False,
         allow_null=True

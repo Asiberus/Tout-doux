@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from tout_doux.models import CommonTask, DailyTask, Task, TaskTag
+from tout_doux.models import CommonTask, DailyTask, Tag
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 
 
 class DailyTaskPostSerializer(serializers.ModelSerializer):
     taskId = serializers.PrimaryKeyRelatedField(
         source='task',
-        queryset=Task.objects.all(),
+        queryset=Tag.objects.filter(type=Tag.Type.TASK),
         required=False,
         allow_null=True
     )
@@ -19,7 +19,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
     )
     tagIds = serializers.PrimaryKeyRelatedField(
         source='tags',
-        queryset=TaskTag.objects.all(),
+        queryset=Tag.objects.all(),
         many=True,
         required=False,
         allow_null=True

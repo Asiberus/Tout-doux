@@ -2,7 +2,6 @@ export const apiRoutes = {
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',
-    projectSections: 'project/:projectId/sections/',
     section: 'section/',
     sectionById: 'section/:sectionId/',
     task: 'task/',
@@ -15,4 +14,7 @@ export const apiRoutes = {
     dailyTask: 'daily-task/',
     dailyTaskSummary: 'daily-task/summary/',
     dailyTaskById: 'daily-task/:dailyTaskId/',
+    tag: 'tag/',
+    tagUnique: 'tag/is-name-unique',
+    tagById: 'tag/:id/',
 }

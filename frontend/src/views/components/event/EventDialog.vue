@@ -415,7 +415,7 @@ export default class EventDialog extends Vue {
             return
         }
 
-        if (this.event) this.$emit('delete', this.event?.id)
+        if (this.event) this.$emit('delete', this.event.id)
     }
 
     emitCloseEvent(): void {
@@ -444,5 +444,3 @@ export default class EventDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

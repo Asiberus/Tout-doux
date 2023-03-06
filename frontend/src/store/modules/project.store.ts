@@ -129,12 +129,12 @@ export class ProjectModule extends VuexModule {
         const { task, projectId, sectionId } = payload
         if (projectId) {
             const t = this.currentProject.tasks.find(t => t.id === task.id)
-            Object.assign(t, task)
+            if (t) Object.assign(t, task)
         } else if (sectionId) {
             const section = this.currentProject.sections.find(s => s.id === sectionId)
             if (section) {
                 const t = section.tasks.find(t => t.id === task.id)
-                Object.assign(t, task)
+                if (t) Object.assign(t, task)
             }
         }
     }

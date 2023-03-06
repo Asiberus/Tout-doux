@@ -3,14 +3,14 @@ from datetime import date
 from django.utils import timezone
 from rest_framework import serializers
 
-from tout_doux.models import DailyTask, TaskTag
+from tout_doux.models import DailyTask, Tag
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 
 
 class DailyTaskPatchSerializer(serializers.ModelSerializer):
     tagIds = serializers.PrimaryKeyRelatedField(
         source='tags',
-        queryset=TaskTag.objects.all(),
+        queryset=Tag.objects.filter(type=Tag.Type.TASK),
         many=True,
         required=False,
         allow_null=True

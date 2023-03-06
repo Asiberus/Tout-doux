@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from tout_doux.models import TaskTag, CommonTask
-from tout_doux.serializers.task_tag import TaskTagSerializer
+from tout_doux.models import CommonTask, Tag
+from tout_doux.serializers.tag import TagSerializer
 
 
 class CommonTaskSerializer(serializers.ModelSerializer):
-    tags = TaskTagSerializer(read_only=True, many=True)
+    tags = TagSerializer(read_only=True, many=True)
     tagIds = serializers.PrimaryKeyRelatedField(
         write_only=True,
         source='tags',
-        queryset=TaskTag.objects.all(),
+        queryset=Tag.objects.filter(type=Tag.Type.TASK),
         many=True,
         required=False,
         allow_null=True

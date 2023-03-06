@@ -2,13 +2,18 @@ import re
 
 from rest_framework import serializers
 
-from tout_doux.models import ProjectTag
+from tout_doux.models import Tag
 
 
-class ProjectTagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProjectTag
-        fields = ('id', 'name', 'color')
+        model = Tag
+        fields = (
+            'id',
+            'type',
+            'name',
+            'color'
+        )
 
     def validate_color(self, value):
         # Test that the color is a correct hex code

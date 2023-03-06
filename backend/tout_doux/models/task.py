@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
 from tout_doux.models.section import Section
-from tout_doux.models.task_tag import TaskTag
+from tout_doux.models.tag import Tag
 
 
 class Task(models.Model):
@@ -13,7 +13,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, editable=False)
     tags = models.ManyToManyField(
-        TaskTag,
+        Tag,
+        limit_choices_to={'type': Tag.Type.TASK},
         related_name='tasks',
         blank=True
     )

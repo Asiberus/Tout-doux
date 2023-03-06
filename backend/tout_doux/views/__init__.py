@@ -3,7 +3,6 @@ from .common_task import CommonTaskViewSet
 from .daily_task import DailyTaskViewSet
 from .event import EventViewSet
 from .project import ProjectViewSet
-from .project_tag import ProjectTagViewSet
 from .section import SectionViewSet
+from .tag import TagViewSet
 from .task import TaskViewSet
-from .task_tag import TaskTagViewSet

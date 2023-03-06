@@ -93,6 +93,10 @@ body {
     gap: 4px;
 }
 
+.gap-2 {
+    gap: 8px;
+}
+
 .hide-scroll {
     overflow-y: hidden !important;
 }

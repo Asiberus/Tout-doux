@@ -62,7 +62,7 @@ export class CollectionModule extends VuexModule {
         if (!this.currentCollection) return
 
         const t = this.currentCollection.tasks.find(t => t.id === task.id)
-        Object.assign(t, task)
+        if (t) Object.assign(t, task)
     }
 
     @Mutation

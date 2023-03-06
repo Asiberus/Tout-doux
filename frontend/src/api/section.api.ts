@@ -1,5 +1,5 @@
 import { apiRoutes } from '@/api-routes'
-import { SectionPatch, SectionPost, SectionTask } from '@/models/section.model'
+import { SectionPatch, SectionPost } from '@/models/section.model'
 import Vue from 'vue'
 
 const createSection = (section: SectionPost) => {

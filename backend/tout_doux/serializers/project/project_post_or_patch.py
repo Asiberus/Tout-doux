@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from tout_doux.models import Project, ProjectTag
+from tout_doux.models import Project, Tag
 from tout_doux.serializers.project.project import ProjectSerializer
 
 
 class ProjectPostOrPatchSerializer(serializers.ModelSerializer):
     tagIds = serializers.PrimaryKeyRelatedField(
         source='tags',
-        queryset=ProjectTag.objects.all(),
+        queryset=Tag.objects.filter(type=Tag.Type.PROJECT),
         many=True,
         required=False,
         allow_null=True

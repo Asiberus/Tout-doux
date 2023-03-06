@@ -1,8 +1,8 @@
 from django.db import models
 
 from tout_doux.models.common_task import CommonTask
+from tout_doux.models.tag import Tag
 from tout_doux.models.task import Task
-from tout_doux.models.task_tag import TaskTag
 
 
 class DailyTask(models.Model):
@@ -37,7 +37,8 @@ class DailyTask(models.Model):
         blank=True
     )
     tags = models.ManyToManyField(
-        TaskTag,
+        Tag,
+        limit_choices_to={'type': Tag.Type.TASK},
         related_name='daily_tasks',
         blank=True
     )
