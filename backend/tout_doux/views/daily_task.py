@@ -1,6 +1,5 @@
 from datetime import date
 
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ParseError
@@ -16,7 +15,6 @@ from tout_doux.utils import daterange
 class DailyTaskViewSet(viewsets.ModelViewSet):
     queryset = DailyTask.objects.all()
     pagination_class = ExtendedPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
     filterset_fields = ('date',)
 
     def get_serializer_class(self):

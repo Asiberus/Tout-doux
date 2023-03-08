@@ -1,4 +1,3 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
@@ -11,7 +10,6 @@ from tout_doux.serializers.collection import CollectionListSerializer, Collectio
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
     pagination_class = ExtendedPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
     filterset_fields = ('archived',)
 
     def get_queryset(self):
