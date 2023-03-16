@@ -62,7 +62,11 @@
                     </div>
                 </div>
                 <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn color="success" text type="submit" :disabled="!tagForm.valid">
+                    <v-btn
+                        color="success"
+                        text
+                        type="submit"
+                        :disabled="!tagForm.valid || tagForm.pending">
                         {{ tag ? 'update' : 'create' }}
                     </v-btn>
                     <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
@@ -77,7 +81,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Tag, TagForm } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
 import { TAG_COLOR_OPTIONS } from '@/utils/constants'
-import { isNameUnique, IsNameUniqueParams } from '@/api/tag.api'
+import { isNameUnique, IsTagNameUniqueParams } from '@/api/tag.api'
 import { tagService } from '@/api'
 
 @Component
@@ -98,6 +102,7 @@ export default class TagDialog extends Vue {
 
     tagForm: Form<TagForm> = {
         valid: false,
+        pending: false,
         data: {
             type: this.type,
             name: '',
@@ -152,21 +157,33 @@ export default class TagDialog extends Vue {
 
     validateName(value: string): void {
         clearTimeout(this.validationTimer)
-        this.validationTimer = setTimeout(() => this.isNameUnique(value), 100)
+
+        if (value === '') return
+
+        this.tagForm.pending = true
+        this.validationTimer = setTimeout(() => this.isNameUnique(value), 300)
     }
 
     private isNameUnique(name: string): void {
-        const params: IsNameUniqueParams = { type: this.type, name }
-        if (this.tag) params['exclude-id'] = this.tag.id
+        const params: IsTagNameUniqueParams = {
+            type: this.type,
+            name,
+            exclude_id: this.tag?.id,
+        }
 
         this.inputNameLoading = true
         tagService
             .isNameUnique(params)
             .then((response: any) => {
-                this.nameUniqueError = !response.body.unique ? 'This name is not unique' : null
+                this.nameUniqueError = !response.body.unique
+                    ? 'A tag with that name already exist'
+                    : null
             })
             .catch((error: any) => console.error(error))
-            .finally(() => (this.inputNameLoading = false))
+            .finally(() => {
+                this.inputNameLoading = false
+                this.tagForm.pending = false
+            })
     }
 
     selectColor(color: string): void {
@@ -175,7 +192,7 @@ export default class TagDialog extends Vue {
     }
 
     emitSubmitEvent(): void {
-        if (!this.tagForm.valid) return
+        if (!this.tagForm.valid || this.tagForm.pending) return
 
         if (this.tag) this.$emit('update', this.tag.id, this.tagForm.data)
         else this.$emit('create', this.tagForm.data)

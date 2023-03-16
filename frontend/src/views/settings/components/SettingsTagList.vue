@@ -51,7 +51,7 @@ export default class SettingsTagList extends Vue {
 
     private fetchTagList(): void {
         tagService
-            .getTagList({ type: this.type })
+            .getTagList({ size: 0, type: this.type })
             .then((response: any) => {
                 this.tagList = response.body.content
             })

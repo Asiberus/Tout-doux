@@ -17,11 +17,20 @@ class TagViewSet(viewsets.ModelViewSet):
     filterset_fields = ('type',)
     search_fields = ('name',)
 
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if 'exclude_ids' in self.request.query_params:
+            exclude_ids = map(lambda x: int(x), self.request.query_params.get('exclude_ids').split(','))
+            queryset = queryset.exclude(id__in=exclude_ids)
+
+        return queryset
+
     @action(detail=False, url_path='is-name-unique', url_name='tag_is_name_unique')
     def is_name_unique(self, request):
         name = request.query_params.get('name')
         tag_type = request.query_params.get('type')
-        exclude_id = request.query_params.get('exclude-id')
+        exclude_id = request.query_params.get('exclude_id')
 
         if not name:
             raise ParseError('You must provide a name')

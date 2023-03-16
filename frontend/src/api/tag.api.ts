@@ -3,21 +3,23 @@ import { apiRoutes } from '@/api-routes'
 import { PaginationParams } from '@/models/common.model'
 import { TagForm, TagType } from '@/models/tag.model'
 
-export interface IsNameUniqueParams {
+export interface IsTagNameUniqueParams {
     type: TagType
     name: string
-    'exclude-id'?: number
+    exclude_id?: number
 }
 
 interface TagListParams extends PaginationParams {
     type: TagType
+    search?: string
+    exclude_ids?: string
 }
 
 export function getTagList(params: TagListParams) {
     return Vue.http.get(apiRoutes.tag, { params })
 }
 
-export function isNameUnique(params: IsNameUniqueParams) {
+export function isNameUnique(params: IsTagNameUniqueParams) {
     return Vue.http.get(apiRoutes.tagUnique, { params })
 }
 

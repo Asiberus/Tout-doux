@@ -15,6 +15,9 @@ export const apiRoutes = {
     dailyTaskSummary: 'daily-task/summary/',
     dailyTaskById: 'daily-task/:dailyTaskId/',
     tag: 'tag/',
-    tagUnique: 'tag/is-name-unique',
+    tagUnique: 'tag/is-name-unique/',
     tagById: 'tag/:id/',
+    commonTask: 'common-task/',
+    commonTaskUnique: 'common-task/is-name-unique/',
+    commonTaskById: 'common-task/:id/',
 }
