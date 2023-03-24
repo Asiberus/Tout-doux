@@ -1,5 +1,5 @@
 <template>
-    <div class="pa-2" :class="{ selected: selected }" @click="selectCollection">
+    <div :class="{ selected: selected }" @click="selectCollection">
         <v-card :disabled="tasksUncompleted.length === 0" :class="{ 'cursor-pointer': !selected }">
             <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="4">
             </v-progress-linear>

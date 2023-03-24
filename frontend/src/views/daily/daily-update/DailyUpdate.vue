@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="daily-update">
         <div class="d-flex justify-space-between align-center mb-4">
             <h2 class="text-h3">
                 <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
@@ -19,7 +19,7 @@
             :value="dailyStepper"
             non-linear
             alt-labels
-            class="daily-stepper">
+            class="daily-update-stepper">
             <v-stepper-header>
                 <v-divider></v-divider>
                 <v-stepper-step :step="1" editable color="accent">Task</v-stepper-step>
@@ -81,17 +81,9 @@ export default class DailyUpdate extends Vue {
 </script>
 
 <style scoped lang="scss">
-.v-stepper {
-    box-shadow: none !important;
-    background: transparent !important;
-    border: none !important;
-
-    &__header {
-        box-shadow: none !important;
-    }
-
-    &__content {
-        padding: 0;
-    }
+.daily-update {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 </style>

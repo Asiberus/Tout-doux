@@ -9,6 +9,7 @@
             <v-btn
                 @click="createDailyTaskDisplayed = !createDailyTaskDisplayed"
                 icon
+                small
                 :color="createDailyTaskDisplayed ? 'accent' : null">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
@@ -17,7 +18,7 @@
         <template v-if="dailyTaskList.length">
             <template v-for="dailyTask in dailyTaskList">
                 <v-hover v-slot="{ hover }" :key="'daily-task-' + dailyTask.id + dailyTask.name">
-                    <v-card class="daily-task-card mb-3">
+                    <v-card class="daily-task-card mb-2">
                         <v-card-text>
                             <template v-if="!dailyTask.editMode">
                                 <div class="d-flex align-center">

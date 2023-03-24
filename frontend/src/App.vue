@@ -114,6 +114,40 @@ body {
     background-color: #212121;
 }
 
+.daily-update-stepper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+
+    .v-stepper__header {
+        box-shadow: none !important;
+        margin-bottom: 4px;
+    }
+
+    .v-stepper__items {
+        flex-grow: 1;
+    }
+
+    .v-stepper__content {
+        height: 100%;
+        padding: 0 !important;
+    }
+
+    .v-stepper__wrapper,
+    .v-window__container {
+        height: 100%;
+    }
+
+    .v-window-item {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 // TODO : fix scroll bar design
 //::-webkit-scrollbar {
 //  height: 0.4rem;

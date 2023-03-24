@@ -28,29 +28,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CommonTask } from '@/models/common-task.model'
-import { commonTaskService } from '@/api'
 import CommonTaskCard from '@/views/components/common-task/CommonTaskCard.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { DailyTask } from '@/models/daily-task.model'
 
 @Component({ components: { CommonTaskCard, EmptyListDisplay } })
 export default class DailyUpdateCommonTask extends Vue {
+    @Prop({ required: true, default: [] }) commonTaskList!: CommonTask[]
     @Prop({ required: true, default: [] }) dailyTaskList!: DailyTask[]
-
-    commonTaskList: CommonTask[] = []
-
-    created(): void {
-        this.fetchCommonTaskList()
-    }
-
-    private fetchCommonTaskList(): void {
-        commonTaskService
-            .getCommonTaskList({ size: 0 })
-            .then((response: any) => {
-                this.commonTaskList = response.body.content
-            })
-            .catch((error: any) => console.error(error))
-    }
 
     selectCommonTask(id: number): void {
         if (this.isCommonTaskSelected(id)) return

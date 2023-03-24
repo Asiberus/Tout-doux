@@ -1,5 +1,5 @@
 <template>
-    <div class="pa-2" :class="{ selected: selected }" @click="selectProject">
+    <div :class="{ selected }" @click="selectProject">
         <v-card
             :disabled="allTasksUncompleted.length === 0"
             :class="{ 'cursor-pointer': !selected }">
