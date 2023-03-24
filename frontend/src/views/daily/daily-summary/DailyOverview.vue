@@ -1,6 +1,16 @@
 <template>
     <div>
-        <h1 class="text-h3 mb-6">Daily Summary</h1>
+        <div class="d-flex justify-space-between align-end mb-6">
+            <h1 class="text-h3">Daily Summary</h1>
+            <v-btn
+                :to="{ name: 'daily-update', params: { date: this.today, step: 'task' } }"
+                color="accent"
+                rounded
+                outlined>
+                prepare today
+            </v-btn>
+        </div>
+
         <v-row>
             <v-col v-for="dailySummary in dailySummaryList" :key="dailySummary.date" cols="3">
                 <DailySummaryItemComponent
@@ -45,15 +55,15 @@ export default class DailySummaryComponent extends Vue {
     dailyOverviewLoading = false
     dailyDetailDialog = false
     dateSelected = ''
+    today = moment().format('YYYY-MM-DD')
 
     DAYS_PER_PAGE = 21
 
     created(): void {
-        const startDate = moment().format('YYYY-MM-DD')
         const endDate = moment()
             .subtract(this.DAYS_PER_PAGE - 1, 'days')
             .format('YYYY-MM-DD')
-        this.retrieveDailySummaryList(startDate, endDate)
+        this.retrieveDailySummaryList(this.today, endDate)
     }
 
     mounted(): void {

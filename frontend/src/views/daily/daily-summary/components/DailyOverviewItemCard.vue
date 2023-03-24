@@ -1,62 +1,46 @@
 <template>
-    <v-hover v-slot="{ hover }">
-        <v-card
-            v-on="
-                dailySummary.totalTask || dailySummary.totalEvent
-                    ? { click: () => openDailyDetailDialog() }
-                    : {}
-            "
-            :color="backgroundColor"
-            :ripple="false">
-            <v-card-text>
-                <div class="d-flex align-end">
-                    <div class="d-flex flex-column">
-                        <h1 class="white--text mb-2">
-                            {{ dateFormat(dailySummary.date, 'dddd') }}
-                        </h1>
-                        <p class="daily-date">
-                            {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
-                        </p>
-                    </div>
-                    <v-spacer></v-spacer>
-                    <div v-if="dailySummary.totalEvent > 0" class="d-flex flex-shrink-0">
-                        <span class="daily-event mr-1">
-                            {{ dailySummary.totalEvent }}
-                        </span>
-                        <v-icon>mdi-calendar-clock</v-icon>
-                    </div>
-                    <div v-if="dailySummary.totalTask" class="flex-shrink-0 ml-6">
-                        <span style="font-size: 3em" class="white--text">{{
-                            dailySummary.totalTaskCompleted
-                        }}</span>
-                        /
-                        <span
-                            style="
-                                font-size: 1.8em;
-                                transform: translateY(0.3em);
-                                display: inline-block;
-                            ">
-                            {{ dailySummary.totalTask }}
-                        </span>
-                    </div>
+    <v-card
+        v-on="
+            dailySummary.totalTask || dailySummary.totalEvent
+                ? { click: () => openDailyDetailDialog() }
+                : {}
+        "
+        :color="backgroundColor"
+        :ripple="false">
+        <v-card-text>
+            <div class="d-flex align-end">
+                <div class="d-flex flex-column">
+                    <h1 class="white--text mb-2">
+                        {{ dateFormat(dailySummary.date, 'dddd') }}
+                    </h1>
+                    <p class="daily-date">
+                        {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
+                    </p>
                 </div>
-            </v-card-text>
-            <v-scale-transition origin="center">
-                <v-card-actions v-if="isToday && hover" class="card-action">
-                    <v-btn
-                        :to="{
-                            name: 'daily-update',
-                            params: { date: dailySummary.date, step: 'task' },
-                        }"
-                        color="accent"
-                        x-small
-                        fab>
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                </v-card-actions>
-            </v-scale-transition>
-        </v-card>
-    </v-hover>
+                <v-spacer></v-spacer>
+                <div v-if="dailySummary.totalEvent > 0" class="d-flex flex-shrink-0">
+                    <span class="daily-event mr-1">
+                        {{ dailySummary.totalEvent }}
+                    </span>
+                    <v-icon>mdi-calendar-clock</v-icon>
+                </div>
+                <div v-if="dailySummary.totalTask" class="flex-shrink-0 ml-6">
+                    <span style="font-size: 3em" class="white--text">{{
+                        dailySummary.totalTaskCompleted
+                    }}</span>
+                    /
+                    <span
+                        style="
+                            font-size: 1.8em;
+                            transform: translateY(0.3em);
+                            display: inline-block;
+                        ">
+                        {{ dailySummary.totalTask }}
+                    </span>
+                </div>
+            </div>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script lang="ts">
@@ -116,11 +100,5 @@ export default class DailySummaryItemComponent extends Vue {
 .daily-event {
     font-size: 1.8em;
     color: white;
-}
-
-.card-action {
-    position: absolute;
-    top: -20px;
-    right: 5px;
 }
 </style>
