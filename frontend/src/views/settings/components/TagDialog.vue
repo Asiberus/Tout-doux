@@ -136,6 +136,7 @@ export default class TagDialog extends Vue {
     private onIsDialogOpenChanges(value: boolean): void {
         if (value) {
             this.confirmDelete = false
+            this.nameUniqueError = null
             this.form.resetValidation()
             this.populateForm()
             this.inputName.focus()

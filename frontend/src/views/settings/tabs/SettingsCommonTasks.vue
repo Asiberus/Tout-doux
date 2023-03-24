@@ -16,7 +16,7 @@
         </div>
 
         <v-row>
-            <v-col v-for="commonTask of commonTaskList" :key="commonTask.id" cols="4">
+            <v-col v-for="commonTask of commonTaskList" :key="commonTask.id" cols="6">
                 <CommonTaskCard
                     :common-task="commonTask"
                     @update="updateCommonTask($event)"

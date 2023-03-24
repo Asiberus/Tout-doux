@@ -46,7 +46,7 @@
                         :tag="tag"
                         clearable
                         @clear="removeTag($event)"
-                        class="mr-2">
+                        class="mr-2 mb-2">
                     </TagChip>
 
                     <v-card-actions class="d-flex justify-end mt-3">
@@ -119,6 +119,7 @@ export default class CommonTaskDialog extends Vue {
             // We need to wait for next tick to access the form and the input name
             this.$nextTick(() => {
                 this.confirmDelete = false
+                this.nameUniqueError = null
                 this.form.resetValidation()
                 this.inputName.focus()
                 this.populateForm()
@@ -196,5 +197,3 @@ export default class CommonTaskDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

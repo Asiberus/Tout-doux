@@ -1,12 +1,15 @@
 <template>
-    <div>
-        <v-card @click="commonTaskDialog = true">
-            <v-card-text class="d-flex align-center">
-                <div class="pl-3">
-                    <h5 class="text-h5 white--text">{{ commonTask.name }}</h5>
-                    <v-chip-group class="tags-wrapper">
-                        <TagChip v-for="tag of commonTask.tags" :tag="tag" :small="true"></TagChip>
-                    </v-chip-group>
+    <div class="fill-height">
+        <v-card @click="commonTaskDialog = true" :ripple="false" class="fill-height">
+            <v-card-text class="wrapper px-5">
+                <v-icon>mdi-timeline</v-icon>
+
+                <div class="content">
+                    <h5 class="text-h5 white--text ml-3 text-ellipsis">
+                        {{ commonTask.name }}
+                    </h5>
+                    <TagGroup v-if="commonTask.tags.length > 0" :tag-list="commonTask.tags">
+                    </TagGroup>
                 </div>
             </v-card-text>
         </v-card>
@@ -25,8 +28,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import TagChip from '@/components/TagChip.vue'
 import CommonTaskDialog from '@/views/components/common-task/CommonTaskDialog.vue'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component({ components: { TagChip, CommonTaskDialog } })
+@Component({ components: { TagGroup, TagChip, CommonTaskDialog } })
 export default class CommonTaskCard extends Vue {
     @Prop({ required: true }) readonly commonTask!: CommonTask
 
@@ -45,8 +49,17 @@ export default class CommonTaskCard extends Vue {
 </script>
 
 <style scoped lang="scss">
-.tags-wrapper {
-    // height of chip + chip margin + padding of chip group
-    min-height: calc(24px + 8px + 8px);
+.wrapper {
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+
+    .content {
+        min-width: 0; // default to min-width: auto for flex children. Prevent content to overflowing
+        display: flex;
+        flex-direction: column;
+        row-gap: 4px;
+    }
 }
 </style>
