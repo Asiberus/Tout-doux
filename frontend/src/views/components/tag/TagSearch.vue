@@ -29,7 +29,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Tag } from '@/models/tag.model'
 import { tagService } from '@/api'
-import TagChip from '@/components/TagChip.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 
 @Component({ components: { TagChip } })
 export default class TagSearch extends Vue {

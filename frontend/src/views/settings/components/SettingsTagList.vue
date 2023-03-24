@@ -32,10 +32,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Tag, TagForm, TagType } from '@/models/tag.model'
-import TagDialog from '@/views/settings/components/TagDialog.vue'
+import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import TagCard from '@/views/settings/components/TagCard.vue'
-import TagChip from '@/components/TagChip.vue'
+import TagCard from '@/views/components/tag/TagCard.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 import { tagService } from '@/api'
 
 @Component({ components: { TagDialog, TagCard, EmptyListDisplay, TagChip } })
@@ -53,7 +53,7 @@ export default class SettingsTagList extends Vue {
         tagService
             .getTagList({ size: 0, type: this.type })
             .then((response: any) => {
-                this.tagList = response.body.content
+                // this.tagList = response.body.content
             })
             .catch((error: any) => console.error(error))
     }

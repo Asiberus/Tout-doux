@@ -73,7 +73,7 @@ import { commonTaskService } from '@/api'
 import { IsCommonTaskNameUniqueParams } from '@/api/common-task.api'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import { Tag } from '@/models/tag.model'
-import TagChip from '@/components/TagChip.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 
 @Component({ components: { TagSearch, TagChip } })
 export default class CommonTaskDialog extends Vue {

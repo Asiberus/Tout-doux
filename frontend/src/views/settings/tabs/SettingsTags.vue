@@ -33,10 +33,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { TagType } from '@/models/tag.model'
-import TagCard from '@/views/settings/components/TagCard.vue'
-import TagDialog from '@/views/settings/components/TagDialog.vue'
+import TagCard from '@/views/components/tag/TagCard.vue'
+import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import TagChip from '@/components/TagChip.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 import SettingsTagList from '@/views/settings/components/SettingsTagList.vue'
 
 @Component({

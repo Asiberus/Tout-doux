@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Tag } from '@/models/tag.model'
-import TagChip from '@/components/TagChip.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 
 @Component({ components: { TagChip } })
 export default class TagGroup extends Vue {

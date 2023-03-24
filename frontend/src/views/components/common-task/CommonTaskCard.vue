@@ -26,11 +26,11 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
-import TagChip from '@/components/TagChip.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
 import CommonTaskDialog from '@/views/components/common-task/CommonTaskDialog.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component({ components: { TagGroup, TagChip, CommonTaskDialog } })
+@Component({ components: { TagGroup, CommonTaskDialog } })
 export default class CommonTaskCard extends Vue {
     @Prop({ required: true }) readonly commonTask!: CommonTask
 

@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Tag, TagForm } from '@/models/tag.model'
-import TagDialog from '@/views/settings/components/TagDialog.vue'
+import TagDialog from '@/views/components/tag/TagDialog.vue'
 
 @Component({ components: { TagDialog } })
 export default class TagCard extends Vue {
