@@ -8,8 +8,7 @@
                 @click="goToDailyDetail()"
                 :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
                 color="accent"
-                rounded
-                class="mr-10">
+                rounded>
                 Start the day
                 <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>

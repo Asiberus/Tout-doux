@@ -14,7 +14,7 @@
                 <v-tab>
                     <v-icon>mdi-list-box</v-icon>
                 </v-tab>
-                <v-tab disabled>
+                <v-tab>
                     <v-icon>mdi-timeline</v-icon>
                 </v-tab>
                 <v-tab disabled>
@@ -26,7 +26,7 @@
             </v-tabs>
             <v-tabs-items v-model="tab" class="transparent flex-grow-1">
                 <v-tab-item :transition="false">
-                    <h5 class="text-h5 ml-2">Project</h5>
+                    <h5 class="text-h5 ml-2 mb-3">Project</h5>
                     <template v-if="projectList.length">
                         <v-row align-content="start" no-gutters class="project-card-wrapper">
                             <v-col
@@ -38,7 +38,7 @@
                                     :daily-task-list="dailyTaskList"
                                     :selected.sync="project.selected"
                                     :section-selected="projectSectionSelected"
-                                    @select-task="createDailyTask"
+                                    @select-task="createDailyTask($event)"
                                     @unselect="project.selected = false">
                                 </DailyUpdateProjectListItem>
                             </v-col>
@@ -56,7 +56,7 @@
                     </template>
                 </v-tab-item>
                 <v-tab-item :transition="false">
-                    <h5 class="text-h5 ml-2">Collection</h5>
+                    <h5 class="text-h5 ml-2 mb-3">Collection</h5>
                     <template v-if="collectionList.length">
                         <v-row align-content="start" no-gutters class="collection-card-wrapper">
                             <v-col
@@ -68,7 +68,7 @@
                                     :daily-task-list="dailyTaskList"
                                     :selected.sync="collection.selected"
                                     @unselect="collection.selected = false"
-                                    @select-task="createDailyTask">
+                                    @select-task="createDailyTask($event)">
                                 </DailyUpdateCollectionListItem>
                             </v-col>
                         </v-row>
@@ -85,13 +85,17 @@
                     </template>
                 </v-tab-item>
                 <v-tab-item :transition="false">
-                    <h5 class="text-h5 ml-2">Weekly task</h5>
+                    <h5 class="text-h5 ml-2 mb-3">Common task</h5>
+                    <DailyUpdateCommonTask
+                        :daily-task-list="dailyTaskList"
+                        @select-common-task="createDailyTask($event)">
+                    </DailyUpdateCommonTask>
                 </v-tab-item>
                 <v-tab-item :transition="false">
-                    <h5 class="text-h5 ml-2">Monthly task</h5>
+                    <h5 class="text-h5 ml-2 mb-3">Weekly task</h5>
                 </v-tab-item>
                 <v-tab-item :transition="false">
-                    <h5 class="text-h5 ml-2">Generic task</h5>
+                    <h5 class="text-h5 ml-2 mb-3">Monthly task</h5>
                 </v-tab-item>
             </v-tabs-items>
         </v-col>
@@ -126,6 +130,7 @@ import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/co
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
 import moment from 'moment'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
 
 // Todo : add btn to create project in no project svg
 // Todo : add btn to create collection in no collection svg
@@ -133,6 +138,7 @@ import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
     components: {
         DailyUpdateProjectListItem,
         DailyUpdateCollectionListItem,
+        DailyUpdateCommonTask,
         DailyUpdateTaskList,
         EmptyListDisplay,
     },
@@ -207,6 +213,7 @@ export default class DailyUpdateTask extends Vue {
     }
 
     createDailyTask(dailyTask: DailyTaskPost): void {
+        console.log(dailyTask)
         dailyTaskService.createDailyTask(dailyTask).then(
             (response: any) => {
                 this.dailyTaskList.push({ ...response.body, editMode: false })

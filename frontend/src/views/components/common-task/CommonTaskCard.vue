@@ -1,11 +1,15 @@
 <template>
-    <div class="fill-height">
-        <v-card @click="commonTaskDialog = true" :ripple="false" class="fill-height">
+    <div>
+        <v-card
+            @click="onCardClick()"
+            :ripple="false"
+            :color="selected ? 'taskCompleted' : null"
+            :disabled="selected">
             <v-card-text class="wrapper px-5">
                 <v-icon>mdi-timeline</v-icon>
 
                 <div class="content">
-                    <h5 class="text-h5 white--text ml-3 text-ellipsis">
+                    <h5 class="text-h5 white--text ml-3 text-ellipsis" :title="commonTask.name">
                         {{ commonTask.name }}
                     </h5>
                     <TagGroup v-if="commonTask.tags.length > 0" :tag-list="commonTask.tags">
@@ -33,8 +37,14 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 @Component({ components: { TagGroup, CommonTaskDialog } })
 export default class CommonTaskCard extends Vue {
     @Prop({ required: true }) readonly commonTask!: CommonTask
+    @Prop({ default: true }) editable!: boolean
+    @Prop({ default: false }) selected!: boolean
 
     commonTaskDialog = false
+
+    onCardClick(): void {
+        if (this.editable) this.commonTaskDialog = true
+    }
 
     emitUpdateEvent(event: { id: number; data: CommonTaskForm }): void {
         this.commonTaskDialog = false

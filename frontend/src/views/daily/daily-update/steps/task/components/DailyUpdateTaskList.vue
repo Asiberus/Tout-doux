@@ -63,10 +63,8 @@
 
                                     <h4
                                         class="white--text font-weight-regular text-ellipsis mr-3"
-                                        :title="
-                                            dailyTask.task ? dailyTask.task.name : dailyTask.name
-                                        ">
-                                        {{ dailyTask.task ? dailyTask.task.name : dailyTask.name }}
+                                        :title="getDailyTaskName(dailyTask)">
+                                        {{ getDailyTaskName(dailyTask) }}
                                     </h4>
 
                                     <template v-if="dailyTask.task">
@@ -120,7 +118,7 @@
                                         class="daily-actions flex-shrink-0"
                                         :class="{ 'is-hover': hover }">
                                         <v-btn
-                                            v-if="!dailyTask.task"
+                                            v-if="!dailyTask.task && !dailyTask.commonTask"
                                             @click="toggleDailyTaskEditMode(dailyTask, true)"
                                             icon
                                             small
@@ -197,6 +195,7 @@ import ProjectChip from '@/components/ProjectChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
+    DailyTask,
     DailyTaskActionEnum,
     DailyTaskDisplay,
     DailyUpdateTaskTab,
@@ -317,6 +316,12 @@ export default class DailyUpdateTaskList extends Vue {
 
     select(type: DailyUpdateTaskTab, id: number, sectionId?: number): void {
         this.$emit('select', type, id, sectionId)
+    }
+
+    getDailyTaskName(dailyTask: DailyTask): string {
+        if (dailyTask.task) return dailyTask.task.name
+        else if (dailyTask.commonTask) return dailyTask.commonTask.name
+        else return dailyTask.name as string // We know name is defined
     }
 }
 </script>

@@ -1,4 +1,5 @@
 import { TaskExtended } from '@/models/task.model'
+import { CommonTask } from '@/models/common-task.model'
 
 // Todo : add get literal in enum
 export enum DailyTaskActionEnum {
@@ -25,6 +26,7 @@ export interface DailyTask {
     date: string
     name?: string
     task?: TaskExtended
+    commonTask?: CommonTask
     action?: DailyTaskActionEnum
     completed: boolean
 }

@@ -1,13 +1,13 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-end mb-6">
+        <div class="d-flex justify-space-between align-center mb-6">
             <h1 class="text-h3">Daily Summary</h1>
             <v-btn
                 :to="{ name: 'daily-update', params: { date: this.today, step: 'task' } }"
                 color="accent"
                 rounded
                 outlined>
-                prepare today
+                prepare the day
             </v-btn>
         </div>
 

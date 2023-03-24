@@ -15,7 +15,7 @@
             </CommonTaskDialog>
         </div>
 
-        <template v-if="commonTaskList.length > 0">
+        <template v-if="commonTaskList.length">
             <v-row>
                 <v-col v-for="commonTask of commonTaskList" :key="commonTask.id" cols="6">
                     <CommonTaskCard
