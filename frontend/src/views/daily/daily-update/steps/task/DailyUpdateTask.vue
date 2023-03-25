@@ -25,7 +25,20 @@
 
         <v-tabs-items v-model="tab" class="transparent">
             <v-tab-item :transition="false" class="lalala">
-                <h5 class="text-h5 mb-3">Project</h5>
+                <div class="d-flex align-center mb-3">
+                    <h5 class="text-h5 mr-2">Project</h5>
+                    <v-hover v-slot="{ hover }">
+                        <v-btn
+                            :to="{ name: 'project-list' }"
+                            :exact="true"
+                            icon
+                            small
+                            :color="hover ? 'grey' : 'grey darken-3'"
+                            title="Go to project list">
+                            <v-icon small>mdi-open-in-new</v-icon>
+                        </v-btn>
+                    </v-hover>
+                </div>
                 <template v-if="projectList.length">
                     <div class="project-wrapper">
                         <DailyUpdateProjectListItem
@@ -52,7 +65,20 @@
                 </template>
             </v-tab-item>
             <v-tab-item :transition="false">
-                <h5 class="text-h5 mb-3">Collection</h5>
+                <div class="d-flex align-center mb-3">
+                    <h5 class="text-h5 mr-2">Collection</h5>
+                    <v-hover v-slot="{ hover }">
+                        <v-btn
+                            :to="{ name: 'collection-list' }"
+                            :exact="true"
+                            icon
+                            small
+                            :color="hover ? 'grey' : 'grey darken-3'"
+                            title="Go to collection">
+                            <v-icon small>mdi-open-in-new</v-icon>
+                        </v-btn>
+                    </v-hover>
+                </div>
                 <template v-if="collectionList.length">
                     <div class="collection-wrapper">
                         <DailyUpdateCollectionListItem
@@ -78,7 +104,20 @@
                 </template>
             </v-tab-item>
             <v-tab-item :transition="false">
-                <h5 class="text-h5 mb-3">Common task</h5>
+                <div class="d-flex align-center mb-3">
+                    <h5 class="text-h5 mr-2">Common task</h5>
+                    <v-hover v-slot="{ hover }">
+                        <v-btn
+                            :to="{ name: 'settings-common-tasks' }"
+                            :exact="true"
+                            icon
+                            small
+                            :color="hover ? 'grey' : 'grey darken-3'"
+                            title="Go to common task">
+                            <v-icon small>mdi-open-in-new</v-icon>
+                        </v-btn>
+                    </v-hover>
+                </div>
                 <DailyUpdateCommonTask
                     :common-task-list="commonTaskList"
                     :daily-task-list="dailyTaskList"
