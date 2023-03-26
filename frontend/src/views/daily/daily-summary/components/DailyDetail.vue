@@ -80,16 +80,10 @@
                                                         )
                                                     }}
                                                 </v-chip>
-                                                <template v-if="dailyTask.task">
-                                                    <h4 class="task-content__name">
-                                                        {{ dailyTask.task.name }}
-                                                    </h4>
-                                                </template>
-                                                <template v-else>
-                                                    <h4 class="task-content__name">
-                                                        {{ dailyTask.name }}
-                                                    </h4>
-                                                </template>
+
+                                                <h4 class="task-content__name">
+                                                    {{ getDailyTaskName(dailyTask) }}
+                                                </h4>
 
                                                 <template v-if="dailyTask.task">
                                                     <ProjectChip
@@ -118,6 +112,7 @@
                             </v-timeline>
                         </div>
                     </v-col>
+
                     <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
                         <h4 class="text-h4">Events</h4>
                         <p class="grey--text text--lighten-1 ml-2">
@@ -263,6 +258,12 @@ export default class DailyDetail extends Vue {
 
     isEventPassed(event: EventModel): boolean {
         return isPassed(event)
+    }
+
+    getDailyTaskName(dailyTask: DailyTask): string {
+        if (dailyTask.task) return dailyTask.task.name
+        else if (dailyTask.commonTask) return dailyTask.commonTask.name
+        else return dailyTask.name as string // We know name is defined
     }
 }
 </script>
