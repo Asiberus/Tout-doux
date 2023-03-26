@@ -47,7 +47,7 @@
 
                 <template v-if="!displayCompletedTask">
                     <template v-if="uncompletedTasks.length > 0">
-                        <TaskItemCard
+                        <TaskCard
                             v-for="task of uncompletedTasks"
                             :key="task.id"
                             :task="task"
@@ -55,7 +55,7 @@
                             @toggle-state="toggleTaskState"
                             @update="updateTask"
                             @delete="deleteTask">
-                        </TaskItemCard>
+                        </TaskCard>
                     </template>
                     <template
                         v-else-if="
@@ -84,13 +84,13 @@
                 </template>
                 <template v-else>
                     <template v-if="completedTasks.length > 0">
-                        <TaskItemCard
+                        <TaskCard
                             v-for="task of completedTasks"
                             :key="task.id"
                             :task="task"
                             :disabled="disabled"
                             @toggle-state="toggleTaskState">
-                        </TaskItemCard>
+                        </TaskCard>
                     </template>
                     <template v-else>
                         <EmptyListDisplay message="You didn't completed any tasks yet !">
@@ -128,14 +128,14 @@ import { SectionPatch, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
     components: {
         SectionDialog,
-        TaskItemCard,
+        TaskCard,
         TaskDialog,
         ProgressCircular,
         EmptyListDisplay,

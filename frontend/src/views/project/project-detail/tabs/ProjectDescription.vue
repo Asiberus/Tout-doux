@@ -51,13 +51,13 @@
             <template v-if="uncompletedTasks.length > 0">
                 <v-row no-gutters>
                     <v-col v-for="task of uncompletedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskItemCard
+                        <TaskCard
                             :task="task"
                             :disabled="project.archived"
                             @toggle-state="toggleTaskState"
                             @update="updateTask"
                             @delete="deleteTask">
-                        </TaskItemCard>
+                        </TaskCard>
                     </v-col>
                 </v-row>
             </template>
@@ -86,11 +86,11 @@
             <template v-if="completedTasks.length > 0">
                 <v-row no-gutters>
                     <v-col v-for="task of completedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskItemCard
+                        <TaskCard
                             :task="task"
                             :disabled="project.archived"
                             @toggle-state="toggleTaskState">
-                        </TaskItemCard>
+                        </TaskCard>
                     </v-col>
                 </v-row>
             </template>
@@ -116,13 +116,13 @@ import { ProjectDetail } from '@/models/project.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
     components: {
-        TaskItemCard,
+        TaskCard,
         TaskDialog,
         ProgressCircular,
         EmptyListDisplay,

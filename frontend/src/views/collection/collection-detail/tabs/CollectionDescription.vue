@@ -29,7 +29,7 @@
 
             <template v-if="!displayCompletedTask">
                 <template v-if="uncompletedTasks.length > 0">
-                    <TaskItemCard
+                    <TaskCard
                         v-for="task in uncompletedTasks"
                         :key="task.id"
                         :task="task"
@@ -37,7 +37,7 @@
                         @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask">
-                    </TaskItemCard>
+                    </TaskCard>
                 </template>
                 <template
                     v-else-if="
@@ -62,13 +62,13 @@
             </template>
             <template v-else>
                 <template v-if="completedTasks.length > 0">
-                    <TaskItemCard
+                    <TaskCard
                         v-for="task of completedTasks"
                         :key="task.id"
                         :task="task"
                         :disabled="collection.archived"
                         @toggle-state="toggleTaskState">
-                    </TaskItemCard>
+                    </TaskCard>
                 </template>
                 <template v-else>
                     <EmptyListDisplay message="You didn't complete any task yet!">
@@ -106,14 +106,14 @@ import { CollectionDetail } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
     components: {
         TaskDialog,
-        TaskItemCard,
+        TaskCard,
         EmptyListDisplay,
         ProgressCircular,
         FilterChip,

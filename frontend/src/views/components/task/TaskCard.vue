@@ -60,7 +60,7 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { TaskDialog, ConfirmDialog } })
-export default class TaskItemCard extends Vue {
+export default class TaskCard extends Vue {
     @Prop() private task!: Task
     @Prop({ default: false }) private disabled!: boolean
 
