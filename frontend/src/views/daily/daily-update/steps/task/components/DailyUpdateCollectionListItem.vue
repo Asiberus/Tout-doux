@@ -44,26 +44,19 @@
                 </div>
                 <template v-if="selected">
                     <v-divider class="mt-3"></v-divider>
-                    <div class="task-wrapper pt-3">
-                        <v-row align-content="start" class="fill-width">
-                            <v-col
-                                v-for="task of tasksUncompleted"
-                                :key="`task-${task.id}`"
-                                cols="6">
-                                <v-card
-                                    @click="selectTask(task)"
-                                    :disabled="isTaskSelected(task)"
-                                    :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
-                                    elevation="5"
-                                    title="Select task">
-                                    <v-card-text class="p-1">
-                                        <h5 class="white--text">
-                                            {{ task.name }}
-                                        </h5>
-                                    </v-card-text>
-                                </v-card>
-                            </v-col>
-                        </v-row>
+                    <div class="task-wrapper">
+                        <v-card
+                            v-for="task of tasksUncompleted"
+                            :key="`task-${task.id}`"
+                            @click="selectTask(task)"
+                            :disabled="isTaskSelected(task)"
+                            :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
+                            elevation="5"
+                            title="Select task">
+                            <v-card-text class="p-1">
+                                <h5 class="white--text">{{ task.name }}</h5>
+                            </v-card-text>
+                        </v-card>
                     </div>
                 </template>
             </v-card-text>
@@ -134,7 +127,7 @@ export default class DailyUpdateCollectionListItem extends Vue {
     z-index: 1;
     cursor: default;
 
-    .v-card {
+    & > .v-card {
         height: 100%;
 
         .v-card__text {
@@ -149,14 +142,13 @@ export default class DailyUpdateCollectionListItem extends Vue {
             .task-wrapper {
                 flex-grow: 1;
                 overflow-y: auto;
-                width: 100%;
+                padding: 12px 8px 8px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: min-content;
+                gap: 8px;
             }
         }
     }
-}
-
-// Todo : place in common css file
-.fill-width {
-    width: 100%;
 }
 </style>

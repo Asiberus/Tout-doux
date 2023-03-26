@@ -16,169 +16,178 @@
         </div>
 
         <template v-if="dailyTaskList.length">
-            <template v-for="dailyTask in dailyTaskList">
-                <v-hover v-slot="{ hover }" :key="'daily-task-' + dailyTask.id + dailyTask.name">
-                    <v-card class="daily-task-card mb-2">
-                        <v-card-text>
-                            <template v-if="!dailyTask.editMode">
-                                <div class="d-flex align-center">
-                                    <v-menu>
-                                        <template #activator="{ on, attrs }">
-                                            <v-chip
-                                                v-bind="attrs"
-                                                v-on="on"
-                                                class="mr-3 flex-shrink-0"
-                                                :color="getActionChipColor(dailyTask.action)">
-                                                <template v-if="dailyTask.action">
-                                                    {{
-                                                        getLiteralFormOfDailyActionEnum(
-                                                            dailyTask.action
+            <div class="daily-task-wrapper">
+                <template v-for="dailyTask in dailyTaskList">
+                    <v-hover
+                        v-slot="{ hover }"
+                        :key="'daily-task-' + dailyTask.id + dailyTask.name">
+                        <v-card>
+                            <v-card-text>
+                                <template v-if="!dailyTask.editMode">
+                                    <div class="d-flex align-center">
+                                        <v-menu>
+                                            <template #activator="{ on, attrs }">
+                                                <v-chip
+                                                    v-bind="attrs"
+                                                    v-on="on"
+                                                    class="mr-3 flex-shrink-0"
+                                                    :color="getActionChipColor(dailyTask.action)">
+                                                    <template v-if="dailyTask.action">
+                                                        {{
+                                                            getLiteralFormOfDailyActionEnum(
+                                                                dailyTask.action
+                                                            )
+                                                        }}
+                                                    </template>
+                                                    <template v-else>
+                                                        <v-icon>mdi-nut</v-icon>
+                                                    </template>
+                                                </v-chip>
+                                            </template>
+                                            <v-list>
+                                                <v-list-item
+                                                    v-for="action in dailyTaskActionItems"
+                                                    :key="action.value"
+                                                    @click="
+                                                        updateDailyTaskAction(
+                                                            dailyTask.id,
+                                                            action.value
                                                         )
-                                                    }}
-                                                </template>
-                                                <template v-else>
-                                                    <v-icon>mdi-nut</v-icon>
-                                                </template>
-                                            </v-chip>
-                                        </template>
-                                        <v-list>
-                                            <v-list-item
-                                                v-for="action in dailyTaskActionItems"
-                                                :key="action.value"
-                                                @click="
-                                                    updateDailyTaskAction(
-                                                        dailyTask.id,
-                                                        action.value
-                                                    )
-                                                "
-                                                dense>
-                                                <span
-                                                    :class="{
-                                                        'font-italic grey--text': !action.value,
-                                                    }">
-                                                    {{ action.text }}
-                                                </span>
-                                            </v-list-item>
-                                        </v-list>
-                                    </v-menu>
+                                                    "
+                                                    dense>
+                                                    <span
+                                                        :class="{
+                                                            'font-italic grey--text': !action.value,
+                                                        }">
+                                                        {{ action.text }}
+                                                    </span>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
 
-                                    <h4
-                                        class="white--text font-weight-regular text-ellipsis mr-3"
-                                        :title="getDailyTaskName(dailyTask)">
-                                        {{ getDailyTaskName(dailyTask) }}
-                                    </h4>
+                                        <h4
+                                            class="
+                                                white--text
+                                                font-weight-regular
+                                                text-ellipsis
+                                                mr-3
+                                            "
+                                            :title="getDailyTaskName(dailyTask)">
+                                            {{ getDailyTaskName(dailyTask) }}
+                                        </h4>
 
-                                    <template v-if="dailyTask.task">
                                         <template v-if="dailyTask.task">
-                                            <ProjectChip
-                                                v-if="dailyTask.task.project"
-                                                :project="dailyTask.task.project"
-                                                :small="true"
-                                                :navigate-to-detail="false"
-                                                @click.native="
-                                                    select(
-                                                        dailyTaskUpdateTabEnum.Project,
-                                                        dailyTask.task.project.id
-                                                    )
-                                                "
-                                                class="daily-task-chip">
-                                            </ProjectChip>
-                                            <SectionChip
-                                                v-if="dailyTask.task.section"
-                                                :section="dailyTask.task.section"
-                                                :small="true"
-                                                :navigate-to-detail="false"
-                                                @click.native="
-                                                    select(
-                                                        dailyTaskUpdateTabEnum.Project,
-                                                        dailyTask.task.section.project.id,
-                                                        dailyTask.task.section.id
-                                                    )
-                                                "
-                                                class="daily-task-chip">
-                                            </SectionChip>
-                                            <CollectionChip
-                                                v-if="dailyTask.task.collection"
-                                                :collection="dailyTask.task.collection"
-                                                :small="true"
-                                                :navigate-to-detail="false"
-                                                @click.native="
-                                                    select(
-                                                        dailyTaskUpdateTabEnum.Collection,
-                                                        dailyTask.task.collection.id
-                                                    )
-                                                "
-                                                class="daily-task-chip">
-                                            </CollectionChip>
+                                            <template v-if="dailyTask.task">
+                                                <ProjectChip
+                                                    v-if="dailyTask.task.project"
+                                                    :project="dailyTask.task.project"
+                                                    :small="true"
+                                                    :navigate-to-detail="false"
+                                                    @click.native="
+                                                        select(
+                                                            dailyTaskUpdateTabEnum.Project,
+                                                            dailyTask.task.project.id
+                                                        )
+                                                    "
+                                                    class="daily-task-chip">
+                                                </ProjectChip>
+                                                <SectionChip
+                                                    v-if="dailyTask.task.section"
+                                                    :section="dailyTask.task.section"
+                                                    :small="true"
+                                                    :navigate-to-detail="false"
+                                                    @click.native="
+                                                        select(
+                                                            dailyTaskUpdateTabEnum.Project,
+                                                            dailyTask.task.section.project.id,
+                                                            dailyTask.task.section.id
+                                                        )
+                                                    "
+                                                    class="daily-task-chip">
+                                                </SectionChip>
+                                                <CollectionChip
+                                                    v-if="dailyTask.task.collection"
+                                                    :collection="dailyTask.task.collection"
+                                                    :small="true"
+                                                    :navigate-to-detail="false"
+                                                    @click.native="
+                                                        select(
+                                                            dailyTaskUpdateTabEnum.Collection,
+                                                            dailyTask.task.collection.id
+                                                        )
+                                                    "
+                                                    class="daily-task-chip">
+                                                </CollectionChip>
+                                            </template>
                                         </template>
-                                    </template>
 
-                                    <v-spacer></v-spacer>
+                                        <v-spacer></v-spacer>
 
-                                    <div
-                                        class="daily-actions flex-shrink-0"
-                                        :class="{ 'is-hover': hover }">
-                                        <v-btn
-                                            v-if="!dailyTask.task && !dailyTask.commonTask"
-                                            @click="toggleDailyTaskEditMode(dailyTask, true)"
-                                            icon
-                                            small
-                                            color="accent">
-                                            <v-icon>mdi-pencil</v-icon>
-                                        </v-btn>
+                                        <div
+                                            class="daily-actions flex-shrink-0"
+                                            :class="{ 'is-hover': hover }">
+                                            <v-btn
+                                                v-if="!dailyTask.task && !dailyTask.commonTask"
+                                                @click="toggleDailyTaskEditMode(dailyTask, true)"
+                                                icon
+                                                small
+                                                color="accent">
+                                                <v-icon>mdi-pencil</v-icon>
+                                            </v-btn>
 
-                                        <v-btn
-                                            @click="deleteDailyTask(dailyTask.id)"
-                                            icon
-                                            small
-                                            color="error"
-                                            class="ml-3">
-                                            <v-icon>mdi-trash-can</v-icon>
-                                        </v-btn>
+                                            <v-btn
+                                                @click="deleteDailyTask(dailyTask.id)"
+                                                icon
+                                                small
+                                                color="error"
+                                                class="ml-3">
+                                                <v-icon>mdi-trash-can</v-icon>
+                                            </v-btn>
+                                        </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
 
-                            <template v-else>
-                                <v-form
-                                    v-model="dailyTaskForm.valid"
-                                    @submit.prevent="handleDailyTaskFormSubmit(dailyTask.id)">
-                                    <v-row align-content="center">
-                                        <v-col>
-                                            <v-text-field
-                                                v-model="dailyTaskForm.data.name"
-                                                :rules="dailyTaskForm.rules.name"
-                                                label="Name"
-                                                counter="50"
-                                                maxlength="50"
-                                                required
-                                                autofocus>
-                                            </v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                    <v-card-actions class="d-flex justify-end">
-                                        <v-btn
-                                            color="success"
-                                            text
-                                            small
-                                            :disabled="!dailyTaskForm.valid"
-                                            @click="handleDailyTaskFormSubmit(dailyTask.id)">
-                                            {{ dailyTask.id ? 'update' : 'create' }}
-                                        </v-btn>
-                                        <v-btn
-                                            plain
-                                            small
-                                            class="ml-2"
-                                            @click="toggleDailyTaskEditMode(dailyTask, false)">
-                                            cancel
-                                        </v-btn>
-                                    </v-card-actions>
-                                </v-form>
-                            </template>
-                        </v-card-text>
-                    </v-card>
-                </v-hover>
-            </template>
+                                <template v-else>
+                                    <v-form
+                                        v-model="dailyTaskForm.valid"
+                                        @submit.prevent="handleDailyTaskFormSubmit(dailyTask.id)">
+                                        <v-row align-content="center">
+                                            <v-col>
+                                                <v-text-field
+                                                    v-model="dailyTaskForm.data.name"
+                                                    :rules="dailyTaskForm.rules.name"
+                                                    label="Name"
+                                                    counter="50"
+                                                    maxlength="50"
+                                                    required
+                                                    autofocus>
+                                                </v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                        <v-card-actions class="d-flex justify-end">
+                                            <v-btn
+                                                color="success"
+                                                text
+                                                small
+                                                :disabled="!dailyTaskForm.valid"
+                                                @click="handleDailyTaskFormSubmit(dailyTask.id)">
+                                                {{ dailyTask.id ? 'update' : 'create' }}
+                                            </v-btn>
+                                            <v-btn
+                                                plain
+                                                small
+                                                class="ml-2"
+                                                @click="toggleDailyTaskEditMode(dailyTask, false)">
+                                                cancel
+                                            </v-btn>
+                                        </v-card-actions>
+                                    </v-form>
+                                </template>
+                            </v-card-text>
+                        </v-card>
+                    </v-hover>
+                </template>
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay message="You didn't add any task yet!">
@@ -328,6 +337,12 @@ export default class DailyUpdateTaskList extends Vue {
 </script>
 
 <style scoped lang="scss">
+.daily-task-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .daily-task-chip {
     max-width: 15rem;
     flex-shrink: 2;

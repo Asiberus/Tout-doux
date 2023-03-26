@@ -70,44 +70,26 @@
                 <template v-if="selected">
                     <v-divider class="mt-3"></v-divider>
 
-                    <v-tabs-items v-model="sectionTab" class="task-wrapper pt-3">
+                    <v-tabs-items v-model="sectionTab" class="tab-item-wrapper">
                         <v-tab-item
                             v-for="section of taskBySection"
                             :key="`tab-item-${section.id}`">
-                            <template v-if="taskUncompleted(section.tasks).length">
-                                <v-row align-content="start">
-                                    <v-col
-                                        v-for="task of taskUncompleted(section.tasks)"
-                                        :key="`${section.name}-task-${task.id}`"
-                                        cols="6">
-                                        <v-card
-                                            @click="selectTask(task)"
-                                            :disabled="isTaskSelected(task)"
-                                            :color="
-                                                isTaskSelected(task) ? 'taskCompleted' : '#212121'
-                                            "
-                                            elevation="5"
-                                            title="Select task">
-                                            <v-card-text class="p-1">
-                                                <h5 class="white--text">
-                                                    {{ task.name }}
-                                                </h5>
-                                            </v-card-text>
-                                        </v-card>
-                                    </v-col>
-                                </v-row>
-                            </template>
-                            <template v-else>
-                                <EmptyListDisplay
-                                    :message="`No task are related to ${section.name}`">
-                                    <template #img>
-                                        <img
-                                            src="../../../../../../assets/no_tasks.svg"
-                                            alt="No tasks"
-                                            height="150" />
-                                    </template>
-                                </EmptyListDisplay>
-                            </template>
+                            <div class="task-wrapper">
+                                <v-card
+                                    v-for="task of taskUncompleted(section.tasks)"
+                                    :key="`${section.name}-task-${task.id}`"
+                                    @click="selectTask(task)"
+                                    :disabled="isTaskSelected(task)"
+                                    :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
+                                    elevation="5"
+                                    title="Select task">
+                                    <v-card-text class="p-1">
+                                        <h5 class="white--text">
+                                            {{ task.name }}
+                                        </h5>
+                                    </v-card-text>
+                                </v-card>
+                            </div>
                         </v-tab-item>
                     </v-tabs-items>
                 </template>
@@ -147,7 +129,7 @@ export default class DailyUpdateProjectListItem extends Vue {
                 tasks: this.project.tasks,
             },
             ...this.project.sections
-                .filter(section => section.tasks.some(task => !task.completed))
+                .filter(({ tasks }) => tasks.some(({ completed }) => !completed))
                 .map(section => ({
                     id: section.id,
                     name: section.name,
@@ -208,7 +190,7 @@ export default class DailyUpdateProjectListItem extends Vue {
     z-index: 1;
     cursor: default;
 
-    .v-card {
+    & > .v-card {
         height: 100%;
 
         .v-card__text {
@@ -216,19 +198,17 @@ export default class DailyUpdateProjectListItem extends Vue {
             display: flex;
             flex-direction: column;
 
-            .project-title {
-                max-width: 17.5rem;
-            }
-
             .section-wrapper {
-                // Set width to low value to let flex handle it
-                // See when fit-content are implemented on firefox
-                width: 1rem;
+                width: min-content;
             }
 
             .task-wrapper {
                 flex-grow: 1;
                 overflow-y: auto;
+                padding: 12px 8px 8px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
         }
     }

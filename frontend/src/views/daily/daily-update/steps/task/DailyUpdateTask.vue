@@ -48,8 +48,7 @@
                             :daily-task-list="dailyTaskList"
                             :selected.sync="project.selected"
                             :section-selected="projectSectionSelected"
-                            @select-task="createDailyTask($event)"
-                            @unselect="project.selected = false">
+                            @select-task="createDailyTask($event)">
                         </DailyUpdateProjectListItem>
                     </div>
                 </template>
@@ -87,7 +86,6 @@
                             :collection="collection.content"
                             :daily-task-list="dailyTaskList"
                             :selected.sync="collection.selected"
-                            @unselect="collection.selected = false"
                             @select-task="createDailyTask($event)">
                         </DailyUpdateCollectionListItem>
                     </div>
