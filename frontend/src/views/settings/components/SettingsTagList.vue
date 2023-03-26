@@ -53,7 +53,7 @@ export default class SettingsTagList extends Vue {
         tagService
             .getTagList({ size: 0, type: this.type })
             .then((response: any) => {
-                // this.tagList = response.body.content
+                this.tagList = response.body.content
             })
             .catch((error: any) => console.error(error))
     }

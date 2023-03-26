@@ -81,7 +81,7 @@
                                     @click="selectTask(task)"
                                     :disabled="isTaskSelected(task)"
                                     :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
-                                    elevation="5"
+                                    elevation="3"
                                     title="Select task">
                                     <v-card-text class="p-1">
                                         <h5 class="white--text">

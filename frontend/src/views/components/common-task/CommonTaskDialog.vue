@@ -37,8 +37,7 @@
                         <v-icon small>mdi-tag</v-icon>
                         Tags
                     </h6>
-
-                    <TagSearch :selected-tags.sync="tagList" class="mb-5"></TagSearch>
+                    <TagSearch :selected-tags.sync="tagList" type="task" class="mb-5"></TagSearch>
 
                     <TagChip
                         v-for="tag of tagList"

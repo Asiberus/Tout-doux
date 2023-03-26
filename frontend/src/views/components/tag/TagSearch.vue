@@ -27,13 +27,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Tag } from '@/models/tag.model'
+import { Tag, TagType } from '@/models/tag.model'
 import { tagService } from '@/api'
 import TagChip from '@/views/components/tag/TagChip.vue'
 
 @Component({ components: { TagChip } })
 export default class TagSearch extends Vue {
     @Prop({ required: true }) selectedTags!: Tag[]
+    @Prop({ required: true }) type!: TagType
 
     tagList: Tag[] = []
     search: string | null = null
@@ -58,7 +59,7 @@ export default class TagSearch extends Vue {
         const excludedId = this.selectedTags.map(({ id }) => id).join(',')
         tagService
             .getTagList({
-                type: 'task',
+                type: this.type,
                 search: value,
                 size: 0,
                 exclude_ids: excludedId || undefined,
