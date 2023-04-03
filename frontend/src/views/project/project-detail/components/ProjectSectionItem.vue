@@ -24,7 +24,7 @@
                     <FilterChip
                         v-if="section.tasks.length > 0"
                         v-model="displayCompletedTask"
-                        color="green"
+                        color="green darken-2"
                         icon="mdi-trophy"
                         class="mr-3">
                         Completed
@@ -89,7 +89,9 @@
                             :key="task.id"
                             :task="task"
                             :disabled="disabled"
-                            @toggle-state="toggleTaskState">
+                            @toggle-state="toggleTaskState"
+                            @update="updateTask"
+                            @delete="deleteTask">
                         </TaskCard>
                     </template>
                     <template v-else>

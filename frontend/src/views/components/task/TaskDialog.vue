@@ -1,18 +1,9 @@
 <template>
     <v-card>
-        <div class="d-flex justify-space-between align-center pa-4">
+        <div class="pa-4">
             <h2>
                 {{ task ? 'Update Task' : 'New Task' }}
             </h2>
-            <div v-if="task">
-                <v-hover v-slot="{ hover }">
-                    <v-btn
-                        @click="emitDeleteTask()"
-                        :color="hover || confirmDelete ? 'error' : null">
-                        {{ confirmDelete ? 'Are you sure ?' : 'Delete Task' }}
-                    </v-btn>
-                </v-hover>
-            </div>
         </div>
         <v-card-text>
             <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent()">
@@ -133,15 +124,6 @@ export default class TaskDialog extends Vue {
         else this.$emit('create', this.taskForm.data)
         // Todo : to delete
         this.$emit('submit', this.taskForm.data)
-    }
-
-    emitDeleteTask(): void {
-        if (!this.confirmDelete) {
-            this.confirmDelete = true
-            return
-        }
-
-        this.$emit('delete')
     }
 
     emitCloseEvent(): void {

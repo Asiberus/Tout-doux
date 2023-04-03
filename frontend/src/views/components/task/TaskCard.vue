@@ -1,53 +1,93 @@
 <template>
     <div class="mb-2">
         <v-card
-            @click.stop="onCardClick"
             :disabled="disabled"
-            :color="task.completed ? 'green' : null"
-            :title="task.completed ? 'Uncomplete task' : null">
-            <v-card-text>
-                <v-row align-content="center">
-                    <v-col cols="11" class="d-flex align-center">
-                        <h3 class="ml-2 white--text font-weight-regular">
-                            {{ task.name }}
-                        </h3>
-                    </v-col>
+            :color="task.completed ? 'green darken-2' : null"
+            :ripple="false"
+            class="task-card rounded-lg">
+            <div class="task-card__header">
+                <template v-if="task.completed">
+                    <v-btn @click="openUncompleteDialog()" icon>
+                        <v-icon>mdi-checkbox-marked-outline</v-icon>
+                    </v-btn>
+                </template>
+                <template v-else>
+                    <v-btn @click="emitToggleStateEvent()" icon>
+                        <v-icon>mdi-checkbox-blank-outline</v-icon>
+                    </v-btn>
+                </template>
 
-                    <v-col cols="1">
-                        <template v-if="!task.completed">
-                            <v-checkbox
-                                v-if="!disabled"
-                                color="success"
-                                hide-details
-                                :input-value="task.completed"
-                                @click.native.prevent.stop.capture="emitToggleStateEvent"
-                                class="mt-0">
-                            </v-checkbox>
+                <div
+                    class="flex-grow-1 text-body-1 font-weight-medium white--text text-truncate"
+                    :title="task.name">
+                    {{ task.name }}
+                </div>
+
+                <div class="align-self-start d-flex">
+                    <v-menu v-model="taskMenu" offset-y>
+                        <template #activator="{ attrs, on }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                x-small
+                                plain
+                                class="task-card__header__action">
+                                <v-icon small>mdi-dots-vertical</v-icon>
+                            </v-btn>
                         </template>
-                        <template v-else>
-                            <v-icon>mdi-check-circle</v-icon>
-                        </template>
-                    </v-col>
-                </v-row>
-            </v-card-text>
+                        <v-list dense>
+                            <v-list-item @click="openEditDialog()">
+                                <v-icon small left>mdi-pencil</v-icon>
+                                <v-list-item-title>Edit</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="openDeleteDialog()">
+                                <v-icon small left>mdi-trash-can</v-icon>
+                                <v-list-item-title>Delete</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+            </div>
+
+            <div class="task-card__footer">
+                <template v-if="task.tags.length">
+                    <v-icon small class="tag-icon mr-1">mdi-tag</v-icon>
+                    <TagGroup
+                        :tag-list="task.tags"
+                        :padding="false"
+                        :x-small="true"
+                        class="task-card__footer__tags">
+                    </TagGroup>
+                </template>
+            </div>
         </v-card>
 
         <v-dialog v-model="taskDialog" width="60%">
             <TaskDialog
                 :task="task"
                 :is-dialog-open="taskDialog"
-                @update="emitUpdateEvent"
-                @delete="emitDeleteEvent"
+                @update="emitUpdateEvent($event)"
                 @close="taskDialog = false">
             </TaskDialog>
         </v-dialog>
 
-        <v-dialog v-model="confirmDialog" width="50%">
-            <ConfirmDialog @confirm="emitToggleStateEvent()" @cancel="confirmDialog = false">
+        <v-dialog v-model="uncompleteConfirmDialog" width="50%">
+            <ConfirmDialog
+                @confirm="emitToggleStateEvent()"
+                @cancel="uncompleteConfirmDialog = false">
                 <template #icon>
                     <v-icon x-large>mdi-trophy</v-icon>
                 </template>
                 <p>Are you sure to uncomplete this task ?</p>
+            </ConfirmDialog>
+        </v-dialog>
+
+        <v-dialog v-model="deleteConfirmDialog" width="50%">
+            <ConfirmDialog @confirm="emitDeleteEvent()" @cancel="deleteConfirmDialog = false">
+                <template #icon>
+                    <v-icon x-large>mdi-trash-can</v-icon>
+                </template>
+                <p>Are you sure to delete this task ?</p>
             </ConfirmDialog>
         </v-dialog>
     </div>
@@ -58,27 +98,28 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component({ components: { TaskDialog, ConfirmDialog } })
+@Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
 export default class TaskCard extends Vue {
     @Prop() private task!: Task
     @Prop({ default: false }) private disabled!: boolean
 
-    private taskDialog = false
-    private confirmDialog = false
+    taskMenu = false
+    taskDialog = false
+    uncompleteConfirmDialog = false
+    deleteConfirmDialog = false
 
-    get backgroundColor(): string | null {
-        if (this.task.completed) {
-            return 'success'
-        }
-        return null
+    openEditDialog(): void {
+        this.taskDialog = true
     }
 
-    onCardClick(): void {
-        if (this.disabled) return
+    openDeleteDialog(): void {
+        this.deleteConfirmDialog = true
+    }
 
-        if (!this.task.completed) this.taskDialog = true
-        else this.confirmDialog = true
+    openUncompleteDialog(): void {
+        this.uncompleteConfirmDialog = true
     }
 
     emitToggleStateEvent(): void {
@@ -91,10 +132,39 @@ export default class TaskCard extends Vue {
     }
 
     emitDeleteEvent(): void {
-        this.taskDialog = false
         this.$emit('delete', this.task.id)
     }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.task-card {
+    padding: 8px;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        column-gap: 4px;
+
+        &__action {
+            min-width: 0 !important;
+            padding: 0 !important;
+        }
+    }
+
+    &__footer {
+        min-height: 20px;
+        padding-left: 40px;
+        display: flex;
+        align-items: center;
+
+        .tag-icon {
+            opacity: 0.62;
+        }
+
+        &__tags {
+            min-width: 0;
+        }
+    }
+}
+</style>

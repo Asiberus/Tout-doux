@@ -27,7 +27,7 @@
             <FilterChip
                 v-if="project.tasks.length > 0"
                 v-model="displayCompletedTask"
-                color="green"
+                color="green darken-2"
                 icon="mdi-trophy"
                 class="mr-3">
                 Completed
@@ -89,6 +89,8 @@
                         <TaskCard
                             :task="task"
                             :disabled="project.archived"
+                            @update="updateTask"
+                            @delete="deleteTask"
                             @toggle-state="toggleTaskState">
                         </TaskCard>
                     </v-col>
