@@ -52,12 +52,12 @@
             <div class="task-card__footer">
                 <template v-if="task.tags.length">
                     <v-icon small class="tag-icon mr-1">mdi-tag</v-icon>
-                    <TagGroup
+                    <TagGroup2
                         :tag-list="task.tags"
                         :padding="false"
-                        :x-small="true"
+                        max-tag="3"
                         class="task-card__footer__tags">
-                    </TagGroup>
+                    </TagGroup2>
                 </template>
             </div>
         </v-card>
@@ -98,9 +98,9 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import TagGroup from '@/views/components/tag/TagGroup.vue'
+import TagGroup2 from '@/views/components/tag/TagGroup2.vue'
 
-@Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
+@Component({ components: { TaskDialog, ConfirmDialog, TagGroup2 } })
 export default class TaskCard extends Vue {
     @Prop() private task!: Task
     @Prop({ default: false }) private disabled!: boolean
