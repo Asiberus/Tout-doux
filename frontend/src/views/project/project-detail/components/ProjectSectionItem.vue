@@ -54,7 +54,8 @@
                             :disabled="disabled"
                             @toggle-state="toggleTaskState"
                             @update="updateTask"
-                            @delete="deleteTask">
+                            @delete="deleteTask"
+                            class="mb-2">
                         </TaskCard>
                     </template>
                     <template
@@ -91,7 +92,8 @@
                             :disabled="disabled"
                             @toggle-state="toggleTaskState"
                             @update="updateTask"
-                            @delete="deleteTask">
+                            @delete="deleteTask"
+                            class="mb-2">
                         </TaskCard>
                     </template>
                     <template v-else>

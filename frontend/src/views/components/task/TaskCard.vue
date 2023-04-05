@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-2">
+    <div>
         <v-card
             :disabled="disabled"
             :color="task.completed ? 'green darken-2' : null"

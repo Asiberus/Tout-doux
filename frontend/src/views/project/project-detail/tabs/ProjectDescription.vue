@@ -49,17 +49,17 @@
 
         <template v-if="!displayCompletedTask">
             <template v-if="uncompletedTasks.length > 0">
-                <v-row no-gutters>
-                    <v-col v-for="task of uncompletedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskCard
-                            :task="task"
-                            :disabled="project.archived"
-                            @toggle-state="toggleTaskState"
-                            @update="updateTask"
-                            @delete="deleteTask">
-                        </TaskCard>
-                    </v-col>
-                </v-row>
+                <div class="task-wrapper">
+                    <TaskCard
+                        v-for="task of uncompletedTasks"
+                        :key="task.id"
+                        :task="task"
+                        :disabled="project.archived"
+                        @toggle-state="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
+                    </TaskCard>
+                </div>
             </template>
             <template
                 v-else-if="
@@ -84,17 +84,17 @@
         </template>
         <template v-else>
             <template v-if="completedTasks.length > 0">
-                <v-row no-gutters>
-                    <v-col v-for="task of completedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskCard
-                            :task="task"
-                            :disabled="project.archived"
-                            @update="updateTask"
-                            @delete="deleteTask"
-                            @toggle-state="toggleTaskState">
-                        </TaskCard>
-                    </v-col>
-                </v-row>
+                <div class="task-wrapper">
+                    <TaskCard
+                        v-for="task of completedTasks"
+                        :key="task.id"
+                        :task="task"
+                        :disabled="project.archived"
+                        @update="updateTask"
+                        @delete="deleteTask"
+                        @toggle-state="toggleTaskState">
+                    </TaskCard>
+                </div>
             </template>
             <template v-else>
                 <EmptyListDisplay message="You didn't completed any general tasks yet !">
@@ -183,4 +183,10 @@ export default class ProjectDescription extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.task-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+</style>
