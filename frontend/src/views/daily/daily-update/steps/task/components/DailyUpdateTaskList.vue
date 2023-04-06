@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="d-flex flex-column">
         <div class="d-flex align-center mb-3">
             <h2 class="text-h5 mr-2">Tasks of the day</h2>
             <v-chip v-if="dailyTaskList.length > 0" small>
@@ -338,6 +338,8 @@ export default class DailyUpdateTaskList extends Vue {
 
 <style scoped lang="scss">
 .daily-task-wrapper {
+    flex: 1 0 0;
+    overflow: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
