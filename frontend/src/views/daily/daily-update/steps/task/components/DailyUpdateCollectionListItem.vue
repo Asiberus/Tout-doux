@@ -45,18 +45,20 @@
                 <template v-if="selected">
                     <v-divider class="mt-3"></v-divider>
                     <div class="task-wrapper">
-                        <v-card
+                        <TaskCard
                             v-for="task of tasksUncompleted"
                             :key="`task-${task.id}`"
-                            @click="selectTask(task)"
+                            :task="task"
+                            @click.native="selectTask(task)"
+                            :selected="isTaskSelected(task)"
                             :disabled="isTaskSelected(task)"
-                            :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
+                            :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+                            :small="true"
+                            :completable="false"
+                            :display-options="false"
                             elevation="3"
-                            title="Select task">
-                            <v-card-text class="p-1">
-                                <h5 class="white--text">{{ task.name }}</h5>
-                            </v-card-text>
-                        </v-card>
+                            color="grey darken-4">
+                        </TaskCard>
                     </div>
                 </template>
             </v-card-text>
@@ -69,37 +71,32 @@ import { DailyTask } from '@/models/daily-task.model'
 import { Task } from '@/models/task.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CollectionDetail } from '@/models/collection.model'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 
-@Component
+@Component({ components: { TaskCard } })
 export default class DailyUpdateCollectionListItem extends Vue {
     @Prop() collection!: CollectionDetail
     @Prop() dailyTaskList!: DailyTask[]
     @Prop() selected!: boolean
-
-    // todo : change color of task selected
-    get isTaskSelected(): (task: Task) => boolean {
-        return (task: Task) =>
-            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
-    }
 
     get tasks(): Task[] {
         return this.collection.tasks
     }
 
     get tasksCompleted(): Task[] {
-        return this.collection.tasks.filter(task => task.completed)
+        return this.tasks.filter(task => task.completed)
     }
 
     get tasksUncompleted(): Task[] {
-        return this.collection.tasks.filter(task => !task.completed)
-    }
-
-    get numberOfTasksCompleted(): number {
-        return this.collection.tasks.filter((task: Task) => task.completed).length
+        return this.tasks.filter(task => !task.completed)
     }
 
     get percentageOfTaskCompleted(): number {
         return (this.tasksCompleted.length / this.tasks.length) * 100
+    }
+
+    isTaskSelected(task: Task): boolean {
+        return this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
     }
 
     selectCollection(): void {

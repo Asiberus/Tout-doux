@@ -75,20 +75,20 @@
                             v-for="section of taskBySection"
                             :key="`tab-item-${section.id}`">
                             <div class="task-wrapper">
-                                <v-card
+                                <TaskCard
                                     v-for="task of taskUncompleted(section.tasks)"
                                     :key="`${section.name}-task-${task.id}`"
-                                    @click="selectTask(task)"
+                                    :task="task"
+                                    @click.native="selectTask(task)"
+                                    :selected="isTaskSelected(task)"
                                     :disabled="isTaskSelected(task)"
-                                    :color="isTaskSelected(task) ? 'taskCompleted' : '#212121'"
+                                    :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+                                    :small="true"
+                                    :completable="false"
+                                    :display-options="false"
                                     elevation="3"
-                                    title="Select task">
-                                    <v-card-text class="p-1">
-                                        <h5 class="white--text">
-                                            {{ task.name }}
-                                        </h5>
-                                    </v-card-text>
-                                </v-card>
+                                    color="grey darken-4">
+                                </TaskCard>
                             </div>
                         </v-tab-item>
                     </v-tabs-items>
@@ -99,14 +99,14 @@
 </template>
 
 <script lang="ts">
-import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import ProgressCircular from '@/components/ProgressCircular.vue'
 import { DailyTask } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 
-@Component({ components: { EmptyListDisplay, ProgressCircular } })
+@Component({ components: { TaskCard, ProgressCircular } })
 export default class DailyUpdateProjectListItem extends Vue {
     @Prop() project!: ProjectDetail
     @Prop() dailyTaskList!: DailyTask[]
@@ -114,12 +114,6 @@ export default class DailyUpdateProjectListItem extends Vue {
     @Prop({ default: 0 }) sectionSelected!: number
 
     sectionTab = 0
-
-    // todo : change color of task selected
-    get isTaskSelected(): (task: Task) => boolean {
-        return (task: Task) =>
-            this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
-    }
 
     get taskBySection(): { id: number; name: string; tasks: Task[] }[] {
         return [
@@ -163,6 +157,10 @@ export default class DailyUpdateProjectListItem extends Vue {
         this.sectionTab = this.taskBySection.findIndex(({ id }) => id === value) ?? 0
     }
 
+    isTaskSelected(task: Task): boolean {
+        return this.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
+    }
+
     selectProject(): void {
         if (this.allTasksUncompleted.length === 0 || this.selected) return
 
@@ -175,6 +173,8 @@ export default class DailyUpdateProjectListItem extends Vue {
     }
 
     selectTask(task: Task): void {
+        if (this.isTaskSelected(task)) return
+
         this.$emit('select-task', { taskId: task.id })
     }
 }

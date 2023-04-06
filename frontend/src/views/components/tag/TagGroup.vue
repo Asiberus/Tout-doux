@@ -15,11 +15,7 @@
             }">
             <div class="tag-group" ref="tagGroup" @scroll="renderArrows()">
                 <template v-for="tag of tagList">
-                    <TagChip
-                        :tag="tag"
-                        :key="tag.id"
-                        :x-small="xSmall"
-                        class="tag-group__chip"></TagChip>
+                    <TagChip :tag="tag" :key="tag.id" class="tag-group__chip"></TagChip>
                 </template>
             </div>
         </div>
@@ -42,7 +38,6 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 export default class TagGroup extends Vue {
     @Prop({ required: true }) tagList!: Tag[]
     @Prop({ default: true }) padding!: boolean
-    @Prop({ default: false }) xSmall!: boolean
 
     tagGroup!: HTMLElement
     isOverflowing = false
@@ -149,7 +144,6 @@ export default class TagGroup extends Vue {
         overflow: hidden;
         scroll-behavior: smooth;
         display: flex;
-        //column-gap: 8px;
         column-gap: 4px;
 
         &__chip {

@@ -36,11 +36,10 @@ import { TagType } from '@/models/tag.model'
 import TagCard from '@/views/components/tag/TagCard.vue'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import TagChip from '@/views/components/tag/TagChip.vue'
 import SettingsTagList from '@/views/settings/components/SettingsTagList.vue'
 
 @Component({
-    components: { TagCard, TagDialog, EmptyListDisplay, TagChip, SettingsTagList },
+    components: { TagCard, TagDialog, EmptyListDisplay, SettingsTagList },
 })
 export default class SettingsTags extends Vue {
     tagTypes: TagType[] = ['project', 'task']

@@ -35,10 +35,9 @@ import { Tag, TagForm, TagType } from '@/models/tag.model'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import TagCard from '@/views/components/tag/TagCard.vue'
-import TagChip from '@/views/components/tag/TagChip.vue'
 import { tagService } from '@/api'
 
-@Component({ components: { TagDialog, TagCard, EmptyListDisplay, TagChip } })
+@Component({ components: { TagDialog, TagCard, EmptyListDisplay } })
 export default class SettingsTagList extends Vue {
     @Prop({ required: true }) type!: TagType
 

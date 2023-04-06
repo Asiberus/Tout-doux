@@ -2,60 +2,67 @@
     <div>
         <v-card
             :disabled="disabled"
-            :color="task.completed ? 'green darken-2' : null"
+            :color="cardColor"
             :ripple="false"
-            class="task-card rounded-lg">
-            <div class="task-card__header">
-                <template v-if="task.completed">
-                    <v-btn @click="openUncompleteDialog()" icon>
-                        <v-icon>mdi-checkbox-marked-outline</v-icon>
-                    </v-btn>
-                </template>
-                <template v-else>
-                    <v-btn @click="emitToggleStateEvent()" icon>
-                        <v-icon>mdi-checkbox-blank-outline</v-icon>
-                    </v-btn>
+            :elevation="elevation"
+            class="task-card rounded-lg"
+            :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': true }">
+            <div class="task-card__header" :class="{ 'mb-1': small }">
+                <template v-if="completable">
+                    <template v-if="task.completed">
+                        <v-btn @click="openUncompleteDialog()" icon>
+                            <v-icon>mdi-checkbox-marked-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <template v-else>
+                        <v-btn @click="emitToggleStateEvent()" icon>
+                            <v-icon>mdi-checkbox-blank-outline</v-icon>
+                        </v-btn>
+                    </template>
                 </template>
 
                 <div
-                    class="flex-grow-1 text-body-1 font-weight-medium white--text text-truncate"
+                    class="flex-grow-1 font-weight-medium white--text text-truncate"
+                    :class="{ 'text-body-2': small, 'text-body-1': !small }"
                     :title="task.name">
                     {{ task.name }}
                 </div>
 
-                <div class="align-self-start d-flex">
-                    <v-menu v-model="taskMenu" offset-y>
-                        <template #activator="{ attrs, on }">
-                            <v-btn
-                                v-bind="attrs"
-                                v-on="on"
-                                x-small
-                                plain
-                                class="task-card__header__action">
-                                <v-icon small>mdi-dots-vertical</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-list dense>
-                            <v-list-item @click="openEditDialog()">
-                                <v-icon small left>mdi-pencil</v-icon>
-                                <v-list-item-title>Edit</v-list-item-title>
-                            </v-list-item>
-                            <v-list-item @click="openDeleteDialog()">
-                                <v-icon small left>mdi-trash-can</v-icon>
-                                <v-list-item-title>Delete</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </div>
+                <template v-if="displayOptions">
+                    <div class="align-self-start d-flex">
+                        <v-menu v-model="taskMenu" offset-y>
+                            <template #activator="{ attrs, on }">
+                                <v-btn
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    x-small
+                                    plain
+                                    class="task-card__header__action">
+                                    <v-icon small>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list dense>
+                                <v-list-item @click="openEditDialog()">
+                                    <v-icon small left>mdi-pencil</v-icon>
+                                    <v-list-item-title>Edit</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="openDeleteDialog()">
+                                    <v-icon small left>mdi-trash-can</v-icon>
+                                    <v-list-item-title>Delete</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </div>
+                </template>
             </div>
 
-            <div class="task-card__footer">
+            <div class="task-card__footer" :class="{ 'pl-10': completable, small }">
                 <template v-if="task.tags.length">
-                    <v-icon small class="tag-icon mr-1">mdi-tag</v-icon>
+                    <v-icon :small="!small" :x-small="small" class="tag-icon">mdi-tag</v-icon>
                     <TagGroup2
                         :tag-list="task.tags"
-                        :padding="false"
                         max-tag="3"
+                        :small="small"
                         class="task-card__footer__tags">
                     </TagGroup2>
                 </template>
@@ -102,13 +109,23 @@ import TagGroup2 from '@/views/components/tag/TagGroup2.vue'
 
 @Component({ components: { TaskDialog, ConfirmDialog, TagGroup2 } })
 export default class TaskCard extends Vue {
-    @Prop() private task!: Task
-    @Prop({ default: false }) private disabled!: boolean
+    @Prop({ required: true }) task!: Task
+    @Prop({ default: false }) disabled!: boolean
+    @Prop({ default: true }) displayOptions!: boolean
+    @Prop({ default: true }) completable!: boolean
+    @Prop({ default: false }) small!: boolean
+    @Prop({ default: false }) selected!: boolean
+    @Prop({ default: 2 }) elevation!: number
+    @Prop({ default: null }) color!: string | null
 
     taskMenu = false
     taskDialog = false
     uncompleteConfirmDialog = false
     deleteConfirmDialog = false
+
+    get cardColor(): string | null {
+        return this.task.completed || this.selected ? 'green darken-2' : this.color
+    }
 
     openEditDialog(): void {
         this.taskDialog = true
@@ -154,12 +171,16 @@ export default class TaskCard extends Vue {
 
     &__footer {
         min-height: 20px;
-        padding-left: 40px;
         display: flex;
         align-items: center;
 
+        &.small {
+            min-height: 18px;
+        }
+
         .tag-icon {
             opacity: 0.62;
+            margin-right: 4px;
         }
 
         &__tags {

@@ -3,7 +3,7 @@
         :color="tag.color"
         :small="small || xSmall"
         :close="clearable"
-        :class="{ 'x-small': xSmall }"
+        :class="{ small, 'x-small': xSmall }"
         @click:close="emitClearEvent()">
         {{ tag.name }}
     </v-chip>
@@ -27,7 +27,13 @@ export default class TagChip extends Vue {
 </script>
 
 <style scoped lang="scss">
-.v-chip.x-small {
-    height: 20px !important;
+.v-chip {
+    &.small {
+        height: 20px !important;
+    }
+
+    &.x-small {
+        height: 18px !important;
+    }
 }
 </style>
