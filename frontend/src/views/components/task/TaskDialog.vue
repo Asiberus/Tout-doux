@@ -1,10 +1,8 @@
 <template>
     <v-card>
-        <div class="pa-4">
-            <h2>
-                {{ task ? 'Update Task' : 'New Task' }}
-            </h2>
-        </div>
+        <h2 class="pa-4">
+            {{ task ? 'Update Task' : 'New Task' }}
+        </h2>
         <v-card-text>
             <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-text-field
@@ -58,7 +56,6 @@ export default class TaskDialog extends Vue {
     @Prop() private task?: Task
     @Prop() private isDialogOpen!: boolean
 
-    confirmDelete = false
     tagList: Tag[] = []
     taskForm: Form<TaskPost | TaskPatch> = {
         valid: false,
@@ -89,7 +86,6 @@ export default class TaskDialog extends Vue {
     @Watch('isDialogOpen')
     private onIsDialogOpenChanges(value: boolean): void {
         if (value) {
-            this.confirmDelete = false
             this.populateForm(this.task)
             this.form.resetValidation()
             this.inputName.focus()

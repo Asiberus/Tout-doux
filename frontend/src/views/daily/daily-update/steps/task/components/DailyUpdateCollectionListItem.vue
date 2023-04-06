@@ -51,7 +51,6 @@
                             :task="task"
                             @click.native="selectTask(task)"
                             :selected="isTaskSelected(task)"
-                            :disabled="isTaskSelected(task)"
                             :class="{ 'cursor-pointer': !isTaskSelected(task) }"
                             :small="true"
                             :completable="false"
@@ -109,6 +108,8 @@ export default class DailyUpdateCollectionListItem extends Vue {
     }
 
     selectTask(task: Task): void {
+        if (this.isTaskSelected(task)) return
+
         this.$emit('select-task', { taskId: task.id })
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="text-h4">Common task</div>
-        <div class="d-flex justify-space-between align-center mb-3">
+        <div class="d-flex justify-space-between align-end mb-3">
             <p class="text-subtitle-1 mb-0">
                 A common task is a task that can be added easily to a daily.
             </p>
@@ -16,14 +16,14 @@
         </div>
 
         <template v-if="commonTaskList.length">
-            <v-row>
-                <v-col v-for="commonTask of commonTaskList" :key="commonTask.id" cols="6">
-                    <CommonTaskCard
-                        :common-task="commonTask"
-                        @update="updateCommonTask($event)"
-                        @delete="deleteCommonTask($event)" />
-                </v-col>
-            </v-row>
+            <div class="common-task-wrapper">
+                <CommonTaskCard
+                    v-for="commonTask of commonTaskList"
+                    :key="commonTask.id"
+                    :common-task="commonTask"
+                    @update="updateCommonTask($event)"
+                    @delete="deleteCommonTask($event)" />
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay :message="`You didn't create any common task yet`" class="mt-10">
@@ -96,3 +96,11 @@ export default class SettingsCommonTasks extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.common-task-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+</style>

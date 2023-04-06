@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card
-            :disabled="disabled"
+            :disabled="disabled || selected"
             :color="cardColor"
             :ripple="false"
             :elevation="elevation"
@@ -59,12 +59,12 @@
             <div class="task-card__footer" :class="{ 'pl-10': completable, small }">
                 <template v-if="task.tags.length">
                     <v-icon :small="!small" :x-small="small" class="tag-icon">mdi-tag</v-icon>
-                    <TagGroup2
+                    <TagGroup
                         :tag-list="task.tags"
-                        max-tag="3"
                         :small="small"
+                        max-tag="3"
                         class="task-card__footer__tags">
-                    </TagGroup2>
+                    </TagGroup>
                 </template>
             </div>
         </v-card>
@@ -105,9 +105,9 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import TagGroup2 from '@/views/components/tag/TagGroup2.vue'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component({ components: { TaskDialog, ConfirmDialog, TagGroup2 } })
+@Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
 export default class TaskCard extends Vue {
     @Prop({ required: true }) task!: Task
     @Prop({ default: false }) disabled!: boolean

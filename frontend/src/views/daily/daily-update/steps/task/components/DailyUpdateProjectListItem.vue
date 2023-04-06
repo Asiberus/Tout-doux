@@ -81,7 +81,6 @@
                                     :task="task"
                                     @click.native="selectTask(task)"
                                     :selected="isTaskSelected(task)"
-                                    :disabled="isTaskSelected(task)"
                                     :class="{ 'cursor-pointer': !isTaskSelected(task) }"
                                     :small="true"
                                     :completable="false"

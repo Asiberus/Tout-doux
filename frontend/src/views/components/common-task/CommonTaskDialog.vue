@@ -4,17 +4,8 @@
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
         <v-card>
-            <v-card-title class="d-flex justify-space-between align-center mb-3">
+            <v-card-title class="mb-3">
                 <h2>{{ title }}</h2>
-                <div v-if="commonTask">
-                    <v-hover v-slot="{ hover }">
-                        <v-btn
-                            @click="emitDelete()"
-                            :color="hover || confirmDelete ? 'error' : null">
-                            {{ confirmDelete ? 'Are you sure ?' : 'Delete Tag' }}
-                        </v-btn>
-                    </v-hover>
-                </div>
             </v-card-title>
             <v-card-text>
                 <v-form ref="form" v-model="commonTaskForm.valid" @submit.prevent="emitSubmit()">
@@ -79,7 +70,6 @@ export default class CommonTaskDialog extends Vue {
     @Prop({ required: true }) value!: boolean
     @Prop({ required: false }) commonTask?: CommonTask
 
-    confirmDelete = false
     nameUniqueError: string | null = null
     inputNameLoading = false
     validationTimer?: number
@@ -117,7 +107,6 @@ export default class CommonTaskDialog extends Vue {
         if (value) {
             // We need to wait for next tick to access the form and the input name
             this.$nextTick(() => {
-                this.confirmDelete = false
                 this.nameUniqueError = null
                 this.form.resetValidation()
                 this.inputName.focus()
@@ -180,15 +169,6 @@ export default class CommonTaskDialog extends Vue {
 
         if (this.commonTask) this.$emit('update', { id: this.commonTask.id, data })
         else this.$emit('create', data)
-    }
-
-    emitDelete(): void {
-        if (!this.confirmDelete) {
-            this.confirmDelete = true
-            return
-        }
-
-        if (this.commonTask) this.$emit('delete', this.commonTask.id)
     }
 
     closeDialog(): void {

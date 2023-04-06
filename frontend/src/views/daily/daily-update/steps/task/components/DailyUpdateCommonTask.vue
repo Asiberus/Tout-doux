@@ -6,9 +6,10 @@
                     v-for="commonTask of commonTaskList"
                     :key="commonTask.id"
                     :common-task="commonTask"
-                    :editable="false"
+                    @click.native="selectCommonTask(commonTask.id)"
                     :selected="isCommonTaskSelected(commonTask.id)"
-                    @click.native="selectCommonTask(commonTask.id)">
+                    :class="{ 'cursor-pointer': !isCommonTaskSelected(commonTask.id) }"
+                    :editable="false">
                 </CommonTaskCard>
             </div>
         </template>
