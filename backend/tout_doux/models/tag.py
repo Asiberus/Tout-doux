@@ -33,7 +33,6 @@ class Tag(models.Model):
     color = models.CharField(choices=Color.choices, max_length=7)
 
     class Meta:
-        ordering = ('pk',)
         constraints = (
             models.UniqueConstraint(fields=('name', 'type'), name='unique_name_for_type'),
         )
