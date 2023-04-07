@@ -1,14 +1,14 @@
 <template>
     <v-card>
-        <div class="d-flex justify-space-between align-center pa-4">
-            <h2>
+        <v-card-title class="d-flex justify-space-between align-center">
+            <h4 class="text-h4">
                 <template v-if="event"> Update Event </template>
                 <template v-else> New Event </template>
 
                 <template v-if="relatedToDate">
                     for the {{ dateFormat(relatedToDate, 'DD MMMM Y') }}
                 </template>
-            </h2>
+            </h4>
             <div v-if="event">
                 <v-hover v-slot="{ hover }">
                     <v-btn
@@ -18,7 +18,8 @@
                     </v-btn>
                 </v-hover>
             </div>
-        </div>
+        </v-card-title>
+
         <v-card-text>
             <v-form ref="form" v-model="eventForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>

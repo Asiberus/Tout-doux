@@ -1,8 +1,8 @@
 <template>
     <v-card>
-        <h2 class="pa-4">
-            {{ task ? 'Update Task' : 'New Task' }}
-        </h2>
+        <v-card-title>
+            <h4 class="text-h4">{{ task ? 'Update Task' : 'New Task' }}</h4>
+        </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-text-field

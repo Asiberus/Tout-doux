@@ -1,6 +1,8 @@
 <template>
     <v-card>
-        <v-card-title>New collection</v-card-title>
+        <v-card-title>
+            <h4 class="text-h4">New collection</h4>
+        </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>

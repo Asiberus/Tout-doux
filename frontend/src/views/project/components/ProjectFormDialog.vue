@@ -1,7 +1,7 @@
 <template>
     <v-card>
-        <v-card-title class="mb-3">
-            <h2 class="text-h4">New project</h2>
+        <v-card-title>
+            <h4 class="text-h4">New project</h4>
         </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="projectForm.valid" @submit.prevent="emitSubmitEvent()">

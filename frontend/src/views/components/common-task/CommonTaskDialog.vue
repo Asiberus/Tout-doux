@@ -4,8 +4,8 @@
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
         <v-card>
-            <v-card-title class="mb-3">
-                <h2>{{ title }}</h2>
+            <v-card-title>
+                <h4 class="text-h4">{{ title }}</h4>
             </v-card-title>
             <v-card-text>
                 <v-form ref="form" v-model="commonTaskForm.valid" @submit.prevent="emitSubmit()">
