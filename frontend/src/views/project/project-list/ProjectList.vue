@@ -28,11 +28,12 @@
         </div>
 
         <template v-if="projectList.length > 0">
-            <v-row>
-                <v-col v-for="project in projectList" :key="project.id" cols="4">
-                    <ProjectItemCard :project="project" />
-                </v-col>
-            </v-row>
+            <div class="project-wrapper">
+                <ProjectItemCard
+                    v-for="project in projectList"
+                    :key="project.id"
+                    :project="project" />
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay>
@@ -118,3 +119,15 @@ export default class ProjectListComponent extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.project-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    & > * {
+        min-width: 0;
+    }
+}
+</style>

@@ -28,18 +28,19 @@
         </div>
 
         <template v-if="collectionList.length > 0">
-            <v-row>
-                <v-col v-for="collection in collectionList" :key="collection.id" cols="4">
-                    <CollectionItemCard :collection="collection" />
-                </v-col>
-            </v-row>
+            <div class="collection-wrapper">
+                <CollectionItemCard
+                    v-for="collection in collectionList"
+                    :key="collection.id"
+                    :collection="collection" />
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay>
                 <template #img>
                     <img
                         src="../../../assets/project.svg"
-                        alt="No project"
+                        alt="No collection"
                         style="max-width: 450px" />
                 </template>
                 <template #message>
@@ -117,3 +118,15 @@ export default class CollectionListComponent extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.collection-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    & > * {
+        min-width: 0;
+    }
+}
+</style>
