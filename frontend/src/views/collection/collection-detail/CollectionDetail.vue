@@ -12,7 +12,7 @@
 
         <v-tabs v-model="collectionTab" background-color="transparent" color="accent">
             <v-tab :to="{ name: 'collection-detail' }" exact>General</v-tab>
-            <v-tab :to="{ name: 'collection-detail-configuration' }" exact>Configuration</v-tab>
+            <v-tab :to="{ name: 'collection-detail-settings' }" exact>Settings</v-tab>
         </v-tabs>
 
         <div class="pa-5">

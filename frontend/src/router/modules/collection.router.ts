@@ -1,5 +1,5 @@
 import CollectionDetailComponent from '@/views/collection/collection-detail/CollectionDetail.vue'
-import CollectionConfiguration from '@/views/collection/collection-detail/tabs/CollectionConfiguration.vue'
+import CollectionSettings from '@/views/collection/collection-detail/tabs/CollectionSettings.vue'
 import CollectionDescription from '@/views/collection/collection-detail/tabs/CollectionDescription.vue'
 import CollectionListComponent from '@/views/collection/collection-list/CollectionList.vue'
 import { RouteConfig } from 'vue-router'
@@ -22,9 +22,9 @@ export const collectionRoutes: Array<RouteConfig> = [
                 component: CollectionDescription,
             },
             {
-                path: 'configuration',
-                name: 'collection-detail-configuration',
-                component: CollectionConfiguration,
+                path: 'settings',
+                name: 'collection-detail-settings',
+                component: CollectionSettings,
             },
         ],
     },

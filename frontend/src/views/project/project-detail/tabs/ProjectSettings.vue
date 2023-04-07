@@ -6,10 +6,6 @@
                     <v-icon left small>mdi-cog</v-icon>
                     General
                 </v-tab>
-                <!--                <v-tab>-->
-                <!--                    <v-icon left small>mdi-tag</v-icon>-->
-                <!--                    Tags-->
-                <!--                </v-tab>-->
                 <v-tab disabled>
                     <v-icon left small>mdi-account</v-icon>
                     User
@@ -144,17 +140,6 @@
                         </v-col>
                     </v-row>
                 </v-tab-item>
-                <v-tab-item :transition="false">
-                    <div class="d-flex justify-space-between align-center mb-3">
-                        <h4 class="text-h4">Tags</h4>
-                    </div>
-                    <v-row>
-                        <v-col cols="10">
-                            <TagSearch :selected-tags="project.tags" type="project"></TagSearch>
-                        </v-col>
-                    </v-row>
-                </v-tab-item>
-
                 <v-tab-item :transition="false" />
             </v-tabs-items>
         </v-col>
