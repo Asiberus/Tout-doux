@@ -1,10 +1,12 @@
 import { EventModel } from '@/models/event.model'
 import { Task } from '@/models/task.model'
 import { SectionTask } from '@/models/section.model'
+import { Tag } from '@/models/tag.model'
 
 export interface ProjectPostOrPatch {
     name: string
     description: string
+    tagIds: number[]
     archived?: boolean
 }
 
@@ -13,6 +15,7 @@ export interface Project {
     name: string
     description: string
     archived: boolean
+    tags: Tag[]
     createdOn: string
 }
 

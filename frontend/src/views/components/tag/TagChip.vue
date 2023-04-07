@@ -2,7 +2,8 @@
     <v-chip
         :color="tag.color"
         :small="small || xSmall"
-        :close="clearable"
+        :close="clearable && !disabled"
+        :disabled="disabled"
         :class="{ small, 'x-small': xSmall }"
         @click:close="emitClearEvent()">
         {{ tag.name }}
@@ -19,6 +20,7 @@ export default class TagChip extends Vue {
     @Prop({ default: false }) small!: boolean
     @Prop({ default: false }) xSmall!: boolean
     @Prop({ default: false }) clearable!: boolean
+    @Prop({ default: false }) disabled!: boolean
 
     emitClearEvent(): void {
         this.$emit('clear', this.tag.id)

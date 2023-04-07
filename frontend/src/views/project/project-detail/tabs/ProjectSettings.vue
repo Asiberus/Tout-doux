@@ -1,19 +1,15 @@
 <template>
     <v-row>
         <v-col cols="2">
-            <v-tabs
-                v-model="configurationTab"
-                vertical
-                background-color="transparent"
-                color="accent">
-                <v-tab href="#general">
+            <v-tabs v-model="settingsTab" vertical background-color="transparent" color="accent">
+                <v-tab>
                     <v-icon left small>mdi-cog</v-icon>
                     General
                 </v-tab>
-                <v-tab disabled>
-                    <v-icon left small>mdi-tag</v-icon>
-                    Tags
-                </v-tab>
+                <!--                <v-tab>-->
+                <!--                    <v-icon left small>mdi-tag</v-icon>-->
+                <!--                    Tags-->
+                <!--                </v-tab>-->
                 <v-tab disabled>
                     <v-icon left small>mdi-account</v-icon>
                     User
@@ -21,9 +17,10 @@
             </v-tabs>
         </v-col>
         <v-col>
-            <v-tabs-items v-model="configurationTab" class="transparent">
-                <v-tab-item value="general" :transition="false">
-                    <div class="d-flex justify-end align-center mb-3">
+            <v-tabs-items v-model="settingsTab" class="transparent">
+                <v-tab-item :transition="false">
+                    <div class="d-flex align-center mb-3">
+                        <h4 class="text-h4 flex-grow-1">General</h4>
                         <v-dialog v-model="archiveProjectDialog" width="50%">
                             <template #activator="{ attrs, on }">
                                 <v-btn
@@ -82,7 +79,8 @@
                                     label="Name"
                                     counter="50"
                                     maxlength="50"
-                                    required>
+                                    required
+                                    class="mb-5">
                                 </v-text-field>
                                 <v-textarea
                                     v-model="projectForm.data.description"
@@ -95,8 +93,45 @@
                                     required
                                     rows="2"
                                     auto-grow
-                                    class="my-5">
+                                    class="mb-5">
                                 </v-textarea>
+
+                                <h6
+                                    class="text-h6 grey--text"
+                                    :class="{
+                                        'text--lighten-2': !this.project.archived,
+                                        'text--darken-2': this.project.archived,
+                                    }">
+                                    <v-icon
+                                        small
+                                        :color="
+                                            this.project.archived
+                                                ? 'grey darken-2'
+                                                : 'grey lighten-2'
+                                        ">
+                                        mdi-tag
+                                    </v-icon>
+                                    Tags
+                                </h6>
+                                <TagSearch
+                                    :selected-tags.sync="tagList"
+                                    :disabled="project.archived"
+                                    type="project"
+                                    class="mb-5">
+                                </TagSearch>
+
+                                <div class="mb-5">
+                                    <TagChip
+                                        v-for="tag of tagList"
+                                        :key="tag.id"
+                                        :tag="tag"
+                                        :disabled="project.archived"
+                                        :clearable="true"
+                                        @clear="removeTag($event)"
+                                        class="mr-2 mb-2">
+                                    </TagChip>
+                                </div>
+
                                 <div v-if="!project.archived" class="float-right mt-5">
                                     <v-btn
                                         color="success"
@@ -109,8 +144,18 @@
                         </v-col>
                     </v-row>
                 </v-tab-item>
-                <v-tab-item value="tag" :transition="false" />
-                <v-tab-item value="user" :transition="false" />
+                <v-tab-item :transition="false">
+                    <div class="d-flex justify-space-between align-center mb-3">
+                        <h4 class="text-h4">Tags</h4>
+                    </div>
+                    <v-row>
+                        <v-col cols="10">
+                            <TagSearch :selected-tags="project.tags" type="project"></TagSearch>
+                        </v-col>
+                    </v-row>
+                </v-tab-item>
+
+                <v-tab-item :transition="false" />
             </v-tabs-items>
         </v-col>
     </v-row>
@@ -119,25 +164,29 @@
 <script lang="ts">
 import { projectService } from '@/api/project.api'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { ProjectDetail } from '@/models/project.model'
+import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import TagSearch from '@/views/components/tag/TagSearch.vue'
+import TagChip from '@/views/components/tag/TagChip.vue'
+import { Tag } from '@/models/tag.model'
+import { Form } from '@/models/common.model'
+import deepEqual from 'deep-equal'
 
-@Component({
-    components: {
-        ConfirmDialog,
-    },
-})
-export default class ProjectConfiguration extends Vue {
-    configurationTab = 'general'
+@Component({ components: { TagSearch, TagChip, ConfirmDialog } })
+export default class ProjectSettings extends Vue {
+    settingsTab = 0
     archiveProjectDialog = false
     deleteProjectDialog = false
 
-    projectForm = {
+    tagList: Tag[] = this.project.tags
+
+    projectForm: Form<ProjectPostOrPatch> = {
         valid: false,
         data: {
             name: this.project.name,
             description: this.project.description,
+            tagIds: [],
         },
         rules: {
             name: [
@@ -158,8 +207,18 @@ export default class ProjectConfiguration extends Vue {
     get isFormUntouched(): boolean {
         return (
             this.projectForm.data.name === this.project.name &&
-            this.projectForm.data.description === this.project.description
+            this.projectForm.data.description === this.project.description &&
+            deepEqual(this.tagList, this.project.tags)
         )
+    }
+
+    @Watch('tagList')
+    private onTagListChanges(value: Tag[]): void {
+        this.projectForm.data.tagIds = value.map(({ id }) => id)
+    }
+
+    removeTag(id: number): void {
+        this.tagList = this.tagList.filter(tag => tag.id !== id)
     }
 
     toggleProjectArchiveState(): void {
@@ -190,5 +249,3 @@ export default class ProjectConfiguration extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

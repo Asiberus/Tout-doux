@@ -9,6 +9,7 @@ import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
+import { Tag } from '@/models/tag.model'
 
 export const projectMutations = {
     setCurrentProject: 'SET_CURRENT_PROJECT',
@@ -69,6 +70,7 @@ export class ProjectModule extends VuexModule {
     private [projectMutations.updateProperties](payload: {
         name: string
         description: string
+        tags: Tag[]
         archived: boolean
     }): void {
         if (!this.currentProject) return
@@ -208,10 +210,11 @@ export class ProjectModule extends VuexModule {
         const { id, data } = payload
         projectService.updateProject(id, data).then(
             (response: any) => {
-                const { name, description, archived } = response.body
+                const { name, description, archived, tags } = response.body
                 this.context.commit(projectMutations.updateProperties, {
                     name,
                     description,
+                    tags,
                     archived,
                 })
             },

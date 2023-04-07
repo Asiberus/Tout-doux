@@ -1,5 +1,5 @@
 import ProjectDetailComponent from '@/views/project/project-detail/ProjectDetail.vue'
-import ProjectConfiguration from '@/views/project/project-detail/tabs/ProjectConfiguration.vue'
+import ProjectSettings from '@/views/project/project-detail/tabs/ProjectSettings.vue'
 import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescription.vue'
 import ProjectEvent from '@/views/project/project-detail/tabs/ProjectEvent.vue'
 import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
@@ -35,9 +35,9 @@ export const projectRoutes: Array<RouteConfig> = [
                 component: ProjectEvent,
             },
             {
-                path: 'configuration',
-                name: 'project-detail-configuration',
-                component: ProjectConfiguration,
+                path: 'settings',
+                name: 'project-detail-settings',
+                component: ProjectSettings,
             },
         ],
     },

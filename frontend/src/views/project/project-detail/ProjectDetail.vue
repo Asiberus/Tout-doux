@@ -15,7 +15,7 @@
             <v-tab :to="{ name: 'project-detail-section' }">Section</v-tab>
             <v-tab :to="{ name: 'project-detail-event' }">Event</v-tab>
             <v-tab disabled>Historic</v-tab>
-            <v-tab :to="{ name: 'project-detail-configuration' }">Configuration</v-tab>
+            <v-tab :to="{ name: 'project-detail-settings' }">Settings</v-tab>
         </v-tabs>
 
         <div class="pa-5">

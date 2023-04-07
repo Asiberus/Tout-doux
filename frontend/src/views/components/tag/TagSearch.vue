@@ -3,6 +3,7 @@
         <v-autocomplete
             :value="selectedTags"
             @input="updateSelectedTags($event)"
+            :disabled="disabled"
             :search-input.sync="search"
             :items="tagList"
             :loading="isLoading"
@@ -35,6 +36,7 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 export default class TagSearch extends Vue {
     @Prop({ required: true }) selectedTags!: Tag[]
     @Prop({ required: true }) type!: TagType
+    @Prop({ default: false }) disabled!: boolean
 
     tagList: Tag[] = []
     search: string | null = null

@@ -24,7 +24,7 @@
         </v-tabs>
 
         <v-tabs-items v-model="tab" class="transparent">
-            <v-tab-item :transition="false" class="lalala">
+            <v-tab-item :transition="false">
                 <div class="d-flex align-center mb-3">
                     <h5 class="text-h5 mr-2">Project</h5>
                     <v-hover v-slot="{ hover }">
