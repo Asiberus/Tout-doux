@@ -13,10 +13,7 @@
                     </h5>
                 </div>
                 <template v-if="commonTask.tags.length > 0">
-                    <div class="d-flex align-center">
-                        <v-icon small class="tag-icon">mdi-tag</v-icon>
-                        <TagGroup :tag-list="commonTask.tags" max-tag="3"></TagGroup>
-                    </div>
+                    <TagGroup :tag-list="commonTask.tags" max-tag="3"></TagGroup>
                 </template>
             </div>
             <div v-if="editable" class="actions">

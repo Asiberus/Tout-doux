@@ -1,21 +1,26 @@
 <template>
     <v-card
-        rounded
         :to="{ name: 'project-detail', params: { id: project.id } }"
         :color="project.archived ? 'projectArchivedCard' : null"
-        :ripple="false">
-        <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
+        :ripple="false"
+        class="rounded-lg">
+        <v-progress-linear :value="percentageOfCompletedTask" color="project lighten-4" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
             <div class="flex-shrink-1 overflow-hidden">
-                <p
-                    class="text-h5 white--text font-weight-bold text-ellipsis mb-1"
+                <h5
+                    class="text-h5 white--text font-weight-bold text-truncate"
                     :title="project.name">
                     {{ project.name }}
-                </p>
-                <p class="mb-0 ml-2 text-ellipsis" :title="project.description">
+                </h5>
+                <p class="text-subtitle text-truncate mb-1" :title="project.description">
                     {{ project.description }}
                 </p>
+                <div class="tag-wrapper">
+                    <template v-if="project.tags.length > 0">
+                        <TagGroup :tag-list="project.tags" max-tag="2"></TagGroup>
+                    </template>
+                </div>
             </div>
             <div class="px-3 flex-shrink-0">
                 <span style="font-size: 2.5em" class="white--text">{{
@@ -33,8 +38,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProjectList } from '@/models/project.model'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component
+@Component({ components: { TagGroup } })
 export default class ProjectItemCard extends Vue {
     @Prop() private project!: ProjectList
 
@@ -45,9 +51,7 @@ export default class ProjectItemCard extends Vue {
 </script>
 
 <style scoped lang="scss">
-.project-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.tag-wrapper {
+    min-height: 20px;
 }
 </style>

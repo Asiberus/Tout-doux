@@ -6,7 +6,7 @@
             :ripple="false"
             :elevation="elevation"
             class="task-card rounded-lg"
-            :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': true }">
+            :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions }">
             <div class="task-card__header" :class="{ 'mb-1': small }">
                 <template v-if="completable">
                     <template v-if="task.completed">
@@ -58,7 +58,6 @@
 
             <div class="task-card__footer" :class="{ 'pl-10': completable, small }">
                 <template v-if="task.tags.length">
-                    <v-icon :small="!small" :x-small="small" class="tag-icon">mdi-tag</v-icon>
                     <TagGroup
                         :tag-list="task.tags"
                         :small="small"
@@ -171,16 +170,9 @@ export default class TaskCard extends Vue {
 
     &__footer {
         min-height: 20px;
-        display: flex;
-        align-items: center;
 
         &.small {
             min-height: 18px;
-        }
-
-        .tag-icon {
-            opacity: 0.62;
-            margin-right: 4px;
         }
 
         &__tags {

@@ -4,16 +4,19 @@
         :to="{ name: 'collection-detail', params: { id: collection.id } }"
         :color="collection.archived ? 'collectionArchived' : null"
         :ripple="false">
-        <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
+        <v-progress-linear
+            :value="percentageOfCompletedTask"
+            color="collection lighten-2"
+            height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
             <div class="flex-shrink-1 overflow-hidden">
-                <p
-                    class="text-h5 white--text font-weight-bold text-ellipsis mb-1"
+                <h5
+                    class="text-h5 white--text font-weight-bold text-truncate"
                     :title="collection.name">
                     {{ collection.name }}
-                </p>
-                <p class="mb-0 ml-2 text-ellipsis" :title="collection.description">
+                </h5>
+                <p class="text-subtitle-1 text-truncate mb-0" :title="collection.description">
                     {{ collection.description }}
                 </p>
             </div>
@@ -44,5 +47,3 @@ export default class CollectionItemCard extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

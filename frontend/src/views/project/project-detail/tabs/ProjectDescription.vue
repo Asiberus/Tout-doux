@@ -13,10 +13,8 @@
                     </v-card-text>
                 </v-card>
                 <template v-if="project.tags.length > 0">
-                    <div class="d-flex align-center">
-                        <v-icon left>mdi-tag</v-icon>
-                        <TagGroup :tag-list="project.tags" :large="true"></TagGroup>
-                    </div>
+                    <TagGroup :tag-list="project.tags" :large="true" :icon-transparent="false">
+                    </TagGroup>
                 </template>
             </v-col>
             <v-col cols="3">

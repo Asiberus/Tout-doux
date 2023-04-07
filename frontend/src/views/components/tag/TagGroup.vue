@@ -1,5 +1,12 @@
 <template>
     <div class="tag-group d-flex align-center gap-1 overflow-auto" :class="{ small, large }">
+        <v-icon
+            :small="!small && !large"
+            :x-small="small"
+            :class="{ transparent: iconTransparent }">
+            mdi-tag
+        </v-icon>
+
         <template v-for="tag of displayedTags">
             <TagChip
                 :tag="tag"
@@ -47,6 +54,7 @@ export default class TagGroup extends Vue {
     @Prop({ required: true }) tagList!: Tag[]
     @Prop({ default: false }) small!: boolean
     @Prop({ default: false }) large!: boolean
+    @Prop({ default: true }) iconTransparent!: boolean
     @Prop() maxTag?: number | undefined
 
     get displayedTags(): Tag[] {
@@ -78,6 +86,10 @@ export default class TagGroup extends Vue {
         .v-chip {
             height: 18px;
         }
+    }
+
+    .transparent {
+        opacity: 0.62;
     }
 }
 
