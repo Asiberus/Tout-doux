@@ -1,14 +1,14 @@
 <template>
     <div v-if="project">
-        <h1>
-            Project : {{ project.name }}
+        <div class="d-flex align-center">
+            <h3 class="text-h3"><span class="grey--text">Project : </span>{{ project.name }}</h3>
             <v-chip v-if="project.archived" color="accent" class="ml-3">
                 <v-icon small class="mr-1"> mdi-archive </v-icon>
                 Archived
             </v-chip>
-        </h1>
+        </div>
 
-        <v-divider class="my-3" />
+        <v-divider class="my-4" />
 
         <v-tabs v-model="projectTab" background-color="transparent" color="accent">
             <v-tab :to="{ name: 'project-detail' }" exact>Description</v-tab>
@@ -28,8 +28,9 @@
 import { ProjectDetail } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
-@Component
+@Component({ components: { TagGroup } })
 export default class ProjectDetailComponent extends Vue {
     @Prop() private projectId!: number
 

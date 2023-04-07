@@ -1,10 +1,10 @@
 <template>
-    <div class="tag-group d-flex align-center gap-1 overflow-auto" :class="{ small }">
+    <div class="tag-group d-flex align-center gap-1 overflow-auto" :class="{ small, large }">
         <template v-for="tag of displayedTags">
             <TagChip
                 :tag="tag"
                 :key="tag.id"
-                :small="!small"
+                :small="!small && !large"
                 :x-small="small"
                 class="flex-shrink-0">
             </TagChip>
@@ -24,7 +24,11 @@
                 </template>
                 <div class="d-flex flex-column align-start gap-1 py-1">
                     <template v-for="tag of hiddenTags">
-                        <TagChip :tag="tag" :key="tag.id" :small="!small" :x-small="small">
+                        <TagChip
+                            :tag="tag"
+                            :key="tag.id"
+                            :small="!small && !large"
+                            :x-small="small">
                         </TagChip>
                     </template>
                 </div>
@@ -41,14 +45,17 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 @Component({ components: { TagChip } })
 export default class TagGroup extends Vue {
     @Prop({ required: true }) tagList!: Tag[]
-    @Prop({ required: true }) maxTag!: number
     @Prop({ default: false }) small!: boolean
+    @Prop({ default: false }) large!: boolean
+    @Prop() maxTag?: number | undefined
 
     get displayedTags(): Tag[] {
         return this.tagList.slice(0, this.maxTag)
     }
 
     get hiddenTags(): Tag[] {
+        if (!this.maxTag) return []
+
         return this.tagList.slice(this.maxTag)
     }
 }
@@ -61,7 +68,7 @@ export default class TagGroup extends Vue {
     column-gap: 4px;
     overflow: auto;
 
-    &:not(.small) {
+    &:not(.small):not(.large) {
         .v-chip {
             height: 20px;
         }

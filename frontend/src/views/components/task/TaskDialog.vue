@@ -131,7 +131,7 @@ export default class TaskDialog extends Vue {
 
 <style scoped lang="scss">
 .tag-wrapper {
-    min-height: 40px;
+    min-height: 32px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;

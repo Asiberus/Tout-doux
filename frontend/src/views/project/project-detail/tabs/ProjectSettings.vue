@@ -76,7 +76,7 @@
                                     counter="50"
                                     maxlength="50"
                                     required
-                                    class="mb-5">
+                                    class="mb-2">
                                 </v-text-field>
                                 <v-textarea
                                     v-model="projectForm.data.description"
@@ -89,7 +89,7 @@
                                     required
                                     rows="2"
                                     auto-grow
-                                    class="mb-5">
+                                    class="mb-2">
                                 </v-textarea>
 
                                 <h6
@@ -116,19 +116,18 @@
                                     class="mb-5">
                                 </TagSearch>
 
-                                <div class="mb-5">
+                                <div class="tag-wrapper mb-3">
                                     <TagChip
                                         v-for="tag of tagList"
                                         :key="tag.id"
                                         :tag="tag"
                                         :disabled="project.archived"
                                         :clearable="true"
-                                        @clear="removeTag($event)"
-                                        class="mr-2 mb-2">
+                                        @clear="removeTag($event)">
                                     </TagChip>
                                 </div>
 
-                                <div v-if="!project.archived" class="float-right mt-5">
+                                <div v-if="!project.archived" class="float-right">
                                     <v-btn
                                         color="success"
                                         type="submit"
@@ -164,7 +163,7 @@ export default class ProjectSettings extends Vue {
     archiveProjectDialog = false
     deleteProjectDialog = false
 
-    tagList: Tag[] = this.project.tags
+    tagList: Tag[] = []
 
     projectForm: Form<ProjectPostOrPatch> = {
         valid: false,
@@ -193,11 +192,19 @@ export default class ProjectSettings extends Vue {
         return (
             this.projectForm.data.name === this.project.name &&
             this.projectForm.data.description === this.project.description &&
-            deepEqual(this.tagList, this.project.tags)
+            deepEqual(
+                this.projectForm.data.tagIds,
+                this.project.tags.map(({ id }) => id)
+            )
         )
     }
 
-    @Watch('tagList')
+    @Watch('project.tags', { deep: true, immediate: true })
+    private onProjectTagsChanges(value: Tag[]): void {
+        this.tagList = value
+    }
+
+    @Watch('tagList', { immediate: true })
     private onTagListChanges(value: Tag[]): void {
         this.projectForm.data.tagIds = value.map(({ id }) => id)
     }
@@ -234,3 +241,12 @@ export default class ProjectSettings extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.tag-wrapper {
+    min-height: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+</style>

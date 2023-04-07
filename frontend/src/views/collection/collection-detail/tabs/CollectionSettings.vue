@@ -59,7 +59,7 @@
                 maxlength="50"
                 required
                 :autofocus="!collection"
-                class="mb-5">
+                class="mb-2">
             </v-text-field>
             <v-textarea
                 v-model="collectionForm.data.description"
@@ -72,9 +72,9 @@
                 required
                 rows="1"
                 auto-grow
-                class="mb-5">
+                class="mb-8">
             </v-textarea>
-            <div v-if="!collection.archived" class="float-right mt-5">
+            <div v-if="!collection.archived" class="float-right">
                 <v-btn
                     color="success"
                     type="submit"

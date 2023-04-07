@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="9">
                 <h3 class="mb-3">Description</h3>
-                <v-card>
+                <v-card class="mb-3">
                     <v-card-text>
                         {{ project.description }}
                         <div class="d-flex justify-end align-center mt-2" title="Created on">
@@ -12,6 +12,12 @@
                         </div>
                     </v-card-text>
                 </v-card>
+                <template v-if="project.tags.length > 0">
+                    <div class="d-flex align-center">
+                        <v-icon left>mdi-tag</v-icon>
+                        <TagGroup :tag-list="project.tags" :large="true"></TagGroup>
+                    </div>
+                </template>
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
@@ -121,9 +127,11 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
 
 @Component({
     components: {
+        TagGroup,
         TaskCard,
         TaskDialog,
         ProgressCircular,
