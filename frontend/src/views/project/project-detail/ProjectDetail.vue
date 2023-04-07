@@ -10,7 +10,7 @@
 
         <v-divider class="my-4" />
 
-        <v-tabs v-model="projectTab" background-color="transparent" color="accent">
+        <v-tabs background-color="transparent" color="accent">
             <v-tab :to="{ name: 'project-detail' }" exact>Description</v-tab>
             <v-tab :to="{ name: 'project-detail-section' }">Section</v-tab>
             <v-tab :to="{ name: 'project-detail-event' }">Event</v-tab>
@@ -33,8 +33,6 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 @Component({ components: { TagGroup } })
 export default class ProjectDetailComponent extends Vue {
     @Prop() private projectId!: number
-
-    projectTab = 'description'
 
     get project(): ProjectDetail | undefined {
         return this.$store.state.project.currentProject

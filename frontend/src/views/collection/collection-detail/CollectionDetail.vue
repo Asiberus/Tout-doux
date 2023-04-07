@@ -12,7 +12,7 @@
 
         <v-divider class="my-4" />
 
-        <v-tabs v-model="collectionTab" background-color="transparent" color="accent">
+        <v-tabs background-color="transparent" color="accent">
             <v-tab :to="{ name: 'collection-detail' }" exact>General</v-tab>
             <v-tab :to="{ name: 'collection-detail-settings' }" exact>Settings</v-tab>
         </v-tabs>
@@ -31,8 +31,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component
 export default class CollectionDetailComponent extends Vue {
     @Prop() collectionId!: number
-
-    collectionTab = 'description'
 
     get collection(): CollectionDetail | undefined {
         return this.$store.state.collection.currentCollection
