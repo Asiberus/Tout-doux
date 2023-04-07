@@ -30,16 +30,17 @@
                     </h6>
                     <TagSearch :selected-tags.sync="tagList" type="task" class="mb-5"></TagSearch>
 
-                    <TagChip
-                        v-for="tag of tagList"
-                        :key="tag.id"
-                        :tag="tag"
-                        clearable
-                        @clear="removeTag($event)"
-                        class="mr-2 mb-2">
-                    </TagChip>
+                    <div class="tag-wrapper mb-3">
+                        <TagChip
+                            v-for="tag of tagList"
+                            :key="tag.id"
+                            :tag="tag"
+                            clearable
+                            @clear="removeTag($event)">
+                        </TagChip>
+                    </div>
 
-                    <v-card-actions class="d-flex justify-end mt-3">
+                    <v-card-actions class="d-flex justify-end">
                         <v-btn
                             color="success"
                             text
@@ -176,3 +177,12 @@ export default class CommonTaskDialog extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.tag-wrapper {
+    min-height: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+</style>

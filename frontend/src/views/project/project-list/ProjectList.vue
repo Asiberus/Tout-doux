@@ -21,7 +21,7 @@
                 </template>
                 <ProjectFormDialog
                     :isDialogOpen="projectDialog"
-                    @submit="createProject"
+                    @submit="createProject($event)"
                     @close="projectDialog = false">
                 </ProjectFormDialog>
             </v-dialog>
