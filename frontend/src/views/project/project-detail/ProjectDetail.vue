@@ -2,7 +2,7 @@
     <div v-if="project">
         <div class="d-flex align-center">
             <h3 class="text-h3"><span class="grey--text">Project : </span>{{ project.name }}</h3>
-            <v-chip v-if="project.archived" color="accent" class="ml-3">
+            <v-chip v-if="project.archived" color="accent" class="ml-4">
                 <v-icon small class="mr-1"> mdi-archive </v-icon>
                 Archived
             </v-chip>
@@ -45,5 +45,3 @@ export default class ProjectDetailComponent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

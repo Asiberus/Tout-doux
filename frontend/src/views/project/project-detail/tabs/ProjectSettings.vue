@@ -16,7 +16,8 @@
             <v-tabs-items v-model="settingsTab" class="transparent">
                 <v-tab-item :transition="false">
                     <div class="d-flex align-center mb-3">
-                        <h4 class="text-h4 flex-grow-1">General</h4>
+                        <h4 class="text-h5">General</h4>
+                        <v-spacer></v-spacer>
                         <v-dialog v-model="archiveProjectDialog" width="50%">
                             <template #activator="{ attrs, on }">
                                 <v-btn

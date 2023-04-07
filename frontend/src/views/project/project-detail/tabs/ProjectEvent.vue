@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="12">
                 <div class="d-flex align-center mb-5">
-                    <h3 class="flex-grow-1">Event related to the project</h3>
+                    <h3 class="text-h5 flex-grow-1">Events related to the project</h3>
 
                     <FilterChip
                         v-if="project.events.length > 0"

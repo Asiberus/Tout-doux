@@ -1,8 +1,8 @@
 <template>
     <v-row>
         <v-col cols="8">
-            <div class="d-flex align-center mb-2">
-                <h3>Tasks</h3>
+            <div class="d-flex align-center mb-3">
+                <h3 class="text-h5">Tasks</h3>
                 <v-spacer></v-spacer>
                 <FilterChip
                     v-if="collection.tasks.length > 0"
@@ -84,12 +84,12 @@
             </template>
         </v-col>
         <v-col cols="4">
-            <div class="d-flex justify-center mt-3">
+            <div class="d-flex justify-center mb-3">
                 <ProgressCircular :value="completedTasks.length" :max="collection.tasks.length">
                 </ProgressCircular>
             </div>
-            <v-card class="mt-5">
-                <v-card-title>Description</v-card-title>
+            <h5 class="text-h5 mb-2">Description</h5>
+            <v-card>
                 <v-card-text>
                     {{ collection.description }}
                     <div class="d-flex justify-end align-center mt-2" title="Created on">
@@ -132,7 +132,7 @@ export default class CollectionDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.collection.createdOn).format('D MMM. Y')
+        return moment(this.collection.createdOn).format('D MMMM Y')
     }
 
     get uncompletedTasks(): Task[] {

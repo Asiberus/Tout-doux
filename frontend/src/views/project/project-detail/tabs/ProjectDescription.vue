@@ -2,7 +2,7 @@
     <div>
         <v-row>
             <v-col cols="9">
-                <h3 class="mb-3">Description</h3>
+                <h3 class="text-h5 mb-3">Description</h3>
                 <v-card class="mb-3">
                     <v-card-text>
                         {{ project.description }}
@@ -28,7 +28,7 @@
         </v-row>
 
         <div class="d-flex align-center mt-10 mb-2">
-            <h3>General Tasks</h3>
+            <h3 class="text-h5">General Tasks</h3>
             <v-spacer></v-spacer>
             <FilterChip
                 v-if="project.tasks.length > 0"
@@ -148,7 +148,7 @@ export default class ProjectDescription extends Vue {
     }
 
     get createdDate(): string {
-        return moment(this.project.createdOn).format('D MMM. Y')
+        return moment(this.project.createdOn).format('D MMMM Y')
     }
 
     get uncompletedTasks(): Task[] {

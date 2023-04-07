@@ -1,14 +1,16 @@
 <template>
     <div v-if="collection">
-        <h1>
-            Collection : {{ collection.name }}
-            <v-chip v-if="collection.archived" color="accent" class="ml-3">
+        <div class="d-flex align-center">
+            <h3 class="text-h3">
+                <span class="grey--text">Collection : </span>{{ collection.name }}
+            </h3>
+            <v-chip v-if="collection.archived" color="accent" class="ml-4">
                 <v-icon small class="mr-1"> mdi-archive </v-icon>
                 Archived
             </v-chip>
-        </h1>
+        </div>
 
-        <v-divider class="my-3" />
+        <v-divider class="my-4" />
 
         <v-tabs v-model="collectionTab" background-color="transparent" color="accent">
             <v-tab :to="{ name: 'collection-detail' }" exact>General</v-tab>
@@ -41,5 +43,3 @@ export default class CollectionDetailComponent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>
