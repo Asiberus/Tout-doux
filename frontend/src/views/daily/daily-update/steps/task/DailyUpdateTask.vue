@@ -340,5 +340,9 @@ export default class DailyUpdateTask extends Vue {
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: min-content;
     gap: 8px;
+
+    & > * {
+        min-width: 0;
+    }
 }
 </style>

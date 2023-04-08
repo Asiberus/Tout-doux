@@ -4,7 +4,7 @@
         :color="project.archived ? 'projectArchivedCard' : null"
         :ripple="false"
         class="rounded-lg">
-        <v-progress-linear :value="percentageOfCompletedTask" color="project lighten-4" height="6">
+        <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
             <div class="flex-shrink-1 overflow-hidden">

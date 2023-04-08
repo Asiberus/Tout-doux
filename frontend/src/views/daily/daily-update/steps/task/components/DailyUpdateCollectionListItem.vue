@@ -1,11 +1,17 @@
 <template>
     <div :class="{ selected: selected }" @click="selectCollection">
-        <v-card :disabled="tasksUncompleted.length === 0" :class="{ 'cursor-pointer': !selected }">
-            <v-progress-linear :value="percentageOfTaskCompleted" color="green accent-2" height="4">
+        <v-card
+            :disabled="tasksUncompleted.length === 0"
+            :class="{ 'cursor-pointer': !selected }"
+            class="rounded-lg">
+            <v-progress-linear
+                :value="percentageOfTaskCompleted"
+                color="collection lighten-2"
+                height="4">
             </v-progress-linear>
             <v-card-text>
                 <div class="d-flex justify-space-between align-center">
-                    <h3 class="white--text text-ellipsis" :title="collection.name">
+                    <h3 class="text-h6 white--text text-truncate" :title="collection.name">
                         {{ collection.name }}
                     </h3>
                     <template v-if="!selected">

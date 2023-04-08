@@ -3,7 +3,8 @@
         rounded
         :to="{ name: 'collection-detail', params: { id: collection.id } }"
         :color="collection.archived ? 'collectionArchived' : null"
-        :ripple="false">
+        :ripple="false"
+        class="rounded-lg">
         <v-progress-linear
             :value="percentageOfCompletedTask"
             color="collection lighten-2"
