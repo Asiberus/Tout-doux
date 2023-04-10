@@ -6,9 +6,8 @@
         :ripple="ripple"
         :small="small"
         :title="title">
-        <v-icon v-if="project.archived" small left>mdi-archive</v-icon>
-
-        <div class="text-ellipsis">
+        <v-icon small left>mdi-briefcase-variant</v-icon>
+        <div class="text-truncate">
             {{ project.name }}
         </div>
     </v-chip>

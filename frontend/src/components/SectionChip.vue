@@ -6,12 +6,11 @@
         :ripple="ripple"
         :small="small"
         :title="title">
-        <v-icon v-if="archived" small left>mdi-archive</v-icon>
-
+        <v-icon small left>mdi-briefcase-variant</v-icon>
         <div class="name-wrapper">
-            <span class="project-name text-ellipsis">{{ project.name }}</span>
+            <span class="project-name text-truncate">{{ project.name }}</span>
             <span class="mx-1">•</span>
-            <span class="section-name text-ellipsis">{{ section.name }}</span>
+            <span class="section-name text-truncate">{{ section.name }}</span>
         </div>
     </v-chip>
 </template>

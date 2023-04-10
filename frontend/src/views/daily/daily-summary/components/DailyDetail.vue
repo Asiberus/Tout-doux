@@ -53,61 +53,21 @@
                             <v-timeline dense>
                                 <v-timeline-item
                                     v-for="dailyTask in dailyTaskList"
-                                    :key="`task-${dailyTask.id}`"
+                                    :key="`daily-task-${dailyTask.id}`"
                                     fill-dot
-                                    :color="dailyTask.completed ? 'green' : null">
+                                    :color="dailyTask.completed ? 'green darken-2' : null">
                                     <template #icon>
                                         <div
                                             v-ripple
-                                            @click="toggleDailyTaskCompleteState(dailyTask)"
+                                            @click="toggleDailyTask(dailyTask)"
                                             class="icon-wrapper">
                                             <v-icon v-if="dailyTask.completed">mdi-check</v-icon>
                                             <v-icon v-else>mdi-trophy</v-icon>
                                         </div>
                                     </template>
-                                    <v-card
-                                        @click="toggleDailyTaskCompleteState(dailyTask)"
-                                        :color="dailyTask.completed ? 'green darken-4' : null">
-                                        <v-card-text class="white--text">
-                                            <div class="task-content">
-                                                <v-chip
-                                                    v-if="dailyTask.action"
-                                                    :color="getActionChipColor(dailyTask.action)"
-                                                    class="task-content__action">
-                                                    {{
-                                                        getLiteralFormOfDailyActionEnum(
-                                                            dailyTask.action
-                                                        )
-                                                    }}
-                                                </v-chip>
-
-                                                <h4 class="task-content__name">
-                                                    {{ getDailyTaskName(dailyTask) }}
-                                                </h4>
-
-                                                <template v-if="dailyTask.task">
-                                                    <ProjectChip
-                                                        v-if="dailyTask.task.project"
-                                                        :project="dailyTask.task.project"
-                                                        @click.native.stop
-                                                        class="task-content__chip">
-                                                    </ProjectChip>
-                                                    <SectionChip
-                                                        v-if="dailyTask.task.section"
-                                                        :section="dailyTask.task.section"
-                                                        @click.native.stop
-                                                        class="task-content__chip">
-                                                    </SectionChip>
-                                                    <CollectionChip
-                                                        v-if="dailyTask.task.collection"
-                                                        :collection="dailyTask.task.collection"
-                                                        @click.native.stop
-                                                        class="task-content__chip">
-                                                    </CollectionChip>
-                                                </template>
-                                            </div>
-                                        </v-card-text>
-                                    </v-card>
+                                    <DailyTaskCard
+                                        :daily-task="dailyTask"
+                                        @toggle="toggleDailyTask(dailyTask)"></DailyTaskCard>
                                 </v-timeline-item>
                             </v-timeline>
                         </div>
@@ -168,8 +128,11 @@ import { isPassed, sortEvents } from '@/utils/event.util'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
 
-@Component({ components: { EventItemCard, ProjectChip, SectionChip, CollectionChip } })
+@Component({
+    components: { DailyTaskCard, EventItemCard },
+})
 export default class DailyDetail extends Vue {
     @Prop() date!: string
     dailyTaskList: DailyTask[] = []
@@ -210,7 +173,7 @@ export default class DailyDetail extends Vue {
         )
     }
 
-    toggleDailyTaskCompleteState(dailyTask: DailyTask): void {
+    toggleDailyTask(dailyTask: DailyTask): void {
         dailyTaskService.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
             (response: any) => {
                 dailyTask.completed = response.body.completed
@@ -218,14 +181,6 @@ export default class DailyDetail extends Vue {
             },
             (error: any) => console.error(error)
         )
-    }
-
-    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
-        return getLiteralFormOfDailyActionEnum(action)
-    }
-
-    getActionChipColor(action: DailyTaskActionEnum): string {
-        return getActionChipColor(action)
     }
 
     emitDailyTaskCompletedEvent(): void {
@@ -242,12 +197,6 @@ export default class DailyDetail extends Vue {
 
     isEventPassed(event: EventModel): boolean {
         return isPassed(event)
-    }
-
-    getDailyTaskName(dailyTask: DailyTask): string {
-        if (dailyTask.task) return dailyTask.task.name
-        else if (dailyTask.commonTask) return dailyTask.commonTask.name
-        else return dailyTask.name as string // We know name is defined
     }
 }
 </script>
@@ -306,30 +255,8 @@ export default class DailyDetail extends Vue {
                     justify-content: center;
                     align-items: center;
                 }
-
-                .task-content {
-                    display: flex;
-                    align-items: center;
-                    column-gap: 1rem;
-
-                    &__action {
-                        flex-shrink: 0;
-                    }
-
-                    &__name {
-                        flex-shrink: 0;
-                    }
-
-                    &__chip {
-                        max-width: 15rem;
-                    }
-                }
             }
         }
     }
-}
-
-.opacity-1 {
-    opacity: 1 !important;
 }
 </style>

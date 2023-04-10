@@ -6,9 +6,8 @@
         :ripple="ripple"
         :small="small"
         :title="title">
-        <v-icon v-if="collection.archived" small left>mdi-archive</v-icon>
-
-        <div class="text-ellipsis">
+        <v-icon small left>mdi-list-box</v-icon>
+        <div class="text-truncate">
             {{ collection.name }}
         </div>
     </v-chip>

@@ -22,7 +22,7 @@
                 offset-y
                 offset-overflow
                 :close-on-content-click="false"
-                z-index="4">
+                :z-index="zIndex">
                 <template #activator="{ attrs, on }">
                     <v-chip v-bind="attrs" v-on="on" small class="flex-shrink-0">
                         <v-icon x-small class="mr-1">mdi-tag</v-icon>
@@ -52,10 +52,11 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 @Component({ components: { TagChip } })
 export default class TagGroup extends Vue {
     @Prop({ required: true }) tagList!: Tag[]
+    @Prop() maxTag?: number | undefined
     @Prop({ default: false }) small!: boolean
     @Prop({ default: false }) large!: boolean
     @Prop({ default: true }) iconTransparent!: boolean
-    @Prop() maxTag?: number | undefined
+    @Prop({ default: 4 }) zIndex!: number
 
     get displayedTags(): Tag[] {
         return this.tagList.slice(0, this.maxTag)
