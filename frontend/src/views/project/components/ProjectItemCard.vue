@@ -3,7 +3,7 @@
         :to="{ name: 'project-detail', params: { id: project.id } }"
         :color="project.archived ? 'projectArchivedCard' : null"
         :ripple="false"
-        class="rounded-lg">
+        class="project-card rounded-lg">
         <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
         </v-progress-linear>
         <v-card-text class="d-flex justify-space-between align-center">
@@ -16,11 +16,9 @@
                 <p class="text-subtitle text-truncate mb-1" :title="project.description">
                     {{ project.description }}
                 </p>
-                <div class="tag-wrapper">
-                    <template v-if="project.tags.length > 0">
-                        <TagGroup :tag-list="project.tags" max-tag="2"></TagGroup>
-                    </template>
-                </div>
+                <template v-if="project.tags.length > 0">
+                    <TagGroup :tag-list="project.tags" max-tag="2"></TagGroup>
+                </template>
             </div>
             <div class="px-3 flex-shrink-0">
                 <span style="font-size: 2.5em" class="white--text">{{
@@ -51,7 +49,13 @@ export default class ProjectItemCard extends Vue {
 </script>
 
 <style scoped lang="scss">
-.tag-wrapper {
-    min-height: 20px;
+.project-card {
+    min-height: 110px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    & > * {
+        min-width: 0;
+    }
 }
 </style>
