@@ -88,6 +88,14 @@ export default class TagGroup extends Vue {
         }
     }
 
+    .v-chip {
+        cursor: inherit;
+
+        &:hover::before {
+            opacity: 0 !important;
+        }
+    }
+
     .transparent {
         opacity: 0.62;
     }

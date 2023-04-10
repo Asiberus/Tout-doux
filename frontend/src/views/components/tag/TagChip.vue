@@ -30,6 +30,12 @@ export default class TagChip extends Vue {
 
 <style scoped lang="scss">
 .v-chip {
+    cursor: inherit;
+
+    &:hover::before {
+        opacity: 0 !important;
+    }
+
     &.small {
         height: 20px !important;
     }
