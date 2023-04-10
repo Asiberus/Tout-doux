@@ -6,8 +6,35 @@
             :ripple="false"
             :elevation="elevation"
             class="task-card rounded-lg"
-            :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions }">
-            <div class="task-card__header" :class="{ 'mb-1': small }">
+            :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions, small }">
+            <template v-if="displayOptions">
+                <div class="task-card__actions">
+                    <v-menu v-model="taskMenu" offset-y>
+                        <template #activator="{ attrs, on }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                x-small
+                                plain
+                                class="task-card__actions__btn">
+                                <v-icon small>mdi-dots-vertical</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list dense>
+                            <v-list-item @click="openEditDialog()">
+                                <v-icon small left>mdi-pencil</v-icon>
+                                <v-list-item-title>Edit</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="openDeleteDialog()">
+                                <v-icon small left>mdi-trash-can</v-icon>
+                                <v-list-item-title>Delete</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+            </template>
+
+            <div class="task-card__content" :class="{ 'mb-1': small }">
                 <template v-if="completable">
                     <template v-if="task.completed">
                         <v-btn @click="openUncompleteDialog()" icon>
@@ -27,45 +54,16 @@
                     :title="task.name">
                     {{ task.name }}
                 </div>
-
-                <template v-if="displayOptions">
-                    <div class="align-self-start d-flex">
-                        <v-menu v-model="taskMenu" offset-y>
-                            <template #activator="{ attrs, on }">
-                                <v-btn
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    x-small
-                                    plain
-                                    class="task-card__header__action">
-                                    <v-icon small>mdi-dots-vertical</v-icon>
-                                </v-btn>
-                            </template>
-                            <v-list dense>
-                                <v-list-item @click="openEditDialog()">
-                                    <v-icon small left>mdi-pencil</v-icon>
-                                    <v-list-item-title>Edit</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item @click="openDeleteDialog()">
-                                    <v-icon small left>mdi-trash-can</v-icon>
-                                    <v-list-item-title>Delete</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </div>
-                </template>
             </div>
 
-            <div class="task-card__footer" :class="{ 'pl-10': completable, small }">
-                <template v-if="task.tags.length">
-                    <TagGroup
-                        :tag-list="task.tags"
-                        :small="small"
-                        max-tag="3"
-                        class="task-card__footer__tags">
-                    </TagGroup>
-                </template>
-            </div>
+            <template v-if="task.tags.length">
+                <TagGroup
+                    :tag-list="task.tags"
+                    :small="small"
+                    max-tag="3"
+                    :class="{ 'pl-10': completable }">
+                </TagGroup>
+            </template>
         </v-card>
 
         <v-dialog v-model="taskDialog" width="60%">
@@ -155,29 +153,31 @@ export default class TaskCard extends Vue {
 
 <style scoped lang="scss">
 .task-card {
+    min-height: 72px;
     padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-    &__header {
-        display: flex;
-        align-items: center;
-        column-gap: 4px;
+    &.small {
+        min-height: 62px;
+    }
 
-        &__action {
+    &__actions {
+        position: absolute;
+        top: 4px;
+        right: 8px;
+
+        &__btn {
             min-width: 0 !important;
             padding: 0 !important;
         }
     }
 
-    &__footer {
-        min-height: 20px;
-
-        &.small {
-            min-height: 18px;
-        }
-
-        &__tags {
-            min-width: 0;
-        }
+    &__content {
+        display: flex;
+        align-items: center;
+        column-gap: 4px;
     }
 }
 </style>
