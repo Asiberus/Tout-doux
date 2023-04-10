@@ -162,6 +162,8 @@ import SectionChip from '@/components/SectionChip.vue'
 import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
 import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
+import { getActionChipColor } from '@/utils/daily-task.utils'
+import { getLiteralFormOfDailyActionEnum } from '@/utils/daily-task.utils'
 import { isPassed, sortEvents } from '@/utils/event.util'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
@@ -218,30 +220,12 @@ export default class DailyDetail extends Vue {
         )
     }
 
-    // Todo : move this function to a better place
-    // Todo : define color for dailytask action chip
-    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string | null {
-        switch (action) {
-            case DailyTaskActionEnum.THINK:
-                return 'Réfléchir'
-            case DailyTaskActionEnum.WORK:
-                return 'Travailler'
-            case DailyTaskActionEnum.FINISH:
-                return 'Finir'
-            default:
-                return null
-        }
+    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
+        return getLiteralFormOfDailyActionEnum(action)
     }
 
     getActionChipColor(action: DailyTaskActionEnum): string {
-        switch (action) {
-            case DailyTaskActionEnum.THINK:
-                return 'teal'
-            case DailyTaskActionEnum.WORK:
-                return 'purple'
-            case DailyTaskActionEnum.FINISH:
-                return 'red'
-        }
+        return getActionChipColor(action)
     }
 
     emitDailyTaskCompletedEvent(): void {

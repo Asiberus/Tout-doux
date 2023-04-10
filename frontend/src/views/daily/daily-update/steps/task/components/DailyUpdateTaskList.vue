@@ -211,6 +211,7 @@ import {
     DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import { getActionChipColor, getLiteralFormOfDailyActionEnum } from '@/utils/daily-task.utils'
 
 // todo : maybe change v-hover on daily task card
 @Component({ components: { EmptyListDisplay, ProjectChip, SectionChip, CollectionChip } })
@@ -265,28 +266,12 @@ export default class DailyUpdateTaskList extends Vue {
         }
     }
 
-    // Todo : move this function to a better place
-    // Todo : define color for dailytask action chip
-    private getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
-        switch (action) {
-            case DailyTaskActionEnum.THINK:
-                return 'Réfléchir'
-            case DailyTaskActionEnum.WORK:
-                return 'Travailler'
-            case DailyTaskActionEnum.FINISH:
-                return 'Finir'
-        }
+    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
+        return getLiteralFormOfDailyActionEnum(action)
     }
 
     getActionChipColor(action: DailyTaskActionEnum): string {
-        switch (action) {
-            case DailyTaskActionEnum.THINK:
-                return 'teal'
-            case DailyTaskActionEnum.WORK:
-                return 'purple'
-            case DailyTaskActionEnum.FINISH:
-                return 'red'
-        }
+        return getActionChipColor(action)
     }
 
     toggleDailyTaskEditMode(dailyTask: DailyTaskDisplay, value: boolean): void {
