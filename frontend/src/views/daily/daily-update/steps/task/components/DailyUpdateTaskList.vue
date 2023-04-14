@@ -30,11 +30,12 @@
                     </DailyTaskFormCard>
                 </template>
                 <template v-if="createDailyTaskDisplayed">
-                    <DailyTaskFormCard
-                        :edit-mode="true"
-                        @hide-edit-mode="createDailyTaskDisplayed = false"
-                        @create="createDailyTask($event)">
-                    </DailyTaskFormCard>
+                    <v-card class="rounded-lg pa-4">
+                        <DailyTaskForm
+                            @submit="createDailyTask($event)"
+                            @close="createDailyTaskDisplayed = false">
+                        </DailyTaskForm>
+                    </v-card>
                 </template>
             </div>
         </template>
@@ -53,9 +54,12 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { DailyTask, DailyTaskPost, DailyUpdateTaskTab } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
+import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 
 // todo : maybe change v-hover on daily task card
-@Component({ components: { DailyTaskFormCard, EmptyListDisplay } })
+@Component({
+    components: { DailyTaskForm, DailyTaskFormCard, EmptyListDisplay },
+})
 export default class DailyUpdateTaskList extends Vue {
     @Prop() dailyTaskList!: DailyTask[]
 
