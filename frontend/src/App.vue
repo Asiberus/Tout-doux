@@ -7,13 +7,15 @@
 <script lang="ts">
 import Vue from 'vue'
 import AppMain from '@/layout/AppMain.vue'
+import { Component } from 'vue-property-decorator'
+import { settingsActions } from '@/store/modules/settings.store'
 
-export default Vue.extend({
-    name: 'App',
-    components: {
-        AppMain,
-    },
-})
+@Component({ components: { AppMain } })
+export default class App extends Vue {
+    mounted(): void {
+        this.$store.dispatch(settingsActions.getSettings)
+    }
+}
 </script>
 
 <style lang="scss">
