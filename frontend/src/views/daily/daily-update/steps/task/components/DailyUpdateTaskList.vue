@@ -15,7 +15,7 @@
             </v-btn>
         </div>
 
-        <template v-if="dailyTaskList.length">
+        <template v-if="dailyTaskList.length > 0 || createDailyTaskDisplayed">
             <div class="daily-task-wrapper">
                 <template v-for="dailyTask of dailyTaskList">
                     <DailyTaskFormCard
@@ -39,6 +39,7 @@
                 </template>
             </div>
         </template>
+
         <template v-else>
             <EmptyListDisplay message="You didn't add any task yet!">
                 <template #img>
@@ -61,7 +62,7 @@ import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
     components: { DailyTaskForm, DailyTaskFormCard, EmptyListDisplay },
 })
 export default class DailyUpdateTaskList extends Vue {
-    @Prop() dailyTaskList!: DailyTask[]
+    @Prop({ required: true }) dailyTaskList!: DailyTask[]
 
     selectedDailyTask: number | null = null
     createDailyTaskDisplayed = false

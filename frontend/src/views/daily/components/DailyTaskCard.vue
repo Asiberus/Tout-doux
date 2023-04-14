@@ -11,7 +11,7 @@
             </DailyTaskActionChip>
 
             <h4 class="text-body-1 font-weight-medium text-truncate">
-                {{ dailyTaskName }}
+                {{ name }}
             </h4>
 
             <v-spacer></v-spacer>
@@ -76,7 +76,7 @@ import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vu
 export default class DailyTaskCard extends Vue {
     @Prop({ required: true }) dailyTask!: DailyTask
 
-    get dailyTaskName(): string {
+    get name(): string {
         if (this.dailyTask.task) return this.dailyTask.task.name
         else if (this.dailyTask.commonTask) return this.dailyTask.commonTask.name
         else return this.dailyTask.name as string // We know name is defined
