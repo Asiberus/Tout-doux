@@ -28,7 +28,7 @@ export interface DailyTask {
     id: number
     date: string
     name?: string
-    tags?: Tag[]
+    tags: Tag[]
     task?: TaskExtended
     commonTask?: CommonTask
     action?: DailyTaskActionEnum

@@ -33,3 +33,19 @@ export function getActionChipTextColor(action: DailyTaskActionEnum): string {
             return 'red--text text--darken-3'
     }
 }
+
+export const actionOptions: { value: DailyTaskActionEnum | null; text: string }[] = [
+    { value: null, text: 'No action' },
+    {
+        value: DailyTaskActionEnum.THINK,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.THINK),
+    },
+    {
+        value: DailyTaskActionEnum.WORK,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.WORK),
+    },
+    {
+        value: DailyTaskActionEnum.FINISH,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.FINISH),
+    },
+]

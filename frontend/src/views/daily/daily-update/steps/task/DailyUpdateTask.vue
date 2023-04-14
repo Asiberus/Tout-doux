@@ -131,11 +131,11 @@
         </v-tabs-items>
 
         <DailyUpdateTaskList
-            :dailyTaskList.sync="dailyTaskList"
-            @create-daily-task="createDailyTask"
-            @update-daily-task="updateDailyTask"
-            @delete-daily-task="deleteDailyTask"
-            @select="select">
+            :dailyTaskList="dailyTaskList"
+            @create="createDailyTask($event)"
+            @update="updateDailyTask($event)"
+            @delete="deleteDailyTask($event)"
+            @select="select($event)">
         </DailyUpdateTaskList>
     </div>
 </template>
@@ -147,7 +147,7 @@ import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { CollectionDetail } from '@/models/collection.model'
 import {
-    DailyTaskDisplay,
+    DailyTask,
     DailyTaskDisplayWrapper,
     DailyTaskPatch,
     DailyTaskPost,
@@ -177,7 +177,7 @@ import { commonTaskService } from '@/api'
 export default class DailyUpdateTask extends Vue {
     @Prop({ required: true }) private date!: string
 
-    dailyTaskList: DailyTaskDisplay[] = []
+    dailyTaskList: DailyTask[] = []
     projectList: DailyTaskDisplayWrapper<ProjectDetail>[] = []
     collectionList: DailyTaskDisplayWrapper<CollectionDetail>[] = []
     commonTaskList: CommonTask[] = []
@@ -202,9 +202,6 @@ export default class DailyUpdateTask extends Vue {
         dailyTaskService.getDailyTasksByDate(date).then(
             (response: any) => {
                 this.dailyTaskList = response.body.content
-                this.dailyTaskList.forEach((dailyTask: DailyTaskDisplay) => {
-                    this.$set(dailyTask, 'editMode', false)
-                })
                 this.emitDailyTaskCount()
             },
             (error: any) => {
@@ -254,50 +251,48 @@ export default class DailyUpdateTask extends Vue {
             .catch((error: any) => console.error(error))
     }
 
-    createDailyTask(dailyTask: DailyTaskPost): void {
-        dailyTaskService.createDailyTask(dailyTask).then(
-            (response: any) => {
-                this.dailyTaskList.push({ ...response.body, editMode: false })
+    createDailyTask(data: DailyTaskPost): void {
+        dailyTaskService
+            .createDailyTask(data)
+            .then((response: any) => {
+                this.dailyTaskList.push(response.body)
                 this.emitDailyTaskCount()
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
+            })
+            .catch((error: any) => console.error(error))
     }
 
-    updateDailyTask(dailyTaskId: number, dailyTaskForm: DailyTaskPatch): void {
-        dailyTaskService.updateDailyTask(dailyTaskId, dailyTaskForm).then(
-            (response: any) => {
+    updateDailyTask(event: { id: number; data: DailyTaskPatch }): void {
+        const { id, data } = event
+
+        dailyTaskService
+            .updateDailyTask(id, data)
+            .then((response: any) => {
                 const dailyTask = this.dailyTaskList.find(
-                    (dailyTask: DailyTaskDisplay) => dailyTask.id === response.body.id
+                    (dailyTask: DailyTask) => dailyTask.id === response.body.id
                 )
-                if (dailyTask) Object.assign(dailyTask, response.body, { editMode: false })
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
+                if (dailyTask) Object.assign(dailyTask, response.body)
+            })
+            .catch((error: any) => console.error(error))
     }
 
-    deleteDailyTask(dailyTaskId: number): void {
-        dailyTaskService.deleteDailyTask(dailyTaskId).then(
-            () => {
+    deleteDailyTask(id: number): void {
+        dailyTaskService
+            .deleteDailyTask(id)
+            .then(() => {
                 const dailyTaskIndex = this.dailyTaskList.findIndex(
-                    (dailyTask: DailyTaskDisplay) => dailyTask.id === dailyTaskId
+                    (dailyTask: DailyTask) => dailyTask.id === id
                 )
                 if (dailyTaskIndex !== -1) {
                     this.dailyTaskList.splice(dailyTaskIndex, 1)
                     this.emitDailyTaskCount()
                 }
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
+            })
+            .catch((error: any) => console.error(error))
     }
 
-    select(tab: DailyUpdateTaskTab, id: number, sectionId: number): void {
+    select(event: { tab: DailyUpdateTaskTab; id: number; sectionId: number }): void {
+        const { tab, id, sectionId } = event
+
         this.tab = tab
         this.resetSelectedItem()
 
