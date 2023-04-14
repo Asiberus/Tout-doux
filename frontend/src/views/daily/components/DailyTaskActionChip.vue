@@ -8,7 +8,7 @@
                             <span class="font-weight-bold" :class="textColor">{{ text }}</span>
                         </template>
                         <template v-else>
-                            <v-icon small>mdi-nut</v-icon>
+                            <v-icon small>mdi-bullseye-arrow</v-icon>
                         </template>
                     </v-chip>
                 </template>
@@ -64,6 +64,7 @@ export default class DailyTaskActionChip extends Vue {
 
     updateAction(action: DailyTaskAction | null): void {
         this.$emit('update', action)
+        this.$emit('update:action', action) // We send both event to meet all possibilities
     }
 }
 </script>

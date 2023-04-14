@@ -20,7 +20,7 @@ export interface DailyTaskPost {
 export interface DailyTaskPatch {
     name?: string
     tagIds?: number[]
-    action?: DailyTaskAction
+    action?: DailyTaskAction | null
     completed?: boolean
 }
 

@@ -16,7 +16,11 @@
                         </h4>
                     </div>
                     <template
-                        v-if="dailyTask.task || dailyTask.commonTask || dailyTask.tags.length > 0">
+                        v-if="
+                            dailyTask.task ||
+                            (dailyTask.commonTask && dailyTask.commonTask.tags.length > 0) ||
+                            dailyTask.tags.length > 0
+                        ">
                         <div class="daily-task-form-card__content__footer">
                             <template v-if="dailyTask.task">
                                 <ProjectChip
