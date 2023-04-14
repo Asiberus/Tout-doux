@@ -25,8 +25,15 @@
                 :z-index="zIndex">
                 <template #activator="{ attrs, on }">
                     <v-chip v-bind="attrs" v-on="on" small class="flex-shrink-0">
-                        <v-icon x-small class="mr-1">mdi-tag</v-icon>
-                        {{ hiddenTags.length }} more {{ hiddenTags.length > 1 ? 'tags' : 'tag' }}
+                        <template v-if="smallMenuChip">
+                            <span>+{{ hiddenTags.length }}</span>
+                            <v-icon x-small class="ml-1">mdi-tag</v-icon>
+                        </template>
+                        <template v-else>
+                            <v-icon x-small class="mr-1">mdi-tag</v-icon>
+                            {{ hiddenTags.length }} more
+                            {{ hiddenTags.length > 1 ? 'tags' : 'tag' }}
+                        </template>
                     </v-chip>
                 </template>
                 <div class="d-flex flex-column align-start gap-1 py-1">
@@ -56,6 +63,7 @@ export default class TagGroup extends Vue {
     @Prop({ default: false }) small!: boolean
     @Prop({ default: false }) large!: boolean
     @Prop({ default: true }) iconTransparent!: boolean
+    @Prop({ default: false }) smallMenuChip!: boolean
     @Prop({ default: 4 }) zIndex!: number
 
     get displayedTags(): Tag[] {

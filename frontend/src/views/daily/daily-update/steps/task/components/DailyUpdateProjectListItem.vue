@@ -23,7 +23,9 @@
                                     <TagGroup
                                         :tag-list="project.tags"
                                         max-tag="1"
-                                        :small="true"></TagGroup>
+                                        :small="true"
+                                        :small-menu-chip="true">
+                                    </TagGroup>
                                 </template>
                             </div>
                         </template>
