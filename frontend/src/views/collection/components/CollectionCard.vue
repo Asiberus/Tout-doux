@@ -40,8 +40,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CollectionList } from '@/models/collection.model'
 
 @Component
-export default class CollectionItemCard extends Vue {
-    @Prop() private collection!: CollectionList
+export default class CollectionCard extends Vue {
+    @Prop({ required: true }) collection!: CollectionList
 
     get percentageOfCompletedTask(): number {
         return (this.collection.completedTaskCount / this.collection.taskCount) * 100

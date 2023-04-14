@@ -29,7 +29,7 @@
 
         <template v-if="collectionList.length > 0">
             <div class="collection-wrapper">
-                <CollectionItemCard
+                <CollectionCard
                     v-for="collection in collectionList"
                     :key="collection.id"
                     :collection="collection" />
@@ -64,13 +64,13 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import { CollectionList, CollectionPostOrPatch } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
-import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
+import CollectionCard from '@/views/collection/components/CollectionCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
     components: {
         CollectionFormDialog,
-        CollectionItemCard,
+        CollectionCard,
         EmptyListDisplay,
         FilterChip,
     },

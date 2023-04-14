@@ -39,7 +39,7 @@ import { ProjectList } from '@/models/project.model'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 
 @Component({ components: { TagGroup } })
-export default class ProjectItemCard extends Vue {
+export default class ProjectCard extends Vue {
     @Prop() private project!: ProjectList
 
     get percentageOfCompletedTask(): number {

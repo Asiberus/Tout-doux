@@ -85,7 +85,10 @@
         </v-col>
         <v-col cols="4">
             <div class="d-flex justify-center mb-3">
-                <ProgressCircular :value="completedTasks.length" :max="collection.tasks.length">
+                <ProgressCircular
+                    :value="completedTasks.length"
+                    :max="collection.tasks.length"
+                    color="collection lighten-2">
                 </ProgressCircular>
             </div>
             <h5 class="text-h5 mb-2">Description</h5>

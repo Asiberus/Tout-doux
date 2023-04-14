@@ -19,7 +19,10 @@
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
-                    <ProgressCircular :value="allCompletedTasks.length" :max="allTasks.length">
+                    <ProgressCircular
+                        :value="allCompletedTasks.length"
+                        :max="allTasks.length"
+                        color="green accent-2">
                     </ProgressCircular>
                 </div>
             </v-col>

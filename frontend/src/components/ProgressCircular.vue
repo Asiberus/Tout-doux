@@ -1,7 +1,7 @@
 <template>
     <v-progress-circular
         :value="percentage"
-        :color="color"
+        :color="computedColor"
         :rotate="-90"
         :size="size"
         :width="width">
@@ -33,6 +33,7 @@ export default class ProgressCircular extends Vue {
     @Prop({ default: 200 }) size?: number
     @Prop({ default: 20 }) width?: number
     @Prop({ default: () => colorArray }) colorArray?: string[]
+    @Prop() color?: string // Override color array
     @Prop({ default: true }) displayText?: boolean
 
     get percentage(): number {
@@ -40,7 +41,9 @@ export default class ProgressCircular extends Vue {
         return (this.value / this.max) * 100
     }
 
-    get color(): string {
+    get computedColor(): string {
+        if (this.color) return this.color
+
         if (!this.colorArray) return ''
         const index = Math.trunc((this.percentage * this.colorArray.length) / 100) - 1
         return colorArray[index]
