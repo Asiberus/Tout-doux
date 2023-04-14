@@ -4,38 +4,12 @@
             <template v-if="!editMode && dailyTask">
                 <div class="daily-task-form-card__content">
                     <div class="daily-task-form-card__content__header">
-                        <v-menu offset-y offset-overflow>
-                            <template #activator="{ on, attrs }">
-                                <v-chip
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    small
-                                    class="flex-shrink-0 rounded-lg"
-                                    :color="getActionChipColor(dailyTask.action)">
-                                    <template v-if="dailyTask.action">
-                                        <span
-                                            class="font-weight-bold"
-                                            :class="getActionChipTextColor(dailyTask.action)">
-                                            {{ getLiteralFormOfDailyActionEnum(dailyTask.action) }}
-                                        </span>
-                                    </template>
-                                    <template v-else>
-                                        <v-icon small>mdi-nut</v-icon>
-                                    </template>
-                                </v-chip>
-                            </template>
-                            <v-list>
-                                <v-list-item
-                                    v-for="action in dailyTaskActionItems"
-                                    :key="action.value"
-                                    @click="updateDailyTaskAction(action.value)"
-                                    dense>
-                                    <span :class="{ 'font-italic grey--text': !action.value }">
-                                        {{ action.text }}
-                                    </span>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
+                        <DailyTaskActionChip
+                            :action="dailyTask.action"
+                            :editable="true"
+                            @update="updateDailyTaskAction($event)"
+                            class="flex-shrink-0">
+                        </DailyTaskActionChip>
 
                         <h4
                             class="text-body-1 font-weight-medium text-truncate"
@@ -169,16 +143,10 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
     DailyTask,
-    DailyTaskActionEnum,
+    DailyTaskAction,
     DailyTaskPatch,
     DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
-import {
-    actionOptions,
-    getActionChipColor,
-    getActionChipTextColor,
-    getLiteralFormOfDailyActionEnum,
-} from '@/utils/daily-task.utils'
 import CollectionChip from '@/components/CollectionChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
@@ -187,9 +155,18 @@ import { Form } from '@/models/common.model'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import { Tag } from '@/models/tag.model'
+import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
 
 @Component({
-    components: { ProjectChip, SectionChip, CollectionChip, TagGroup, TagSearch, TagChip },
+    components: {
+        DailyTaskActionChip,
+        ProjectChip,
+        SectionChip,
+        CollectionChip,
+        TagGroup,
+        TagSearch,
+        TagChip,
+    },
 })
 export default class DailyTaskFormCard extends Vue {
     @Prop({ default: null }) dailyTask!: DailyTask | null
@@ -210,7 +187,6 @@ export default class DailyTaskFormCard extends Vue {
         },
     }
 
-    dailyTaskActionItems = actionOptions
     dailyTaskUpdateTabEnum = DailyUpdateTaskTab
 
     get form(): Vue & { resetValidation: () => void } {
@@ -262,7 +238,7 @@ export default class DailyTaskFormCard extends Vue {
         }
     }
 
-    updateDailyTaskAction(action: DailyTaskActionEnum | null): void {
+    updateDailyTaskAction(action: DailyTaskAction | null): void {
         this.$emit('update', { action })
     }
 
@@ -276,18 +252,6 @@ export default class DailyTaskFormCard extends Vue {
 
     select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
         this.$emit('select', { tab, id, sectionId })
-    }
-
-    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
-        return getLiteralFormOfDailyActionEnum(action)
-    }
-
-    getActionChipColor(action: DailyTaskActionEnum): string {
-        return getActionChipColor(action)
-    }
-
-    getActionChipTextColor(action: DailyTaskActionEnum): string {
-        return getActionChipTextColor(action)
     }
 }
 </script>

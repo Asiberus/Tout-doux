@@ -3,7 +3,7 @@ import { CommonTask } from '@/models/common-task.model'
 import { Tag } from '@/models/tag.model'
 
 // Todo : add get literal in enum
-export enum DailyTaskActionEnum {
+export enum DailyTaskAction {
     THINK = 'TH',
     WORK = 'WO',
     FINISH = 'FI',
@@ -14,13 +14,13 @@ export interface DailyTaskPost {
     tagIds?: number[]
     taskId?: number
     commonTaskId?: number
-    action?: DailyTaskActionEnum
+    action?: DailyTaskAction
 }
 
 export interface DailyTaskPatch {
     name?: string
     tagIds?: number[]
-    action?: DailyTaskActionEnum
+    action?: DailyTaskAction
     completed?: boolean
 }
 
@@ -31,7 +31,7 @@ export interface DailyTask {
     tags: Tag[]
     task?: TaskExtended
     commonTask?: CommonTask
-    action?: DailyTaskActionEnum
+    action?: DailyTaskAction
     completed: boolean
 }
 

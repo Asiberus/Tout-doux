@@ -4,15 +4,11 @@
         :color="dailyTask.completed ? 'green darken-2' : null"
         class="daily-task-card rounded-lg">
         <div class="daily-task-card__header">
-            <v-chip
+            <DailyTaskActionChip
                 v-if="dailyTask.action"
-                :color="getActionChipColor(dailyTask.action)"
-                small
-                class="daily-task-card__header__action rounded-lg">
-                <span class="font-weight-bold" :class="getActionChipTextColor(dailyTask.action)">
-                    {{ getLiteralFormOfDailyActionEnum(dailyTask.action) }}
-                </span>
-            </v-chip>
+                :action="dailyTask.action"
+                class="flex-shrink-0">
+            </DailyTaskActionChip>
 
             <h4 class="text-body-1 font-weight-medium text-truncate">
                 {{ dailyTaskName }}
@@ -67,18 +63,16 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { DailyTask, DailyTaskActionEnum } from '@/models/daily-task.model'
-import {
-    getActionChipColor,
-    getActionChipTextColor,
-    getLiteralFormOfDailyActionEnum,
-} from '@/utils/daily-task.utils'
+import { DailyTask } from '@/models/daily-task.model'
 import CollectionChip from '@/components/CollectionChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
 
-@Component({ components: { TagGroup, ProjectChip, SectionChip, CollectionChip } })
+@Component({
+    components: { DailyTaskActionChip, TagGroup, ProjectChip, SectionChip, CollectionChip },
+})
 export default class DailyTaskCard extends Vue {
     @Prop({ required: true }) dailyTask!: DailyTask
 
@@ -90,18 +84,6 @@ export default class DailyTaskCard extends Vue {
 
     emitDailyTaskToggle(): void {
         this.$emit('toggle')
-    }
-
-    getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
-        return getLiteralFormOfDailyActionEnum(action)
-    }
-
-    getActionChipColor(action: DailyTaskActionEnum): string {
-        return getActionChipColor(action)
-    }
-
-    getActionChipTextColor(action: DailyTaskActionEnum): string {
-        return getActionChipTextColor(action)
     }
 }
 </script>

@@ -1,51 +1,51 @@
-import { DailyTaskActionEnum } from '@/models/daily-task.model'
+import { DailyTaskAction } from '@/models/daily-task.model'
 
 // Todo : define color for dailytask action chip
-export function getLiteralFormOfDailyActionEnum(action: DailyTaskActionEnum): string {
+export function getLiteralFormOfDailyActionEnum(action: DailyTaskAction): string {
     switch (action) {
-        case DailyTaskActionEnum.THINK:
+        case DailyTaskAction.THINK:
             return 'Réfléchir'
-        case DailyTaskActionEnum.WORK:
+        case DailyTaskAction.WORK:
             return 'Travailler'
-        case DailyTaskActionEnum.FINISH:
+        case DailyTaskAction.FINISH:
             return 'Finir'
     }
 }
 
-export function getActionChipColor(action: DailyTaskActionEnum): string {
+export function getActionChipColor(action: DailyTaskAction): string {
     switch (action) {
-        case DailyTaskActionEnum.THINK:
+        case DailyTaskAction.THINK:
             return 'teal lighten-3'
-        case DailyTaskActionEnum.WORK:
+        case DailyTaskAction.WORK:
             return 'purple lighten-3'
-        case DailyTaskActionEnum.FINISH:
+        case DailyTaskAction.FINISH:
             return 'red lighten-3'
     }
 }
 
-export function getActionChipTextColor(action: DailyTaskActionEnum): string {
+export function getActionChipTextColor(action: DailyTaskAction): string {
     switch (action) {
-        case DailyTaskActionEnum.THINK:
+        case DailyTaskAction.THINK:
             return 'teal--text text--darken-3'
-        case DailyTaskActionEnum.WORK:
+        case DailyTaskAction.WORK:
             return 'purple--text text--darken-3'
-        case DailyTaskActionEnum.FINISH:
+        case DailyTaskAction.FINISH:
             return 'red--text text--darken-3'
     }
 }
 
-export const actionOptions: { value: DailyTaskActionEnum | null; text: string }[] = [
+export const actionOptions: { value: DailyTaskAction | null; text: string }[] = [
     { value: null, text: 'No action' },
     {
-        value: DailyTaskActionEnum.THINK,
-        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.THINK),
+        value: DailyTaskAction.THINK,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskAction.THINK),
     },
     {
-        value: DailyTaskActionEnum.WORK,
-        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.WORK),
+        value: DailyTaskAction.WORK,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskAction.WORK),
     },
     {
-        value: DailyTaskActionEnum.FINISH,
-        text: getLiteralFormOfDailyActionEnum(DailyTaskActionEnum.FINISH),
+        value: DailyTaskAction.FINISH,
+        text: getLiteralFormOfDailyActionEnum(DailyTaskAction.FINISH),
     },
 ]

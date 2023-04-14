@@ -49,37 +49,13 @@
 </template>
 
 <script lang="ts">
-import CollectionChip from '@/components/CollectionChip.vue'
-import ProjectChip from '@/components/ProjectChip.vue'
-import SectionChip from '@/components/SectionChip.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import {
-    DailyTask,
-    DailyTaskActionEnum,
-    DailyTaskDisplay,
-    DailyTaskPost,
-    DailyUpdateTaskTab,
-} from '@/models/daily-task.model'
+import { DailyTask, DailyTaskPost, DailyUpdateTaskTab } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import {
-    getActionChipColor,
-    getActionChipTextColor,
-    getLiteralFormOfDailyActionEnum,
-} from '@/utils/daily-task.utils'
-import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 
 // todo : maybe change v-hover on daily task card
-@Component({
-    components: {
-        DailyTaskFormCard,
-        EmptyListDisplay,
-        DailyTaskCard,
-        ProjectChip,
-        SectionChip,
-        CollectionChip,
-    },
-})
+@Component({ components: { DailyTaskFormCard, EmptyListDisplay } })
 export default class DailyUpdateTaskList extends Vue {
     @Prop() dailyTaskList!: DailyTask[]
 
