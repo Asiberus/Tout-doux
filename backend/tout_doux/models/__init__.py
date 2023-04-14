@@ -4,5 +4,6 @@ from .daily_task import DailyTask
 from .event import Event
 from .project import Project
 from .section import Section
+from .settings import Settings
 from .tag import Tag
 from .task import Task

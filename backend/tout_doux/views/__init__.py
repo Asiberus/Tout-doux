@@ -4,5 +4,6 @@ from .daily_task import DailyTaskViewSet
 from .event import EventViewSet
 from .project import ProjectViewSet
 from .section import SectionViewSet
+from .settings import SettingsViewSet
 from .tag import TagViewSet
 from .task import TaskViewSet

@@ -3,7 +3,7 @@ from django.urls import include
 from rest_framework import routers
 
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
-    EventViewSet, TagViewSet, CommonTaskViewSet
+    EventViewSet, TagViewSet, CommonTaskViewSet, SettingsViewSet
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
@@ -17,5 +17,6 @@ router.register(r'common-task', CommonTaskViewSet, basename='common_task')
 
 urlpatterns = [
     url('', include(router.urls)),
+    url('settings/', SettingsViewSet.as_view(), name='settings'),
     url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
