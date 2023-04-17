@@ -2,7 +2,7 @@
     <div class="flex-fill d-flex justify-end align-center">
         <span class="version mr-2" :title="`Tout Doux version : ${version}`">v{{ version }}</span>
         <v-hover v-slot="{ hover }">
-            <router-link :to="{ name: 'settings-general' }" title="Settings">
+            <router-link :to="{ name: 'settings-preferences' }" title="Settings">
                 <v-icon :color="hover ? 'white' : 'grey lighten-1'">mdi-cog</v-icon>
             </router-link>
         </v-hover>

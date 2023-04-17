@@ -1,9 +1,11 @@
 <template>
     <div v-if="settings">
-        <h4 class="text-h4">General</h4>
-        <p class="text-subtitle-1">Some preferences and general settings.</p>
+        <h4 class="text-h4">Preferences</h4>
+        <p class="text-subtitle-1">
+            In this page you can personalize how some components or layout are displayed.
+        </p>
 
-        <h5 class="text-h5 mb-3">Progress Wheel</h5>
+        <h5 class="text-h6 mb-2">Progress Wheel</h5>
         <div class="progress-wheel-wrapper">
             <template v-for="mode of [ProgressWheelMode.Number, ProgressWheelMode.Percent]">
                 <v-sheet
@@ -28,34 +30,17 @@
                 </v-sheet>
             </template>
         </div>
-
-        <div class="d-flex flex-wrap mt-16">
-            <div
-                v-for="color of colors"
-                :key="color"
-                :style="{ backgroundColor: color }"
-                class="color"></div>
-        </div>
-        <v-divider class="my-3"></v-divider>
-        <v-chip v-for="color of colors" :key="'color' + color" :color="color" class="ma-1">
-            Nom Tags
-        </v-chip>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { TAG_COLOR_OPTIONS } from '@/utils/constants'
-
 import ProgressWheel from '@/components/ProgressWheel.vue'
 import { ProgressWheelMode, Settings } from '@/models/settings.model'
-import { settingsService } from '@/api'
 import { settingsActions } from '@/store/modules/settings.store'
 
 @Component({ components: { ProgressWheel } })
-export default class SettingsGeneral extends Vue {
-    colors = TAG_COLOR_OPTIONS
-
+export default class SettingsPreferences extends Vue {
     ProgressWheelMode = ProgressWheelMode
 
     get settings(): Settings | undefined {
@@ -97,11 +82,5 @@ export default class SettingsGeneral extends Vue {
             left: 16px;
         }
     }
-}
-
-.color {
-    width: 100px;
-    height: 75px;
-    margin: 4px;
 }
 </style>

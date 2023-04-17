@@ -1,6 +1,6 @@
 import { RouteConfig } from 'vue-router'
 import SettingsComponent from '@/views/settings/Settings.vue'
-import SettingsGeneral from '@/views/settings/tabs/SettingsGeneral.vue'
+import SettingsPreferences from '@/views/settings/tabs/SettingsPreferences.vue'
 import SettingsCommonTasks from '@/views/settings/tabs/SettingsCommonTasks.vue'
 import SettingsTags from '@/views/settings/tabs/SettingsTags.vue'
 
@@ -11,8 +11,8 @@ export const settingsRoutes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                name: 'settings-general',
-                component: SettingsGeneral,
+                name: 'settings-preferences',
+                component: SettingsPreferences,
             },
             {
                 path: 'common-tasks',

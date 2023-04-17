@@ -4,14 +4,10 @@
 
         <v-row>
             <v-col cols="2">
-                <v-tabs
-                    v-model="settingsTab"
-                    vertical
-                    color="accent"
-                    background-color="transparent">
-                    <v-tab :to="{ name: 'settings-general' }" exact class="justify-start">
+                <v-tabs vertical color="accent" background-color="transparent">
+                    <v-tab :to="{ name: 'settings-preferences' }" exact class="justify-start">
                         <v-icon left small>mdi-cog</v-icon>
-                        General
+                        Preferences
                     </v-tab>
                     <v-tab :to="{ name: 'settings-common-tasks' }" exact class="justify-start">
                         <v-icon left small>mdi-timeline</v-icon>
@@ -34,7 +30,5 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class SettingsComponent extends Vue {
-    settingsTab = 'general'
-}
+export default class SettingsComponent extends Vue {}
 </script>
