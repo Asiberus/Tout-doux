@@ -19,11 +19,12 @@
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
-                    <ProgressCircular
+                    <ProgressWheel
+                        :mode="settings.progressWheelMode"
                         :value="allCompletedTasks.length"
                         :max="allTasks.length"
                         color="green accent-2">
-                    </ProgressCircular>
+                    </ProgressWheel>
                 </div>
             </v-col>
         </v-row>
@@ -120,7 +121,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
+import ProgressWheel from '@/components/ProgressWheel.vue'
 import { ProjectDetail } from '@/models/project.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
@@ -129,13 +130,14 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import { Settings } from '@/models/settings.model'
 
 @Component({
     components: {
         TagGroup,
         TaskCard,
         TaskDialog,
-        ProgressCircular,
+        ProgressWheel,
         EmptyListDisplay,
         FilterChip,
     },
@@ -143,6 +145,10 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 export default class ProjectDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
+
+    get settings(): Settings {
+        return this.$store.state.settings.settings
+    }
 
     get project(): ProjectDetail {
         return this.$store.state.project.currentProject

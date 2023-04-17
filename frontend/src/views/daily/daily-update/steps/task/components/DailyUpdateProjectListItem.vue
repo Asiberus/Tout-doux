@@ -82,18 +82,16 @@
                             <span class="text-ellipsis" :title="section.name">
                                 {{ section.name }}
                             </span>
-                            <ProgressCircular
+                            <ProgressDisk
                                 v-if="section.tasks.length > 0"
-                                :value="section.tasks.filter(t => t.completed).length"
+                                :value="section.tasks.filter(({ completed }) => completed).length"
                                 :max="section.tasks.length"
-                                :size="16"
-                                :width="8"
-                                :display-text="false"
+                                color="green accent-2"
                                 class="ml-1 flex-shrink-0"
-                                :title="`${section.tasks.filter(t => t.completed).length} of ${
-                                    section.tasks.length
-                                } tasks completed`">
-                            </ProgressCircular>
+                                :title="`${
+                                    section.tasks.filter(({ completed }) => completed).length
+                                } of ${section.tasks.length} tasks completed`">
+                            </ProgressDisk>
                         </v-tab>
                     </v-tabs>
                     <v-divider class="mt-0"></v-divider>
@@ -126,15 +124,15 @@
 </template>
 
 <script lang="ts">
-import ProgressCircular from '@/components/ProgressCircular.vue'
 import { DailyTask } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
 import { Task } from '@/models/task.model'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import ProgressDisk from '@/components/ProgressDisk.vue'
 
-@Component({ components: { TaskCard, TagGroup, ProgressCircular } })
+@Component({ components: { TaskCard, TagGroup, ProgressDisk } })
 export default class DailyUpdateProjectListItem extends Vue {
     @Prop({ required: true }) project!: ProjectDetail
     @Prop({ required: true }) dailyTaskList!: DailyTask[]

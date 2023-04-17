@@ -1,6 +1,6 @@
 export enum ProgressWheelMode {
-    PERCENT = 'percent',
-    NUMBER = 'number',
+    Percent = 'percent',
+    Number = 'number',
 }
 
 export interface Settings {

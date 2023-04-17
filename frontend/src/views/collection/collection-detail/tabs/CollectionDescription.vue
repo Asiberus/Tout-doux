@@ -85,11 +85,12 @@
         </v-col>
         <v-col cols="4">
             <div class="d-flex justify-center mb-3">
-                <ProgressCircular
+                <ProgressWheel
+                    :mode="settings.progressWheelMode"
                     :value="completedTasks.length"
                     :max="collection.tasks.length"
                     color="collection lighten-2">
-                </ProgressCircular>
+                </ProgressWheel>
             </div>
             <h5 class="text-h5 mb-2">Description</h5>
             <v-card>
@@ -108,7 +109,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
+import ProgressWheel from '@/components/ProgressWheel.vue'
 import { CollectionDetail } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { collectionActions } from '@/store/modules/collection.store'
@@ -116,19 +117,24 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
+import { Settings } from '@/models/settings.model'
 
 @Component({
     components: {
         TaskDialog,
         TaskCard,
         EmptyListDisplay,
-        ProgressCircular,
+        ProgressWheel,
         FilterChip,
     },
 })
 export default class CollectionDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
+
+    get settings(): Settings {
+        return this.$store.state.settings.settings
+    }
 
     get collection(): CollectionDetail {
         return this.$store.state.collection.currentCollection
@@ -165,5 +171,3 @@ export default class CollectionDescription extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

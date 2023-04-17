@@ -111,12 +111,13 @@
             <v-col cols="3">
                 <v-scale-transition origin="center">
                     <div class="d-flex align-center justify-center" v-if="section.tasks.length > 0">
-                        <ProgressCircular
+                        <ProgressWheel
+                            :mode="settings.progressWheelMode"
                             :value="completedTasks.length"
                             :max="section.tasks.length"
-                            :size="180"
-                            :width="15">
-                        </ProgressCircular>
+                            size="small"
+                            color="green accent-2">
+                        </ProgressWheel>
                     </div>
                 </v-scale-transition>
             </v-col>
@@ -127,7 +128,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
+import ProgressWheel from '@/components/ProgressWheel.vue'
 import { SectionPatch, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
@@ -135,13 +136,14 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Settings } from '@/models/settings.model'
 
 @Component({
     components: {
         SectionDialog,
         TaskCard,
         TaskDialog,
-        ProgressCircular,
+        ProgressWheel,
         EmptyListDisplay,
         FilterChip,
     },
@@ -153,6 +155,10 @@ export default class ProjectSectionItem extends Vue {
     taskDialog = false
     sectionDialog = false
     displayCompletedTask = false
+
+    get settings(): Settings {
+        return this.$store.state.settings.settings
+    }
 
     get completedTasks(): Task[] {
         return this.section.tasks.filter(({ completed }) => completed)
@@ -195,5 +201,3 @@ export default class ProjectSectionItem extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

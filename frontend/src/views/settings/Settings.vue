@@ -34,7 +34,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class Settings extends Vue {
+export default class SettingsComponent extends Vue {
     settingsTab = 'general'
 }
 </script>
