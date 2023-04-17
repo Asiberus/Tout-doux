@@ -73,6 +73,7 @@
 
                 <template v-if="selected">
                     <v-tabs
+                        v-if="taskBySection.length > 1 || taskBySection[0].id !== 0"
                         v-model="sectionTab"
                         color="accent"
                         class="section-wrapper"
@@ -94,7 +95,11 @@
                             </ProgressDisk>
                         </v-tab>
                     </v-tabs>
-                    <v-divider class="mt-0"></v-divider>
+
+                    <v-divider
+                        :class="{
+                            'mt-2': taskBySection.length === 1 && taskBySection[0].id === 0,
+                        }"></v-divider>
 
                     <v-tabs-items v-model="sectionTab" class="tab-item-wrapper">
                         <v-tab-item
@@ -102,7 +107,9 @@
                             :key="`tab-item-${section.id}`">
                             <div class="task-wrapper">
                                 <TaskCard
-                                    v-for="task of taskUncompleted(section.tasks)"
+                                    v-for="task of section.tasks.filter(
+                                        ({ completed }) => !completed
+                                    )"
                                     :key="`${section.name}-task-${task.id}`"
                                     :task="task"
                                     @click.native="selectTask(task)"
@@ -142,20 +149,22 @@ export default class DailyUpdateProjectListItem extends Vue {
     sectionTab = 0
 
     get taskBySection(): { id: number; name: string; tasks: Task[] }[] {
-        return [
-            {
+        const sections = this.project.sections
+            .filter(({ tasks }) => tasks.some(({ completed }) => !completed))
+            .map(section => ({
+                id: section.id,
+                name: section.name,
+                tasks: section.tasks,
+            }))
+
+        if (this.project.tasks.some(({ completed }) => !completed))
+            sections.unshift({
                 id: 0,
                 name: 'General tasks',
                 tasks: this.project.tasks,
-            },
-            ...this.project.sections
-                .filter(({ tasks }) => tasks.some(({ completed }) => !completed))
-                .map(section => ({
-                    id: section.id,
-                    name: section.name,
-                    tasks: section.tasks,
-                })),
-        ]
+            })
+
+        return sections
     }
 
     get allTasks(): Task[] {
@@ -168,10 +177,6 @@ export default class DailyUpdateProjectListItem extends Vue {
 
     get allTasksUncompleted(): Task[] {
         return this.allTasks.filter(task => !task.completed)
-    }
-
-    get taskUncompleted(): (tasks: Task[]) => Task[] {
-        return (tasks: Task[]) => tasks.filter(task => !task.completed)
     }
 
     get percentageOfTaskCompleted(): number {
