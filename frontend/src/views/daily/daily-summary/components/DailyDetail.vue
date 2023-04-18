@@ -27,27 +27,8 @@
                         :cols="events.length > 0 ? 7 : 8"
                         class="d-flex flex-column">
                         <h4 class="text-h4">Tasks</h4>
-                        <p class="grey--text text--lighten-1 ml-2">
-                            <template v-if="isToday">
-                                <template v-if="numberOfDailyTaskUncompleted">
-                                    You have {{ numberOfDailyTaskUncompleted }}
-                                    {{ numberOfDailyTaskUncompleted > 1 ? 'tasks' : 'task' }} left
-                                    to do today!
-                                </template>
-                                <template v-else>All tasks done for today! :)</template>
-                            </template>
-                            <template v-else>
-                                <template
-                                    v-if="numberOfDailyTaskCompleted === dailyTaskList.length">
-                                    All tasks completed for that day! :)
-                                </template>
-                                <template v-else-if="numberOfDailyTaskCompleted > 0">
-                                    {{ numberOfDailyTaskCompleted }} on {{ dailyTaskList.length }}
-                                    {{ dailyTaskList.length > 1 ? 'tasks' : 'task' }} were completed
-                                    that day.
-                                </template>
-                                <template v-else> No tasks completed that day :(</template>
-                            </template>
+                        <p class="text-subtitle-1 grey--text text--lighten-1 ml-2">
+                            {{ taskText }}
                         </p>
                         <div class="task-wrapper">
                             <v-timeline dense>
@@ -75,15 +56,8 @@
 
                     <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
                         <h4 class="text-h4">Events</h4>
-                        <p class="grey--text text--lighten-1 ml-2">
-                            <template v-if="isToday">
-                                You have {{ events.length }}
-                                {{ events.length > 1 ? 'events' : 'event' }} today!
-                            </template>
-                            <template v-else>
-                                You had {{ events.length }}
-                                {{ events.length > 1 ? 'events' : 'event' }} that day!
-                            </template>
+                        <p class="text-subtitle-1 grey--text text--lighten-1 ml-2">
+                            {{ eventText }}
                         </p>
                         <div class="event-wrapper">
                             <v-timeline dense>
@@ -143,6 +117,33 @@ export default class DailyDetail extends Vue {
 
     get isToday(): boolean {
         return moment().isSame(this.date, 'day')
+    }
+
+    get taskText(): string {
+        if (this.isToday) {
+            if (this.numberOfDailyTaskUncompleted > 0)
+                return `You have ${this.numberOfDailyTaskUncompleted} ${
+                    this.numberOfDailyTaskUncompleted > 1 ? 'tasks' : 'task'
+                } left to do today!`
+            else return 'All tasks done for today! :)'
+        } else {
+            if (this.numberOfDailyTaskUncompleted === this.dailyTaskList.length)
+                return 'All tasks completed for that day! :)'
+            else if (this.numberOfDailyTaskCompleted > 0)
+                return `${this.numberOfDailyTaskCompleted} on ${this.dailyTaskList.length} tasks were completed that day`
+            else return 'No tasks completed that day :('
+        }
+    }
+
+    get eventText(): string {
+        if (this.isToday)
+            return `You have ${this.events.length} ${
+                this.events.length > 1 ? 'events' : 'event'
+            } today !`
+        else
+            return `You had ${this.events.length} ${
+                this.events.length > 1 ? 'events' : 'event'
+            } that day !`
     }
 
     @Watch('date', { immediate: true })
