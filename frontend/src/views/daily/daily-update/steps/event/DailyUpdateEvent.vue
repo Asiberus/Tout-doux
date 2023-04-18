@@ -30,7 +30,6 @@
                     :event="event"
                     :project="event.project"
                     :clickable="event.project ? !event.project.archived : true"
-                    :ripple="event.project ? !event.project.archived : true"
                     color="event"
                     :day-selected="true"
                     :show-icon="true"
@@ -142,5 +141,3 @@ export default class DailyUpdateEvent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

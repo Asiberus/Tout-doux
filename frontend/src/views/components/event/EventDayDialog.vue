@@ -17,7 +17,6 @@
                             :event="event"
                             :project="event.project"
                             :clickable="event.project ? !event.project.archived : true"
-                            :ripple="event.project ? !event.project.archived : true"
                             color="event"
                             :daySelected="true"
                             :change-passed-text-color="false"
@@ -59,5 +58,3 @@ export default class EventDayDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

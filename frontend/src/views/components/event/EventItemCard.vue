@@ -5,7 +5,7 @@
                 @click="openEventDialog()"
                 :color="cardColor"
                 :disabled="disabled"
-                :ripple="ripple"
+                :ripple="false"
                 class="rounded-lg"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
                 <v-card-text class="d-flex align-center">
@@ -121,7 +121,6 @@ export default class EventItemCard extends Vue {
     @Prop({ default: true }) changePassedTextColor!: boolean
     @Prop({ default: false }) disabled!: boolean
     @Prop({ default: true }) clickable!: boolean
-    @Prop({ default: true }) ripple!: boolean
     @Prop({ default: false }) daySelected!: boolean
     @Prop({ default: false }) showIcon!: boolean
     @Prop({ default: true }) caret!: boolean

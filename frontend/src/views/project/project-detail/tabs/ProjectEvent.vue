@@ -126,5 +126,3 @@ export default class ProjectEvent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>
