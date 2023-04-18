@@ -12,6 +12,7 @@ class CollectionDetailSerializer(CollectionSerializer):
             'id',
             'name',
             'description',
+            'itemName',
             'archived',
             'createdOn',
             'tasks'

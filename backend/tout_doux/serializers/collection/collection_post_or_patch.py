@@ -5,11 +5,14 @@ from tout_doux.serializers.collection.collection import CollectionSerializer
 
 
 class CollectionPostOrPatchSerializer(serializers.ModelSerializer):
+    itemName = serializers.CharField(source='item_name')
+
     class Meta:
         model = Collection
         fields = (
             'name',
             'description',
+            'itemName',
             'archived'
         )
 

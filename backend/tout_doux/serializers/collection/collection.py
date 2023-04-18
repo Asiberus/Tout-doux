@@ -5,6 +5,7 @@ from tout_doux.serializers.common import ReadOnlyModelSerializer
 
 
 class CollectionSerializer(ReadOnlyModelSerializer):
+    itemName = serializers.CharField(source='item_name')
     createdOn = serializers.DateField(source='created_on')
 
     class Meta:
@@ -13,6 +14,7 @@ class CollectionSerializer(ReadOnlyModelSerializer):
             'id',
             'name',
             'description',
+            'itemName',
             'archived',
             'createdOn',
         )
