@@ -58,9 +58,9 @@
                 counter="50"
                 maxlength="50"
                 required
-                :autofocus="!collection"
                 class="mb-2">
             </v-text-field>
+
             <v-textarea
                 v-model="collectionForm.data.description"
                 :rules="collectionForm.rules.description"
@@ -72,8 +72,21 @@
                 required
                 rows="1"
                 auto-grow
-                class="mb-8">
+                class="mb-2">
             </v-textarea>
+
+            <div class="item-name-wrapper mb-2">
+                <v-text-field
+                    v-model="collectionForm.data.itemName"
+                    :rules="collectionForm.rules.itemName"
+                    :disabled="collection.archived"
+                    label="Item name"
+                    counter="20"
+                    maxlength="20"
+                    required>
+                </v-text-field>
+            </div>
+
             <div v-if="!collection.archived" class="float-right">
                 <v-btn
                     color="success"
@@ -89,32 +102,36 @@
 <script lang="ts">
 import { collectionService } from '@/api/collection.api'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { CollectionDetail } from '@/models/collection.model'
+import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Vue } from 'vue-property-decorator'
+import { Form } from '@/models/common.model'
 
 @Component({
-    components: {
-        ConfirmDialog,
-    },
+    components: { ConfirmDialog },
 })
 export default class CollectionSettings extends Vue {
     archiveProjectDialog = false
     deleteCollectionDialog = false
-    collectionForm = {
+    collectionForm: Form<CollectionPatch> = {
         valid: false,
         data: {
             name: this.collection.name,
             description: this.collection.description,
+            itemName: this.collection.itemName,
         },
         rules: {
             name: [
-                (value: string) => !!value || 'Collection name is required',
+                (value: string) => !!value || 'This field is required',
                 (value: string) => value.length <= 50 || 'Max 50 characters',
             ],
             description: [
-                (value: string) => !!value || 'Collection description is required',
+                (value: string) => !!value || 'This field is required',
                 (value: string) => value.length <= 500 || 'Max 500 characters',
+            ],
+            itemName: [
+                (value: string) => !!value || 'This field is required',
+                (value: string) => value.length <= 20 || 'Max 15 characters',
             ],
         },
     }
@@ -126,7 +143,8 @@ export default class CollectionSettings extends Vue {
     get isFormUntouched(): boolean {
         return (
             this.collectionForm.data.name === this.collection.name &&
-            this.collectionForm.data.description === this.collection.description
+            this.collectionForm.data.description === this.collection.description &&
+            this.collectionForm.data.itemName === this.collection.itemName
         )
     }
 
@@ -147,14 +165,18 @@ export default class CollectionSettings extends Vue {
 
     deleteCollection(): void {
         this.deleteCollectionDialog = false
-        collectionService.deleteCollection(this.collection.id).then(
-            () => {
+        collectionService
+            .deleteCollection(this.collection.id)
+            .then(() => {
                 this.$router.push({ name: 'collection-list' })
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
+            })
+            .catch((error: any) => console.error(error))
     }
 }
 </script>
+
+<style scoped lang="scss">
+.item-name-wrapper {
+    width: calc(100% / 3);
+}
+</style>

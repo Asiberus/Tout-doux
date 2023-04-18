@@ -99,6 +99,10 @@ body {
     gap: 8px;
 }
 
+.gap-3 {
+    gap: 12px;
+}
+
 .hide-scroll {
     overflow-y: hidden !important;
 }

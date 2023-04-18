@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title>
-            <h4 class="text-h4">{{ task ? 'Update Task' : 'New Task' }}</h4>
+            <h4 class="text-h4">{{ task ? 'Update' : 'New' }} {{ itemName }}</h4>
         </v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="taskForm.valid" @submit.prevent="emitSubmitEvent()">
@@ -54,8 +54,9 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 
 @Component({ components: { TagSearch, TagChip } })
 export default class TaskDialog extends Vue {
-    @Prop() private task?: Task
-    @Prop() private isDialogOpen!: boolean
+    @Prop() task?: Task
+    @Prop({ required: true }) isDialogOpen!: boolean
+    @Prop({ default: 'task' }) itemName!: string
 
     tagList: Tag[] = []
     taskForm: Form<TaskPost | TaskPatch> = {

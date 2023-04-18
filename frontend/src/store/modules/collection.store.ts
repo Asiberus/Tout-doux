@@ -1,6 +1,6 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
-import { CollectionDetail, CollectionPostOrPatch } from '@/models/collection.model'
+import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
@@ -43,6 +43,7 @@ export class CollectionModule extends VuexModule {
     private [collectionMutations.updateProperties](payload: {
         name: string
         description: string
+        itemName: string
         archived: boolean
     }): void {
         if (!this.currentCollection) return
@@ -91,15 +92,16 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.updateProperties](payload: {
         id: number
-        data: CollectionPostOrPatch
+        data: CollectionPatch
     }): Promise<void> {
         const { id, data } = payload
         collectionService.updateCollection(id, data).then(
             (response: any) => {
-                const { name, description, archived } = response.body
+                const { name, description, itemName, archived } = response.body
                 this.context.commit(collectionMutations.updateProperties, {
                     name,
                     description,
+                    itemName,
                     archived,
                 })
             },

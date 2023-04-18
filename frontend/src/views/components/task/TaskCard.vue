@@ -70,6 +70,7 @@
             <TaskDialog
                 :task="task"
                 :is-dialog-open="taskDialog"
+                :item-name="itemName"
                 @update="emitUpdateEvent($event)"
                 @close="taskDialog = false">
             </TaskDialog>
@@ -114,6 +115,7 @@ export default class TaskCard extends Vue {
     @Prop({ default: false }) selected!: boolean
     @Prop({ default: 2 }) elevation!: number
     @Prop({ default: null }) color!: string | null
+    @Prop({ default: 'task' }) itemName!: string
 
     taskMenu = false
     taskDialog = false

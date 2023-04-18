@@ -1,6 +1,6 @@
 import { apiRoutes } from '@/api-routes'
 import Vue from 'vue'
-import { CollectionPostOrPatch } from '@/models/collection.model'
+import { CollectionPatch, CollectionPost } from '@/models/collection.model'
 
 const getCollectionList = (params = {}) => {
     return Vue.http.get(apiRoutes.collection, { params: { size: 0, ...params } })
@@ -14,11 +14,11 @@ const getCollectionById = (collectionId: number) => {
     return Vue.http.get(apiRoutes.collectionById.replace(':collectionId', collectionId.toString()))
 }
 
-const createCollection = (collectionForm: CollectionPostOrPatch) => {
+const createCollection = (collectionForm: CollectionPost) => {
     return Vue.http.post(apiRoutes.collection, collectionForm)
 }
 
-const updateCollection = (collectionId: number, collectionForm: CollectionPostOrPatch) => {
+const updateCollection = (collectionId: number, collectionForm: CollectionPatch) => {
     return Vue.http.patch(
         apiRoutes.collectionById.replace(':collectionId', collectionId.toString()),
         collectionForm

@@ -2,7 +2,7 @@
     <v-row>
         <v-col cols="8">
             <div class="d-flex align-center mb-3">
-                <h3 class="text-h5">Tasks</h3>
+                <h5 class="text-h5">List of {{ collection.itemName }}</h5>
                 <v-spacer></v-spacer>
                 <FilterChip
                     v-if="collection.tasks.length > 0"
@@ -16,11 +16,12 @@
                     <template #activator="{ on, attrs }">
                         <v-btn v-bind="attrs" v-on="on" :disabled="collection.archived">
                             <v-icon left>mdi-plus</v-icon>
-                            task
+                            {{ collection.itemName }}
                         </v-btn>
                     </template>
                     <TaskDialog
                         :is-dialog-open="taskDialog"
+                        :item-name="collection.itemName"
                         @create="createTask"
                         @close="taskDialog = false">
                     </TaskDialog>
@@ -34,6 +35,7 @@
                         :key="task.id"
                         :task="task"
                         :disabled="collection.archived"
+                        :item-name="collection.itemName"
                         @toggle-state="toggleTaskState"
                         @update="updateTask"
                         @delete="deleteTask"
