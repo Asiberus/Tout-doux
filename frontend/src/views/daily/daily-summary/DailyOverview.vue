@@ -11,16 +11,17 @@
             </v-btn>
         </div>
 
-        <v-row>
-            <v-col v-for="dailySummary in dailySummaryList" :key="dailySummary.date" cols="3">
-                <DailySummaryItemComponent
-                    :dailySummary="dailySummary"
-                    @open-daily-detail="openDailyDetailDialog(dailySummary.date)">
-                </DailySummaryItemComponent>
-            </v-col>
-        </v-row>
+        <div class="daily-wrapper">
+            <DailySummaryItemComponent
+                v-for="dailySummary in dailySummaryList"
+                :key="dailySummary.date"
+                :dailySummary="dailySummary"
+                @open-daily-detail="openDailyDetailDialog(dailySummary.date)">
+            </DailySummaryItemComponent>
+        </div>
+
         <div class="mt-5 d-flex justify-center" v-if="dailySummaryList.length">
-            <v-btn @click="loadNextPage" :loading="dailyOverviewLoading" rounded>
+            <v-btn @click="loadNextPage()" :loading="dailyOverviewLoading" rounded>
                 Load more days
             </v-btn>
         </div>
@@ -122,3 +123,15 @@ export default class DailySummaryComponent extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.daily-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+
+    & > * {
+        min-width: 0;
+    }
+}
+</style>
