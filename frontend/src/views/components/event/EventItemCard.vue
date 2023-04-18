@@ -6,6 +6,7 @@
                 :color="cardColor"
                 :disabled="disabled"
                 :ripple="ripple"
+                class="rounded-lg"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
                 <v-card-text class="d-flex align-center">
                     <v-icon v-if="showIcon" :class="[getTextColor('icon')]" large class="mr-4">

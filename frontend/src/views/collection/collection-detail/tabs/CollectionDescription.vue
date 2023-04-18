@@ -95,7 +95,7 @@
                 </ProgressWheel>
             </div>
             <h5 class="text-h5 mb-2">Description</h5>
-            <v-card>
+            <v-card class="rounded-lg">
                 <v-card-text>
                     {{ collection.description }}
                     <div class="d-flex justify-end align-center mt-2" title="Created on">

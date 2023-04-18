@@ -6,7 +6,8 @@
                 : {}
         "
         :color="backgroundColor"
-        :ripple="false">
+        :ripple="false"
+        class="rounded-lg">
         <v-card-text>
             <div class="d-flex align-end">
                 <div class="d-flex flex-column">

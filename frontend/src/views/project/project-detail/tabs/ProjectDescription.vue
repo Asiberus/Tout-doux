@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="9">
                 <h3 class="text-h5 mb-3">Description</h3>
-                <v-card class="mb-3">
+                <v-card class="rounded-lg mb-3">
                     <v-card-text>
                         {{ project.description }}
                         <div class="d-flex justify-end align-center mt-2" title="Created on">
