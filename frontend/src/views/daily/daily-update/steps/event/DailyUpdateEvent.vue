@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="d-flex align-center mb-4">
-            <h5 class="text-h5">Events of the day</h5>
+            <h5 class="text-h5 mr-2">Events of the day</h5>
             <v-chip v-if="eventList.length > 0" small>
                 {{ eventList.length }}
             </v-chip>

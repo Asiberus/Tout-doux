@@ -22,9 +22,15 @@
             class="daily-update-stepper">
             <v-stepper-header>
                 <v-divider></v-divider>
-                <v-stepper-step :step="1" editable color="accent">Task</v-stepper-step>
+                <v-stepper-step :step="1" editable color="accent">
+                    Task
+                    <template v-if="dailyTaskCount > 0"> ({{ dailyTaskCount }}) </template>
+                </v-stepper-step>
                 <v-divider></v-divider>
-                <v-stepper-step :step="2" editable color="accent">Event</v-stepper-step>
+                <v-stepper-step :step="2" editable color="accent">
+                    Event
+                    <template v-if="dailyEventCount > 0"> ({{ dailyEventCount }}) </template>
+                </v-stepper-step>
                 <v-divider></v-divider>
             </v-stepper-header>
             <v-stepper-items>
