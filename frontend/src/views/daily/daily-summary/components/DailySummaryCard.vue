@@ -51,12 +51,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { DailySummary } from 'src/models/daily-summary.model'
 
 @Component
-export default class DailySummaryItemComponent extends Vue {
+export default class DailySummaryCardComponent extends Vue {
     @Prop({ required: true }) dailySummary!: DailySummary
-
-    get isToday(): boolean {
-        return moment().isSame(this.dailySummary.date, 'days')
-    }
 
     // todo : Set colorArray
     get colorOfTaskCompleted(): string {

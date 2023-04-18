@@ -1,4 +1,4 @@
-import DailySummaryComponent from '@/views/daily/daily-summary/DailyOverview.vue'
+import DailySummaryComponent from '@/views/daily/daily-summary/DailySummary.vue'
 import DailyUpdate from '@/views/daily/daily-update/DailyUpdate.vue'
 import moment from 'moment'
 import { RouteConfig } from 'vue-router'

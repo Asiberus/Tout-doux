@@ -12,12 +12,12 @@
         </div>
 
         <div class="daily-wrapper">
-            <DailySummaryItemComponent
+            <DailySummaryCardComponent
                 v-for="dailySummary in dailySummaryList"
                 :key="dailySummary.date"
-                :dailySummary="dailySummary"
+                :daily-summary="dailySummary"
                 @open-daily-detail="openDailyDetailDialog(dailySummary.date)">
-            </DailySummaryItemComponent>
+            </DailySummaryCardComponent>
         </div>
 
         <div class="mt-5 d-flex justify-center" v-if="dailySummaryList.length">
@@ -46,11 +46,11 @@ import { dailyTaskService } from '@/api/daily-task.api'
 import { DailySummary } from '@/models/daily-summary.model'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
-import DailySummaryItemComponent from '@/views/daily/daily-summary/components/DailyOverviewItemCard.vue'
+import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
 import moment from 'moment'
 import { Component, Vue, Watch } from 'vue-property-decorator'
 
-@Component({ components: { DailySummaryItemComponent, DailyDetail } })
+@Component({ components: { DailySummaryCardComponent, DailyDetail } })
 export default class DailySummaryComponent extends Vue {
     dailySummaryList: DailySummary[] = []
     dailyOverviewLoading = false
