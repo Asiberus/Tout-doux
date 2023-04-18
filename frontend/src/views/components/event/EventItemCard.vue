@@ -65,7 +65,7 @@
                         </div>
 
                         <h3
-                            class="text-ellipsis white--text"
+                            class="text-truncate white--text"
                             :class="[getTextColor('name')]"
                             :title="event.name">
                             {{ event.name }}
@@ -73,7 +73,7 @@
 
                         <span
                             v-if="event.description"
-                            class="text-ellipsis"
+                            class="text-truncate"
                             :class="[getTextColor('description')]"
                             :title="event.description">
                             {{ event.description }}

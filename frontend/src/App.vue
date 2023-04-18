@@ -39,12 +39,6 @@ body {
     cursor: default !important;
 }
 
-.text-ellipsis {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .opacity-60 {
     opacity: 0.6;
 }

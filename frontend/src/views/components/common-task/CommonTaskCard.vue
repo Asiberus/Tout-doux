@@ -8,7 +8,7 @@
             <v-icon>mdi-timeline</v-icon>
             <div class="content">
                 <div class="content__body">
-                    <h5 class="text-h6 white--text text-ellipsis" :title="commonTask.name">
+                    <h5 class="text-h6 white--text text-truncate" :title="commonTask.name">
                         {{ commonTask.name }}
                     </h5>
                 </div>

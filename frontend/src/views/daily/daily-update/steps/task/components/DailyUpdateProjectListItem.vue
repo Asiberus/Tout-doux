@@ -80,7 +80,7 @@
                         hide-slider
                         show-arrows>
                         <v-tab v-for="section of taskBySection" :key="`tab-${section.id}`">
-                            <span class="text-ellipsis" :title="section.name">
+                            <span class="text-truncate" :title="section.name">
                                 {{ section.name }}
                             </span>
                             <ProgressDisk
