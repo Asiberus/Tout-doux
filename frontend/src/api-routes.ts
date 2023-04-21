@@ -1,4 +1,6 @@
 export const apiRoutes = {
+    login: 'login/',
+    logout: 'logout/',
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',

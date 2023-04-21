@@ -1,7 +1,5 @@
 <template>
-    <div id="app">
-        <AppMain />
-    </div>
+    <AppMain />
 </template>
 
 <script lang="ts">
@@ -11,11 +9,7 @@ import { Component } from 'vue-property-decorator'
 import { settingsActions } from '@/store/modules/settings.store'
 
 @Component({ components: { AppMain } })
-export default class App extends Vue {
-    mounted(): void {
-        this.$store.dispatch(settingsActions.getSettings)
-    }
-}
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">
@@ -29,6 +23,10 @@ export default class App extends Vue {
 
 body {
     background: #121212; // Background color of vuetify dark theme
+}
+
+input:autofill {
+    background: none;
 }
 
 .cursor-pointer {
