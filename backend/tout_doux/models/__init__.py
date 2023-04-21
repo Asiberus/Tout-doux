@@ -7,3 +7,4 @@ from .section import Section
 from .settings import Settings
 from .tag import Tag
 from .task import Task
+from .user import User
