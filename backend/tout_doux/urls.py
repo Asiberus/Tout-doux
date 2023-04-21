@@ -1,9 +1,10 @@
 from django.conf.urls import url
 from django.urls import include
+from knox.views import LogoutView
 from rest_framework import routers
 
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
-    EventViewSet, TagViewSet, CommonTaskViewSet, SettingsViewSet
+    EventViewSet, TagViewSet, CommonTaskViewSet, SettingsViewSet, LoginView
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
@@ -17,6 +18,8 @@ router.register(r'common-task', CommonTaskViewSet, basename='common_task')
 
 urlpatterns = [
     url('', include(router.urls)),
+    url('login/', LoginView.as_view(), name='login'),
+    url('logout/', LogoutView.as_view(), name='logout'),
     url('settings/', SettingsViewSet.as_view(), name='settings'),
     url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

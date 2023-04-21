@@ -1,3 +1,4 @@
+from .auth import LoginView
 from .collection import CollectionViewSet
 from .common_task import CommonTaskViewSet
 from .daily_task import DailyTaskViewSet
