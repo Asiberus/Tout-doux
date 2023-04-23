@@ -5,8 +5,7 @@ import { projectRoutes } from '@/router/modules/project.router'
 import { collectionRoutes } from '@/router/modules/collection.router'
 import { dailyRoutes } from '@/router/modules/daily.router'
 import { settingsRoutes } from '@/router/modules/settings.router'
-import { authGuard } from '@/router/guards/auth.guard'
-import { loginGuard } from '@/router/guards/login.guard'
+import { authGuard, loginGuard } from '@/router/guards'
 
 const routes: Array<RouteConfig> = [
     {
