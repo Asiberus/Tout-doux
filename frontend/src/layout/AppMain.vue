@@ -24,12 +24,17 @@ import { Component, Vue } from 'vue-property-decorator'
 import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { authService } from '@/services'
+import { settingsActions } from '@/store/modules/settings.store'
 
 @Component({
     methods: { isAuthenticated: authService.isAuthenticated },
     components: { TheNavbar, TheHeader },
 })
-export default class AppMain extends Vue {}
+export default class AppMain extends Vue {
+    mounted() {
+        if (authService.isAuthenticated()) this.$store.dispatch(settingsActions.getSettings)
+    }
+}
 </script>
 
 <style scoped lang="scss">
