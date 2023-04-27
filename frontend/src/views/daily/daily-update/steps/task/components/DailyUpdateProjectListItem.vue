@@ -20,11 +20,7 @@
                         <template v-if="!selected">
                             <div class="mt-1">
                                 <template v-if="project.tags.length > 0">
-                                    <TagGroup
-                                        :tag-list="project.tags"
-                                        max-tag="1"
-                                        :small="true"
-                                        :small-menu-chip="true">
+                                    <TagGroup :tag-list="project.tags" max-tag="1" :small="true">
                                     </TagGroup>
                                 </template>
                             </div>
