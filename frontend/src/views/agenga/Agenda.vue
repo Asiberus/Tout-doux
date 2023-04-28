@@ -127,7 +127,7 @@
 import { eventService } from '@/api/event.api'
 import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
-import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
+import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'

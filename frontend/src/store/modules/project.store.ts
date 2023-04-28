@@ -4,16 +4,18 @@ import { taskService } from '@/api/task.api'
 import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { SectionPost, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
-import { sortEvents } from '@/utils/event.util'
+import { sortEvents } from '@/utils/event.utils'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
 import { Tag } from '@/models/tag.model'
+import { sortByCompletionDate } from '@/utils/task.utils'
 
 export const projectMutations = {
     setCurrentProject: 'SET_CURRENT_PROJECT',
     updateProperties: 'UPDATE_PROJECT_PROPERTIES',
+    sortTasks: 'SORT_TASKS',
     section: {
         addSection: 'PROJECT_ADD_SECTION',
         editSection: 'PROJECT_EDIT_SECTION',
@@ -79,6 +81,18 @@ export class ProjectModule extends VuexModule {
     }
 
     @Mutation
+    private [projectMutations.sortTasks](sectionId?: number): void {
+        if (!this.currentProject) return
+
+        if (sectionId) {
+            const section = this.currentProject.sections.find(({ id }) => id === sectionId)
+            if (section) section.tasks = [...sortByCompletionDate(section.tasks)]
+        } else {
+            this.currentProject.tasks = [...sortByCompletionDate(this.currentProject.tasks)]
+        }
+    }
+
+    @Mutation
     private [projectMutations.section.addSection](section: SectionTask): void {
         if (!this.currentProject) return
 
@@ -128,15 +142,15 @@ export class ProjectModule extends VuexModule {
     }): void {
         if (!this.currentProject) return
 
-        const { task, projectId, sectionId } = payload
+        const { task: updatedTask, projectId, sectionId } = payload
         if (projectId) {
-            const t = this.currentProject.tasks.find(t => t.id === task.id)
-            if (t) Object.assign(t, task)
+            const task = this.currentProject.tasks.find(({ id }) => id === updatedTask.id)
+            if (task) Object.assign(task, updatedTask)
         } else if (sectionId) {
-            const section = this.currentProject.sections.find(s => s.id === sectionId)
+            const section = this.currentProject.sections.find(({ id }) => id === sectionId)
             if (section) {
-                const t = section.tasks.find(t => t.id === task.id)
-                if (t) Object.assign(t, task)
+                const task = section.tasks.find(({ id }) => id === updatedTask.id)
+                if (task) Object.assign(task, updatedTask)
             }
         }
     }
@@ -293,11 +307,9 @@ export class ProjectModule extends VuexModule {
         const { id, data, projectId, sectionId } = payload
         await taskService.updateTaskById(id, data).then(
             (response: any) => {
-                this.context.commit(projectMutations.task.editTask, {
-                    task: response.body,
-                    projectId,
-                    sectionId,
-                })
+                const task: Task = response.body
+                this.context.commit(projectMutations.task.editTask, { task, projectId, sectionId })
+                this.context.commit(projectMutations.sortTasks, sectionId)
             },
             (error: any) => {
                 console.error(error)

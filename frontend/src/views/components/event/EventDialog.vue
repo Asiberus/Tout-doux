@@ -240,7 +240,7 @@
 <script lang="ts">
 import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
-import { isEventRelatedToDate } from '@/utils/event.util'
+import { isEventRelatedToDate } from '@/utils/event.utils'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 

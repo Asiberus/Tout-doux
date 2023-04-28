@@ -43,7 +43,7 @@ class Task(models.Model):
     )
 
     class Meta:
-        ordering = ('-pk',)
+        ordering = ('-completed_at', '-pk')
 
     def __str__(self):
         return 'project : {0} - task : {1} - completed : {2}'.format(self.project, self.name, self.completed)

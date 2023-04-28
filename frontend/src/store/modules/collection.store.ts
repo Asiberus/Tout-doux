@@ -4,10 +4,12 @@ import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
+import { sortByCompletionDate } from '@/utils/task.utils'
 
 export const collectionMutations = {
     setCurrentCollection: 'SET_CURRENT_COLLECTION',
     updateProperties: 'UPDATE_COLLECTION_PROPERTIES',
+    sortTasks: 'SORT_TASKS',
     task: {
         addTask: 'COLLECTION_ADD_TASK',
         editTask: 'COLLECTION_EDIT_TASK',
@@ -49,6 +51,13 @@ export class CollectionModule extends VuexModule {
         if (!this.currentCollection) return
 
         Object.assign(this.currentCollection, payload)
+    }
+
+    @Mutation
+    private [collectionMutations.sortTasks](): void {
+        if (!this.currentCollection) return
+
+        this.currentCollection.tasks = [...sortByCompletionDate(this.currentCollection.tasks)]
     }
 
     @Mutation
@@ -131,7 +140,9 @@ export class CollectionModule extends VuexModule {
         const { id, data } = payload
         await taskService.updateTaskById(id, data).then(
             (response: any) => {
-                this.context.commit(collectionMutations.task.editTask, response.body)
+                const task: Task = response.body
+                this.context.commit(collectionMutations.task.editTask, task)
+                this.context.commit(collectionMutations.sortTasks)
             },
             (error: any) => {
                 console.error(error)
