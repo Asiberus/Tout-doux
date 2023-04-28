@@ -24,7 +24,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { authService } from '@/services'
-import { settingsActions } from '@/store/modules/settings.store'
+import { preferencesActions } from '@/store/modules/preferences.store'
 
 @Component({
     methods: { isAuthenticated: authService.isAuthenticated },
@@ -32,7 +32,7 @@ import { settingsActions } from '@/store/modules/settings.store'
 })
 export default class AppMain extends Vue {
     mounted() {
-        if (authService.isAuthenticated()) this.$store.dispatch(settingsActions.getSettings)
+        if (authService.isAuthenticated()) this.$store.dispatch(preferencesActions.getPreferences)
     }
 }
 </script>

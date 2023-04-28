@@ -119,7 +119,7 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
-import { Settings } from '@/models/settings.model'
+import { Preferences } from '@/models/preferences.model'
 
 @Component({
     components: {
@@ -134,7 +134,7 @@ export default class CollectionDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get settings(): Settings {
+    get settings(): Preferences {
         return this.$store.state.settings.settings
     }
 

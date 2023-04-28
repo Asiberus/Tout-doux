@@ -20,7 +20,7 @@
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
                     <ProgressWheel
-                        :mode="settings.progressWheelMode"
+                        :mode="preferences.progressWheelMode"
                         :value="allCompletedTasks.length"
                         :max="allTasks.length"
                         color="green accent-2">
@@ -130,7 +130,7 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
-import { Settings } from '@/models/settings.model'
+import { Preferences } from '@/models/preferences.model'
 
 @Component({
     components: {
@@ -146,8 +146,8 @@ export default class ProjectDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get settings(): Settings {
-        return this.$store.state.settings.settings
+    get preferences(): Preferences {
+        return this.$store.state.preferences.preferences
     }
 
     get project(): ProjectDetail {

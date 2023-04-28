@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Settings(models.Model):
+class Preferences(models.Model):
     class ProgressWheelMode(models.TextChoices):
         NUMBER = 'number'
         PERCENT = 'percent'

@@ -29,7 +29,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { authService } from '@/services'
-import { settingsActions } from '@/store/modules/settings.store'
+import { preferencesActions } from '@/store/modules/preferences.store'
 import { LoginPost } from '@/models/login.model'
 
 @Component
@@ -59,8 +59,8 @@ export default class Login extends Vue {
         authService
             .login(this.form.data)
             .then(() => {
-                // Fetch settings
-                this.$store.dispatch(settingsActions.getSettings)
+                // Fetch preferences
+                this.$store.dispatch(preferencesActions.getPreferences)
 
                 const next = this.$route.query.next
                 if (next && typeof next === 'string') this.$router.push(next)

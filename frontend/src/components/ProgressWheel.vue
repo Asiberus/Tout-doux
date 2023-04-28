@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProgressWheelMode } from '@/models/settings.model'
+import { ProgressWheelMode } from '@/models/preferences.model'
 
 @Component
 export default class ProgressWheel extends Vue {

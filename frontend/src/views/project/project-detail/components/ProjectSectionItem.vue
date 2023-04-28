@@ -136,7 +136,7 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Settings } from '@/models/settings.model'
+import { Preferences } from '@/models/preferences.model'
 
 @Component({
     components: {
@@ -156,7 +156,7 @@ export default class ProjectSectionItem extends Vue {
     sectionDialog = false
     displayCompletedTask = false
 
-    get settings(): Settings {
+    get settings(): Preferences {
         return this.$store.state.settings.settings
     }
 

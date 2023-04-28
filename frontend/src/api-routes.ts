@@ -22,5 +22,5 @@ export const apiRoutes = {
     commonTask: 'common-task/',
     commonTaskUnique: 'common-task/is-name-unique/',
     commonTaskById: 'common-task/:id/',
-    settings: 'settings/',
+    preferences: 'preferences/',
 }

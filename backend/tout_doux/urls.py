@@ -4,7 +4,7 @@ from knox.views import LogoutView
 from rest_framework import routers
 
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
-    EventViewSet, TagViewSet, CommonTaskViewSet, SettingsViewSet, LoginView
+    EventViewSet, TagViewSet, CommonTaskViewSet, PreferencesViewSet, LoginView
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
@@ -20,6 +20,6 @@ urlpatterns = [
     url('', include(router.urls)),
     url('login/', LoginView.as_view(), name='login'),
     url('logout/', LogoutView.as_view(), name='logout'),
-    url('settings/', SettingsViewSet.as_view(), name='settings'),
+    url('preferences/', PreferencesViewSet.as_view(), name='preferences'),
     url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

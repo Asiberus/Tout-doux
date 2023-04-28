@@ -1,16 +1,16 @@
 from rest_framework import serializers
 
-from tout_doux.models import Settings
+from tout_doux.models import Preferences
 
 
-class SettingsSerializer(serializers.ModelSerializer):
+class PreferencesSerializer(serializers.ModelSerializer):
     progressWheelMode = serializers.ChoiceField(
         source='progress_wheel_mode',
-        choices=Settings.ProgressWheelMode.choices
+        choices=Preferences.ProgressWheelMode.choices
     )
 
     class Meta:
-        model = Settings
+        model = Preferences
         fields = (
             'progressWheelMode',
         )

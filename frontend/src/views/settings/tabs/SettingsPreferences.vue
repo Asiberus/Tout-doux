@@ -1,5 +1,5 @@
 <template>
-    <div v-if="settings">
+    <div v-if="preferences">
         <h4 class="text-h4">Preferences</h4>
         <p class="text-subtitle-1">
             In this page you can personalize how some components or layout are displayed.
@@ -9,11 +9,11 @@
         <div class="progress-wheel-wrapper">
             <template v-for="mode of [ProgressWheelMode.Number, ProgressWheelMode.Percent]">
                 <v-sheet
-                    @click="updateSettings(mode)"
+                    @click="updatePreferences(mode)"
                     v-ripple
                     class="progress-wheel-card rounded-lg"
-                    :class="{ selected: settings.progressWheelMode === mode }">
-                    <template v-if="settings.progressWheelMode === mode">
+                    :class="{ selected: preferences.progressWheelMode === mode }">
+                    <template v-if="preferences.progressWheelMode === mode">
                         <v-icon class="radio-button" color="accent">mdi-radiobox-marked</v-icon>
                     </template>
                     <template v-else>
@@ -36,19 +36,19 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ProgressWheel from '@/components/ProgressWheel.vue'
-import { ProgressWheelMode, Settings } from '@/models/settings.model'
-import { settingsActions } from '@/store/modules/settings.store'
+import { ProgressWheelMode, Preferences } from '@/models/preferences.model'
+import { preferencesActions } from '@/store/modules/preferences.store'
 
 @Component({ components: { ProgressWheel } })
 export default class SettingsPreferences extends Vue {
     ProgressWheelMode = ProgressWheelMode
 
-    get settings(): Settings | undefined {
-        return this.$store.state.settings.settings
+    get preferences(): Preferences | undefined {
+        return this.$store.state.preferences.preferences
     }
 
-    updateSettings(progressWheelMode: ProgressWheelMode): void {
-        this.$store.dispatch(settingsActions.updateSettings, { progressWheelMode })
+    updatePreferences(progressWheelMode: ProgressWheelMode): void {
+        this.$store.dispatch(preferencesActions.updatePreferences, { progressWheelMode })
     }
 }
 </script>

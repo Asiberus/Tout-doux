@@ -3,6 +3,6 @@ export enum ProgressWheelMode {
     Number = 'number',
 }
 
-export interface Settings {
+export interface Preferences {
     progressWheelMode: ProgressWheelMode
 }
