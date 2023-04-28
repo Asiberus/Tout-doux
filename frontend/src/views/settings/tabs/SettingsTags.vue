@@ -1,9 +1,9 @@
 <template>
     <div>
         <h4 class="text-h4 mb-4">Tags</h4>
-        <p class="text-body-1 mb-3">
-            Tags are useful to group or filter items. Two types of tag are available : project tag
-            and task tag. Task tag can be used in Task, Daily Task or Common Task.
+        <p class="text-body-1 mb-1">
+            Tags are useful to group or filter items. Two types of tag are available : project
+            related tag and task related tag (Task, Common Task, Daily Task).
         </p>
 
         <div class="d-flex justify-space-between align-center mb-2">

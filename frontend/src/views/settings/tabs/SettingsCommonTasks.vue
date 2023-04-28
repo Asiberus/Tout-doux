@@ -1,9 +1,10 @@
 <template>
     <div>
-        <div class="text-h4">Common task</div>
-        <div class="d-flex justify-space-between align-end mb-3">
-            <p class="text-subtitle-1 mb-0">
-                A common task is a task that can be added easily to a daily.
+        <div class="text-h4 mb-4">Common task</div>
+        <div class="d-flex justify-space-between align-center mb-1">
+            <p class="text-subtitle-1 mb-0 mr-10">
+                A common task represent a task that can be done multiple times (e.g. take the dog
+                out, buy some groceries). They can be easily added in the daily update.
             </p>
             <CommonTaskDialog v-model="commonTaskDialog" @create="createCommonTask($event)">
                 <template #activator="{ attrs, on }">

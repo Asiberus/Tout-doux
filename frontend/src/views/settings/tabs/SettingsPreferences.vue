@@ -1,8 +1,8 @@
 <template>
     <div v-if="preferences">
-        <h4 class="text-h4">Preferences</h4>
-        <p class="text-subtitle-1">
-            In this page you can personalize how some components or layout are displayed.
+        <h4 class="text-h4 mb-4">Preferences</h4>
+        <p class="text-subtitle-1 mb-1">
+            You can here personalize the layout or the behavior of some components.
         </p>
 
         <h5 class="text-h6 mb-2">Progress Wheel</h5>
