@@ -112,7 +112,7 @@
                 <v-scale-transition origin="center">
                     <div class="d-flex align-center justify-center" v-if="section.tasks.length > 0">
                         <ProgressWheel
-                            :mode="settings.progressWheelMode"
+                            :mode="preferences.progressWheelMode"
                             :value="completedTasks.length"
                             :max="section.tasks.length"
                             size="small"
@@ -156,8 +156,8 @@ export default class ProjectSectionItem extends Vue {
     sectionDialog = false
     displayCompletedTask = false
 
-    get settings(): Preferences {
-        return this.$store.state.settings.settings
+    get preferences(): Preferences {
+        return this.$store.state.preferences.preferences
     }
 
     get completedTasks(): Task[] {

@@ -88,7 +88,7 @@
         <v-col cols="4">
             <div class="d-flex justify-center mb-3">
                 <ProgressWheel
-                    :mode="settings.progressWheelMode"
+                    :mode="preferences.progressWheelMode"
                     :value="completedTasks.length"
                     :max="collection.tasks.length"
                     color="collection lighten-2">
@@ -134,8 +134,8 @@ export default class CollectionDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get settings(): Preferences {
-        return this.$store.state.settings.settings
+    get preferences(): Preferences {
+        return this.$store.state.preferences.preferences
     }
 
     get collection(): CollectionDetail {
