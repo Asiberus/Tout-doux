@@ -57,18 +57,10 @@ export default class SectionChip extends Vue {
     display: flex;
     overflow: hidden;
 
-    // Todo: fix css rules to make it fit content
-    .project-name {
-        max-width: 50%;
-        flex-grow: 1;
-        flex-shrink: 1;
-    }
-
+    .project-name,
     .section-name {
-        flex-basis: fit-content;
-        flex-shrink: 2;
-        flex-grow: 1;
-        max-width: min-content;
+        flex: 1 1 auto;
+        min-width: 1ch;
     }
 }
 </style>
