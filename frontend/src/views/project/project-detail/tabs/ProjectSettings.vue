@@ -68,7 +68,10 @@
                     </div>
                     <v-row>
                         <v-col cols="10">
-                            <v-form v-model="projectForm.valid" @submit.prevent="updateProject()">
+                            <v-form
+                                ref="form"
+                                v-model="projectForm.valid"
+                                @submit.prevent="updateProject()">
                                 <v-text-field
                                     v-model="projectForm.data.name"
                                     :rules="projectForm.rules.name"
@@ -200,6 +203,10 @@ export default class ProjectSettings extends Vue {
         )
     }
 
+    get form(): Vue & { resetValidation: () => void } {
+        return this.$refs.form as Vue & { resetValidation: () => void }
+    }
+
     @Watch('project.tags', { deep: true, immediate: true })
     private onProjectTagsChanges(value: Tag[]): void {
         this.tagList = value
@@ -220,6 +227,16 @@ export default class ProjectSettings extends Vue {
             id: this.project.id,
             data: { archived: !this.project.archived },
         })
+        this.resetForm()
+    }
+
+    resetForm(): void {
+        this.projectForm.data = {
+            name: this.project.name,
+            description: this.project.description,
+            tagIds: [],
+        }
+        this.form.resetValidation()
     }
 
     updateProject(): void {

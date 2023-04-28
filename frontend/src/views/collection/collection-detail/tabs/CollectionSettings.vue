@@ -49,7 +49,7 @@
                 </v-dialog>
             </template>
         </div>
-        <v-form v-model="collectionForm.valid" @submit.prevent="updateCollection()">
+        <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="updateCollection()">
             <v-text-field
                 v-model="collectionForm.data.name"
                 :rules="collectionForm.rules.name"
@@ -140,6 +140,10 @@ export default class CollectionSettings extends Vue {
         return this.$store.state.collection.currentCollection
     }
 
+    get form(): Vue & { resetValidation: () => void } {
+        return this.$refs.form as Vue & { resetValidation: () => void }
+    }
+
     get isFormUntouched(): boolean {
         return (
             this.collectionForm.data.name === this.collection.name &&
@@ -154,6 +158,16 @@ export default class CollectionSettings extends Vue {
             id: this.collection.id,
             data: { archived: !this.collection.archived },
         })
+        this.resetForm()
+    }
+
+    resetForm(): void {
+        this.collectionForm.data = {
+            name: this.collection.name,
+            description: this.collection.description,
+            itemName: this.collection.itemName,
+        }
+        this.form.resetValidation()
     }
 
     updateCollection(): void {
