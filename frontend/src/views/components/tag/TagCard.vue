@@ -3,7 +3,7 @@
         <v-card @click="tagDialog = true" :color="tag.color" class="rounded-pill px-3">
             <v-card-text class="d-flex align-center px-3 py-3">
                 <v-icon>mdi-tag</v-icon>
-                <h3 class="white--text pl-3">{{ tag.name }}</h3>
+                <h3 class="white--text pl-3 text-truncate">{{ tag.name }}</h3>
             </v-card-text>
         </v-card>
 

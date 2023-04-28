@@ -1,23 +1,22 @@
 <template>
     <div>
-        <div class="tag-wrapper">
-            <template v-if="tagList.length > 0">
-                <v-row class="tag-wrapper__rows" no-gutters>
-                    <v-col v-for="tag of tagList" :key="'tag-' + tag.id" cols="3" class="px-1 py-2">
-                        <TagCard :tag="tag" @update="updateTag" @delete="deleteTag" />
-                    </v-col>
-                </v-row>
-            </template>
-            <template v-else>
-                <EmptyListDisplay
-                    :message="`You didn't configure any ${type} tag yet`"
-                    class="mt-10">
-                    <template #img>
-                        <img src="../../../assets/settings.svg" width="330" alt="No tag" />
-                    </template>
-                </EmptyListDisplay>
-            </template>
-        </div>
+        <template v-if="tagList.length > 0">
+            <div class="tag-wrapper">
+                <TagCard
+                    v-for="tag of tagList"
+                    :key="tag.id"
+                    :tag="tag"
+                    @update="updateTag"
+                    @delete="deleteTag" />
+            </div>
+        </template>
+        <template v-else>
+            <EmptyListDisplay :message="`You didn't configure any ${type} tag yet`" class="mt-10">
+                <template #img>
+                    <img src="../../../assets/settings.svg" width="330" alt="No tag" />
+                </template>
+            </EmptyListDisplay>
+        </template>
 
         <v-dialog v-model="tagDialog" width="60%">
             <TagDialog
@@ -92,3 +91,12 @@ export default class SettingsTagList extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.tag-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    column-gap: 4px;
+}
+</style>
