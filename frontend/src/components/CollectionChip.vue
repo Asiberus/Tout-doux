@@ -5,7 +5,9 @@
         :color="collection.archived ? 'projectArchived' : 'collection'"
         :ripple="ripple"
         :small="small"
-        :title="title">
+        :title="title"
+        :class="{ 'cursor-default': this.collection.archived && !this.detailLocation }"
+        @click="click($event)">
         <v-icon small left>mdi-list-box</v-icon>
         <div class="text-truncate">
             {{ collection.name }}
@@ -34,6 +36,12 @@ export default class CollectionChip extends Vue {
     get detailLocation(): Location | undefined {
         if (!this.navigateToDetail) return
         return { name: 'collection-detail', params: { id: `${this.collection.id}` } }
+    }
+
+    click(event: Event): void {
+        if (this.collection.archived) return
+
+        this.$emit('click', event)
     }
 }
 </script>

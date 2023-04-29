@@ -5,7 +5,9 @@
         :color="archived ? 'projectArchived' : 'project'"
         :ripple="ripple"
         :small="small"
-        :title="title">
+        :title="title"
+        :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
+        @click="click($event)">
         <v-icon small left>mdi-briefcase-variant</v-icon>
         <div class="name-wrapper">
             <span class="project-name text-truncate">{{ project.name }}</span>
@@ -48,6 +50,12 @@ export default class SectionChip extends Vue {
         let title = `Go to : ${this.project.name} • ${this.section.name}`
         if (this.project.archived) title += ' (Archived)'
         return title
+    }
+
+    click(event: Event): void {
+        if (this.project.archived) return
+
+        this.$emit('click', event)
     }
 }
 </script>

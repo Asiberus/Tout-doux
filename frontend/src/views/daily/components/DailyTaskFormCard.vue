@@ -28,7 +28,7 @@
                                     :project="dailyTask.task.project"
                                     :small="true"
                                     :navigate-to-detail="false"
-                                    @click.native="
+                                    @click="
                                         select(
                                             dailyTaskUpdateTabEnum.Project,
                                             dailyTask.task.project.id
@@ -41,7 +41,7 @@
                                     :section="dailyTask.task.section"
                                     :small="true"
                                     :navigate-to-detail="false"
-                                    @click.native="
+                                    @click="
                                         select(
                                             dailyTaskUpdateTabEnum.Project,
                                             dailyTask.task.section.project.id,
@@ -55,7 +55,7 @@
                                     :collection="dailyTask.task.collection"
                                     :small="true"
                                     :navigate-to-detail="false"
-                                    @click.native="
+                                    @click="
                                         select(
                                             dailyTaskUpdateTabEnum.Collection,
                                             dailyTask.task.collection.id
