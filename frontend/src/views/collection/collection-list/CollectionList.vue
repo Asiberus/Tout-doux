@@ -62,7 +62,7 @@
 import { collectionService } from '@/api/collection.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { CollectionList, CollectionPatch } from '@/models/collection.model'
+import { CollectionList, CollectionPatch, CollectionPost } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionCard from '@/views/collection/components/CollectionCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
@@ -101,7 +101,7 @@ export default class CollectionListComponent extends Vue {
         )
     }
 
-    createCollection(collectionForm: CollectionPatch): void {
+    createCollection(collectionForm: CollectionPost): void {
         this.collectionDialog = false
         collectionService.createCollection(collectionForm).then(
             (response: any) => {
