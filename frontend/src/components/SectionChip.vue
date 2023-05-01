@@ -5,26 +5,27 @@
         :color="archived ? 'projectArchived' : 'project'"
         :ripple="ripple"
         :small="small"
-        :title="title">
-        <v-icon v-if="archived" small left>mdi-archive</v-icon>
-
+        :title="title"
+        :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
+        @click="click($event)">
+        <v-icon small left>mdi-briefcase-variant</v-icon>
         <div class="name-wrapper">
-            <span class="project-name text-ellipsis">{{ project.name }}</span>
+            <span class="project-name text-truncate">{{ project.name }}</span>
             <span class="mx-1">•</span>
-            <span class="section-name text-ellipsis">{{ section.name }}</span>
+            <span class="section-name text-truncate">{{ section.name }}</span>
         </div>
     </v-chip>
 </template>
 
 <script lang="ts">
 import { Project } from 'src/models/project.model'
-import { SectionExtended } from 'src/models/section.model'
+import { Section } from 'src/models/section.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Location, Route } from 'vue-router'
 
 @Component
 export default class SectionChip extends Vue {
-    @Prop({ required: true }) section!: SectionExtended
+    @Prop({ required: true }) section!: Section
     @Prop({ default: false }) ripple!: boolean
     @Prop({ default: false }) small!: boolean
     @Prop({ default: true }) navigateToDetail!: boolean
@@ -50,6 +51,12 @@ export default class SectionChip extends Vue {
         if (this.project.archived) title += ' (Archived)'
         return title
     }
+
+    click(event: Event): void {
+        if (this.project.archived) return
+
+        this.$emit('click', event)
+    }
 }
 </script>
 
@@ -58,18 +65,10 @@ export default class SectionChip extends Vue {
     display: flex;
     overflow: hidden;
 
-    // Todo: fix css rules to make it fit content
-    .project-name {
-        max-width: 50%;
-        flex-grow: 1;
-        flex-shrink: 1;
-    }
-
+    .project-name,
     .section-name {
-        flex-basis: fit-content;
-        flex-shrink: 2;
-        flex-grow: 1;
-        max-width: min-content;
+        flex: 1 1 auto;
+        min-width: 1ch;
     }
 }
 </style>

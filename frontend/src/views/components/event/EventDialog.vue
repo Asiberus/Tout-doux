@@ -1,14 +1,14 @@
 <template>
     <v-card>
-        <div class="d-flex justify-space-between align-center pa-4">
-            <h2>
+        <v-card-title class="d-flex justify-space-between align-center">
+            <h4 class="text-h4">
                 <template v-if="event"> Update Event </template>
                 <template v-else> New Event </template>
 
                 <template v-if="relatedToDate">
                     for the {{ dateFormat(relatedToDate, 'DD MMMM Y') }}
                 </template>
-            </h2>
+            </h4>
             <div v-if="event">
                 <v-hover v-slot="{ hover }">
                     <v-btn
@@ -18,7 +18,8 @@
                     </v-btn>
                 </v-hover>
             </div>
-        </div>
+        </v-card-title>
+
         <v-card-text>
             <v-form ref="form" v-model="eventForm.valid" @submit.prevent="emitSubmitEvent()">
                 <v-row>
@@ -237,9 +238,9 @@
 </template>
 
 <script lang="ts">
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
-import { isEventRelatedToDate } from '@/utils/event.util'
+import { isEventRelatedToDate } from '@/utils/event.utils'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
@@ -343,16 +344,15 @@ export default class EventDialog extends Vue {
 
     @Watch('eventForm.data', { deep: true })
     private onEventFormChanges(): void {
-        const { data } = this.eventForm
+        const { startDate, endDate, takesWholeDay } = this.eventForm.data
 
-        if (data.takesWholeDay) {
+        if (takesWholeDay) {
             this.resetStartTime()
             this.resetEndDate()
         }
-        if (data.startDate && data.endDate) this.validateDate()
+        if (startDate && endDate) this.validateDate()
         if (this.relatedToDate) {
-            // TODO : optimize this line when api send back data in camelCase
-            const tempEvent = <EventModel>{ start_date: data.startDate, end_date: data.endDate }
+            const tempEvent = <EventModel>{ startDate, endDate }
             this.relatedToDateError = !isEventRelatedToDate(tempEvent, this.relatedToDate)
         }
     }
@@ -373,11 +373,11 @@ export default class EventDialog extends Vue {
             this.eventForm.data = {
                 name: event.name,
                 description: event.description ?? '',
-                startDate: event.start_date,
-                startTime: event.start_time ?? '',
-                endDate: event.end_date ?? '',
-                endTime: event.end_time ?? '',
-                takesWholeDay: event.takes_whole_day,
+                startDate: event.startDate,
+                startTime: event.startTime ?? '',
+                endDate: event.endDate ?? '',
+                endTime: event.endTime ?? '',
+                takesWholeDay: event.takesWholeDay,
             }
         } else
             this.eventForm.data = {
@@ -395,14 +395,14 @@ export default class EventDialog extends Vue {
         if (!this.eventForm.valid || this.relatedToDateError) return
 
         const { data } = this.eventForm
-        const event: Partial<EventModel> = {
+        const event: EventPostOrPatch = {
             name: data.name,
             description: data.description || null,
-            start_date: data.startDate,
-            start_time: data.startTime || null,
-            end_date: data.endDate || null,
-            end_time: data.endTime || null,
-            takes_whole_day: data.takesWholeDay,
+            startDate: data.startDate,
+            startTime: data.startTime || null,
+            endDate: data.endDate || null,
+            endTime: data.endTime || null,
+            takesWholeDay: data.takesWholeDay,
         }
 
         this.$emit('submit', event)
@@ -416,7 +416,7 @@ export default class EventDialog extends Vue {
             return
         }
 
-        if (this.event) this.$emit('delete', this.event?.id)
+        if (this.event) this.$emit('delete', this.event.id)
     }
 
     emitCloseEvent(): void {
@@ -445,5 +445,3 @@ export default class EventDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

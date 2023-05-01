@@ -19,7 +19,7 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class TheNavbar extends Vue {
     private menu = [
         { name: 'Dashboard' },
-        { name: 'Daily', link: { name: 'daily-overview' } },
+        { name: 'Daily', link: { name: 'daily-summary' } },
         { name: 'Projects', link: { name: 'project-list' } },
         { name: 'Collections', link: { name: 'collection-list' } },
         { name: 'Agenda', link: { name: 'agenda' } },

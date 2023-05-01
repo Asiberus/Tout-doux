@@ -2,32 +2,40 @@
     <div>
         <v-row>
             <v-col cols="9">
-                <h3 class="mb-3">Description</h3>
-                <v-card>
+                <h3 class="text-h5 mb-3">Description</h3>
+                <v-card class="rounded-lg mb-3">
                     <v-card-text>
                         {{ project.description }}
-                        <div class="d-flex justify-end align-center mt-2" title="Created at">
+                        <div class="d-flex justify-end align-center mt-2" title="Created on">
                             <v-icon small>mdi-clock</v-icon>
                             <span class="font-italic ml-1">{{ createdDate }}</span>
                         </div>
                     </v-card-text>
                 </v-card>
+                <template v-if="project.tags.length > 0">
+                    <TagGroup :tag-list="project.tags" :large="true" :icon-transparent="false">
+                    </TagGroup>
+                </template>
             </v-col>
             <v-col cols="3">
                 <div class="d-flex justify-center mt-3">
-                    <ProgressCircular :value="allCompletedTasks.length" :max="allTasks.length">
-                    </ProgressCircular>
+                    <ProgressWheel
+                        :mode="preferences.progressWheelMode"
+                        :value="allCompletedTasks.length"
+                        :max="allTasks.length"
+                        color="green accent-2">
+                    </ProgressWheel>
                 </div>
             </v-col>
         </v-row>
 
         <div class="d-flex align-center mt-10 mb-2">
-            <h3>General Tasks</h3>
+            <h3 class="text-h5">General Tasks</h3>
             <v-spacer></v-spacer>
             <FilterChip
                 v-if="project.tasks.length > 0"
                 v-model="displayCompletedTask"
-                color="green"
+                color="green darken-2"
                 icon="mdi-trophy"
                 class="mr-3">
                 Completed
@@ -41,7 +49,7 @@
                 </template>
                 <TaskDialog
                     :is-dialog-open="taskDialog"
-                    @submit="createTask"
+                    @create="createTask"
                     @close="taskDialog = false">
                 </TaskDialog>
             </v-dialog>
@@ -49,17 +57,17 @@
 
         <template v-if="!displayCompletedTask">
             <template v-if="uncompletedTasks.length > 0">
-                <v-row no-gutters>
-                    <v-col v-for="task of uncompletedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskItemCard
-                            :task="task"
-                            :disabled="project.archived"
-                            @toggle-state="toggleTaskState"
-                            @update="updateTask"
-                            @delete="deleteTask">
-                        </TaskItemCard>
-                    </v-col>
-                </v-row>
+                <div class="task-wrapper">
+                    <TaskCard
+                        v-for="task of uncompletedTasks"
+                        :key="task.id"
+                        :task="task"
+                        :disabled="project.archived"
+                        @toggle-state="toggleTaskState"
+                        @update="updateTask"
+                        @delete="deleteTask">
+                    </TaskCard>
+                </div>
             </template>
             <template
                 v-else-if="
@@ -84,15 +92,17 @@
         </template>
         <template v-else>
             <template v-if="completedTasks.length > 0">
-                <v-row no-gutters>
-                    <v-col v-for="task of completedTasks" :key="task.id" cols="6" class="px-2">
-                        <TaskItemCard
-                            :task="task"
-                            :disabled="project.archived"
-                            @toggle-state="toggleTaskState">
-                        </TaskItemCard>
-                    </v-col>
-                </v-row>
+                <div class="task-wrapper">
+                    <TaskCard
+                        v-for="task of completedTasks"
+                        :key="task.id"
+                        :task="task"
+                        :disabled="project.archived"
+                        @update="updateTask"
+                        @delete="deleteTask"
+                        @toggle-state="toggleTaskState">
+                    </TaskCard>
+                </div>
             </template>
             <template v-else>
                 <EmptyListDisplay message="You didn't completed any general tasks yet !">
@@ -111,20 +121,23 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
-import { ProjectTask } from '@/models/project.model'
-import { Task } from '@/models/task.model'
+import ProgressWheel from '@/components/ProgressWheel.vue'
+import { ProjectDetail } from '@/models/project.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
+import TagGroup from '@/views/components/tag/TagGroup.vue'
+import { Preferences } from '@/models/preferences.model'
 
 @Component({
     components: {
-        TaskItemCard,
+        TagGroup,
+        TaskCard,
         TaskDialog,
-        ProgressCircular,
+        ProgressWheel,
         EmptyListDisplay,
         FilterChip,
     },
@@ -133,12 +146,16 @@ export default class ProjectDescription extends Vue {
     taskDialog = false
     displayCompletedTask = false
 
-    get project(): ProjectTask {
+    get preferences(): Preferences {
+        return this.$store.state.preferences.preferences
+    }
+
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 
     get createdDate(): string {
-        return moment(this.project.created_at).format('D MMM. Y')
+        return moment(this.project.createdOn).format('D MMMM Y')
     }
 
     get uncompletedTasks(): Task[] {
@@ -157,7 +174,7 @@ export default class ProjectDescription extends Vue {
         return this.allTasks.filter(({ completed }) => completed)
     }
 
-    createTask(task: Partial<Task>): void {
+    createTask(task: TaskPost): void {
         this.taskDialog = false
         task.projectId = this.project.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -171,7 +188,7 @@ export default class ProjectDescription extends Vue {
         })
     }
 
-    updateTask(id: number, data: Partial<Task>): void {
+    updateTask(id: number, data: TaskPatch): void {
         this.$store.dispatch(projectActions.task.editTask, { id, data, projectId: this.project.id })
     }
 
@@ -181,4 +198,10 @@ export default class ProjectDescription extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.task-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+</style>

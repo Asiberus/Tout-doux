@@ -28,18 +28,19 @@
         </div>
 
         <template v-if="collectionList.length > 0">
-            <v-row>
-                <v-col v-for="collection in collectionList" :key="collection.id" cols="4">
-                    <CollectionItemCard :collection="collection" />
-                </v-col>
-            </v-row>
+            <div class="collection-wrapper">
+                <CollectionCard
+                    v-for="collection in collectionList"
+                    :key="collection.id"
+                    :collection="collection" />
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay>
                 <template #img>
                     <img
                         src="../../../assets/project.svg"
-                        alt="No project"
+                        alt="No collection"
                         style="max-width: 450px" />
                 </template>
                 <template #message>
@@ -61,23 +62,23 @@
 import { collectionService } from '@/api/collection.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { Collection, CollectionTask } from '@/models/collection.model'
+import { CollectionList, CollectionPatch } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
-import CollectionItemCard from '@/views/collection/components/CollectionItemCard.vue'
+import CollectionCard from '@/views/collection/components/CollectionCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
     components: {
         CollectionFormDialog,
-        CollectionItemCard,
+        CollectionCard,
         EmptyListDisplay,
         FilterChip,
     },
 })
-export default class CollectionList extends Vue {
+export default class CollectionListComponent extends Vue {
     @Prop({ default: false }) archived!: boolean
 
-    collectionList: CollectionTask[] = []
+    collectionList: CollectionList[] = []
     collectionDialog = false
 
     created(): void {
@@ -100,7 +101,7 @@ export default class CollectionList extends Vue {
         )
     }
 
-    createCollection(collectionForm: Partial<Collection>): void {
+    createCollection(collectionForm: CollectionPatch): void {
         this.collectionDialog = false
         collectionService.createCollection(collectionForm).then(
             (response: any) => {
@@ -117,3 +118,15 @@ export default class CollectionList extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.collection-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    & > * {
+        min-width: 0;
+    }
+}
+</style>

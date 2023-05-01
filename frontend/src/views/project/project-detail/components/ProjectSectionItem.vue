@@ -24,7 +24,7 @@
                     <FilterChip
                         v-if="section.tasks.length > 0"
                         v-model="displayCompletedTask"
-                        color="green"
+                        color="green darken-2"
                         icon="mdi-trophy"
                         class="mr-3">
                         Completed
@@ -39,7 +39,7 @@
                         </template>
                         <TaskDialog
                             :is-dialog-open="taskDialog"
-                            @submit="createTask"
+                            @create="createTask"
                             @close="taskDialog = false">
                         </TaskDialog>
                     </v-dialog>
@@ -47,15 +47,16 @@
 
                 <template v-if="!displayCompletedTask">
                     <template v-if="uncompletedTasks.length > 0">
-                        <TaskItemCard
+                        <TaskCard
                             v-for="task of uncompletedTasks"
                             :key="task.id"
                             :task="task"
                             :disabled="disabled"
                             @toggle-state="toggleTaskState"
                             @update="updateTask"
-                            @delete="deleteTask">
-                        </TaskItemCard>
+                            @delete="deleteTask"
+                            class="mb-2">
+                        </TaskCard>
                     </template>
                     <template
                         v-else-if="
@@ -84,13 +85,16 @@
                 </template>
                 <template v-else>
                     <template v-if="completedTasks.length > 0">
-                        <TaskItemCard
+                        <TaskCard
                             v-for="task of completedTasks"
                             :key="task.id"
                             :task="task"
                             :disabled="disabled"
-                            @toggle-state="toggleTaskState">
-                        </TaskItemCard>
+                            @toggle-state="toggleTaskState"
+                            @update="updateTask"
+                            @delete="deleteTask"
+                            class="mb-2">
+                        </TaskCard>
                     </template>
                     <template v-else>
                         <EmptyListDisplay message="You didn't completed any tasks yet !">
@@ -107,12 +111,13 @@
             <v-col cols="3">
                 <v-scale-transition origin="center">
                     <div class="d-flex align-center justify-center" v-if="section.tasks.length > 0">
-                        <ProgressCircular
+                        <ProgressWheel
+                            :mode="preferences.progressWheelMode"
                             :value="completedTasks.length"
                             :max="section.tasks.length"
-                            :size="180"
-                            :width="15">
-                        </ProgressCircular>
+                            size="small"
+                            color="green accent-2">
+                        </ProgressWheel>
                     </div>
                 </v-scale-transition>
             </v-col>
@@ -123,21 +128,22 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
-import { SectionTask } from '@/models/section.model'
-import { Task } from '@/models/task.model'
+import ProgressWheel from '@/components/ProgressWheel.vue'
+import { SectionPatch, SectionTask } from '@/models/section.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { projectActions } from '@/store/modules/project.store'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
-import TaskItemCard from '@/views/components/task/TaskItemCard.vue'
+import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Preferences } from '@/models/preferences.model'
 
 @Component({
     components: {
         SectionDialog,
-        TaskItemCard,
+        TaskCard,
         TaskDialog,
-        ProgressCircular,
+        ProgressWheel,
         EmptyListDisplay,
         FilterChip,
     },
@@ -150,6 +156,10 @@ export default class ProjectSectionItem extends Vue {
     sectionDialog = false
     displayCompletedTask = false
 
+    get preferences(): Preferences {
+        return this.$store.state.preferences.preferences
+    }
+
     get completedTasks(): Task[] {
         return this.section.tasks.filter(({ completed }) => completed)
     }
@@ -158,7 +168,7 @@ export default class ProjectSectionItem extends Vue {
         return this.section.tasks.filter(({ completed }) => !completed)
     }
 
-    updateSection({ name }: { name: string }): void {
+    updateSection({ name }: SectionPatch): void {
         this.sectionDialog = false
         this.$store.dispatch(projectActions.section.editSection, { id: this.section.id, name })
     }
@@ -168,7 +178,7 @@ export default class ProjectSectionItem extends Vue {
         this.$store.dispatch(projectActions.section.deleteSection, this.section.id)
     }
 
-    createTask(task: Partial<Task>): void {
+    createTask(task: TaskPost): void {
         this.taskDialog = false
         task.sectionId = this.section.id
         this.$store.dispatch(projectActions.task.addTask, task)
@@ -182,7 +192,7 @@ export default class ProjectSectionItem extends Vue {
         })
     }
 
-    updateTask(id: number, data: Partial<Task>): void {
+    updateTask(id: number, data: TaskPatch): void {
         this.$store.dispatch(projectActions.task.editTask, { id, data, sectionId: this.section.id })
     }
 
@@ -191,5 +201,3 @@ export default class ProjectSectionItem extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

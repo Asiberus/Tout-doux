@@ -1,16 +1,23 @@
 import { Task } from '@/models/task.model'
 import { Project } from '@/models/project.model'
 
+export interface SectionPost {
+    name: string
+    projectId: number
+}
+
+export interface SectionPatch {
+    name: string
+}
+
 export interface SectionTask {
     id: number
-    projectId: number
     name: string
     tasks: Task[]
 }
 
-export interface SectionExtended {
+export interface Section {
     id: number
-    projectId: number
     name: string
     project: Project
 }

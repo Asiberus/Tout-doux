@@ -1,12 +1,12 @@
 import { apiRoutes } from '@/api-routes'
-import { SectionTask } from '@/models/section.model'
+import { SectionPatch, SectionPost } from '@/models/section.model'
 import Vue from 'vue'
 
-const createSection = (section: Partial<SectionTask>) => {
+const createSection = (section: SectionPost) => {
     return Vue.http.post(apiRoutes.section, section)
 }
 
-const updateSection = (id: number, section: { name: string }) => {
+const updateSection = (id: number, section: SectionPatch) => {
     const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
     return Vue.http.patch(url, section)
 }

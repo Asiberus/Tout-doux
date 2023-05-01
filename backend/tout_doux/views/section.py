@@ -2,8 +2,8 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from tout_doux.models.section import Section
-from tout_doux.serializers.section.section import SectionSerializer
+from tout_doux.models import Section
+from tout_doux.serializers.section import SectionSerializer, SectionPatchSerializer, SectionPostSerializer
 
 
 class SectionViewSet(mixins.CreateModelMixin,
@@ -11,7 +11,14 @@ class SectionViewSet(mixins.CreateModelMixin,
                      mixins.DestroyModelMixin,
                      viewsets.GenericViewSet):
     queryset = Section.objects.all()
-    serializer_class = SectionSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return SectionPostSerializer
+        elif self.action in ['partial_update', 'update']:
+            return SectionPatchSerializer
+        else:
+            return SectionSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

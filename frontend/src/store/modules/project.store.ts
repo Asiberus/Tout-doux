@@ -1,18 +1,21 @@
 import { eventService } from '@/api/event.api'
 import { sectionService } from '@/api/section.api'
 import { taskService } from '@/api/task.api'
-import { EventModel } from '@/models/event.model'
-import { SectionTask } from '@/models/section.model'
-import { Task } from '@/models/task.model'
-import { sortEvents } from '@/utils/event.util'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { SectionPost, SectionTask } from '@/models/section.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
+import { sortEvents } from '@/utils/event.utils'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
-import { Project, ProjectTask } from '@/models/project.model'
+import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectService } from '@/api/project.api'
+import { Tag } from '@/models/tag.model'
+import { sortByCompletionDate } from '@/utils/task.utils'
 
 export const projectMutations = {
     setCurrentProject: 'SET_CURRENT_PROJECT',
     updateProperties: 'UPDATE_PROJECT_PROPERTIES',
+    sortTasks: 'SORT_TASKS',
     section: {
         addSection: 'PROJECT_ADD_SECTION',
         editSection: 'PROJECT_EDIT_SECTION',
@@ -53,11 +56,11 @@ export const projectActions = {
 @Module
 export class ProjectModule extends VuexModule {
     // State
-    currentProject?: ProjectTask
+    currentProject?: ProjectDetail
 
     // Mutations
     @Mutation
-    private [projectMutations.setCurrentProject](project: ProjectTask | undefined): void {
+    private [projectMutations.setCurrentProject](project: ProjectDetail | undefined): void {
         if (project?.events)
             project.events = project.events.sort((event1, event2) => sortEvents(event1, event2))
 
@@ -69,11 +72,24 @@ export class ProjectModule extends VuexModule {
     private [projectMutations.updateProperties](payload: {
         name: string
         description: string
+        tags: Tag[]
         archived: boolean
     }): void {
         if (!this.currentProject) return
 
         Object.assign(this.currentProject, payload)
+    }
+
+    @Mutation
+    private [projectMutations.sortTasks](sectionId?: number): void {
+        if (!this.currentProject) return
+
+        if (sectionId) {
+            const section = this.currentProject.sections.find(({ id }) => id === sectionId)
+            if (section) section.tasks = [...sortByCompletionDate(section.tasks)]
+        } else {
+            this.currentProject.tasks = [...sortByCompletionDate(this.currentProject.tasks)]
+        }
     }
 
     @Mutation
@@ -126,15 +142,15 @@ export class ProjectModule extends VuexModule {
     }): void {
         if (!this.currentProject) return
 
-        const { task, projectId, sectionId } = payload
+        const { task: updatedTask, projectId, sectionId } = payload
         if (projectId) {
-            const t = this.currentProject.tasks.find(t => t.id === task.id)
-            Object.assign(t, task)
+            const task = this.currentProject.tasks.find(({ id }) => id === updatedTask.id)
+            if (task) Object.assign(task, updatedTask)
         } else if (sectionId) {
-            const section = this.currentProject.sections.find(s => s.id === sectionId)
+            const section = this.currentProject.sections.find(({ id }) => id === sectionId)
             if (section) {
-                const t = section.tasks.find(t => t.id === task.id)
-                Object.assign(t, task)
+                const task = section.tasks.find(({ id }) => id === updatedTask.id)
+                if (task) Object.assign(task, updatedTask)
             }
         }
     }
@@ -203,15 +219,16 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.updateProperties](payload: {
         id: number
-        data: Partial<Project>
+        data: ProjectPostOrPatch
     }): Promise<void> {
         const { id, data } = payload
         projectService.updateProject(id, data).then(
             (response: any) => {
-                const { name, description, archived } = response.body
+                const { name, description, archived, tags } = response.body
                 this.context.commit(projectMutations.updateProperties, {
                     name,
                     description,
+                    tags,
                     archived,
                 })
             },
@@ -222,7 +239,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.section.addSection](section: Partial<SectionTask>): Promise<void> {
+    async [projectActions.section.addSection](section: SectionPost): Promise<void> {
         await sectionService.createSection(section).then(
             (response: any) => {
                 this.context.commit(projectMutations.section.addSection, response.body)
@@ -265,7 +282,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.task.addTask](task: Partial<Task>): Promise<void> {
+    async [projectActions.task.addTask](task: TaskPost): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(projectMutations.task.addTask, {
@@ -283,18 +300,16 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.task.editTask](payload: {
         id: number
-        data: Partial<Task>
+        data: TaskPatch
         projectId?: number
         sectionId?: number
     }): Promise<void> {
         const { id, data, projectId, sectionId } = payload
         await taskService.updateTaskById(id, data).then(
             (response: any) => {
-                this.context.commit(projectMutations.task.editTask, {
-                    task: response.body,
-                    projectId,
-                    sectionId,
-                })
+                const task: Task = response.body
+                this.context.commit(projectMutations.task.editTask, { task, projectId, sectionId })
+                this.context.commit(projectMutations.sortTasks, sectionId)
             },
             (error: any) => {
                 console.error(error)
@@ -318,7 +333,7 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
-    async [projectActions.event.addEvent](event: Partial<EventModel>): Promise<void> {
+    async [projectActions.event.addEvent](event: EventPostOrPatch): Promise<void> {
         await eventService.createEvent(event).then(
             (response: any) => this.context.commit(projectMutations.event.addEvent, response.body),
             (error: any) => console.error(error)
@@ -328,7 +343,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.event.editEvent](payload: {
         id: number
-        data: Partial<EventModel>
+        data: EventPostOrPatch
     }): Promise<void> {
         const { id, data } = payload
         await eventService.updateEventById(id, data).then(

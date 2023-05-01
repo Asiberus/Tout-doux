@@ -30,7 +30,6 @@
                     :event="event"
                     :project="event.project"
                     :clickable="event.project ? !event.project.archived : true"
-                    :ripple="event.project ? !event.project.archived : true"
                     color="event"
                     :day-selected="true"
                     :show-icon="true"
@@ -54,18 +53,17 @@
 <script lang="ts">
 import { eventService } from '@/api/event.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { EventExtended, EventModel } from '@/models/event.model'
-import { isEventRelatedToDate, sortEvents } from '@/utils/event.util'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import moment from 'moment'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { EventItemCard, EventDialog, EmptyListDisplay } })
 export default class DailyUpdateEvent extends Vue {
     @Prop({ required: true }) private date!: string
 
-    eventList: EventExtended[] = []
+    eventList: EventModel[] = []
     eventDialog = false
 
     created(): void {
@@ -92,8 +90,7 @@ export default class DailyUpdateEvent extends Vue {
         this.eventList.sort((event1, event2) => sortEvents(event1, event2))
     }
 
-    // TODO : See if we block the creation of event non related to date
-    createEvent(event: Partial<EventModel>): void {
+    createEvent(event: EventPostOrPatch): void {
         eventService.createEvent(event, { extended: true }).then(
             (response: any) => {
                 const event = response.body
@@ -108,8 +105,7 @@ export default class DailyUpdateEvent extends Vue {
         )
     }
 
-    // TODO : See if we block the update of event non related to date
-    updateEvent({ id, data }: { id: number; data: Partial<EventModel> }): void {
+    updateEvent({ id, data }: { id: number; data: EventPostOrPatch }): void {
         eventService.updateEventById(id, data, { extended: true }).then(
             (response: any) => {
                 const eventIndex = this.eventList.findIndex(e => e.id === id)
@@ -145,5 +141,3 @@ export default class DailyUpdateEvent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

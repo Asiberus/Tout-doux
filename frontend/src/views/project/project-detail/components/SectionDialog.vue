@@ -1,7 +1,7 @@
 <template>
     <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
-            <span>{{ section ? 'Update section' : 'New section' }}</span>
+            <h4 class="text-h4">{{ section ? 'Update section' : 'New section' }}</h4>
             <div v-if="section">
                 <v-hover v-slot="{ hover }">
                     <v-btn
@@ -110,5 +110,3 @@ export default class SectionDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

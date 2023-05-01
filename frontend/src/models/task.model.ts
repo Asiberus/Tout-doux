@@ -1,25 +1,33 @@
-import { ProjectTask } from '@/models/project.model'
-import { SectionExtended } from '@/models/section.model'
-import { CollectionTask } from '@/models/collection.model'
+import { Project, ProjectDetail } from '@/models/project.model'
+import { Section } from '@/models/section.model'
+import { Collection, CollectionDetail } from '@/models/collection.model'
+import { Tag } from '@/models/tag.model'
 
-export interface Task {
-    id: number
+export interface TaskPost {
     name: string
-    completed: boolean
-    created_at: string
-    completed_at: string
+    tagIds: number[]
     projectId?: number
     sectionId?: number
     collectionId?: number
 }
 
-export interface TaskExtended {
+export interface TaskPatch {
+    name?: string
+    completed?: boolean
+    tagIds?: number[]
+}
+
+export interface Task {
     id: number
     name: string
     completed: boolean
-    created_at: string
-    completed_at: string
-    project?: ProjectTask
-    section?: SectionExtended
-    collection?: CollectionTask
+    tags: Tag[]
+    createdAt: string
+    completedAt: string
+}
+
+export interface TaskExtended extends Task {
+    project?: Project
+    section?: Section
+    collection?: Collection
 }

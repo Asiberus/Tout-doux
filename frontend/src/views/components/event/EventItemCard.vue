@@ -5,14 +5,15 @@
                 @click="openEventDialog()"
                 :color="cardColor"
                 :disabled="disabled"
-                :ripple="ripple"
+                :ripple="false"
+                class="rounded-lg"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
                 <v-card-text class="d-flex align-center">
                     <v-icon v-if="showIcon" :class="[getTextColor('icon')]" large class="mr-4">
                         mdi-calendar-clock
                     </v-icon>
 
-                    <template v-if="event.takes_whole_day">
+                    <template v-if="event.takesWholeDay">
                         <v-icon
                             title="Takes whole day"
                             class="mr-2"
@@ -25,38 +26,38 @@
                         <div
                             class="d-flex align-center grey--text font-weight-bold"
                             :class="[getTextColor('date')]">
-                            <template v-if="event.takes_whole_day && !daySelected">
+                            <template v-if="event.takesWholeDay && !daySelected">
                                 <span title="Date">
-                                    {{ dateFormat(event.start_date, 'DD/MM/YY') }}
+                                    {{ dateFormat(event.startDate, 'DD/MM/YY') }}
                                 </span>
                             </template>
 
-                            <template v-if="!event.takes_whole_day">
+                            <template v-if="!event.takesWholeDay">
                                 <span title="Start date">
                                     <template
                                         v-if="
                                             !daySelected ||
-                                            (event.end_date &&
-                                                !isDateEqual(event.start_date, event.end_date))
+                                            (event.endDate &&
+                                                !isDateEqual(event.startDate, event.endDate))
                                         ">
-                                        {{ dateFormat(event.start_date, 'DD/MM/YY') }}
+                                        {{ dateFormat(event.startDate, 'DD/MM/YY') }}
                                     </template>
-                                    <template v-if="event.start_time">
-                                        {{ event.start_time }}
+                                    <template v-if="event.startTime">
+                                        {{ event.startTime }}
                                     </template>
                                 </span>
 
-                                <template v-if="event.end_date">
+                                <template v-if="event.endDate">
                                     <v-icon :class="[getTextColor('date')]" small class="mx-1">
                                         mdi-arrow-right
                                     </v-icon>
                                     <span title="End date">
                                         <template
-                                            v-if="!isDateEqual(event.start_date, event.end_date)">
-                                            {{ dateFormat(event.end_date, 'DD/MM/YY') }}
+                                            v-if="!isDateEqual(event.startDate, event.endDate)">
+                                            {{ dateFormat(event.endDate, 'DD/MM/YY') }}
                                         </template>
-                                        <template v-if="event.end_time">
-                                            {{ event.end_time }}
+                                        <template v-if="event.endTime">
+                                            {{ event.endTime }}
                                         </template>
                                     </span>
                                 </template>
@@ -64,7 +65,7 @@
                         </div>
 
                         <h3
-                            class="text-ellipsis white--text"
+                            class="text-truncate white--text"
                             :class="[getTextColor('name')]"
                             :title="event.name">
                             {{ event.name }}
@@ -72,7 +73,7 @@
 
                         <span
                             v-if="event.description"
-                            class="text-ellipsis"
+                            class="text-truncate"
                             :class="[getTextColor('description')]"
                             :title="event.description">
                             {{ event.description }}
@@ -95,18 +96,18 @@
                 :related-to-date="relatedToDate"
                 @submit="emitUpdateEvent"
                 @delete="emitDeleteEvent"
-                @close="eventDialog = false"></EventDialog>
+                @close="eventDialog = false">
+            </EventDialog>
         </v-dialog>
     </div>
 </template>
 
 <script lang="ts">
 import ProjectAvatar from '@/components/ProjectAvatar.vue'
-import { EventModel } from '@/models/event.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { Project } from '@/models/project.model'
-import { Task } from '@/models/task.model'
 import { dateFormat } from '@/pipes'
-import { isPassed } from '@/utils/event.util'
+import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
@@ -119,7 +120,6 @@ export default class EventItemCard extends Vue {
     @Prop({ default: true }) changePassedTextColor!: boolean
     @Prop({ default: false }) disabled!: boolean
     @Prop({ default: true }) clickable!: boolean
-    @Prop({ default: true }) ripple!: boolean
     @Prop({ default: false }) daySelected!: boolean
     @Prop({ default: false }) showIcon!: boolean
     @Prop({ default: true }) caret!: boolean
@@ -141,7 +141,7 @@ export default class EventItemCard extends Vue {
         this.eventDialog = true
     }
 
-    emitUpdateEvent(data: Partial<Task>): void {
+    emitUpdateEvent(data: EventPostOrPatch): void {
         this.eventDialog = false
         this.$emit('update', { id: this.event.id, data })
     }

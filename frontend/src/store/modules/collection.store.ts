@@ -1,13 +1,15 @@
 import { collectionService } from '@/api/collection.api'
 import { taskService } from '@/api/task.api'
-import { Collection, CollectionTask } from '@/models/collection.model'
-import { Task } from '@/models/task.model'
+import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
+import { sortByCompletionDate } from '@/utils/task.utils'
 
 export const collectionMutations = {
     setCurrentCollection: 'SET_CURRENT_COLLECTION',
     updateProperties: 'UPDATE_COLLECTION_PROPERTIES',
+    sortTasks: 'SORT_TASKS',
     task: {
         addTask: 'COLLECTION_ADD_TASK',
         editTask: 'COLLECTION_EDIT_TASK',
@@ -28,12 +30,12 @@ export const collectionActions = {
 @Module
 export class CollectionModule extends VuexModule {
     // State
-    currentCollection?: CollectionTask
+    currentCollection?: CollectionDetail
 
     // Mutations
     @Mutation
     private [collectionMutations.setCurrentCollection](
-        collection: CollectionTask | undefined
+        collection: CollectionDetail | undefined
     ): void {
         // Due to Vue reactivity lack with undefined properties with need to call the Vue.set function
         Vue.set(this, 'currentCollection', collection)
@@ -43,11 +45,19 @@ export class CollectionModule extends VuexModule {
     private [collectionMutations.updateProperties](payload: {
         name: string
         description: string
+        itemName: string
         archived: boolean
     }): void {
         if (!this.currentCollection) return
 
         Object.assign(this.currentCollection, payload)
+    }
+
+    @Mutation
+    private [collectionMutations.sortTasks](): void {
+        if (!this.currentCollection) return
+
+        this.currentCollection.tasks = [...sortByCompletionDate(this.currentCollection.tasks)]
     }
 
     @Mutation
@@ -62,7 +72,7 @@ export class CollectionModule extends VuexModule {
         if (!this.currentCollection) return
 
         const t = this.currentCollection.tasks.find(t => t.id === task.id)
-        Object.assign(t, task)
+        if (t) Object.assign(t, task)
     }
 
     @Mutation
@@ -91,15 +101,16 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.updateProperties](payload: {
         id: number
-        data: Partial<Collection>
+        data: CollectionPatch
     }): Promise<void> {
         const { id, data } = payload
         collectionService.updateCollection(id, data).then(
             (response: any) => {
-                const { name, description, archived } = response.body
+                const { name, description, itemName, archived } = response.body
                 this.context.commit(collectionMutations.updateProperties, {
                     name,
                     description,
+                    itemName,
                     archived,
                 })
             },
@@ -110,7 +121,7 @@ export class CollectionModule extends VuexModule {
     }
 
     @Action
-    async [collectionActions.task.addTask](task: Partial<Task>): Promise<void> {
+    async [collectionActions.task.addTask](task: TaskPost): Promise<void> {
         await taskService.createTask(task).then(
             (response: any) => {
                 this.context.commit(collectionMutations.task.addTask, response.body)
@@ -124,12 +135,14 @@ export class CollectionModule extends VuexModule {
     @Action
     async [collectionActions.task.editTask](payload: {
         id: number
-        data: Partial<Task>
+        data: TaskPatch
     }): Promise<void> {
         const { id, data } = payload
         await taskService.updateTaskById(id, data).then(
             (response: any) => {
-                this.context.commit(collectionMutations.task.editTask, response.body)
+                const task: Task = response.body
+                this.context.commit(collectionMutations.task.editTask, task)
+                this.context.commit(collectionMutations.sortTasks)
             },
             (error: any) => {
                 console.error(error)

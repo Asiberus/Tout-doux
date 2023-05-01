@@ -1,18 +1,20 @@
 <template>
     <div v-if="collection">
-        <h1>
-            Collection : {{ collection.name }}
-            <v-chip v-if="collection.archived" color="accent" class="ml-3">
+        <div class="d-flex align-center">
+            <h3 class="text-h3">
+                <span class="grey--text">Collection : </span>{{ collection.name }}
+            </h3>
+            <v-chip v-if="collection.archived" color="accent" class="ml-4">
                 <v-icon small class="mr-1"> mdi-archive </v-icon>
                 Archived
             </v-chip>
-        </h1>
+        </div>
 
-        <v-divider class="my-3" />
+        <v-divider class="my-4" />
 
-        <v-tabs v-model="collectionTab" background-color="transparent" color="accent">
+        <v-tabs background-color="transparent" color="accent">
             <v-tab :to="{ name: 'collection-detail' }" exact>General</v-tab>
-            <v-tab :to="{ name: 'collection-detail-configuration' }" exact>Configuration</v-tab>
+            <v-tab :to="{ name: 'collection-detail-settings' }" exact>Settings</v-tab>
         </v-tabs>
 
         <div class="pa-5">
@@ -22,17 +24,15 @@
 </template>
 
 <script lang="ts">
-import { CollectionTask } from '@/models/collection.model'
+import { CollectionDetail } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
-export default class CollectionDetail extends Vue {
+export default class CollectionDetailComponent extends Vue {
     @Prop() collectionId!: number
 
-    collectionTab = 'description'
-
-    get collection(): CollectionTask | undefined {
+    get collection(): CollectionDetail | undefined {
         return this.$store.state.collection.currentCollection
     }
 
@@ -41,5 +41,3 @@ export default class CollectionDetail extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

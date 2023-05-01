@@ -21,18 +21,16 @@
                 </template>
                 <ProjectFormDialog
                     :isDialogOpen="projectDialog"
-                    @submit="createProject"
+                    @submit="createProject($event)"
                     @close="projectDialog = false">
                 </ProjectFormDialog>
             </v-dialog>
         </div>
 
         <template v-if="projectList.length > 0">
-            <v-row>
-                <v-col v-for="project in projectList" :key="project.id" cols="4">
-                    <ProjectItemCard :project="project" />
-                </v-col>
-            </v-row>
+            <div class="project-wrapper">
+                <ProjectCard v-for="project in projectList" :key="project.id" :project="project" />
+            </div>
         </template>
         <template v-else>
             <EmptyListDisplay>
@@ -67,18 +65,18 @@
 import { projectService } from '@/api/project.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { Project, ProjectTask } from '@/models/project.model'
+import { ProjectList, ProjectPostOrPatch } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
-import ProjectItemCard from '@/views/project/components/ProjectItemCard.vue'
+import ProjectCard from '@/views/project/components/ProjectCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
-    components: { ProjectItemCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
+    components: { ProjectCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
 })
-export default class ProjectList extends Vue {
+export default class ProjectListComponent extends Vue {
     @Prop({ default: false }) archived!: boolean
 
-    projectList: ProjectTask[] = []
+    projectList: ProjectList[] = []
     projectDialog = false
 
     created(): void {
@@ -101,7 +99,7 @@ export default class ProjectList extends Vue {
         )
     }
 
-    createProject(projectForm: Partial<Project>): void {
+    createProject(projectForm: ProjectPostOrPatch): void {
         this.projectDialog = false
         projectService.createProject(projectForm).then(
             (response: any) => {
@@ -118,3 +116,15 @@ export default class ProjectList extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.project-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    & > * {
+        min-width: 0;
+    }
+}
+</style>
