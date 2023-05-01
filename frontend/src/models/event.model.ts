@@ -1,25 +1,24 @@
 import { Project } from '@/models/project.model'
 
-export interface EventModel {
-    id: number
+export interface EventPostOrPatch {
     name: string
-    start_date: string
-    start_time: string | null
-    end_date: string | null
-    end_time: string | null
-    takes_whole_day: boolean
     description: string | null
+    startDate: string
+    startTime: string | null
+    endDate: string | null
+    endTime: string | null
+    takesWholeDay: boolean
     projectId?: number
 }
 
-export interface EventExtended {
+export interface EventModel {
     id: number
+    description?: string
     name: string
-    start_date: string
-    start_time: string | null
-    end_date: string | null
-    end_time: string | null
-    takes_whole_day: boolean
-    description: string | null
-    project: Project | null
+    startDate: string
+    startTime?: string
+    endDate?: string
+    endTime?: string
+    takesWholeDay: boolean
+    project?: Project
 }

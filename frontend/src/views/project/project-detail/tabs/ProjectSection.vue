@@ -11,18 +11,16 @@
                     background-color="transparent">
                     <v-tab v-for="section of sections" :key="'tab-' + section.id">
                         {{ section.name }}
-                        <ProgressCircular
+                        <ProgressDisk
                             v-if="section.tasks.length > 0"
-                            :value="section.tasks.filter(t => t.completed).length"
+                            :value="section.tasks.filter(({ completed }) => completed).length"
                             :max="section.tasks.length"
-                            :size="16"
-                            :width="8"
-                            :display-text="false"
+                            color="green accent-2"
                             class="ml-1 flex-shrink-0"
-                            :title="`${section.tasks.filter(t => t.completed).length} of ${
-                                section.tasks.length
-                            } tasks completed`">
-                        </ProgressCircular>
+                            :title="`${
+                                section.tasks.filter(({ completed }) => completed).length
+                            } of ${section.tasks.length} tasks completed`">
+                        </ProgressDisk>
                     </v-tab>
                 </v-tabs>
 
@@ -75,16 +73,21 @@
 
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import ProgressCircular from '@/components/ProgressCircular.vue'
-import { ProjectTask } from '@/models/project.model'
+import { ProjectDetail } from '@/models/project.model'
 import { SectionTask } from '@/models/section.model'
 import { projectActions } from '@/store/modules/project.store'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import ProgressDisk from '@/components/ProgressDisk.vue'
 
 @Component({
-    components: { ProjectSectionItem, SectionDialog, EmptyListDisplay, ProgressCircular },
+    components: {
+        ProgressDisk,
+        ProjectSectionItem,
+        SectionDialog,
+        EmptyListDisplay,
+    },
 })
 export default class ProjectSection extends Vue {
     @Prop({ default: 0 }) sectionId!: number
@@ -92,7 +95,7 @@ export default class ProjectSection extends Vue {
     sectionDialog = false
     sectionTabs = 0
 
-    get project(): ProjectTask {
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 

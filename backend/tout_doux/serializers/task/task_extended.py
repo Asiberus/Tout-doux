@@ -1,16 +1,25 @@
-from rest_framework import serializers
+from tout_doux.models import Task
+from tout_doux.serializers.collection import CollectionSerializer
+from tout_doux.serializers.project import ProjectSerializer
+from tout_doux.serializers.section import SectionSerializer
+from tout_doux.serializers.task.task import TaskSerializer
 
-from tout_doux.models.task import Task
-from tout_doux.serializers.collection.collection import CollectionSerializer
-from tout_doux.serializers.project.project import ProjectSerializer
-from tout_doux.serializers.section.section_extended import SectionExtendedSerializer
 
-
-class TaskExtendedSerializer(serializers.ModelSerializer):
-    project = ProjectSerializer(read_only=True)
-    section = SectionExtendedSerializer(read_only=True)
-    collection = CollectionSerializer(read_only=True)
+class TaskExtendedSerializer(TaskSerializer):
+    project = ProjectSerializer()
+    section = SectionSerializer()
+    collection = CollectionSerializer()
 
     class Meta:
         model = Task
-        fields = ('id', 'name', 'completed', 'project', 'section', 'collection', 'created_at')
+        fields = (
+            'id',
+            'name',
+            'tags',
+            'completed',
+            'createdAt',
+            'completedAt',
+            'project',
+            'section',
+            'collection',
+        )

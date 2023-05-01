@@ -5,10 +5,11 @@
         :color="project.archived ? 'projectArchived' : 'project'"
         :ripple="ripple"
         :small="small"
-        :title="title">
-        <v-icon v-if="project.archived" small left>mdi-archive</v-icon>
-
-        <div class="text-ellipsis">
+        :title="title"
+        :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
+        @click="click($event)">
+        <v-icon small left>mdi-briefcase-variant</v-icon>
+        <div class="text-truncate">
             {{ project.name }}
         </div>
     </v-chip>
@@ -35,6 +36,12 @@ export default class ProjectChip extends Vue {
     get detailLocation(): Location | undefined {
         if (!this.navigateToDetail) return
         return { name: 'project-detail', params: { id: `${this.project.id}` } }
+    }
+
+    click(event: Event): void {
+        if (this.project.archived) return
+
+        this.$emit('click', event)
     }
 }
 </script>

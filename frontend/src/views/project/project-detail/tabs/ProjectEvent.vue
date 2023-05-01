@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="12">
                 <div class="d-flex align-center mb-5">
-                    <h3 class="flex-grow-1">Event related to the project</h3>
+                    <h3 class="text-h5 flex-grow-1">Events related to the project</h3>
 
                     <FilterChip
                         v-if="project.events.length > 0"
@@ -84,10 +84,10 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { EventModel } from '@/models/event.model'
-import { ProjectTask } from '@/models/project.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { ProjectDetail } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
-import { isPassed } from '@/utils/event.util'
+import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { Component, Vue } from 'vue-property-decorator'
@@ -99,7 +99,7 @@ export default class ProjectEvent extends Vue {
     eventDialog = false
     displayPassedEvent = false
 
-    get project(): ProjectTask {
+    get project(): ProjectDetail {
         return this.$store.state.project.currentProject
     }
 
@@ -111,13 +111,13 @@ export default class ProjectEvent extends Vue {
         return this.project.events.filter(event => isPassed(event)).reverse()
     }
 
-    createEvent(event: Partial<EventModel>): void {
+    createEvent(event: EventPostOrPatch): void {
         this.eventDialog = false
         event.projectId = this.project.id
         this.$store.dispatch(projectActions.event.addEvent, event)
     }
 
-    updateEvent(payload: { id: number; data: Partial<EventModel> }): void {
+    updateEvent(payload: { id: number; data: EventPostOrPatch }): void {
         this.$store.dispatch(projectActions.event.editEvent, payload)
     }
 
@@ -126,5 +126,3 @@ export default class ProjectEvent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

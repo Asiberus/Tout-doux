@@ -48,6 +48,11 @@ services:
       - ${DB_PORT}:${DB_CONTAINER_PORT}
     volumes:
       - td_db:/var/lib/postgresql/data
+  adminer:
+    container_name: ${DB_ADMINER_NAME}
+    image: adminer
+    ports:
+      - ${DB_ADMINER_PORT}:${DB_ADMINER_CONTAINER_PORT}
 volumes:
   td_db:
     name: td_db

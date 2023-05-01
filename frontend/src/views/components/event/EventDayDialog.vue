@@ -17,7 +17,6 @@
                             :event="event"
                             :project="event.project"
                             :clickable="event.project ? !event.project.archived : true"
-                            :ripple="event.project ? !event.project.archived : true"
                             color="event"
                             :daySelected="true"
                             :change-passed-text-color="false"
@@ -43,7 +42,7 @@
 <script lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import HalfDialog from '@/components/HalfDialog.vue'
-import { EventExtended } from '@/models/event.model'
+import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
@@ -52,12 +51,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 export default class EventDayDialog extends Vue {
     @Prop({ required: true }) value!: boolean
     @Prop({ required: true }) date!: string
-    @Prop({ required: true }) events!: EventExtended[]
+    @Prop({ required: true }) events!: EventModel[]
 
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

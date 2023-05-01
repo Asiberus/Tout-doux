@@ -1,19 +1,21 @@
 from rest_framework import serializers
 
-from tout_doux.models.project import Project
+from tout_doux.models import Project
+from tout_doux.serializers.common import ReadOnlyModelSerializer
+from tout_doux.serializers.tag import TagSerializer
 
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ProjectSerializer(ReadOnlyModelSerializer):
+    createdOn = serializers.DateField(source='created_on')
+    tags = TagSerializer(many=True)
+
     class Meta:
         model = Project
-        fields = ('id', 'name', 'description', 'archived', 'created_at')
-
-    def validate(self, data):
-        if not self.instance and data.get('archived'):
-            raise serializers.ValidationError('You can\'t create a archived project')
-
-        if self.instance and self.instance.archived:
-            if 'name' in data or 'description' in data:
-                raise serializers.ValidationError('You can\'t edit an archived project')
-
-        return data
+        fields = (
+            'id',
+            'name',
+            'description',
+            'tags',
+            'archived',
+            'createdOn'
+        )

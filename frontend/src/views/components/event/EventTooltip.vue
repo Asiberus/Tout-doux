@@ -9,27 +9,27 @@
         </v-toolbar>
         <v-card-text>
             <div class="d-flex align-center mb-2 white--text">
-                <template v-if="!event.takes_whole_day">
+                <template v-if="!event.takesWholeDay">
                     <div class="flex-shrink-0 d-flex align-center">
                         <v-icon class="mr-2">mdi-calendar-clock</v-icon>
                         <span>
-                            {{ dateFormat(event.start_date, 'D MMMM Y') }}
-                            <template v-if="event.start_time">{{ event.start_time }}</template>
+                            {{ dateFormat(event.startDate, 'D MMMM Y') }}
+                            <template v-if="event.startTime">{{ event.startTime }}</template>
                         </span>
-                        <template v-if="event.end_date">
+                        <template v-if="event.endDate">
                             <v-icon small class="mx-1">mdi-arrow-right</v-icon>
                             <span>
-                                <template v-if="!isDateEqual(event.start_date, event.end_date)">
-                                    {{ dateFormat(event.end_date, 'D MMMM Y') }}
+                                <template v-if="!isDateEqual(event.startDate, event.endDate)">
+                                    {{ dateFormat(event.endDate, 'D MMMM Y') }}
                                 </template>
-                                <template v-if="event.end_time">{{ event.end_time }}</template>
+                                <template v-if="event.endTime">{{ event.endTime }}</template>
                             </span>
                         </template>
                     </div>
                 </template>
                 <template v-else>
                     <v-icon title="Takes whole day" class="mr-2">mdi-white-balance-sunny</v-icon>
-                    <span>{{ dateFormat(event.start_date, 'D MMMM Y') }}</span>
+                    <span>{{ dateFormat(event.startDate, 'D MMMM Y') }}</span>
                 </template>
 
                 <template v-if="event.project">
@@ -44,21 +44,21 @@
 
 <script lang="ts">
 import ProjectChip from '@/components/ProjectChip.vue'
-import { EventExtended } from '@/models/event.model'
+import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import moment from 'moment'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 
 @Component({ components: { ProjectChip } })
 export default class EventTooltip extends Vue {
-    @Prop({ required: true }) event!: EventExtended
+    @Prop({ required: true }) event!: EventModel
 
     get isEditDisabled(): boolean {
         return this.event.project ? this.event.project.archived : false
     }
 
     @Emit('update')
-    emitUpdateEvent(): EventExtended {
+    emitUpdateEvent(): EventModel {
         return this.event
     }
 
