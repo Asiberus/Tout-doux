@@ -127,7 +127,7 @@ export default class DailyDetail extends Vue {
                 } left to do today!`
             else return 'All tasks done for today! :)'
         } else {
-            if (this.numberOfDailyTaskUncompleted === this.dailyTaskList.length)
+            if (this.numberOfDailyTaskCompleted === this.dailyTaskList.length)
                 return 'All tasks completed for that day! :)'
             else if (this.numberOfDailyTaskCompleted > 0)
                 return `${this.numberOfDailyTaskCompleted} on ${this.dailyTaskList.length} tasks were completed that day`
