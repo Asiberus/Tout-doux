@@ -7,12 +7,28 @@ from rest_framework.views import APIView
 
 from tout_doux.auth.json_authentication import JsonAuthentication
 from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordResetSerializer
+from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
 
 
 class LoginView(KnoxLoginView):
     authentication_classes = [JsonAuthentication]
     permission_classes = [AllowAny]
+
+
+class UserRegisterView(CreateAPIView):
+    serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny]
+
+
+class UserActivationView(CreateAPIView):
+    serializer_class = UserActivationSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PasswordResetRequestView(APIView):

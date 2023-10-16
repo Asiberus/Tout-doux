@@ -1,4 +1,4 @@
-from .auth import LoginView, PasswordResetView, PasswordResetRequestView
+from .auth import LoginView, UserRegisterView, UserActivationView, PasswordResetView, PasswordResetRequestView
 from .collection import CollectionViewSet
 from .common_task import CommonTaskViewSet
 from .daily_task import DailyTaskViewSet
@@ -8,4 +8,4 @@ from .project import ProjectViewSet
 from .section import SectionViewSet
 from .tag import TagViewSet
 from .task import TaskViewSet
-from .user import UserViewSet, UserRegisterView, UserActivationView
+from .user import UserViewSet
