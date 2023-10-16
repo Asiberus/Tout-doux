@@ -35,6 +35,7 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Event
@@ -47,6 +48,7 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
             'description',
             'takesWholeDay',
             'projectId',
+            'user',
         )
 
     def to_representation(self, instance):
@@ -59,6 +61,10 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
         return representation_serializer(instance).data
 
     def validate_projectId(self, project):
+        current_user = self.context.get('request').user
+        if project.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{project.pk}\" - object does not exist.')
+
         if project.archived:
             raise serializers.ValidationError('You can\'t create an event related to an archived project')
 

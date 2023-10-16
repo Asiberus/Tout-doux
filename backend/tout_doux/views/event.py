@@ -21,7 +21,7 @@ class EventViewSet(viewsets.ModelViewSet):
             return EventSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = self.request.user.events.all()
 
         if 'date' in self.request.query_params:
             queryset = self.filter_queryset_by_date(queryset, self.request.query_params.get('date'))

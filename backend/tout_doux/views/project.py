@@ -2,23 +2,14 @@ from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from tout_doux.models import Project
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.serializers.project import ProjectListSerializer, ProjectDetailSerializer, ProjectPostOrPatchSerializer, \
     ProjectSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
     pagination_class = ExtendedPageNumberPagination
     filterset_fields = ('archived',)
-
-    def get_queryset(self):
-        queryset = self.queryset
-        if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
-            queryset = queryset.filter(Q(tasks__completed=False) | Q(sections__tasks__completed=False)).distinct()
-
-        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -29,6 +20,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return ProjectPostOrPatchSerializer
         else:
             return ProjectSerializer
+
+    def get_queryset(self):
+        queryset = self.request.user.projects.all()
+
+        if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
+            queryset = queryset.filter(Q(tasks__completed=False) | Q(sections__tasks__completed=False)).distinct()
+
+        return queryset
 
     @action(detail=False)
     def detailed(self, request):

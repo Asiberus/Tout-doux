@@ -1,9 +1,10 @@
 from django.db import models
 
 from tout_doux.models.project import Project
+from tout_doux.models.user import UserRelatedModel
 
 
-class Event(models.Model):
+class Event(UserRelatedModel):
     name = models.CharField(max_length=50)
     start_date = models.DateField()
     start_time = models.TimeField(null=True, blank=True)

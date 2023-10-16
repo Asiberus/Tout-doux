@@ -1,9 +1,10 @@
 from django.db import models
 
 from tout_doux.models.tag import Tag
+from tout_doux.models.user import UserRelatedModel
 
 
-class Project(models.Model):
+class Project(UserRelatedModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     tags = models.ManyToManyField(

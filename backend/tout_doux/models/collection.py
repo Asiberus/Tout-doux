@@ -1,7 +1,9 @@
 from django.db import models
 
+from tout_doux.models.user import UserRelatedModel
 
-class Collection(models.Model):
+
+class Collection(UserRelatedModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     item_name = models.CharField(max_length=15, default='task', blank=True)

@@ -6,6 +6,7 @@ from tout_doux.serializers.collection.collection import CollectionSerializer
 
 class CollectionPostOrPatchSerializer(serializers.ModelSerializer):
     itemName = serializers.CharField(source='item_name')
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Collection
@@ -13,7 +14,8 @@ class CollectionPostOrPatchSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'itemName',
-            'archived'
+            'archived',
+            'user',
         )
 
     def to_representation(self, instance):

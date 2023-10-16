@@ -24,6 +24,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = DailyTask
@@ -33,12 +34,17 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
             'name',
             'tagIds',
             'action',
+            'user',
         )
 
     def to_representation(self, instance):
         return DailyTaskSerializer(instance).data
 
     def validate_taskId(self, task):
+        current_user = self.context.get('request').user
+        if task.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{task.pk}\" - object does not exist.')
+
         # Test that the task is not completed or related to an archived project/collection
         if task.completed:
             raise serializers.ValidationError('You can\'t link a completed task to a daily task')
@@ -50,6 +56,21 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
                 'You can\'t create a daily task with a task related to an archived collection')
 
         return task
+
+    def validate_commonTaskId(self, common_task):
+        current_user = self.context.get('request').user
+        if common_task.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{common_task.pk}\" - object does not exist.')
+
+        return common_task
+
+    def validate_tagIds(self, tags):
+        current_user = self.context.get('request').user
+        for tag in tags:
+            if tag.user.pk is not current_user.pk:
+                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
+
+        return tags
 
     def validate(self, data):
         if 'task' in data and 'common_task' in data:

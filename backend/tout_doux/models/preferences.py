@@ -1,7 +1,9 @@
 from django.db import models
 
+from tout_doux.models.user import UserRelatedModel
 
-class Preferences(models.Model):
+
+class Preferences(UserRelatedModel):
     class ProgressWheelMode(models.TextChoices):
         NUMBER = 'number'
         PERCENT = 'percent'
