@@ -8,11 +8,9 @@ class PreferencesSerializer(serializers.ModelSerializer):
         source='progress_wheel_mode',
         choices=Preferences.ProgressWheelMode.choices
     )
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Preferences
         fields = (
             'progressWheelMode',
-            'user',
         )

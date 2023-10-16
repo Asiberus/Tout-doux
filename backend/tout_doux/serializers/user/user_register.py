@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from tout_doux.models import Preferences
 from tout_doux.serializers.user.user import UserSerializer
 from tout_doux.services.email import EmailService
 
@@ -30,6 +31,10 @@ class UserRegisterSerializer(serializers.Serializer):
 
         user.set_password(password)
         user.save()
+
+        # We save the preferences in the db at registration
+        preferences = Preferences(user=user)
+        preferences.save()
 
         EmailService.send_user_creation_email(user)
         return user

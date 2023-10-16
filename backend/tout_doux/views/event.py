@@ -5,13 +5,10 @@ from rest_framework import viewsets, status
 from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
-from tout_doux.models import Event
 from tout_doux.serializers.event import EventSerializer, EventExtendedSerializer, EventPostOrPatchSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.all()
-
     def get_serializer_class(self):
         if self.action in ['create', 'partial_update', 'update']:
             return EventPostOrPatchSerializer
