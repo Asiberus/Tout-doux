@@ -1,0 +1,15 @@
+{% autoescape off %}
+<h1>
+  Bonjour et surtout bienvenu sur Tout Doux, {{ user.username | capfirst }}!
+</h1>
+
+<p>
+  Pour finaliser la création de votre compte veuillez cliquer sur le lien ci
+  dessous :
+</p>
+
+<a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a>
+
+<p>Cordialement</p>
+<p>L'Équipe Tout Doux</p>
+{% endautoescape %}

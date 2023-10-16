@@ -23,6 +23,7 @@ services:
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
+      SERVER_URL: http://localhost:${FRONTEND_PORT}/
       SECRET_KEY: ${BACKEND_SECRET_KEY}
       DEBUG: ${BACKEND_DEBUG}
       ALLOWED_HOSTS: ${BACKEND_ALLOWED_HOSTS}

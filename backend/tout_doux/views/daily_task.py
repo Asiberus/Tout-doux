@@ -9,7 +9,7 @@ from tout_doux.models import DailyTask
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer, \
     DailySummarySerializer
-from tout_doux.utils import daterange
+from tout_doux.utils.date import daterange
 
 
 class DailyTaskViewSet(viewsets.ModelViewSet):

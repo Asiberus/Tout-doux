@@ -27,12 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'secret')
 DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 
 ALLOWED_HOSTS = []
-ALLOWED_HOSTS.extend(
-    filter(
-        None,
-        os.environ.get('ALLOWED_HOSTS', '').split(';')
-    )
-)
+ALLOWED_HOSTS.extend(filter(None, os.environ.get('ALLOWED_HOSTS', '').split(';')))
+
+SERVER_URL = os.environ.get('SERVER_URL')
 
 # Application definition
 
@@ -103,24 +100,16 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = "tout_doux.User"
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
-AUTH_USER_MODEL = "tout_doux.User"
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 AUTHENTICATION_BACKENDS = ['tout_doux.auth.email_backend.EmailBackend']
@@ -139,6 +128,10 @@ REST_KNOX = {
 
 EXTENDED_PAGINATION_DEFAULT_SIZE = 20
 EXTENDED_PAGINATION_DEFAULT_SIZE_QUERY_PARAM = 'size'
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp/email')
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

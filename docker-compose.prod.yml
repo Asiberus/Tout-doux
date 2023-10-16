@@ -30,6 +30,7 @@ services:
       context: .
       dockerfile: ./.conf/production/backend/Dockerfile
     environment:
+      SERVER_URL: ${SERVER_HOST}
       BACKEND_PORT: ${BACKEND_PORT}
       SECRET_KEY: ${BACKEND_SECRET_KEY}
       DEBUG: ${BACKEND_DEBUG}
