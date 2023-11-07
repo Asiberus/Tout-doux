@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, max_length=100)
 
 
 class UserRelatedModel(models.Model):

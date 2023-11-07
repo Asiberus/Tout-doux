@@ -10,9 +10,9 @@ from tout_doux.services.email import EmailService
 
 
 class UserRegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=50,
+    username = serializers.CharField(max_length=100,
                                      validators=[UniqueValidator(queryset=get_user_model().objects.all())])
-    email = serializers.EmailField(max_length=264,
+    email = serializers.EmailField(max_length=100,
                                    validators=[UniqueValidator(queryset=get_user_model().objects.all())])
     password1 = serializers.CharField(max_length=64)
     password2 = serializers.CharField(max_length=64)
@@ -32,7 +32,7 @@ class UserRegisterSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
 
-        # We save the preferences in the db at registration
+        # We create the preferences in the db at registration
         preferences = Preferences(user=user)
         preferences.save()
 

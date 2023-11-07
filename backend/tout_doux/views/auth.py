@@ -1,5 +1,8 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import status
+from rest_framework.exceptions import ParseError
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -51,3 +54,21 @@ class PasswordResetView(CreateAPIView):
         super().post(request, *args, **kwargs)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ValidatePasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        password = request.data.get('password')
+
+        if not password:
+            raise ParseError('You must provide a password')
+
+        error_messages = []
+        try:
+            validate_password(password=password)
+        except ValidationError as error:
+            error_messages = error.messages
+
+        return Response({'errors': error_messages})
