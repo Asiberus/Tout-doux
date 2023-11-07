@@ -16,7 +16,10 @@
         <template v-else>
             <div class="non-authenticated-wrapper">
                 <div class="router-view-wrapper">
-                    <h1 class="text-h1 green--text mb-6">Tout Doux</h1>
+                    <router-link :to="{ name: 'login' }">
+                        <h1 class="text-h1 green--text mb-6">Tout Doux</h1>
+                    </router-link>
+
                     <router-view />
                 </div>
             </div>
@@ -57,6 +60,11 @@ export default class AppMain extends Vue {
 
     .router-view-wrapper {
         min-width: 400px;
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
     }
 }
 </style>

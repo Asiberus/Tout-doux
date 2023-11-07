@@ -1,6 +1,7 @@
 export const apiRoutes = {
     login: 'login/',
     logout: 'logout/',
+    activateUser: 'activate/',
     register: 'register/',
     validatePassword: 'auth/validate-password/',
     project: 'project/',

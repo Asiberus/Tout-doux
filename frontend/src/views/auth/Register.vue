@@ -54,9 +54,14 @@
             type="submit"
             color="green"
             block
-            class="mt-4">
+            class="mt-4 mb-2">
             Submit
         </v-btn>
+        <router-link
+            :to="{ name: 'login' }"
+            class="text-body-1 green--text text--lighten-1 float-right login-link">
+            Go back to login
+        </router-link>
     </v-form>
 </template>
 
@@ -135,7 +140,7 @@ export default class Register extends Vue {
             .isUsernameUnique({ username: value })
             .then((response: any) => {
                 this.usernameUniqueError = !response.body.unique
-                    ? 'This username is not unique'
+                    ? 'This username is already used'
                     : null
             })
             .catch((error: any) => console.error(error))
@@ -157,7 +162,7 @@ export default class Register extends Vue {
         userApi
             .isEmailUnique({ email: value })
             .then((response: any) => {
-                this.emailUniqueError = !response.body.unique ? 'This email is not unique' : null
+                this.emailUniqueError = !response.body.unique ? 'This email is already used' : null
             })
             .catch((error: any) => console.error(error))
             .finally(() => (this.userForm.pending = false))
@@ -193,14 +198,15 @@ export default class Register extends Vue {
         if (!password1 || !password2) {
             this.passwordMatchError = null
         }
-        this.passwordMatchTimer = setTimeout(
-            () =>
-                (this.passwordMatchError =
-                    password1 && password2 && password1 !== password2
-                        ? 'Password is not matching'
-                        : null),
-            300
-        )
+
+        this.userForm.pending = true
+        this.passwordMatchTimer = setTimeout(() => {
+            this.passwordMatchError =
+                password1 && password2 && password1 !== password2
+                    ? 'Password is not matching'
+                    : null
+            this.userForm.pending = false
+        }, 300)
     }
 
     registerUser(): void {
@@ -216,4 +222,12 @@ export default class Register extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.login-link {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+</style>
