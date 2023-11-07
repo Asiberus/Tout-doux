@@ -1,6 +1,8 @@
 export const apiRoutes = {
     login: 'login/',
     logout: 'logout/',
+    register: 'register/',
+    validatePassword: 'auth/validate-password/',
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',
@@ -23,4 +25,6 @@ export const apiRoutes = {
     commonTaskUnique: 'common-task/is-name-unique/',
     commonTaskById: 'common-task/:id/',
     preferences: 'preferences/',
+    isUsernameUnique: 'user/is-username-unique/',
+    isEmailUnique: 'user/is-email-unique/',
 }

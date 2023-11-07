@@ -73,7 +73,7 @@ export default class CommonTaskDialog extends Vue {
 
     nameUniqueError: string | null = null
     inputNameLoading = false
-    validationTimer?: number
+    validationTimer?: number = undefined
 
     tagList: Tag[] = []
     commonTaskForm: Form<CommonTaskForm> = {

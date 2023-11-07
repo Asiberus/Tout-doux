@@ -14,7 +14,12 @@
             </v-main>
         </template>
         <template v-else>
-            <router-view />
+            <div class="non-authenticated-wrapper">
+                <div class="router-view-wrapper">
+                    <h1 class="text-h1 green--text mb-6">Tout Doux</h1>
+                    <router-view />
+                </div>
+            </div>
         </template>
     </v-app>
 </template>
@@ -40,5 +45,18 @@ export default class AppMain extends Vue {
 <style scoped lang="scss">
 .h-100 {
     height: 100%;
+}
+
+.non-authenticated-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .router-view-wrapper {
+        min-width: 400px;
+    }
 }
 </style>

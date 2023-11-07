@@ -98,7 +98,7 @@ export default class TagDialog extends Vue {
 
     nameUniqueError: string | null = null
     inputNameLoading = false
-    validationTimer?: number
+    validationTimer?: number = undefined
 
     tagForm: Form<TagForm> = {
         valid: false,

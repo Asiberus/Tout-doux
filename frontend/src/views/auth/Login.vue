@@ -1,28 +1,34 @@
 <template>
-    <div class="login">
-        <h1 class="text-h1 green--text mb-6">Tout Doux</h1>
-        <v-form class="login__form" @submit.prevent="login()">
-            <v-text-field v-model="form.data.email" label="Email" autofocus hide-details>
-            </v-text-field>
+    <v-form class="login__form" @submit.prevent="login()">
+        <v-text-field v-model="form.data.email" label="Email" autofocus hide-details>
+        </v-text-field>
 
-            <v-text-field
-                v-model="form.data.password"
-                :type="showPassword ? 'text' : 'password'"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showPassword = !showPassword"
-                label="Password"
-                hide-details>
-            </v-text-field>
+        <v-text-field
+            v-model="form.data.password"
+            :type="showPassword ? 'text' : 'password'"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showPassword = !showPassword"
+            label="Password"
+            hide-details>
+        </v-text-field>
 
-            <p
-                class="error-message text-subtitle-1 error--text text-center mb-0"
-                :class="{ active: credentialsError }">
-                Invalid credentials
-            </p>
+        <p
+            class="error-message text-subtitle-1 error--text text-center mb-0"
+            :class="{ active: credentialsError }">
+            Invalid credentials
+        </p>
 
-            <v-btn :disabled="!form.valid" :loading="loading" type="submit">login</v-btn>
-        </v-form>
-    </div>
+        <v-btn :disabled="!form.valid" :loading="loading" type="submit">login</v-btn>
+
+        <div class="login__form__links">
+            <router-link :to="{ name: 'register' }" class="text-body-1 green--text text--lighten-1"
+                >Create account</router-link
+            >
+            <router-link to="" class="text-body-1 green--text text--lighten-1"
+                >Forgot password ?</router-link
+            >
+        </div>
+    </v-form>
 </template>
 
 <script lang="ts">
@@ -76,19 +82,11 @@ export default class Login extends Vue {
 
 <style scoped lang="scss">
 .login {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
     &__form {
-        min-width: 20%;
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        row-gap: 20px;
+        row-gap: 8px;
 
         .error-message {
             opacity: 0;
@@ -96,6 +94,19 @@ export default class Login extends Vue {
 
             &.active {
                 opacity: 1;
+            }
+        }
+
+        &__links {
+            display: flex;
+            justify-content: space-between;
+
+            a {
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
             }
         }
     }

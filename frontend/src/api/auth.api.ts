@@ -1,5 +1,10 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
+import { RegisterPost } from '@/models/register.model'
+
+export interface ValidatePasswordBody {
+    password: string
+}
 
 export function login(data: { email: string; password: string }) {
     return Vue.http.post(apiRoutes.login, data)
@@ -7,4 +12,12 @@ export function login(data: { email: string; password: string }) {
 
 export function logout() {
     return Vue.http.post(apiRoutes.logout)
+}
+
+export function register(data: RegisterPost) {
+    return Vue.http.post(apiRoutes.register, data)
+}
+
+export function validatePassword(data: ValidatePasswordBody) {
+    return Vue.http.post(apiRoutes.validatePassword, data)
 }

@@ -42,7 +42,7 @@ export default class TagSearch extends Vue {
     search: string | null = null
     isLoading = false
 
-    private searchTimer?: number
+    private searchTimer?: number = undefined
 
     @Watch('search')
     private onSearchChanges(value: string): void {
