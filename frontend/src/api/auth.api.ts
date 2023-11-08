@@ -1,15 +1,12 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { RegisterPost } from '@/models/register.model'
-
-export interface ActivateUserBody {
-    uidb64: string
-    token: string
-}
-
-export interface ValidatePasswordBody {
-    password: string
-}
+import {
+    ActivateUserBody,
+    ResetPasswordRequestBody,
+    RegisterPost,
+    ValidatePasswordBody,
+    ResetPasswordBody,
+} from '@/models/auth.model'
 
 export function login(data: { email: string; password: string }) {
     return Vue.http.post(apiRoutes.login, data)
@@ -29,4 +26,12 @@ export function activateUser(data: ActivateUserBody) {
 
 export function validatePassword(data: ValidatePasswordBody) {
     return Vue.http.post(apiRoutes.validatePassword, data)
+}
+
+export function resetPasswordRequest(data: ResetPasswordRequestBody) {
+    return Vue.http.post(apiRoutes.resetPasswordRequest, data)
+}
+
+export function resetPassword(data: ResetPasswordBody) {
+    return Vue.http.post(apiRoutes.resetPassword, data)
 }

@@ -18,15 +18,19 @@
             Invalid credentials
         </p>
 
-        <v-btn :disabled="!form.valid" :loading="loading" type="submit">login</v-btn>
+        <v-btn :disabled="!form.valid" :loading="loading" type="submit" color="success">
+            login
+        </v-btn>
 
         <div class="login__form__links">
-            <router-link :to="{ name: 'register' }" class="text-body-1 green--text text--lighten-1"
-                >Create account</router-link
-            >
-            <router-link to="" class="text-body-1 green--text text--lighten-1"
-                >Forgot password ?</router-link
-            >
+            <router-link :to="{ name: 'register' }" class="text-body-1 green--text text--lighten-1">
+                Create account
+            </router-link>
+            <router-link
+                :to="{ name: 'password-reset-request' }"
+                class="text-body-1 green--text text--lighten-1">
+                Forgot password ?
+            </router-link>
         </div>
     </v-form>
 </template>

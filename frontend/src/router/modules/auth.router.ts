@@ -4,6 +4,8 @@ import { loginGuard } from '@/router/guards'
 import Register from '@/views/auth/Register.vue'
 import { NavigationGuardNext } from 'vue-router/types/router'
 import { authApi } from '@/api'
+import ResetPasswordRequest from '@/views/auth/ResetPasswordRequest.vue'
+import ResetPassword from '@/views/auth/ResetPassword.vue'
 
 export const authRoutes: Array<RouteConfig> = [
     {
@@ -41,5 +43,18 @@ export const authRoutes: Array<RouteConfig> = [
                 })
                 .finally(() => next({ name: 'login' }))
         },
+    },
+    {
+        path: '/password-reset-request',
+        name: 'password-reset-request',
+        component: ResetPasswordRequest,
+        beforeEnter: loginGuard,
+    },
+    {
+        path: '/password-reset',
+        name: 'password-reset',
+        component: ResetPassword,
+        props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
+        beforeEnter: loginGuard,
     },
 ]

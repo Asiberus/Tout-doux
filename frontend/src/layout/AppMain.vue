@@ -17,7 +17,7 @@
             <div class="non-authenticated-wrapper">
                 <div class="router-view-wrapper">
                     <router-link :to="{ name: 'login' }">
-                        <h1 class="text-h1 green--text mb-6">Tout Doux</h1>
+                        <h1 class="text-h1 green--text mb-6 text-center">Tout Doux</h1>
                     </router-link>
 
                     <router-view />

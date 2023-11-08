@@ -4,6 +4,8 @@ export const apiRoutes = {
     activateUser: 'activate/',
     register: 'register/',
     validatePassword: 'auth/validate-password/',
+    resetPasswordRequest: 'password-reset-request/',
+    resetPassword: 'password-reset/',
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',

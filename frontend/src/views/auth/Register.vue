@@ -1,9 +1,9 @@
 <template>
-    <v-form ref="form" v-model="userForm.valid" @submit.prevent="registerUser()">
+    <v-form v-model="form.valid" @submit.prevent="registerUser()">
         <v-text-field
             label="Username"
-            v-model="userForm.data.username"
-            :rules="userForm.rules.username"
+            v-model="form.data.username"
+            :rules="form.rules.username"
             :error-messages="usernameUniqueError"
             @input="validateUsername"
             required
@@ -14,8 +14,8 @@
         <v-text-field
             label="Email"
             type="email"
-            v-model="userForm.data.email"
-            :rules="userForm.rules.email"
+            v-model="form.data.email"
+            :rules="form.rules.email"
             :error-messages="emailUniqueError"
             @input="validateEmail"
             validate-on-blur
@@ -25,8 +25,8 @@
         </v-text-field>
         <v-text-field
             label="Password"
-            v-model="userForm.data.password1"
-            :rules="userForm.rules.password1"
+            v-model="form.data.password1"
+            :rules="form.rules.password1"
             :error-messages="passwordValidationErrors"
             error-count="6"
             @input="validatePasswordStrength"
@@ -38,8 +38,8 @@
         </v-text-field>
         <v-text-field
             label="Confirm password"
-            v-model="userForm.data.password2"
-            :rules="userForm.rules.password2"
+            v-model="form.data.password2"
+            :rules="form.rules.password2"
             required
             @input="validatePasswordMatch()"
             :error-messages="passwordMatchError"
@@ -49,13 +49,13 @@
         </v-text-field>
 
         <v-btn
-            :disabled="!userForm.valid || userForm.pending"
+            :disabled="!form.valid || form.pending"
             :loading="submitLoading"
             type="submit"
             color="green"
             block
             class="mt-4 mb-2">
-            Submit
+            Create account
         </v-btn>
         <router-link
             :to="{ name: 'login' }"
@@ -66,15 +66,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
-import { RegisterPost } from '@/models/register.model'
 import { authApi, userApi } from '@/api'
-import { ValidatePasswordBody } from '@/api/auth.api'
+import { RegisterPost } from '@/models/auth.model'
 
 @Component
 export default class Register extends Vue {
-    userForm: Form<RegisterPost> = {
+    form: Form<RegisterPost> = {
         valid: false,
         pending: false,
         data: {
@@ -120,10 +119,6 @@ export default class Register extends Vue {
     private passwordValidationTimer?: number = undefined
     private passwordMatchTimer?: number = undefined
 
-    get form(): Vue & { validate: () => void } {
-        return this.$refs.form as Vue & { validate: () => void }
-    }
-
     validateUsername(value: string): void {
         clearTimeout(this.usernameValidationTimer)
         if (value === '') {
@@ -131,7 +126,7 @@ export default class Register extends Vue {
             return
         }
 
-        this.userForm.pending = true
+        this.form.pending = true
         this.usernameValidationTimer = setTimeout(() => this.isUsernameUnique(value), 300)
     }
 
@@ -144,7 +139,7 @@ export default class Register extends Vue {
                     : null
             })
             .catch((error: any) => console.error(error))
-            .finally(() => (this.userForm.pending = false))
+            .finally(() => (this.form.pending = false))
     }
 
     validateEmail(value: string): void {
@@ -154,7 +149,7 @@ export default class Register extends Vue {
             return
         }
 
-        this.userForm.pending = true
+        this.form.pending = true
         this.emailValidationTimer = setTimeout(() => this.isEmailUnique(value), 300)
     }
 
@@ -165,7 +160,7 @@ export default class Register extends Vue {
                 this.emailUniqueError = !response.body.unique ? 'This email is already used' : null
             })
             .catch((error: any) => console.error(error))
-            .finally(() => (this.userForm.pending = false))
+            .finally(() => (this.form.pending = false))
     }
 
     validatePasswordStrength(value: string): void {
@@ -177,44 +172,42 @@ export default class Register extends Vue {
             return
         }
 
-        this.userForm.pending = true
+        this.form.pending = true
         this.passwordValidationTimer = setTimeout(() => this.testPasswordStrength(value), 400)
     }
 
     private testPasswordStrength(value: string): void {
-        const body: ValidatePasswordBody = { password: value }
-
         authApi
-            .validatePassword(body)
+            .validatePassword({ password: value })
             .then((response: any) => (this.passwordValidationErrors = response.body.errors))
             .catch((error: any) => console.error(error))
-            .finally(() => (this.userForm.pending = false))
+            .finally(() => (this.form.pending = false))
     }
 
     validatePasswordMatch(): void {
         clearTimeout(this.passwordMatchTimer)
-        const { password1, password2 } = this.userForm.data
+        const { password1, password2 } = this.form.data
 
         if (!password1 || !password2) {
             this.passwordMatchError = null
         }
 
-        this.userForm.pending = true
+        this.form.pending = true
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
                 password1 && password2 && password1 !== password2
                     ? 'Password is not matching'
                     : null
-            this.userForm.pending = false
+            this.form.pending = false
         }, 300)
     }
 
     registerUser(): void {
-        if (!this.userForm.valid || this.userForm.pending) return
+        if (!this.form.valid || this.form.pending) return
 
         this.submitLoading = true
         authApi
-            .register(this.userForm.data)
+            .register(this.form.data)
             .then(() => this.$router.push({ name: 'login' }))
             .catch((error: any) => console.error(error))
             .finally(() => (this.submitLoading = false))
