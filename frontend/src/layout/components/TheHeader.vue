@@ -1,21 +1,36 @@
 <template>
     <div class="flex-fill d-flex justify-end align-center">
-        <span class="version mr-2" :title="`Tout Doux version : ${version}`">v{{ version }}</span>
-        <v-hover v-slot="{ hover }">
-            <v-btn
-                :to="{ name: 'settings-preferences' }"
-                title="Settings"
-                plain
-                class="header-button">
-                <v-icon :color="hover ? 'white' : 'grey lighten-1'">mdi-cog</v-icon>
-            </v-btn>
-        </v-hover>
+        <v-menu v-if="user" offset-y>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn v-bind="attrs" v-on="on" depressed class="header-menu text-body-1">
+                    <v-avatar size="24" left class="mr-1">
+                        <v-icon>mdi-account-circle</v-icon>
+                    </v-avatar>
+                    {{ user.username }}
+                </v-btn>
+            </template>
+            <v-list>
+                <v-list-item>
+                    <v-icon small left>mdi-account-circle</v-icon>
+                    <v-list-item-title>Profile</v-list-item-title>
+                </v-list-item>
+                <v-list-item :to="{ name: 'settings-preferences' }" class="header-menu__link">
+                    <v-icon small left>mdi-cog</v-icon>
+                    <v-list-item-title>Settings</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="logout()">
+                    <v-icon small left>mdi-logout</v-icon>
+                    <v-list-item-title>Logout</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <span class="font-italic text-body-2">Give a feedback!</span>
+                </v-list-item>
+            </v-list>
+        </v-menu>
 
-        <v-hover v-slot="{ hover }">
-            <v-btn @click="logout()" title="Logout" plain class="header-button">
-                <v-icon :color="hover ? 'white' : 'grey lighten-1'">mdi-logout</v-icon>
-            </v-btn>
-        </v-hover>
+        <span class="version ml-4 mr-2" :title="`Tout Doux version : ${appVersion}`">
+            v{{ appVersion }}
+        </span>
     </div>
 </template>
 
@@ -23,13 +38,24 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { config } from '@/config'
 import { authService } from '@/services'
+import { userActions } from '@/store/modules/user.store'
+import { preferencesActions } from '@/store/modules/preferences.store'
+import { User } from '@/models/user.model'
 
 @Component
 export default class TheHeader extends Vue {
-    version = config.VERSION
+    appVersion = config.VERSION
+
+    get user(): User | undefined {
+        return this.$store.state.user.user
+    }
 
     logout(): void {
-        authService.logout().then(() => this.$router.push({ name: 'login' }))
+        authService.logout().then(() => {
+            this.$store.dispatch(userActions.removeUser)
+            this.$store.dispatch(preferencesActions.removePreferences)
+            this.$router.push({ name: 'login' })
+        })
     }
 }
 </script>
@@ -40,8 +66,15 @@ export default class TheHeader extends Vue {
     color: #bdbdbd;
 }
 
-.header-button {
+.header-menu {
     padding: 0 8px !important;
     min-width: 0 !important;
+    text-transform: capitalize;
+
+    &__link {
+        &.v-list-item--active::before {
+            opacity: 0;
+        }
+    }
 }
 </style>

@@ -41,6 +41,7 @@ import { Form } from '@/models/common.model'
 import { authService } from '@/services'
 import { preferencesActions } from '@/store/modules/preferences.store'
 import { LoginPost } from '@/models/login.model'
+import { userActions } from '@/store/modules/user.store'
 
 @Component
 export default class Login extends Vue {
@@ -69,7 +70,7 @@ export default class Login extends Vue {
         authService
             .login(this.form.data)
             .then(() => {
-                // Fetch preferences
+                this.$store.dispatch(userActions.getUser)
                 this.$store.dispatch(preferencesActions.getPreferences)
 
                 const next = this.$route.query.next

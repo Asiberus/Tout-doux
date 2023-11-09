@@ -9,6 +9,10 @@ export interface IsEmailUniqueParams {
     email: string
 }
 
+export function getUserConnected() {
+    return Vue.http.get(apiRoutes.userConnected)
+}
+
 export function isUsernameUnique(params: IsUsernameUniqueParams) {
     return Vue.http.get(apiRoutes.isUsernameUnique, { params })
 }

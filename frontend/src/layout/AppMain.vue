@@ -33,14 +33,18 @@ import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { authService } from '@/services'
 import { preferencesActions } from '@/store/modules/preferences.store'
+import { userActions } from '@/store/modules/user.store'
 
 @Component({
     methods: { isAuthenticated: authService.isAuthenticated },
     components: { TheNavbar, TheHeader },
 })
 export default class AppMain extends Vue {
-    mounted() {
-        if (authService.isAuthenticated()) this.$store.dispatch(preferencesActions.getPreferences)
+    beforeCreate() {
+        if (authService.isAuthenticated()) {
+            this.$store.dispatch(userActions.getUser)
+            this.$store.dispatch(preferencesActions.getPreferences)
+        }
     }
 }
 </script>

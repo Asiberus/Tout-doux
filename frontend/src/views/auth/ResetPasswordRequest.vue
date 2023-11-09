@@ -13,7 +13,12 @@
                     autofocus>
                 </v-text-field>
 
-                <v-btn type="submit" color="green" block class="mt-2 mb-2">Reset Password</v-btn>
+                <v-btn type="submit" color="green" block class="my-2">Reset Password</v-btn>
+                <router-link
+                    :to="{ name: 'login' }"
+                    class="text-body-1 green--text text--lighten-1 float-right login-link">
+                    Go back to login
+                </router-link>
             </v-form>
         </template>
         <template v-else>
@@ -74,6 +79,14 @@ export default class ResetPasswordRequest extends Vue {
 </script>
 
 <style scoped lang="scss">
+.login-link {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 .password-reset-requested {
     display: flex;
     flex-direction: column;

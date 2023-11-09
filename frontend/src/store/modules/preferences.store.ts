@@ -6,11 +6,13 @@ import { preferencesService } from '@/api'
 const preferencesMutations = {
     setPreferences: 'SET_PREFERENCES',
     updatePreferences: 'UPDATE_PREFERENCES',
+    removePreferences: 'REMOVE_PREFERENCES',
 }
 
 export const preferencesActions = {
     getPreferences: 'getPreferences',
     updatePreferences: 'updatePreferences',
+    removePreferences: 'removePreferences',
 }
 
 @Module
@@ -29,6 +31,11 @@ export class PreferencesModule extends VuexModule {
         if (!this.preferences) return
 
         Object.assign(this.preferences, data)
+    }
+
+    @Mutation
+    private [preferencesMutations.removePreferences](): void {
+        this.preferences = undefined
     }
 
     // Actions
@@ -50,5 +57,10 @@ export class PreferencesModule extends VuexModule {
                 this.context.commit(preferencesMutations.updatePreferences, response.body)
             )
             .catch((error: any) => console.error(error))
+    }
+
+    @Action
+    [preferencesActions.removePreferences](): void {
+        this.context.commit(preferencesMutations.removePreferences)
     }
 }

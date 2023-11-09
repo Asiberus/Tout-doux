@@ -11,6 +11,7 @@
                     @input="validatePasswordStrength"
                     required
                     validate-on-blur
+                    :counter="form.data.password1.length > 0"
                     :type="showPassword1 ? 'text' : 'password'"
                     :append-icon="showPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
                     @click:append="showPassword1 = !showPassword1">
