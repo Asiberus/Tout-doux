@@ -140,9 +140,11 @@ export default class ProfileUser extends Vue {
 <style scoped lang="scss">
 .profile-user {
     display: flex;
-    column-gap: 32px;
+    column-gap: 48px;
 
     &__avatar {
+        margin-right: 24px;
+
         img {
             width: 175px;
         }

@@ -29,6 +29,7 @@ export const apiRoutes = {
     commonTaskById: 'common-task/:id/',
     preferences: 'preferences/',
     userConnected: 'user/me/',
+    changePassword: 'user/me/change-password/',
     isUsernameUnique: 'user/is-username-unique/',
     isEmailUnique: 'user/is-email-unique/',
 }
