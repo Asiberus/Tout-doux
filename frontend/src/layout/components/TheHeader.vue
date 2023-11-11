@@ -10,7 +10,7 @@
                 </v-btn>
             </template>
             <v-list>
-                <v-list-item :to="{ name: 'profile' }" class="header-menu__link">
+                <v-list-item :to="{ name: 'profile-user' }" class="header-menu__link">
                     <v-icon small left>mdi-account-circle</v-icon>
                     <v-list-item-title>Profile</v-list-item-title>
                 </v-list-item>

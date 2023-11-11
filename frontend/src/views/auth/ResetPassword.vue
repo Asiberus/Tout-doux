@@ -23,6 +23,7 @@
                     required
                     @input="validatePasswordMatch()"
                     :error-messages="passwordMatchError"
+                    :counter="form.data.password2.length > 0"
                     :type="showPassword2 ? 'text' : 'password'"
                     :append-icon="showPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
                     @click:append="showPassword2 = !showPassword2">

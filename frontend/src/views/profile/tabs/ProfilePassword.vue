@@ -1,5 +1,7 @@
 <template>
-    <div>password</div>
+    <div>
+        <div class="text-h4 mb-4">Change Password</div>
+    </div>
 </template>
 
 <script lang="ts">

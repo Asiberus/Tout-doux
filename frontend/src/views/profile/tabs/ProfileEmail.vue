@@ -1,5 +1,7 @@
 <template>
-    <div>email</div>
+    <div>
+        <div class="text-h4 mb-4">Email Management</div>
+    </div>
 </template>
 
 <script lang="ts">

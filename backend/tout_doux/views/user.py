@@ -12,12 +12,12 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=False)
+    @action(detail=False, methods=['get'])
     def me(self, request):
         serializer = self.serializer_class(request.user)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['patch'], url_path='me/update', url_name='connected_user_update')
+    @me.mapping.patch
     def update_connected_user(self, request):
         user = request.user
         serializer = UserPatchSerializer(data=request.data, instance=user, partial=True)
@@ -39,11 +39,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, permission_classes=[AllowAny], url_path='is-username-unique', url_name='is_username_unique')
     def is_username_unique(self, request):
         username = request.query_params.get('username')
+        exclude_id = request.query_params.get('excludeId')
 
         if not username:
             raise ParseError('You must provide an username')
 
-        if self.get_queryset().filter(username=username).count() > 0:
+        query = self.get_queryset().filter(username=username)
+
+        if exclude_id:
+            query = query.exclude(id=exclude_id)
+
+        if query.count() > 0:
             data = {'unique': False}
         else:
             data = {'unique': True}

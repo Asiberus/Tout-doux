@@ -5,8 +5,8 @@ from tout_doux.serializers.user.user import UserSerializer
 
 
 class UserPatchSerializer(serializers.ModelSerializer):
-    firstName = serializers.CharField(source='first_name', max_length=150)
-    lastName = serializers.CharField(source='last_name', max_length=150)
+    firstName = serializers.CharField(source='first_name', max_length=100, allow_blank=True)
+    lastName = serializers.CharField(source='last_name', max_length=100, allow_blank=True)
 
     class Meta:
         model = get_user_model()

@@ -4,7 +4,9 @@ from django.db import models
 
 class User(AbstractUser):
     email = models.EmailField(unique=True, max_length=100)
-    bio = models.CharField(max_length=500, default='')
+    first_name = models.CharField(max_length=100, default='', blank=True)
+    last_name = models.CharField(max_length=100, default='', blank=True)
+    bio = models.CharField(max_length=500, default='', blank=True)
 
 
 class UserRelatedModel(models.Model):

@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
+import { UserPatch } from '@/models/user.model'
 
 export interface IsUsernameUniqueParams {
     username: string
+    excludeId?: number
 }
 
 export interface IsEmailUniqueParams {
@@ -11,6 +13,10 @@ export interface IsEmailUniqueParams {
 
 export function getUserConnected() {
     return Vue.http.get(apiRoutes.userConnected)
+}
+
+export function updateUserConnected(data: UserPatch) {
+    return Vue.http.patch(apiRoutes.userConnected, data)
 }
 
 export function isUsernameUnique(params: IsUsernameUniqueParams) {
