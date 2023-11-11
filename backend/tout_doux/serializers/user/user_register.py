@@ -14,8 +14,8 @@ class UserRegisterSerializer(serializers.Serializer):
                                      validators=[UniqueValidator(queryset=get_user_model().objects.all())])
     email = serializers.EmailField(max_length=100,
                                    validators=[UniqueValidator(queryset=get_user_model().objects.all())])
-    password1 = serializers.CharField(max_length=64)
-    password2 = serializers.CharField(max_length=64)
+    password = serializers.CharField(max_length=64)
+    confirmPassword = serializers.CharField(max_length=64)
     is_active = serializers.HiddenField(default=False)
 
     def to_representation(self, instance):
@@ -24,6 +24,7 @@ class UserRegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = get_user_model()(**validated_data)
         password = validated_data.get('password')
+        
         try:
             validate_password(password=password, user=user)
         except ValidationError as error:
@@ -40,11 +41,8 @@ class UserRegisterSerializer(serializers.Serializer):
         return user
 
     def validate(self, data):
-        password1 = data.pop('password1')
-        password2 = data.pop('password2')
-
-        if password1 != password2:
+        password, confirm_password = data.get('password'), data.get('confirmPassword')
+        if password != confirm_password:
             raise serializers.ValidationError({'password': 'The passwords does not match'})
 
-        data['password'] = password1
         return data

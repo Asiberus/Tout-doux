@@ -4,29 +4,30 @@
             <v-form v-model="form.valid" @submit.prevent="submit()">
                 <v-text-field
                     label="Password"
-                    v-model="form.data.password1"
-                    :rules="form.rules.password1"
+                    v-model="form.data.password"
+                    :rules="form.rules.password"
                     :error-messages="passwordValidationErrors"
                     error-count="6"
                     @input="validatePasswordStrength"
                     required
                     validate-on-blur
-                    :counter="form.data.password1.length > 0"
-                    :type="showPassword1 ? 'text' : 'password'"
-                    :append-icon="showPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    @click:append="showPassword1 = !showPassword1">
+                    :counter="form.data.password.length > 0"
+                    :type="showPassword ? 'text' : 'password'"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showPassword = !showPassword">
                 </v-text-field>
+
                 <v-text-field
                     label="Confirm password"
-                    v-model="form.data.password2"
-                    :rules="form.rules.password2"
+                    v-model="form.data.confirmPassword"
+                    :rules="form.rules.confirmPassword"
                     required
                     @input="validatePasswordMatch()"
                     :error-messages="passwordMatchError"
-                    :counter="form.data.password2.length > 0"
-                    :type="showPassword2 ? 'text' : 'password'"
-                    :append-icon="showPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
-                    @click:append="showPassword2 = !showPassword2">
+                    :counter="form.data.confirmPassword.length > 0"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showConfirmPassword = !showConfirmPassword">
                 </v-text-field>
 
                 <v-btn
@@ -66,19 +67,19 @@ export default class ResetPassword extends Vue {
     @Prop({ default: '', required: true }) uidb64!: string
     @Prop({ default: '', required: true }) token!: string
 
-    form: Form<Pick<ResetPasswordBody, 'password1' | 'password2'>> = {
+    form: Form<Pick<ResetPasswordBody, 'password' | 'confirmPassword'>> = {
         valid: false,
         pending: false,
         data: {
-            password1: '',
-            password2: '',
+            password: '',
+            confirmPassword: '',
         },
         rules: {
-            password1: [
+            password: [
                 (value: string) => !!value || 'Password is required',
                 (value: string) => value.length <= 64 || 'Max 64 characters',
             ],
-            password2: [
+            confirmPassword: [
                 (value: string) => !!value || 'Password is required',
                 (value: string) => value.length <= 64 || 'Max 64 characters',
             ],
@@ -86,10 +87,10 @@ export default class ResetPassword extends Vue {
     }
 
     passwordReseted = false
-
-    showPassword1 = false
-    showPassword2 = false
     submitLoading = false
+
+    showPassword = false
+    showConfirmPassword = false
 
     passwordMatchError: string | null = null
     passwordValidationErrors: string[] = []
@@ -119,16 +120,16 @@ export default class ResetPassword extends Vue {
 
     validatePasswordMatch(): void {
         clearTimeout(this.passwordMatchTimer)
-        const { password1, password2 } = this.form.data
+        const { password, confirmPassword } = this.form.data
 
-        if (!password1 || !password2) {
+        if (!password || !confirmPassword) {
             this.passwordMatchError = null
         }
 
         this.form.pending = true
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
-                password1 && password2 && password1 !== password2
+                password && confirmPassword && password !== confirmPassword
                     ? 'Password is not matching'
                     : null
             this.form.pending = false

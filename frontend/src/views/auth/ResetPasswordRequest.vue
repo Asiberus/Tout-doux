@@ -63,8 +63,8 @@ export default class ResetPasswordRequest extends Vue {
 
     passwordResetRequested = false
 
-    get formRef(): Vue & { validate: () => void } {
-        return this.$refs.formRef as Vue & { validate: () => void }
+    get formRef(): Vue & { validate: () => boolean } {
+        return this.$refs.formRef as Vue & { validate: () => boolean }
     }
 
     submit(): void {

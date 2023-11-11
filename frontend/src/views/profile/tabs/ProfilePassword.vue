@@ -17,31 +17,31 @@
 
             <v-text-field
                 label="New Password"
-                v-model="form.data.newPassword1"
-                :rules="form.rules.newPassword1"
+                v-model="form.data.newPassword"
+                :rules="form.rules.newPassword"
                 :error-messages="newPasswordValidationErrors"
                 error-count="6"
                 @input="validatePasswordStrength"
                 required
                 autocomplete="new-password"
-                :counter="form.data.newPassword1.length > 0"
-                :type="showNewPassword1 ? 'text' : 'password'"
-                :append-icon="showNewPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showNewPassword1 = !showNewPassword1">
+                :counter="form.data.newPassword.length > 0"
+                :type="showNewPassword ? 'text' : 'password'"
+                :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="showNewPassword = !showNewPassword">
             </v-text-field>
 
             <v-text-field
                 label="Confirm password"
-                v-model="form.data.newPassword2"
-                :rules="form.rules.newPassword2"
+                v-model="form.data.confirmPassword"
+                :rules="form.rules.confirmPassword"
                 required
                 @input="validatePasswordMatch()"
                 autocomplete="none"
                 :error-messages="passwordMatchError"
-                :counter="form.data.newPassword2.length > 0"
-                :type="showNewPassword2 ? 'text' : 'password'"
-                :append-icon="showNewPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="showNewPassword2 = !showNewPassword2">
+                :counter="form.data.confirmPassword.length > 0"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="showConfirmPassword = !showConfirmPassword">
             </v-text-field>
 
             <v-btn
@@ -68,19 +68,19 @@ export default class ProfilePassword extends Vue {
         pending: false,
         data: {
             currentPassword: '',
-            newPassword1: '',
-            newPassword2: '',
+            newPassword: '',
+            confirmPassword: '',
         },
         rules: {
             currentPassword: [
                 (value: string) => !!value || 'Password is required',
                 (value: string) => value.length <= 64 || 'Max 64 characters',
             ],
-            newPassword1: [
+            newPassword: [
                 (value: string) => !!value || 'Password is required',
                 (value: string) => value.length <= 64 || 'Max 64 characters',
             ],
-            newPassword2: [
+            confirmPassword: [
                 (value: string) => !!value || 'Password is required',
                 (value: string) => value.length <= 64 || 'Max 64 characters',
             ],
@@ -88,8 +88,8 @@ export default class ProfilePassword extends Vue {
     }
 
     showCurrentPassword = false
-    showNewPassword1 = false
-    showNewPassword2 = false
+    showNewPassword = false
+    showConfirmPassword = false
 
     currentPasswordError: string | null = null
     newPasswordValidationErrors: string[] = []
@@ -124,16 +124,16 @@ export default class ProfilePassword extends Vue {
 
     validatePasswordMatch(): void {
         clearTimeout(this.passwordMatchTimer)
-        const { newPassword1, newPassword2 } = this.form.data
+        const { newPassword, confirmPassword } = this.form.data
 
-        if (!newPassword1 || !newPassword2) {
+        if (!newPassword || !confirmPassword) {
             this.passwordMatchError = null
         }
 
         this.form.pending = true
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
-                newPassword1 && newPassword2 && newPassword1 !== newPassword2
+                newPassword && confirmPassword && newPassword !== confirmPassword
                     ? 'Password is not matching'
                     : null
             this.form.pending = false
@@ -146,7 +146,7 @@ export default class ProfilePassword extends Vue {
         userApi
             .changePassword(this.form.data)
             .then(() => {
-                this.form.data = { currentPassword: '', newPassword1: '', newPassword2: '' }
+                this.form.data = { currentPassword: '', newPassword: '', confirmPassword: '' }
                 this.formRef.resetValidation()
             })
             .catch((error: any) => {

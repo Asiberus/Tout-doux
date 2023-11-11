@@ -18,6 +18,6 @@ export interface UserPatch {
 
 export interface UserChangePassword {
     currentPassword: string
-    newPassword1: string
-    newPassword2: string
+    newPassword: string
+    confirmPassword: string
 }

@@ -12,7 +12,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False)
     def me(self, request):
         serializer = self.serializer_class(request.user)
         return Response(serializer.data)

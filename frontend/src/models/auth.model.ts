@@ -1,8 +1,8 @@
 export interface RegisterPost {
     username: string
     email: string
-    password1: string
-    password2: string
+    password: string
+    confirmPassword: string
 }
 
 export interface ActivateUserBody {
@@ -21,6 +21,6 @@ export interface ResetPasswordRequestBody {
 export interface ResetPasswordBody {
     uidb64: string
     token: string
-    password1: string
-    password2: string
+    password: string
+    confirmPassword: string
 }

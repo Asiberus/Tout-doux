@@ -9,8 +9,8 @@ from tout_doux.utils.token import decode_uid, check_token
 class PasswordResetSerializer(serializers.Serializer):
     uidb64 = serializers.CharField(write_only=True)
     token = serializers.CharField(write_only=True)
-    password1 = serializers.CharField(max_length=64, write_only=True)
-    password2 = serializers.CharField(max_length=64, write_only=True)
+    password = serializers.CharField(max_length=64, write_only=True)
+    confirmPassword = serializers.CharField(max_length=64, write_only=True)
 
     def save(self):
         user, password = self.validated_data.get('user'), self.validated_data.get('password')
@@ -31,16 +31,15 @@ class PasswordResetSerializer(serializers.Serializer):
         if not check_token(user, token):
             raise serializers.ValidationError('Invalid token')
 
-        password1, password2 = data.pop('password1'), data.pop('password2')
+        password, confirm_password = data.get('password'), data.get('confirmPassword')
 
-        if password1 != password2:
+        if password != confirm_password:
             raise serializers.ValidationError({'password': 'The passwords does not match'})
 
         try:
-            validate_password(password=password1, user=user)
+            validate_password(password=password, user=user)
         except ValidationError as error:
             raise serializers.ValidationError({'password': error.messages})
 
         data['user'] = user
-        data['password'] = password1
         return data

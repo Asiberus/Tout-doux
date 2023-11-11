@@ -6,12 +6,12 @@ from rest_framework.exceptions import PermissionDenied
 
 class UserChangePassword(serializers.Serializer):
     currentPassword = serializers.CharField(max_length=64)
-    newPassword1 = serializers.CharField(max_length=64)
-    newPassword2 = serializers.CharField(max_length=64)
+    newPassword = serializers.CharField(max_length=64)
+    confirmPassword = serializers.CharField(max_length=64)
 
     def save(self):
         user = self.context.get('user')
-        new_password = self.validated_data.get('new_password')
+        new_password = self.validated_data.get('newPassword')
 
         user.set_password(new_password)
         user.save()
@@ -25,19 +25,18 @@ class UserChangePassword(serializers.Serializer):
         return current_password
 
     def validate(self, data):
-        new_password1, new_password2 = data.pop('newPassword1'), data.pop('newPassword2')
-        if new_password1 != new_password2:
+        new_password, confirm_password = data.get('newPassword'), data.get('confirmPassword')
+        if new_password != confirm_password:
             raise serializers.ValidationError({'password': 'The passwords does not match'})
 
-        if new_password1 == data.get('currentPassword'):
+        if new_password == data.get('currentPassword'):
             raise serializers.ValidationError(
                 {'password': 'The new password can\'t be the same as the current password.'})
 
         user = self.context.get('user')
         try:
-            validate_password(password=new_password1, user=user)
+            validate_password(password=new_password, user=user)
         except ValidationError as error:
             raise serializers.ValidationError({'password': error.messages})
 
-        data['new_password'] = new_password1
         return data
