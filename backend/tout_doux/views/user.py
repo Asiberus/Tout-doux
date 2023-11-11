@@ -5,7 +5,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from tout_doux.serializers.user import UserSerializer
+from tout_doux.serializers.user import UserSerializer, UserPatchSerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -15,6 +15,16 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False)
     def me(self, request):
         serializer = self.serializer_class(request.user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['patch'], url_path='me/update', url_name='connected_user_update')
+    def update_connected_user(self, request):
+        user = request.user
+        serializer = UserPatchSerializer(data=request.data, instance=user, partial=True)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data)
 
     @action(detail=False, permission_classes=[AllowAny], url_path='is-username-unique', url_name='is_username_unique')
