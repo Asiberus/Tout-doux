@@ -45,6 +45,6 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             raise ParseError('Date not valid.')
 
         summary_range = [{'date': d} for d in daterange(start_date, end_date)]
-        data = DailySummarySerializer(summary_range, many=True, context={'user': self.request.user}).data
+        data = DailySummarySerializer(summary_range, many=True, context={'user': request.user}).data
 
         return Response(data)
