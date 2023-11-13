@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { UserChangePassword, UserPatch } from '@/models/user.model'
+import { UserChangeEmail, UserChangePassword, UserPatch } from '@/models/user.model'
 
 export interface IsUsernameUniqueParams {
     username: string
@@ -21,6 +21,10 @@ export function updateUserConnected(data: UserPatch) {
 
 export function changePassword(data: UserChangePassword) {
     return Vue.http.post(apiRoutes.changePassword, data)
+}
+
+export function changeEmail(data: UserChangeEmail) {
+    return Vue.http.post(apiRoutes.changeEmail, data)
 }
 
 export function isUsernameUnique(params: IsUsernameUniqueParams) {

@@ -1,14 +1,116 @@
 <template>
-    <div>
+    <div class="profile-email">
         <div class="text-h4 mb-4">Email Management</div>
+        <p class="text-subtitle-1 mb-2">
+            Your current email address is : <span class="font-weight-bold">{{ user.email }}</span>
+        </p>
+        <p class="text-subtitle-1 mb-6">
+            If you want to change it, fill the input bellow. An email will be sent to the new
+            address with a link. <br />
+            In order to complete the change, you must click on the link.
+        </p>
+        <v-form
+            ref="form"
+            v-model="form.valid"
+            @submit.prevent="submit()"
+            class="profile-email__form">
+            <v-text-field
+                label="Email"
+                type="email"
+                v-model="form.data.email"
+                :rules="form.rules.email"
+                :error-messages="emailUniqueError"
+                @input="validateEmail"
+                validate-on-blur
+                required
+                maxlength="100"
+                counter="100">
+            </v-text-field>
+
+            <v-btn :disabled="!form.data.email" type="submit" color="green">Submit</v-btn>
+        </v-form>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { User, UserChangeEmail } from '@/models/user.model'
+import { userApi } from '@/api'
+import { Form } from '@/models/common.model'
 
 @Component
-export default class ProfileEmail extends Vue {}
+export default class ProfileEmail extends Vue {
+    form: Form<UserChangeEmail> = {
+        valid: false,
+        pending: false,
+        data: {
+            email: '',
+        },
+        rules: {
+            email: [
+                (value: string) => !!value || 'Email is required',
+                (value: string) => value.length <= 100 || 'Max 100 characters',
+                (value: string) =>
+                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) || 'Invalid e-mail address',
+            ],
+        },
+    }
+
+    emailUniqueError: string | null = null
+    private emailValidationTimer?: number = undefined
+
+    get user(): User {
+        return this.$store.state.user.user
+    }
+
+    get formRef(): Vue & { validate: () => boolean; resetValidation: () => void } {
+        return this.$refs.form as Vue & { validate: () => boolean; resetValidation: () => void }
+    }
+
+    validateEmail(value: string): void {
+        clearTimeout(this.emailValidationTimer)
+        if (value === '') {
+            this.emailUniqueError = null
+            return
+        }
+
+        this.form.pending = true
+        this.emailValidationTimer = setTimeout(() => this.isEmailUnique(value), 300)
+    }
+
+    private isEmailUnique(value: string): void {
+        userApi
+            .isEmailUnique({ email: value })
+            .then((response: any) => {
+                this.emailUniqueError = !response.body.unique ? 'This email is already used' : null
+            })
+            .catch((error: any) => console.error(error))
+            .finally(() => (this.form.pending = false))
+    }
+
+    submit(): void {
+        if (!this.formRef.validate()) return
+
+        userApi
+            .changeEmail(this.form.data)
+            .then(() => {
+                this.form.data.email = ''
+                this.formRef.resetValidation()
+            })
+            .catch((error: any) => console.error(error))
+    }
+}
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.profile-email {
+    width: 75%;
+
+    &__form {
+        width: 50%;
+        display: flex;
+        align-items: center;
+        column-gap: 8px;
+    }
+}
+</style>

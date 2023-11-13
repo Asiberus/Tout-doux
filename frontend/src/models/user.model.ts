@@ -21,3 +21,7 @@ export interface UserChangePassword {
     newPassword: string
     confirmPassword: string
 }
+
+export interface UserChangeEmail {
+    email: string
+}

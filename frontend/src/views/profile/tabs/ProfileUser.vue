@@ -22,7 +22,8 @@
                 label="Last Name"
                 v-model="form.data.lastName"
                 :rules="form.rules.lastName"
-                counter="100">
+                counter="100"
+                >1
             </v-text-field>
 
             <v-textarea
@@ -48,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { User, UserPatch } from '@/models/user.model'
 import { userApi } from '@/api'
@@ -60,10 +61,10 @@ export default class ProfileUser extends Vue {
         valid: false,
         pending: false,
         data: {
-            username: this.user?.username ?? '',
-            firstName: this.user?.firstName ?? '',
-            lastName: this.user?.lastName ?? '',
-            bio: this.user?.bio ?? '',
+            username: this.user.username,
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            bio: this.user.bio,
         },
         rules: {
             username: [
@@ -79,13 +80,11 @@ export default class ProfileUser extends Vue {
     usernameUniqueError: string | null = null
     private usernameValidationTimer?: number = undefined
 
-    get user(): User | undefined {
+    get user(): User {
         return this.$store.state.user.user
     }
 
     get isFormUntouched(): boolean {
-        if (!this.user) return true
-
         return (
             this.form.data.username === this.user.username &&
             this.form.data.firstName === this.user.firstName &&
@@ -96,14 +95,6 @@ export default class ProfileUser extends Vue {
 
     get canSubmit(): boolean {
         return this.form.valid && !this.form.pending && !this.isFormUntouched
-    }
-
-    @Watch('user')
-    private onUserChanges(): void {
-        if (!this.user) return
-
-        const { username, firstName, lastName, bio } = this.user
-        this.form.data = { username, firstName, lastName, bio }
     }
 
     validateUsername(value: string): void {
@@ -119,7 +110,7 @@ export default class ProfileUser extends Vue {
 
     private isUsernameUnique(value: string): void {
         userApi
-            .isUsernameUnique({ username: value, excludeId: this.user?.id })
+            .isUsernameUnique({ username: value, excludeId: this.user.id })
             .then((response: any) => {
                 this.usernameUniqueError = !response.body.unique
                     ? 'This username is already used'

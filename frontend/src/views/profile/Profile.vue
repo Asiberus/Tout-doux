@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-h3 mb-5">Profile</h1>
 
-        <v-row>
+        <v-row v-if="user">
             <v-col cols="2">
                 <v-tabs vertical color="accent" background-color="transparent">
                     <v-tab :to="{ name: 'profile-user' }" exact class="justify-start">
@@ -28,9 +28,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { User } from '@/models/user.model'
 
 @Component
-export default class ProfileComponent extends Vue {}
+export default class ProfileComponent extends Vue {
+    get user(): User | undefined {
+        return this.$store.state.user.user
+    }
+}
 </script>
 
 <style scoped lang="scss"></style>

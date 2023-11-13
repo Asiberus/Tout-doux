@@ -30,6 +30,7 @@ export const apiRoutes = {
     preferences: 'preferences/',
     userConnected: 'user/me/',
     changePassword: 'user/me/change-password/',
+    changeEmail: 'user/me/change-email/',
     isUsernameUnique: 'user/is-username-unique/',
     isEmailUnique: 'user/is-email-unique/',
 }
