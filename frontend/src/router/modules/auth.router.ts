@@ -6,6 +6,7 @@ import { NavigationGuardNext } from 'vue-router/types/router'
 import { authApi } from '@/api'
 import ResetPasswordRequest from '@/views/auth/ResetPasswordRequest.vue'
 import ResetPassword from '@/views/auth/ResetPassword.vue'
+import ConfirmEmail from '@/views/auth/ConfirmEmail.vue'
 
 export const authRoutes: Array<RouteConfig> = [
     {
@@ -56,5 +57,11 @@ export const authRoutes: Array<RouteConfig> = [
         component: ResetPassword,
         props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
         beforeEnter: loginGuard,
+    },
+    {
+        path: '/confirm-email',
+        name: 'confirm-email',
+        component: ConfirmEmail,
+        props: (route: Route) => ({ token: route.query.token }),
     },
 ]

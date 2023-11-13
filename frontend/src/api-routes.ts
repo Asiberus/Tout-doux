@@ -6,6 +6,7 @@ export const apiRoutes = {
     validatePassword: 'auth/validate-password/',
     resetPasswordRequest: 'password-reset-request/',
     resetPassword: 'password-reset/',
+    confirmEmail: 'auth/confirm-email-change/',
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',

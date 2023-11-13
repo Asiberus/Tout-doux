@@ -6,6 +6,7 @@ import {
     RegisterPost,
     ValidatePasswordBody,
     ResetPasswordBody,
+    ConfirmEmailBody,
 } from '@/models/auth.model'
 
 export function login(data: { email: string; password: string }) {
@@ -34,4 +35,8 @@ export function resetPasswordRequest(data: ResetPasswordRequestBody) {
 
 export function resetPassword(data: ResetPasswordBody) {
     return Vue.http.post(apiRoutes.resetPassword, data)
+}
+
+export function confirmEmail(data: ConfirmEmailBody) {
+    return Vue.http.post(apiRoutes.confirmEmail, data)
 }

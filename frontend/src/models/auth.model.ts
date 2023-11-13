@@ -24,3 +24,7 @@ export interface ResetPasswordBody {
     password: string
     confirmPassword: string
 }
+
+export interface ConfirmEmailBody {
+    token: string
+}
