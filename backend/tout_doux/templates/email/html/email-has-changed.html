@@ -1,0 +1,12 @@
+{% autoescape off %}
+<h1>Bonjour {{ user.username | capfirst }}!</h1>
+
+<p>
+  Une demande de changement d'email a été effectué sur votre compte. Si vous
+  n'êtes pas à l'origine de cette demande merci de contacter au plus tot le
+  service technique Tout Doux.
+</p>
+
+<p>Cordialement</p>
+<p>L'Équipe Tout Doux</p>
+{% endautoescape %}

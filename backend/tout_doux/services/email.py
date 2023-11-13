@@ -55,3 +55,28 @@ class EmailService:
         to = (user.email,)
 
         EmailService._send_mail_async(subject=subject, to=to, body=text_body, html_body=html_body)
+
+    @staticmethod
+    def send_change_email_request_email(user, new_email, token):
+        link = f'{settings.SERVER_URL}confirm-email?token={token}'
+        context = {'user': user, 'link': link}
+
+        html_template = get_template('email/html/change-email.html')
+        html_body = html_template.render(context)
+
+        subject = 'Tout Doux - Changement d\'adresse e-mail'
+        to = (new_email,)
+
+        EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)
+
+    @staticmethod
+    def send_email_changed_email(user, previous_email):
+        context = {'user': user}
+
+        html_template = get_template('email/html/email-has-changed.html')
+        html_body = html_template.render(context)
+
+        subject = 'Tout Doux - Un changement d\'adresse à été effectué'
+        to = (previous_email,)
+
+        EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)

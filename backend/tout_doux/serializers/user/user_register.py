@@ -10,10 +10,14 @@ from tout_doux.services.email import EmailService
 
 
 class UserRegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=100,
-                                     validators=[UniqueValidator(queryset=get_user_model().objects.all())])
-    email = serializers.EmailField(max_length=100,
-                                   validators=[UniqueValidator(queryset=get_user_model().objects.all())])
+    username = serializers.CharField(
+        max_length=100,
+        validators=[UniqueValidator(queryset=get_user_model().objects.all())]
+    )
+    email = serializers.EmailField(
+        max_length=100,
+        validators=[UniqueValidator(queryset=get_user_model().objects.all())]
+    )
     password = serializers.CharField(max_length=64)
     confirmPassword = serializers.CharField(max_length=64)
     is_active = serializers.HiddenField(default=False)
@@ -24,7 +28,7 @@ class UserRegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = get_user_model()(**validated_data)
         password = validated_data.get('password')
-        
+
         try:
             validate_password(password=password, user=user)
         except ValidationError as error:

@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from tout_doux.auth.json_authentication import JsonAuthentication
-from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordResetSerializer
+from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordResetSerializer, \
+    ConfirmEmailChangeSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
 
@@ -72,3 +73,13 @@ class ValidatePasswordView(APIView):
             error_messages = error.messages
 
         return Response({'errors': error_messages})
+
+
+class ConfirmEmailView(CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = ConfirmEmailChangeSerializer
+
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -5,7 +5,8 @@ from rest_framework.exceptions import ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from tout_doux.serializers.user import UserSerializer, UserPatchSerializer, UserChangePassword
+from tout_doux.serializers.user import UserSerializer, UserPatchSerializer, UserChangePassword, \
+    UserEmailChangeSerializer
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -30,6 +31,15 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['post'], url_path='me/change-password', url_name='connected_user_change_password')
     def change_password(self, request):
         serializer = UserChangePassword(data=request.data, context={'user': request.user})
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'], url_path='me/change-email', url_name='change_email')
+    def change_email(self, request):
+        serializer = UserEmailChangeSerializer(data=request.data, context={'user': request.user})
 
         serializer.is_valid(raise_exception=True)
         serializer.save()

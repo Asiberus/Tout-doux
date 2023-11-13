@@ -1,2 +1,3 @@
+from .confirm_email_change import ConfirmEmailChangeSerializer
 from .password_reset import PasswordResetSerializer
 from .password_reset_request import PasswordResetRequestSerializer

@@ -8,3 +8,4 @@ from .section import Section
 from .tag import Tag
 from .task import Task
 from .user import User
+from .user_email_change import UserEmailChange
