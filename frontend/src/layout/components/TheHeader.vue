@@ -2,7 +2,7 @@
     <div class="flex-fill d-flex justify-end align-center">
         <v-menu v-if="user" offset-y>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" depressed class="header-menu text-body-1">
+                <v-btn v-bind="attrs" v-on="on" depressed class="header-menu-btn text-body-1">
                     <v-avatar size="24" left class="mr-1">
                         <v-icon>mdi-account-circle</v-icon>
                     </v-avatar>
@@ -10,11 +10,11 @@
                 </v-btn>
             </template>
             <v-list>
-                <v-list-item :to="{ name: 'profile-user' }" class="header-menu__link">
+                <v-list-item :to="{ name: 'profile-user' }" class="header-menu-link">
                     <v-icon small left>mdi-account-circle</v-icon>
                     <v-list-item-title>Profile</v-list-item-title>
                 </v-list-item>
-                <v-list-item :to="{ name: 'settings-preferences' }" class="header-menu__link">
+                <v-list-item :to="{ name: 'settings-preferences' }" class="header-menu-link">
                     <v-icon small left>mdi-cog</v-icon>
                     <v-list-item-title>Settings</v-list-item-title>
                 </v-list-item>
@@ -63,18 +63,17 @@ export default class TheHeader extends Vue {
 <style scoped lang="scss">
 .version {
     font-size: 0.95rem;
-    color: #bdbdbd;
 }
 
-.header-menu {
+.header-menu-btn {
     padding: 0 8px !important;
     min-width: 0 !important;
     text-transform: capitalize;
+}
 
-    &__link {
-        &.v-list-item--active::before {
-            opacity: 0;
-        }
+.header-menu-link {
+    &.v-list-item--active::before {
+        opacity: 0;
     }
 }
 </style>

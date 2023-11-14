@@ -15,14 +15,13 @@
             @submit.prevent="submit()"
             class="profile-email__form">
             <v-text-field
-                label="Email"
+                label="New Email"
                 type="email"
                 v-model="form.data.email"
                 :rules="form.rules.email"
                 :error-messages="emailUniqueError"
                 @input="validateEmail"
                 validate-on-blur
-                required
                 maxlength="100"
                 counter="100">
             </v-text-field>
@@ -48,10 +47,11 @@ export default class ProfileEmail extends Vue {
         },
         rules: {
             email: [
-                (value: string) => !!value || 'Email is required',
                 (value: string) => value.length <= 100 || 'Max 100 characters',
                 (value: string) =>
-                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) || 'Invalid e-mail address',
+                    value.length === 0 ||
+                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) ||
+                    'Invalid e-mail address',
             ],
         },
     }
@@ -89,7 +89,7 @@ export default class ProfileEmail extends Vue {
     }
 
     submit(): void {
-        if (!this.formRef.validate()) return
+        if (!this.formRef.validate() || !this.form.data.email) return
 
         userApi
             .changeEmail(this.form.data)
