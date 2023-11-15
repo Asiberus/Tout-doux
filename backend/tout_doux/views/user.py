@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'], url_path='me/change-password', url_name='connected_user_change_password')
+    @action(detail=False, methods=['post'], url_path='me/change-password', url_name='change_password')
     def change_password(self, request):
         serializer = UserChangePassword(data=request.data, context={'user': request.user})
 
@@ -43,6 +43,12 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post'], url_path='me/delete-account', url_name='delete_account')
+    def delete_account(self, request):
+        request.user.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
