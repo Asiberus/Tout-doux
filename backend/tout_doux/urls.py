@@ -6,7 +6,7 @@ from rest_framework import routers
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
     EventViewSet, TagViewSet, CommonTaskViewSet, PreferencesViewSet, LoginView, UserRegisterView, UserActivationView, \
     PasswordResetRequestView, PasswordResetView, UserViewSet, ValidatePasswordView, ConfirmEmailView, CheckTokenView, \
-    ResendActivationEmailView
+    ResendActivationEmailView, CheckPasswordView
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
@@ -31,6 +31,7 @@ urlpatterns = [
     url('auth/validate-password/', ValidatePasswordView.as_view(), name='validate_password'),
     url('auth/confirm-email-change/', ConfirmEmailView.as_view(), name='confirm_email_change'),
     url('auth/check-token/', CheckTokenView.as_view(), name='check_token'),
+    url('auth/check-password/', CheckPasswordView.as_view(), name='check_password'),
     url('preferences/', PreferencesViewSet.as_view(), name='preferences'),
     url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

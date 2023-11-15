@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from tout_doux.auth.json_authentication import JsonAuthentication
 from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordResetSerializer, \
-    ConfirmEmailChangeSerializer
+    ConfirmEmailChangeSerializer, CheckPasswordSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
 from tout_doux.utils.token import decode_uid, check_token
@@ -46,7 +46,7 @@ class ResendActivationEmailView(APIView):
 
         if not uidb64 or type(uidb64) != str:
             raise ParseError('You must provide an uidb64')
-        
+
         try:
             uid = decode_uid(uidb64)
             user = user_model.objects.get(pk=uid)
@@ -124,3 +124,11 @@ class CheckTokenView(APIView):
             raise ParseError('User not found')
 
         return Response({'valid': check_token(user, token)})
+
+
+class CheckPasswordView(APIView):
+    def post(self, request):
+        serializer = CheckPasswordSerializer(data=request.data, context={'user': request.user})
+        serializer.is_valid(raise_exception=True)
+
+        return Response({'valid': True})
