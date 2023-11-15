@@ -9,6 +9,7 @@ import { config } from '@/config'
 import { authService } from '@/services'
 import { HttpOptions, HttpResponse } from 'vue-resource/types/vue_resource'
 import VueRouter from 'vue-router'
+import { resetStore } from '@/services/auth.service'
 
 Vue.use(VueRouter)
 Vue.router = router
@@ -26,12 +27,16 @@ Vue.http.interceptors.push(() => {
     return (response: HttpResponse) => {
         if (response.status === 401) {
             authService.removeToken()
+            authService.resetStore()
+
             Vue.router.push({ name: 'login' })
         }
     }
 })
 
 Vue.config.productionTip = false
+
+Vue.store = store
 
 new Vue({
     router,

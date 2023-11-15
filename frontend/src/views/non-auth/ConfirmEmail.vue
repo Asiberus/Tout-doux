@@ -13,7 +13,7 @@
             <p class="text-body-1 text-center mb-0">
                 Invalid token. Please restart the process to change your email.
             </p>
-            <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
+            <v-btn :to="{ name: 'login' }" outlined color="green">Go back</v-btn>
         </template>
     </div>
 </template>
@@ -21,6 +21,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { authApi } from '@/api'
+import { authService } from '@/services'
 
 @Component
 export default class ConfirmEmail extends Vue {
@@ -31,7 +32,13 @@ export default class ConfirmEmail extends Vue {
     created(): void {
         authApi
             .confirmEmail({ token: this.token })
-            .then(() => (this.state = 'valid'))
+            .then(() => {
+                this.state = 'valid'
+                if (authService.isAuthenticated()) {
+                    authService.removeToken()
+                    authService.resetStore()
+                }
+            })
             .catch(() => (this.state = 'invalid'))
     }
 }

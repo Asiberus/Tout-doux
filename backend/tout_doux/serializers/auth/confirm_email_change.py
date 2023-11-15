@@ -15,9 +15,9 @@ class ConfirmEmailChangeSerializer(serializers.Serializer):
         previous_email = user.email
 
         user.email = user_email_change.new_email
-        user.auth_token_set.all().delete()
+        user.auth_token_set.all().delete()  # we log out the user from all his sessions
         user.save()
-        
+
         user_email_change.delete()
 
         EmailService.send_email_changed_email(user=user, previous_email=previous_email)

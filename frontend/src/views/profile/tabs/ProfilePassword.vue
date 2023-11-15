@@ -134,7 +134,7 @@ export default class ProfilePassword extends Vue {
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
                 newPassword && confirmPassword && newPassword !== confirmPassword
-                    ? 'Password is not matching'
+                    ? 'Passwords are not matching'
                     : null
             this.form.pending = false
         }, 300)

@@ -15,6 +15,7 @@ class PasswordResetSerializer(serializers.Serializer):
     def save(self):
         user, password = self.validated_data.get('user'), self.validated_data.get('password')
         user.set_password(password)
+        user.auth_token_set.all().delete()  # we log out the user from all his sessions
         user.save()
 
     def validate(self, data):

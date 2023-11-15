@@ -1,12 +1,12 @@
 import { Route, RouteConfig } from 'vue-router'
-import Login from '@/views/auth/Login.vue'
+import Login from '@/views/non-auth/Login.vue'
 import { loginGuard } from '@/router/guards'
-import Register from '@/views/auth/Register.vue'
+import Register from '@/views/non-auth/Register.vue'
 import { NavigationGuardNext } from 'vue-router/types/router'
 import { authApi } from '@/api'
-import ResetPasswordRequest from '@/views/auth/ResetPasswordRequest.vue'
-import ResetPassword from '@/views/auth/ResetPassword.vue'
-import ConfirmEmail from '@/views/auth/ConfirmEmail.vue'
+import ResetPasswordRequest from '@/views/non-auth/ResetPasswordRequest.vue'
+import ResetPassword from '@/views/non-auth/ResetPassword.vue'
+import ConfirmEmail from '@/views/non-auth/ConfirmEmail.vue'
 
 // TODO : When updated to Vue Router 4 remove the loginGuard hack
 export const nonAuthRoutes: Array<RouteConfig> = [

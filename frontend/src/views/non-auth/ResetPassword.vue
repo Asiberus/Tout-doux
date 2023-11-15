@@ -61,6 +61,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { ResetPasswordBody } from '@/models/auth.model'
 import { authApi } from '@/api'
+import { authService } from '@/services'
 
 @Component
 export default class ResetPassword extends Vue {
@@ -130,7 +131,7 @@ export default class ResetPassword extends Vue {
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
                 password && confirmPassword && password !== confirmPassword
-                    ? 'Password is not matching'
+                    ? 'Passwords are not matching'
                     : null
             this.form.pending = false
         }, 300)
@@ -145,7 +146,13 @@ export default class ResetPassword extends Vue {
 
         authApi
             .resetPassword(data)
-            .then(() => (this.passwordReseted = true))
+            .then(() => {
+                this.passwordReseted = true
+                if (authService.isAuthenticated()) {
+                    authService.removeToken()
+                    authService.resetStore()
+                }
+            })
             .catch((error: any) => console.error(error))
     }
 }

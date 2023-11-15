@@ -198,7 +198,7 @@ export default class Register extends Vue {
         this.passwordMatchTimer = setTimeout(() => {
             this.passwordMatchError =
                 password && confirmPassword && password !== confirmPassword
-                    ? 'Password is not matching'
+                    ? 'Passwords are not matching'
                     : null
             this.form.pending = false
         }, 300)

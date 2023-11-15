@@ -51,11 +51,7 @@ export default class TheHeader extends Vue {
     }
 
     logout(): void {
-        authService.logout().then(() => {
-            this.$store.dispatch(userActions.removeUser)
-            this.$store.dispatch(preferencesActions.removePreferences)
-            this.$router.push({ name: 'login' })
-        })
+        authService.logout().then(() => this.$router.push({ name: 'login' }))
     }
 }
 </script>
