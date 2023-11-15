@@ -49,6 +49,14 @@ input:autofill {
     opacity: 0.6;
 }
 
+.text-link {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 * {
     scrollbar-width: thin;
 }

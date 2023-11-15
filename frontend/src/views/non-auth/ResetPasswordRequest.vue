@@ -16,7 +16,7 @@
                 <v-btn type="submit" color="green" block class="my-2">Reset Password</v-btn>
                 <router-link
                     :to="{ name: 'login' }"
-                    class="text-body-1 green--text text--lighten-1 float-right login-link">
+                    class="text-body-1 text-link green--text text--lighten-1 float-right">
                     Go back to login
                 </router-link>
             </v-form>
@@ -30,7 +30,7 @@
                 </p>
                 <router-link
                     :to="{ name: 'login' }"
-                    class="text-body-1 green--text text--lighten-1">
+                    class="text-body-1 text-link green--text text--lighten-1">
                     Go back to login
                 </router-link>
             </div>
@@ -79,26 +79,10 @@ export default class ResetPasswordRequest extends Vue {
 </script>
 
 <style scoped lang="scss">
-.login-link {
-    text-decoration: none;
-
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
 .password-reset-requested {
     display: flex;
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
-
-    a {
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
 }
 </style>

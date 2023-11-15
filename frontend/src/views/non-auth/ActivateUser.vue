@@ -58,13 +58,5 @@ export default class ActivateUser extends Vue {
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
-
-    a {
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
 }
 </style>

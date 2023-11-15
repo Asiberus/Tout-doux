@@ -23,12 +23,14 @@
         </v-btn>
 
         <div class="login__form__links">
-            <router-link :to="{ name: 'register' }" class="text-body-1 green--text text--lighten-1">
+            <router-link
+                :to="{ name: 'register' }"
+                class="text-body-1 text-link green--text text--lighten-1">
                 Create account
             </router-link>
             <router-link
                 :to="{ name: 'password-reset-request' }"
-                class="text-body-1 green--text text--lighten-1">
+                class="text-body-1 text-link green--text text--lighten-1">
                 Forgot password ?
             </router-link>
         </div>
@@ -105,14 +107,6 @@ export default class Login extends Vue {
         &__links {
             display: flex;
             justify-content: space-between;
-
-            a {
-                text-decoration: none;
-
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
         }
     }
 }

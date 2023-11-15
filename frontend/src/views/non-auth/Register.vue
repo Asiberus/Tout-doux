@@ -63,7 +63,7 @@
                 </v-btn>
                 <router-link
                     :to="{ name: 'login' }"
-                    class="text-body-1 green--text text--lighten-1 float-right login-link">
+                    class="text-body-1 text-link green--text text--lighten-1 float-right">
                     Go back to login
                 </router-link>
             </v-form>
@@ -241,14 +241,6 @@ export default class Register extends Vue {
 
     &__form {
         width: 100%;
-
-        .login-link {
-            text-decoration: none;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
     }
 }
 </style>
