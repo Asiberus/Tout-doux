@@ -1,14 +1,23 @@
 <template>
-    <AppMain />
+    <router-view />
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import AppMain from '@/layout/AppMain.vue'
 import { Component } from 'vue-property-decorator'
+import { authService } from '@/services'
+import { userActions } from '@/store/modules/user.store'
+import { preferencesActions } from '@/store/modules/preferences.store'
 
-@Component({ components: { AppMain } })
-export default class App extends Vue {}
+@Component
+export default class App extends Vue {
+    beforeCreate() {
+        if (authService.isAuthenticated()) {
+            this.$store.dispatch(userActions.getUser)
+            this.$store.dispatch(preferencesActions.getPreferences)
+        }
+    }
+}
 </script>
 
 <style lang="scss">

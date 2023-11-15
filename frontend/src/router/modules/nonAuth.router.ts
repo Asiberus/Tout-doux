@@ -8,18 +8,34 @@ import ResetPasswordRequest from '@/views/auth/ResetPasswordRequest.vue'
 import ResetPassword from '@/views/auth/ResetPassword.vue'
 import ConfirmEmail from '@/views/auth/ConfirmEmail.vue'
 
-export const authRoutes: Array<RouteConfig> = [
+// TODO : When updated to Vue Router 4 remove the loginGuard hack
+export const nonAuthRoutes: Array<RouteConfig> = [
     {
         path: '/login',
         name: 'login',
         component: Login,
-        beforeEnter: loginGuard,
+        // Hack for the loginGuard to be called
+        beforeEnter: (to, from, next): void => {
+            loginGuard(to, from, next)
+        },
     },
     {
         path: '/register',
         name: 'register',
         component: Register,
-        beforeEnter: loginGuard,
+        // Hack for the loginGuard to be called
+        beforeEnter: (to, from, next): void => {
+            loginGuard(to, from, next)
+        },
+    },
+    {
+        path: '/password-reset-request',
+        name: 'password-reset-request',
+        component: ResetPasswordRequest,
+        // Hack for the loginGuard to be called
+        beforeEnter: (to, from, next): void => {
+            loginGuard(to, from, next)
+        },
     },
     {
         path: '/activate',
@@ -46,17 +62,10 @@ export const authRoutes: Array<RouteConfig> = [
         },
     },
     {
-        path: '/password-reset-request',
-        name: 'password-reset-request',
-        component: ResetPasswordRequest,
-        beforeEnter: loginGuard,
-    },
-    {
         path: '/password-reset',
         name: 'password-reset',
         component: ResetPassword,
         props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
-        beforeEnter: loginGuard,
     },
     {
         path: '/confirm-email',

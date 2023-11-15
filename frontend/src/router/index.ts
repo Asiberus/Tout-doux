@@ -5,34 +5,44 @@ import { collectionRoutes } from '@/router/modules/collection.router'
 import { dailyRoutes } from '@/router/modules/daily.router'
 import { settingsRoutes } from '@/router/modules/settings.router'
 import { authGuard } from '@/router/guards'
-import { authRoutes } from '@/router/modules/auth.router'
+import { nonAuthRoutes } from '@/router/modules/nonAuth.router'
 import { profileRoute } from '@/router/modules/profile.router'
+import AuthenticatedLayout from '@/layout/AuthenticatedLayout.vue'
+import NonAuthenticatedLayout from '@/layout/NonAuthenticatedLayout.vue'
 
 const routes: Array<RouteConfig> = [
     {
-        path: '/',
-        name: 'home',
-        redirect: { name: 'daily-summary' },
+        path: '',
+        component: AuthenticatedLayout,
+        children: [
+            {
+                path: '/',
+                name: 'home',
+                redirect: { name: 'daily-summary' },
+            },
+            {
+                path: '/agenda',
+                name: 'agenda',
+                component: Agenda,
+            },
+            ...projectRoutes,
+            ...collectionRoutes,
+            ...dailyRoutes,
+            ...settingsRoutes,
+            ...profileRoute,
+        ],
     },
     {
-        path: '/agenda',
-        name: 'agenda',
-        component: Agenda,
+        path: '',
+        component: NonAuthenticatedLayout,
+        children: nonAuthRoutes,
     },
 ]
 
 const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
-    routes: [
-        ...routes,
-        ...authRoutes,
-        ...projectRoutes,
-        ...collectionRoutes,
-        ...dailyRoutes,
-        ...settingsRoutes,
-        ...profileRoute,
-    ],
+    routes,
 })
 
 router.beforeEach(authGuard)
