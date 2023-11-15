@@ -37,3 +37,7 @@ export interface CheckTokenBody {
     uidb64: string
     token: string
 }
+
+export interface CheckPasswordBody {
+    password: string
+}

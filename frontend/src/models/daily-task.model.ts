@@ -35,6 +35,7 @@ export interface DailyTask {
     completed: boolean
 }
 
+// TODO : remove if not used
 export interface DailyTaskDisplay extends DailyTask {
     editMode: boolean
 }

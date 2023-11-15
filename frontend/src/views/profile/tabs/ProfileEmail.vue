@@ -28,6 +28,9 @@
 
             <v-btn :disabled="!form.data.email" type="submit" color="green">Submit</v-btn>
         </v-form>
+
+        <ConfirmPasswordDialog v-model="confirmPasswordDialog" @password-confirmed="changeEmail()">
+        </ConfirmPasswordDialog>
     </div>
 </template>
 
@@ -36,8 +39,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { User, UserChangeEmail } from '@/models/user.model'
 import { userApi } from '@/api'
 import { Form } from '@/models/common.model'
+import ConfirmPasswordDialog from '@/components/ConfirmPasswordDialog.vue'
 
-@Component
+@Component({
+    components: { ConfirmPasswordDialog },
+})
 export default class ProfileEmail extends Vue {
     form: Form<UserChangeEmail> = {
         valid: false,
@@ -58,6 +64,8 @@ export default class ProfileEmail extends Vue {
 
     emailUniqueError: string | null = null
     private emailValidationTimer?: number = undefined
+
+    confirmPasswordDialog = false
 
     get user(): User {
         return this.$store.state.user.user
@@ -91,6 +99,10 @@ export default class ProfileEmail extends Vue {
     submit(): void {
         if (!this.formRef.validate() || !this.form.data.email) return
 
+        this.confirmPasswordDialog = true
+    }
+
+    changeEmail(): void {
         userApi
             .changeEmail(this.form.data)
             .then(() => {

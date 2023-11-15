@@ -9,6 +9,7 @@ export const apiRoutes = {
     resetPassword: 'password-reset/',
     confirmEmail: 'auth/confirm-email-change/',
     checkToken: 'auth/check-token/',
+    checkPassword: 'auth/check-password/',
     project: 'project/',
     projectDetailed: 'project/detailed/',
     projectById: 'project/:projectId/',

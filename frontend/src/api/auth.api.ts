@@ -9,6 +9,7 @@ import {
     ConfirmEmailBody,
     CheckTokenBody,
     ResendActivationEmailBody,
+    CheckPasswordBody,
 } from '@/models/auth.model'
 
 export function login(data: { email: string; password: string }) {
@@ -49,4 +50,8 @@ export function confirmEmail(data: ConfirmEmailBody) {
 
 export function checkToken(data: CheckTokenBody) {
     return Vue.http.post(apiRoutes.checkToken, data)
+}
+
+export function checkPassword(data: CheckPasswordBody) {
+    return Vue.http.post(apiRoutes.checkPassword, data)
 }
