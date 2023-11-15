@@ -1,70 +1,84 @@
 <template>
-    <v-form v-model="form.valid" @submit.prevent="registerUser()">
-        <v-text-field
-            label="Username"
-            v-model="form.data.username"
-            :rules="form.rules.username"
-            :error-messages="usernameUniqueError"
-            @input="validateUsername"
-            required
-            maxlength="100"
-            counter="100"
-            autofocus>
-        </v-text-field>
-        <v-text-field
-            label="Email"
-            type="email"
-            v-model="form.data.email"
-            :rules="form.rules.email"
-            :error-messages="emailUniqueError"
-            @input="validateEmail"
-            validate-on-blur
-            required
-            maxlength="100"
-            counter="100">
-        </v-text-field>
-        <v-text-field
-            label="Password"
-            v-model="form.data.password"
-            :rules="form.rules.password"
-            :error-messages="passwordValidationErrors"
-            error-count="6"
-            @input="validatePasswordStrength"
-            required
-            validate-on-blur
-            :counter="form.data.password.length > 0"
-            :type="showPassword ? 'text' : 'password'"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showPassword = !showPassword">
-        </v-text-field>
-        <v-text-field
-            label="Confirm password"
-            v-model="form.data.confirmPassword"
-            :rules="form.rules.confirmPassword"
-            required
-            @input="validatePasswordMatch()"
-            :error-messages="passwordMatchError"
-            :counter="form.data.confirmPassword.length > 0"
-            :type="showConfirmPassword ? 'text' : 'password'"
-            :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showConfirmPassword = !showConfirmPassword">
-        </v-text-field>
+    <div class="register">
+        <template v-if="!userCreated">
+            <v-form v-model="form.valid" @submit.prevent="registerUser()" class="register__form">
+                <v-text-field
+                    label="Username"
+                    v-model="form.data.username"
+                    :rules="form.rules.username"
+                    :error-messages="usernameUniqueError"
+                    @input="validateUsername"
+                    required
+                    maxlength="100"
+                    counter="100"
+                    autofocus>
+                </v-text-field>
+                <v-text-field
+                    label="Email"
+                    type="email"
+                    v-model="form.data.email"
+                    :rules="form.rules.email"
+                    :error-messages="emailUniqueError"
+                    @input="validateEmail"
+                    validate-on-blur
+                    required
+                    maxlength="100"
+                    counter="100">
+                </v-text-field>
+                <v-text-field
+                    label="Password"
+                    v-model="form.data.password"
+                    :rules="form.rules.password"
+                    :error-messages="passwordValidationErrors"
+                    error-count="6"
+                    @input="validatePasswordStrength"
+                    required
+                    validate-on-blur
+                    :counter="form.data.password.length > 0"
+                    :type="showPassword ? 'text' : 'password'"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showPassword = !showPassword">
+                </v-text-field>
+                <v-text-field
+                    label="Confirm password"
+                    v-model="form.data.confirmPassword"
+                    :rules="form.rules.confirmPassword"
+                    required
+                    @input="validatePasswordMatch()"
+                    :error-messages="passwordMatchError"
+                    :counter="form.data.confirmPassword.length > 0"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    @click:append="showConfirmPassword = !showConfirmPassword">
+                </v-text-field>
 
-        <v-btn
-            :disabled="!form.valid || form.pending"
-            :loading="submitLoading"
-            type="submit"
-            color="green"
-            block
-            class="mt-4 mb-2">
-            Create account
-        </v-btn>
-        <router-link
-            :to="{ name: 'login' }"
-            class="text-body-1 green--text text--lighten-1 float-right login-link">
-            Go back to login
-        </router-link>
-    </v-form>
+                <v-btn
+                    :disabled="!form.valid || form.pending"
+                    :loading="submitLoading"
+                    type="submit"
+                    color="green"
+                    block
+                    class="mt-4 mb-2">
+                    Create account
+                </v-btn>
+                <router-link
+                    :to="{ name: 'login' }"
+                    class="text-body-1 green--text text--lighten-1 float-right login-link">
+                    Go back to login
+                </router-link>
+            </v-form>
+        </template>
+        <template v-else>
+            <img src="../../assets/mail-sent.svg" width="250" alt="mail sent" />
+            <h6 class="text-h6 mb-0">Account successfully created!</h6>
+            <p class="text-body-1 text-center mb-0">
+                The last step to the activation of your account is to
+                <span class="font-weight-bold">confirm your email</span>! <br />
+                We have sent you a message with a link. Click on it and your account will be ready
+                to use!
+            </p>
+        </template>
+    </div>
 </template>
 
 <script lang="ts">
@@ -106,10 +120,11 @@ export default class Register extends Vue {
         },
     }
 
+    submitLoading = false
+    userCreated = false
+
     showPassword = false
     showConfirmPassword = false
-
-    submitLoading = false
 
     usernameUniqueError: string | null = null
     emailUniqueError: string | null = null
@@ -210,7 +225,7 @@ export default class Register extends Vue {
         this.submitLoading = true
         authApi
             .register(this.form.data)
-            .then(() => this.$router.push({ name: 'login' }))
+            .then(() => (this.userCreated = true))
             .catch((error: any) => console.error(error))
             .finally(() => (this.submitLoading = false))
     }
@@ -218,11 +233,22 @@ export default class Register extends Vue {
 </script>
 
 <style scoped lang="scss">
-.login-link {
-    text-decoration: none;
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 16px;
 
-    &:hover {
-        text-decoration: underline;
+    &__form {
+        width: 100%;
+
+        .login-link {
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
 }
 </style>

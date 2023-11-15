@@ -21,6 +21,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { authApi } from '@/api'
+import { authService } from '@/services'
 
 @Component
 export default class ActivateUser extends Vue {
@@ -34,8 +35,11 @@ export default class ActivateUser extends Vue {
             .activateUser({ uidb64: this.uidb64, token: this.token })
             .then(() => {
                 // TODO : add alert
+                if (authService.isAuthenticated()) {
+                    authService.removeToken()
+                    authService.resetStore()
+                }
                 this.$router.push({ name: 'login' })
-                console.log('User successfully activated')
             })
             .catch(() => {
                 this.state = 'tokenInvalid'

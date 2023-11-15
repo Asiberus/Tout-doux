@@ -45,7 +45,8 @@ class UserRegisterSerializer(serializers.Serializer):
         return user
 
     def validate(self, data):
-        password, confirm_password = data.get('password'), data.get('confirmPassword')
+        # We remove confirmPassword from data as it not need in the creation of the user
+        password, confirm_password = data.get('password'), data.pop('confirmPassword')
         if password != confirm_password:
             raise serializers.ValidationError({'password': 'The passwords does not match'})
 
