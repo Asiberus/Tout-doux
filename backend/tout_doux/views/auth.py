@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
@@ -13,6 +14,7 @@ from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordR
     ConfirmEmailChangeSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
+from tout_doux.utils.token import decode_uid, check_token
 
 
 class LoginView(KnoxLoginView):
@@ -83,3 +85,22 @@ class ConfirmEmailView(CreateAPIView):
         super().post(request, *args, **kwargs)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CheckTokenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        user_model = get_user_model()
+        uidb64, token = request.data.get('uidb64'), request.data.get('token')
+
+        if not uidb64 or not token or type(uidb64) != str or type(token) != str:
+            raise ParseError('You must provide an id and a token')
+
+        try:
+            uid = decode_uid(uidb64)
+            user = user_model.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
+            raise ParseError('User not found')
+
+        return Response({'valid': check_token(user, token)})

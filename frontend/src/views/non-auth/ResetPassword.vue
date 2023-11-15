@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <template v-if="!passwordReseted">
-            <v-form v-model="form.valid" @submit.prevent="submit()">
+    <div class="password-reset">
+        <template v-if="state === 'tokenValid'">
+            <v-form v-model="form.valid" @submit.prevent="submit()" class="password-reset__form">
                 <v-text-field
                     label="Password"
                     v-model="form.data.password"
@@ -41,17 +41,21 @@
                 </v-btn>
             </v-form>
         </template>
-        <template v-else>
-            <div class="password-reset-success">
-                <img
-                    src="../../assets/password-reset-success.svg"
-                    width="250"
-                    alt="password reset success" />
-                <p class="text-body-1 text-center mb-0">
-                    Your password has been successfully changed!
-                </p>
-                <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
-            </div>
+        <template v-else-if="state === 'passwordChanged'">
+            <img
+                src="../../assets/password-reset-success.svg"
+                width="250"
+                alt="password reset success" />
+            <p class="text-body-1 text-center mb-0">Your password has been successfully changed!</p>
+            <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
+        </template>
+        <template v-else-if="state === 'tokenInvalid'">
+            <img src="../../assets/token-error.svg" width="250" alt="token error" />
+            <p class="text-body-1 text-center mb-0">
+                The token is invalid or it may be expired. <br />
+                Please restart the process to change your password.
+            </p>
+            <v-btn :to="{ name: 'login' }" outlined color="error">Go back</v-btn>
         </template>
     </div>
 </template>
@@ -62,11 +66,14 @@ import { Form } from '@/models/common.model'
 import { ResetPasswordBody } from '@/models/auth.model'
 import { authApi } from '@/api'
 import { authService } from '@/services'
+import { checkToken } from '@/api/auth.api'
 
 @Component
 export default class ResetPassword extends Vue {
     @Prop({ default: '', required: true }) uidb64!: string
     @Prop({ default: '', required: true }) token!: string
+
+    state: 'tokenValid' | 'tokenInvalid' | 'passwordChanged' | null = null
 
     form: Form<Pick<ResetPasswordBody, 'password' | 'confirmPassword'>> = {
         valid: false,
@@ -87,7 +94,6 @@ export default class ResetPassword extends Vue {
         },
     }
 
-    passwordReseted = false
     submitLoading = false
 
     showPassword = false
@@ -97,6 +103,15 @@ export default class ResetPassword extends Vue {
     passwordValidationErrors: string[] = []
     private passwordValidationTimer?: number = undefined
     private passwordMatchTimer?: number = undefined
+
+    created() {
+        authApi
+            .checkToken({ uidb64: this.uidb64, token: this.token })
+            .then((response: any) => {
+                this.state = response.body.valid ? 'tokenValid' : 'tokenInvalid'
+            })
+            .catch(() => (this.state = 'tokenInvalid'))
+    }
 
     validatePasswordStrength(value: string): void {
         this.validatePasswordMatch()
@@ -147,7 +162,7 @@ export default class ResetPassword extends Vue {
         authApi
             .resetPassword(data)
             .then(() => {
-                this.passwordReseted = true
+                this.state = 'passwordChanged'
                 if (authService.isAuthenticated()) {
                     authService.removeToken()
                     authService.resetStore()
@@ -159,10 +174,14 @@ export default class ResetPassword extends Vue {
 </script>
 
 <style scoped lang="scss">
-.password-reset-success {
+.password-reset {
     display: flex;
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
+
+    &__form {
+        width: 100%;
+    }
 }
 </style>

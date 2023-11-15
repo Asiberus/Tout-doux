@@ -28,3 +28,8 @@ export interface ResetPasswordBody {
 export interface ConfirmEmailBody {
     token: string
 }
+
+export interface CheckTokenBody {
+    uidb64: string
+    token: string
+}
