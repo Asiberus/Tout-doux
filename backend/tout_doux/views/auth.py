@@ -37,6 +37,26 @@ class UserActivationView(CreateAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ResendActivationEmailView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        user_model = get_user_model()
+        uidb64 = request.data.get('uidb64')
+
+        if not uidb64 or type(uidb64) != str:
+            raise ParseError('You must provide an uidb64')
+        
+        try:
+            uid = decode_uid(uidb64)
+            user = user_model.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
+            raise ParseError('User not found')
+
+        EmailService.send_user_creation_email(user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
 
@@ -65,7 +85,7 @@ class ValidatePasswordView(APIView):
     def post(self, request):
         password = request.data.get('password')
 
-        if not password:
+        if not password or type(password) != str:
             raise ParseError('You must provide a password')
 
         error_messages = []

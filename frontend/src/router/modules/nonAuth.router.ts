@@ -7,6 +7,7 @@ import { authApi } from '@/api'
 import ResetPasswordRequest from '@/views/non-auth/ResetPasswordRequest.vue'
 import ResetPassword from '@/views/non-auth/ResetPassword.vue'
 import ConfirmEmail from '@/views/non-auth/ConfirmEmail.vue'
+import ActivateUser from '@/views/non-auth/ActivateUser.vue'
 
 // TODO : When updated to Vue Router 4 remove the loginGuard hack
 export const nonAuthRoutes: Array<RouteConfig> = [
@@ -41,25 +42,8 @@ export const nonAuthRoutes: Array<RouteConfig> = [
         path: '/activate',
         name: 'activate',
         // Activate user and then redirect to /login
-        beforeEnter: (to: Route, _from: Route, next: NavigationGuardNext) => {
-            const { uidb64, token } = to.query
-            if (typeof uidb64 !== 'string' || typeof token !== 'string') {
-                next({ name: 'login' })
-                return
-            }
-
-            authApi
-                .activateUser({ uidb64, token })
-                .then(() => {
-                    console.log('User successfully activated')
-                    // TODO : add alert
-                })
-                .catch(() => {
-                    console.error('An error occurred')
-                    // TODO : add message and button to resend mail
-                })
-                .finally(() => next({ name: 'login' }))
-        },
+        component: ActivateUser,
+        props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
     },
     {
         path: '/password-reset',

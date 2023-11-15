@@ -1,0 +1,66 @@
+<template>
+    <div class="activate-user">
+        <template v-if="state === 'tokenInvalid'">
+            <img src="../../assets/token-error.svg" width="250" alt="token error" />
+            <p class="text-body-1 text-center mb-0">
+                The token is invalid or it may be expired. <br />
+                Please click on the button bellow to resend an email.
+            </p>
+            <v-btn @click="resendEmail()" outlined color="info">Resend email</v-btn>
+        </template>
+        <template v-else-if="state === 'mailSent'">
+            <img src="../../assets/mail-sent.svg" width="250" alt="mail sent" />
+            <p class="text-body-1 text-center mb-0">
+                An email has been sent to you ! <br />
+                Check your inbox to activate your account.
+            </p>
+        </template>
+    </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { authApi } from '@/api'
+
+@Component
+export default class ActivateUser extends Vue {
+    @Prop({ default: '', required: true }) uidb64!: string
+    @Prop({ default: '', required: true }) token!: string
+
+    state: 'tokenInvalid' | 'mailSent' | null = null
+
+    created() {
+        authApi
+            .activateUser({ uidb64: this.uidb64, token: this.token })
+            .then(() => {
+                // TODO : add alert
+                this.$router.push({ name: 'login' })
+                console.log('User successfully activated')
+            })
+            .catch(() => {
+                this.state = 'tokenInvalid'
+            })
+    }
+
+    resendEmail(): void {
+        authApi.resendActivationEmail({ uidb64: this.uidb64 }).then((this.state = 'mailSent'))
+    }
+}
+</script>
+
+<style scoped lang="scss">
+.activate-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 16px;
+
+    a {
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+</style>

@@ -1,5 +1,5 @@
 from .auth import LoginView, UserRegisterView, UserActivationView, PasswordResetView, PasswordResetRequestView, \
-    ValidatePasswordView, ConfirmEmailView, CheckTokenView
+    ValidatePasswordView, ConfirmEmailView, CheckTokenView, ResendActivationEmailView
 from .collection import CollectionViewSet
 from .common_task import CommonTaskViewSet
 from .daily_task import DailyTaskViewSet

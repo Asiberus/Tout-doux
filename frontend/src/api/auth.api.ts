@@ -8,6 +8,7 @@ import {
     ResetPasswordBody,
     ConfirmEmailBody,
     CheckTokenBody,
+    ResendActivationEmailBody,
 } from '@/models/auth.model'
 
 export function login(data: { email: string; password: string }) {
@@ -24,6 +25,10 @@ export function register(data: RegisterPost) {
 
 export function activateUser(data: ActivateUserBody) {
     return Vue.http.post(apiRoutes.activateUser, data)
+}
+
+export function resendActivationEmail(data: ResendActivationEmailBody) {
+    return Vue.http.post(apiRoutes.resendActivationEmail, data)
 }
 
 export function validatePassword(data: ValidatePasswordBody) {

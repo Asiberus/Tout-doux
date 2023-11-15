@@ -10,6 +10,10 @@ export interface ActivateUserBody {
     token: string
 }
 
+export interface ResendActivationEmailBody {
+    uidb64: string
+}
+
 export interface ValidatePasswordBody {
     password: string
 }
