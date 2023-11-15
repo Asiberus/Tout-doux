@@ -33,6 +33,7 @@ export const nonAuthRoutes: Array<RouteConfig> = [
         path: '/password-reset-request',
         name: 'password-reset-request',
         component: ResetPasswordRequest,
+        props: (route: Route) => ({ email: route.query.email }),
         // Hack for the loginGuard to be called
         beforeEnter: (to, from, next): void => {
             loginGuard(to, from, next)

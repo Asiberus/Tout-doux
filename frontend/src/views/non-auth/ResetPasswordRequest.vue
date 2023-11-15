@@ -39,13 +39,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { ResetPasswordRequestBody } from '@/models/auth.model'
 import { authApi } from '@/api'
 
 @Component
 export default class ResetPasswordRequest extends Vue {
+    @Prop({ required: false, default: '' }) email?: string
+
     form: Form<ResetPasswordRequestBody> = {
         valid: false,
         data: {
@@ -62,6 +64,10 @@ export default class ResetPasswordRequest extends Vue {
     }
 
     passwordResetRequested = false
+
+    created() {
+        if (this.email) this.form.data.email = this.email
+    }
 
     get formRef(): Vue & { validate: () => boolean } {
         return this.$refs.formRef as Vue & { validate: () => boolean }

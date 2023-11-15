@@ -29,7 +29,10 @@
                 Create account
             </router-link>
             <router-link
-                :to="{ name: 'password-reset-request' }"
+                :to="{
+                    name: 'password-reset-request',
+                    query: { email: form.data.email || undefined },
+                }"
                 class="text-body-1 text-link green--text text--lighten-1">
                 Forgot password ?
             </router-link>
