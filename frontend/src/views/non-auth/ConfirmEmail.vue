@@ -3,13 +3,13 @@
         <template v-if="state === 'valid'">
             <img
                 src="../../assets/confirm-email-success.svg"
-                width="250"
+                width="300"
                 alt="confirm email success" />
             <p class="text-body-1 text-center mb-0">Your email has been successfully changed!</p>
             <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
         </template>
         <template v-else-if="state === 'invalid'">
-            <img src="../../assets/token-error.svg" width="250" alt="confirm email error" />
+            <img src="../../assets/token-error.svg" width="300" alt="confirm email error" />
             <p class="text-body-1 text-center mb-0">
                 The token is invalid or it may be expired. <br />
                 Please restart the process to change your email.

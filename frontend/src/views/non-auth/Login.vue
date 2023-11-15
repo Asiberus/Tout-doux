@@ -1,14 +1,14 @@
 <template>
     <v-form class="login__form" @submit.prevent="login()">
-        <v-text-field v-model="form.data.email" label="Email" autofocus hide-details>
+        <v-text-field label="Email" v-model="form.data.email" autofocus hide-details>
         </v-text-field>
 
         <v-text-field
+            label="Password"
             v-model="form.data.password"
             :type="showPassword ? 'text' : 'password'"
             :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="showPassword = !showPassword"
-            label="Password"
             hide-details>
         </v-text-field>
 

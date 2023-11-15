@@ -1,11 +1,14 @@
 <template>
-    <v-app>
-        <div class="non-authenticated-layout">
-            <div class="router-view-wrapper">
-                <router-link :to="{ name: 'login' }">
-                    <h1 class="text-h1 green--text mb-6 text-center">Tout Doux</h1>
-                </router-link>
-
+    <v-app class="non-authenticated-layout">
+        <header class="non-authenticated-layout__header">
+            <router-link
+                :to="{ name: 'login' }"
+                class="non-authenticated-layout__header__title green--text text-center">
+                Tout Doux
+            </router-link>
+        </header>
+        <div class="non-authenticated-layout__content">
+            <div class="non-authenticated-layout__content__wrapper">
                 <router-view />
             </div>
         </div>
@@ -21,19 +24,31 @@ export default class NonAuthenticatedLayout extends Vue {}
 
 <style scoped lang="scss">
 .non-authenticated-layout {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    &__header {
+        display: flex;
+        justify-content: center;
 
-    .router-view-wrapper {
-        min-width: 400px;
-
-        a {
+        &__title {
+            margin-top: 4rem;
             text-decoration: none;
-            color: inherit;
+            font-size: 8rem;
+            line-height: 8rem;
+            font-weight: 300;
+            font-family: Roboto, sans-serif;
+            letter-spacing: -0.015625em; // from vuetify text-h1 class
+        }
+    }
+
+    &__content {
+        margin-top: -4rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        &__wrapper {
+            min-width: 400px;
         }
     }
 }

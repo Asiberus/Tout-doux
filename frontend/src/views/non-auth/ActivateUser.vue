@@ -1,15 +1,15 @@
 <template>
     <div class="activate-user">
         <template v-if="state === 'tokenInvalid'">
-            <img src="../../assets/token-error.svg" width="250" alt="token error" />
+            <img src="../../assets/token-error.svg" width="300" alt="token error" />
             <p class="text-body-1 text-center mb-0">
                 The token is invalid or it may be expired. <br />
-                Please click on the button bellow to resend an email.
+                Click on the button bellow to resend an email.
             </p>
             <v-btn @click="resendEmail()" outlined color="info">Resend email</v-btn>
         </template>
         <template v-else-if="state === 'mailSent'">
-            <img src="../../assets/mail-sent.svg" width="250" alt="mail sent" />
+            <img src="../../assets/mail-sent.svg" width="300" alt="mail sent" />
             <p class="text-body-1 text-center mb-0">
                 An email has been sent to you ! <br />
                 Check your inbox to activate your account.
