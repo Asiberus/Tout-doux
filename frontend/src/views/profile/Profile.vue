@@ -9,13 +9,17 @@
                         <v-icon left small>mdi-account-circle</v-icon>
                         Profile
                     </v-tab>
-                    <v-tab :to="{ name: 'profile-password' }" exact class="justify-start">
-                        <v-icon left small>mdi-lock</v-icon>
-                        Password
-                    </v-tab>
                     <v-tab :to="{ name: 'profile-email' }" exact class="justify-start">
                         <v-icon left small>mdi-at</v-icon>
                         Email
+                    </v-tab>
+                    <v-tab :to="{ name: 'profile-account' }" exact class="justify-start">
+                        <v-icon left small>mdi-cog</v-icon>
+                        Account
+                    </v-tab>
+                    <v-tab :to="{ name: 'profile-password' }" exact class="justify-start">
+                        <v-icon left small>mdi-lock</v-icon>
+                        Password
                     </v-tab>
                 </v-tabs>
             </v-col>

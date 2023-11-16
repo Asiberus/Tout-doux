@@ -27,6 +27,10 @@ export function changeEmail(data: UserChangeEmail) {
     return Vue.http.post(apiRoutes.changeEmail, data)
 }
 
+export function deleteAccount() {
+    return Vue.http.post(apiRoutes.deleteAccount)
+}
+
 export function isUsernameUnique(params: IsUsernameUniqueParams) {
     return Vue.http.get(apiRoutes.isUsernameUnique, { params })
 }

@@ -35,6 +35,7 @@ export const apiRoutes = {
     userConnected: 'user/me/',
     changePassword: 'user/me/change-password/',
     changeEmail: 'user/me/change-email/',
+    deleteAccount: 'user/me/delete-account/',
     isUsernameUnique: 'user/is-username-unique/',
     isEmailUnique: 'user/is-email-unique/',
 }

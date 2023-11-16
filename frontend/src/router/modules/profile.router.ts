@@ -3,6 +3,7 @@ import ProfileComponent from '@/views/profile/Profile.vue'
 import ProfileUser from '@/views/profile/tabs/ProfileUser.vue'
 import ProfilePassword from '@/views/profile/tabs/ProfilePassword.vue'
 import ProfileEmail from '@/views/profile/tabs/ProfileEmail.vue'
+import ProfileAccount from '@/views/profile/tabs/ProfileAccount.vue'
 
 export const profileRoute: Array<RouteConfig> = [
     {
@@ -15,14 +16,19 @@ export const profileRoute: Array<RouteConfig> = [
                 component: ProfileUser,
             },
             {
-                path: 'password',
-                name: 'profile-password',
-                component: ProfilePassword,
-            },
-            {
                 path: 'email',
                 name: 'profile-email',
                 component: ProfileEmail,
+            },
+            {
+                path: 'account',
+                name: 'profile-account',
+                component: ProfileAccount,
+            },
+            {
+                path: 'password',
+                name: 'profile-password',
+                component: ProfilePassword,
             },
         ],
     },

@@ -1,5 +1,8 @@
 <template>
     <v-dialog :value="value" @input="$emit('input', $event)" width="50%">
+        <template #activator="{ attrs, on }">
+            <slot name="activator" :attrs="attrs" :on="on"></slot>
+        </template>
         <v-card>
             <v-card-title>
                 <h4 class="text-h4">Confirm Your Password</h4>
