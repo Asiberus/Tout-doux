@@ -9,6 +9,7 @@ class UserSerializer(ReadOnlyModelSerializer):
     lastName = serializers.CharField(source='last_name')
     isActive = serializers.BooleanField(source='is_active')
     isStaff = serializers.BooleanField(source='is_staff')
+    lastLogin = serializers.DateTimeField(source='last_login')
 
     class Meta:
         model = get_user_model()
@@ -21,4 +22,5 @@ class UserSerializer(ReadOnlyModelSerializer):
             'bio',
             'isActive',
             'isStaff',
+            'lastLogin',
         )
