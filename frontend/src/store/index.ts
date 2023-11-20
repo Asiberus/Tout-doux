@@ -4,12 +4,12 @@ import { preferencesActions, PreferencesModule } from '@/store/modules/preferenc
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { userActions, UserModule } from '@/store/modules/user.store'
+import { StoreInterface } from '@/store/store.interface'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+export default new Vuex.Store<StoreInterface>({
     strict: process.env.NODE_ENV !== 'production',
-    state: {},
     modules: {
         user: UserModule,
         preferences: PreferencesModule,
