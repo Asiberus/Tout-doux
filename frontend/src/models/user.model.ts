@@ -7,6 +7,7 @@ export interface User {
     bio: string
     isActive: boolean
     isStaff: boolean
+    lastLogin: string
 }
 
 export interface UserPatch {

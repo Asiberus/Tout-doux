@@ -9,7 +9,8 @@ import { config } from '@/config'
 import { authService } from '@/services'
 import { HttpOptions, HttpResponse } from 'vue-resource/types/vue_resource'
 import VueRouter from 'vue-router'
-import { resetStore } from '@/services/auth.service'
+
+Vue.store = store
 
 Vue.use(VueRouter)
 Vue.router = router
@@ -35,8 +36,6 @@ Vue.http.interceptors.push(() => {
 })
 
 Vue.config.productionTip = false
-
-Vue.store = store
 
 new Vue({
     router,

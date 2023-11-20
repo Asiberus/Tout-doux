@@ -60,7 +60,7 @@ export class UserModule extends VuexModule {
 
     @Action
     async [userActions.updateUser](data: UserPatch): Promise<void> {
-        userApi
+        await userApi
             .updateUserConnected(data)
             .then((response: any) => this.context.commit(userMutations.updateUser, response.body))
             .catch((error: any) => console.error(error))

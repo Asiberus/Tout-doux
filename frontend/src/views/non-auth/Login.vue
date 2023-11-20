@@ -75,12 +75,12 @@ export default class Login extends Vue {
         authService
             .login(this.form.data)
             .then(() => {
-                this.$store.dispatch(userActions.getUser)
-                this.$store.dispatch(preferencesActions.getPreferences)
-
-                const next = this.$route.query.next
-                if (next && typeof next === 'string') this.$router.push(next)
-                else this.$router.push({ name: 'home' })
+                this.$store.dispatch('init').then(() => {
+                    const next = this.$route.query.next
+                    // We need to catch the error here when a navigation guard block the navigation
+                    if (next && typeof next === 'string') this.$router.push(next).catch(() => {})
+                    else this.$router.push({ name: 'home' })
+                })
             })
             .catch(() => {
                 this.credentialsError = true

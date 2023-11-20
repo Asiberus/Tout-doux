@@ -18,6 +18,13 @@
                     <v-icon small left>mdi-cog</v-icon>
                     <v-list-item-title>Settings</v-list-item-title>
                 </v-list-item>
+                <v-list-item
+                    v-if="user.isStaff"
+                    :to="{ name: 'administration-user' }"
+                    class="header-menu-link">
+                    <v-icon small left>mdi-security</v-icon>
+                    <v-list-item-title>Administration</v-list-item-title>
+                </v-list-item>
                 <v-list-item @click="logout()">
                     <v-icon small left>mdi-logout</v-icon>
                     <v-list-item-title>Logout</v-list-item-title>

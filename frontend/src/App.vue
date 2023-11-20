@@ -5,19 +5,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
-import { authService } from '@/services'
-import { userActions } from '@/store/modules/user.store'
-import { preferencesActions } from '@/store/modules/preferences.store'
 
 @Component
-export default class App extends Vue {
-    beforeCreate() {
-        if (authService.isAuthenticated()) {
-            this.$store.dispatch(userActions.getUser)
-            this.$store.dispatch(preferencesActions.getPreferences)
-        }
-    }
-}
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">

@@ -1,14 +1,19 @@
 import Agenda from '@/views/agenga/Agenda.vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import { projectRoutes } from '@/router/modules/project.router'
-import { collectionRoutes } from '@/router/modules/collection.router'
-import { dailyRoutes } from '@/router/modules/daily.router'
-import { settingsRoutes } from '@/router/modules/settings.router'
 import { authGuard } from '@/router/guards'
-import { nonAuthRoutes } from '@/router/modules/nonAuth.router'
-import { profileRoute } from '@/router/modules/profile.router'
 import AuthenticatedLayout from '@/layout/AuthenticatedLayout.vue'
 import NonAuthenticatedLayout from '@/layout/NonAuthenticatedLayout.vue'
+import {
+    administrationRoutes,
+    collectionRoutes,
+    dailyRoutes,
+    nonAuthRoutes,
+    profileRoute,
+    projectRoutes,
+    settingsRoutes,
+} from '@/router/modules'
+import store from '@/store'
+import { authService } from '@/services'
 
 const routes: Array<RouteConfig> = [
     {
@@ -30,6 +35,7 @@ const routes: Array<RouteConfig> = [
             ...dailyRoutes,
             ...settingsRoutes,
             ...profileRoute,
+            ...administrationRoutes,
         ],
     },
     {
@@ -45,6 +51,12 @@ const router = new VueRouter({
     routes,
 })
 
+// If the user is authenticated, fetch the user & preferences data
+router.beforeEach((to, from, next) => {
+    if (from === VueRouter.START_LOCATION && authService.isAuthenticated())
+        store.dispatch('init').then(next)
+    else next()
+})
 router.beforeEach(authGuard)
 
 export default router

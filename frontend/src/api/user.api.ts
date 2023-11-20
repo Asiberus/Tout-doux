@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
 import { UserChangeEmail, UserChangePassword, UserPatch } from '@/models/user.model'
+import { PaginationParams } from '@/models/common.model'
 
 export interface IsUsernameUniqueParams {
     username: string
@@ -9,6 +10,10 @@ export interface IsUsernameUniqueParams {
 
 export interface IsEmailUniqueParams {
     email: string
+}
+
+export function getUserList(params: PaginationParams = {}) {
+    return Vue.http.get(apiRoutes.user, { params })
 }
 
 export function getUserConnected() {

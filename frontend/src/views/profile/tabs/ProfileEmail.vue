@@ -4,7 +4,7 @@
         <p class="text-subtitle-1 mb-2">
             Your current email address is : <span class="font-weight-bold">{{ user.email }}</span>
         </p>
-        <p class="text-subtitle-1 mb-6">
+        <p class="text-subtitle-1">
             If you want to change it, fill the input bellow. An email will be sent to the new
             address with a link. <br />
             In order to complete the change, you must click on the link.
