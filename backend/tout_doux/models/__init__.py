@@ -2,6 +2,7 @@ from .collection import Collection
 from .common_task import CommonTask
 from .daily_task import DailyTask
 from .event import Event
+from .feedback import Feedback
 from .preferences import Preferences
 from .project import Project
 from .section import Section

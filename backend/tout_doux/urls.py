@@ -6,7 +6,7 @@ from rest_framework import routers
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
     EventViewSet, TagViewSet, CommonTaskViewSet, PreferencesViewSet, LoginView, UserRegisterView, UserActivationView, \
     PasswordResetRequestView, PasswordResetView, UserViewSet, ValidatePasswordView, ConfirmEmailView, CheckTokenView, \
-    ResendActivationEmailView, CheckPasswordView
+    ResendActivationEmailView, CheckPasswordView, FeedbackViewSet
 
 router = routers.DefaultRouter()
 router.register(r'project', ProjectViewSet, basename='project')
@@ -18,6 +18,7 @@ router.register(r'event', EventViewSet, basename='event')
 router.register(r'tag', TagViewSet, basename='tag')
 router.register(r'common-task', CommonTaskViewSet, basename='common_task')
 router.register(r'user', UserViewSet, basename='user')
+router.register(r'feedback', FeedbackViewSet, basename='feedback')
 
 urlpatterns = [
     url('', include(router.urls)),
