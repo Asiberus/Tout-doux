@@ -101,6 +101,10 @@ input:autofill {
     gap: 12px;
 }
 
+.gap-4 {
+    gap: 16px;
+}
+
 .hide-scroll {
     overflow-y: hidden !important;
 }

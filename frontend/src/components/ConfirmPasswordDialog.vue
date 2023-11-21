@@ -4,15 +4,22 @@
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
         <v-card>
-            <v-card-title>
-                <h4 class="text-h4">Confirm Your Password</h4>
-            </v-card-title>
-            <v-card-text>
+            <v-card-text class="pa-6">
                 <v-form
                     ref="form"
                     v-model="form.valid"
                     @submit.prevent="submit()"
-                    class="d-flex align-center gap-3">
+                    class="d-flex flex-column justify-center align-center white--text gap-4">
+                    <div class="icon-wrapper mb-2">
+                        <span class="icon-content">
+                            <slot name="icon">
+                                <v-icon x-large>mdi-lock</v-icon>
+                            </slot>
+                        </span>
+                    </div>
+
+                    <h1 class="text-h6">You must confirm your password to validate this action</h1>
+
                     <v-text-field
                         ref="passwordInput"
                         v-model="form.data.password"
@@ -28,11 +35,12 @@
                         @click:append="showPassword = !showPassword"
                         class="password-input">
                     </v-text-field>
-                    <v-btn type="submit" color="success">Submit</v-btn>
+
+                    <div class="d-flex justify-center gap-3">
+                        <v-btn type="submit" color="success">Submit</v-btn>
+                        <v-btn plain @click="setDialogStateTo(false)">Cancel</v-btn>
+                    </div>
                 </v-form>
-                <div class="d-flex justify-end">
-                    <v-btn plain @click="setDialogStateTo(false)">Cancel</v-btn>
-                </div>
             </v-card-text>
         </v-card>
     </v-dialog>
@@ -110,7 +118,50 @@ export default class ConfirmPasswordDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
+@keyframes animate-icon-circle {
+    from {
+        opacity: 0;
+        transform: scale(1, 0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes animate-icon-content {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10rem;
+    width: 10rem;
+    border-radius: 50%;
+    border: 0.4rem solid;
+    user-select: none;
+
+    animation: animate-icon-circle 0.2s ease-in;
+
+    .icon-content {
+        display: flex;
+        align-items: center;
+        font-size: 3rem;
+
+        animation: animate-icon-content 0.4s cubic-bezier(0.63, 0, 0.39, 1.78);
+    }
+}
+
 .password-input {
-    max-width: 50%;
+    width: 50%;
 }
 </style>
