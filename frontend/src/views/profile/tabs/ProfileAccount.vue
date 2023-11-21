@@ -7,9 +7,7 @@
         </p>
         <p class="text-subtitle-1 font-italic">Please be careful, this action is not reversible.</p>
 
-        <ConfirmPasswordDialog
-            v-model="confirmPasswordDialog"
-            @password-confirmed="deleteAccount()">
+        <ConfirmPasswordDialog @password-confirmed="deleteAccount()">
             <template #activator="{ attrs, on }">
                 <v-btn v-bind="attrs" v-on="on" color="error">Delete my account</v-btn>
             </template>
@@ -27,14 +25,15 @@ import { authService } from '@/services'
     components: { ConfirmPasswordDialog },
 })
 export default class ProfileAccount extends Vue {
-    confirmPasswordDialog = false
-
     deleteAccount(): void {
-        userApi.deleteAccount().then(() => {
-            authService.removeToken()
-            authService.resetStore()
-            this.$router.push({ name: 'login' })
-        })
+        userApi
+            .deleteAccount()
+            .then(() => {
+                authService.removeToken()
+                authService.resetStore()
+                this.$router.push({ name: 'login' })
+            })
+            .catch((error: any) => console.error(error))
     }
 }
 </script>

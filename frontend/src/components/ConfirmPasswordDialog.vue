@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="value" @input="$emit('input', $event)" width="50%">
+    <v-dialog :value="dialogState" @input="setDialogStateTo($event)" width="50%">
         <template #activator="{ attrs, on }">
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
@@ -31,7 +31,7 @@
                     <v-btn type="submit" color="success">Submit</v-btn>
                 </v-form>
                 <div class="d-flex justify-end">
-                    <v-btn plain @click="$emit('input', false)">Cancel</v-btn>
+                    <v-btn plain @click="setDialogStateTo(false)">Cancel</v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -46,7 +46,8 @@ import { authApi } from '@/api'
 
 @Component
 export default class ConfirmPasswordDialog extends Vue {
-    @Prop({ required: true }) value!: boolean
+    @Prop({ default: false }) value!: boolean
+    dialogState = false
 
     form: Form<CheckPasswordBody> = {
         valid: false,
@@ -74,6 +75,7 @@ export default class ConfirmPasswordDialog extends Vue {
 
     @Watch('value')
     private onDialogOpening(value: boolean): void {
+        this.dialogState = value
         this.form.data.password = ''
 
         if (value) {
@@ -86,6 +88,11 @@ export default class ConfirmPasswordDialog extends Vue {
         }
     }
 
+    setDialogStateTo(value: boolean): void {
+        this.dialogState = value
+        this.$emit('input', value)
+    }
+
     submit(): void {
         if (!this.form.valid || this.form.pending) return
 
@@ -93,7 +100,7 @@ export default class ConfirmPasswordDialog extends Vue {
             .checkPassword(this.form.data)
             .then(() => {
                 this.$emit('password-confirmed')
-                this.$emit('input', false)
+                this.setDialogStateTo(false)
             })
             .catch((error: any) => {
                 if (error.status === 403) this.passwordError = 'Incorrect Password'

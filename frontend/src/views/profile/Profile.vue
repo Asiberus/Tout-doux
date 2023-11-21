@@ -41,5 +41,3 @@ export default class ProfileComponent extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

@@ -8,6 +8,9 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=100, default='', blank=True)
     bio = models.CharField(max_length=500, default='', blank=True)
 
+    class Meta:
+        ordering = ['date_joined']
+
 
 class UserRelatedModel(models.Model):
     user = models.ForeignKey(

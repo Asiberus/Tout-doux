@@ -7,7 +7,8 @@ export interface User {
     bio: string
     isActive: boolean
     isStaff: boolean
-    lastLogin: string
+    lastLogin: string | null
+    dateJoined: string
 }
 
 export interface UserPatch {
@@ -25,4 +26,8 @@ export interface UserChangePassword {
 
 export interface UserChangeEmail {
     email: string
+}
+
+export interface UserChangeAccountState {
+    active: boolean
 }

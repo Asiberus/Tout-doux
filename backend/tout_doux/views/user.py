@@ -28,7 +28,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     def change_account_state(self, request, pk=None):
         user = self.get_object()
 
-        if user == request.user:
+        if request.user == user:
             raise PermissionDenied('You can\'t deactivate or activate your account.')
 
         serializer = UserAccountState(instance=user, data=request.data)
@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.data)
 
     @action(
         detail=True,
@@ -48,6 +48,20 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.get_object()
 
         EmailService.send_user_creation_email(user)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def destroy(self, request, pk=None):
+        user = self.get_object()
+
+        if user.is_superuser:
+            raise PermissionDenied('You can\'t delete the superuser.')
+        elif user.is_staff and not request.user.is_superuser:
+            raise PermissionDenied('You must be a superuser to delete a staff user.')
+        elif request.user == user:
+            raise PermissionDenied('You can\'t delete your own account.')
+
+        user.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -106,6 +120,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         url_name='delete_account'
     )
     def delete_account(self, request):
+        if request.user.is_superuser:
+            raise PermissionDenied('The superuser can\'t be deleted.')
+
         request.user.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

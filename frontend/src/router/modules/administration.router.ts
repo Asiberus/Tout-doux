@@ -11,11 +11,11 @@ export const administrationRoutes: Array<RouteConfig> = [
         children: [
             {
                 path: '',
-                redirect: 'user',
+                redirect: 'user-list',
             },
             {
-                path: 'user',
-                name: 'administration-user',
+                path: 'user-list',
+                name: 'administration-user-list',
                 component: AdministrationUser,
             },
         ],

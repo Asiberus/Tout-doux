@@ -5,9 +5,9 @@
         <v-row>
             <v-col cols="2">
                 <v-tabs vertical color="accent" background-color="transparent">
-                    <v-tab :to="{ name: 'profile-user' }" exact class="justify-start">
+                    <v-tab :to="{ name: 'administration-user-list' }" exact class="justify-start">
                         <v-icon left small>mdi-account-group</v-icon>
-                        User
+                        User List
                     </v-tab>
                 </v-tabs>
             </v-col>
@@ -24,5 +24,3 @@ import { Component, Vue } from 'vue-property-decorator'
 @Component
 export default class Administration extends Vue {}
 </script>
-
-<style scoped lang="scss"></style>

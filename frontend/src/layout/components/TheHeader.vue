@@ -20,7 +20,7 @@
                 </v-list-item>
                 <v-list-item
                     v-if="user.isStaff"
-                    :to="{ name: 'administration-user' }"
+                    :to="{ name: 'administration-user-list' }"
                     class="header-menu-link">
                     <v-icon small left>mdi-security</v-icon>
                     <v-list-item-title>Administration</v-list-item-title>
@@ -45,8 +45,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { config } from '@/config'
 import { authService } from '@/services'
-import { userActions } from '@/store/modules/user.store'
-import { preferencesActions } from '@/store/modules/preferences.store'
 import { User } from '@/models/user.model'
 
 @Component
