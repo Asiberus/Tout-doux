@@ -22,8 +22,7 @@
                 label="Last Name"
                 v-model="form.data.lastName"
                 :rules="form.rules.lastName"
-                counter="100"
-                >1
+                counter="100">
             </v-text-field>
 
             <v-textarea

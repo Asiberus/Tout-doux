@@ -42,4 +42,6 @@ export const apiRoutes = {
     deleteAccount: 'user/me/delete-account/',
     isUsernameUnique: 'user/is-username-unique/',
     isEmailUnique: 'user/is-email-unique/',
+    feedback: 'feedback/',
+    feedbackById: 'feedback/:id/',
 }

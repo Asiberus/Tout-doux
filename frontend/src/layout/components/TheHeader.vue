@@ -29,8 +29,15 @@
                     <v-icon small left>mdi-logout</v-icon>
                     <v-list-item-title>Logout</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                    <span class="font-italic text-body-2">Give a feedback!</span>
+                <v-list-item class="justify-center" dense>
+                    <v-hover v-slot="{ hover }">
+                        <router-link
+                            :to="{ name: 'feedback' }"
+                            class="font-italic text-body-2 text-link"
+                            :class="{ 'grey--text': !hover, 'white--text': hover }"
+                            >Give a feedback!</router-link
+                        >
+                    </v-hover>
                 </v-list-item>
             </v-list>
         </v-menu>

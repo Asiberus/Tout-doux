@@ -14,6 +14,7 @@ import {
 } from '@/router/modules'
 import store from '@/store'
 import { authService } from '@/services'
+import FeedbackComponent from '@/views/feedback/Feedback.vue'
 
 const routes: Array<RouteConfig> = [
     {
@@ -29,6 +30,11 @@ const routes: Array<RouteConfig> = [
                 path: '/agenda',
                 name: 'agenda',
                 component: Agenda,
+            },
+            {
+                path: '/feedback',
+                name: 'feedback',
+                component: FeedbackComponent,
             },
             ...projectRoutes,
             ...collectionRoutes,
