@@ -9,6 +9,10 @@
                         <v-icon left small>mdi-account-group</v-icon>
                         User List
                     </v-tab>
+                    <v-tab :to="{ name: 'administration-feedback' }" exact class="justify-start">
+                        <v-icon left small>mdi-comment-quote</v-icon>
+                        Feedback
+                    </v-tab>
                 </v-tabs>
             </v-col>
             <v-col>
