@@ -22,7 +22,6 @@
                 :error-messages="emailUniqueError"
                 @input="validateEmail"
                 validate-on-blur
-                maxlength="100"
                 counter="100">
             </v-text-field>
 

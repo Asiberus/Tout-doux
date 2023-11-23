@@ -56,7 +56,6 @@
                 :disabled="collection.archived"
                 label="Name"
                 counter="50"
-                maxlength="50"
                 required
                 class="mb-2">
             </v-text-field>
@@ -68,7 +67,6 @@
                 @keyup.enter.ctrl="updateCollection()"
                 label="Description"
                 counter="500"
-                maxlength="500"
                 required
                 rows="1"
                 auto-grow
@@ -81,8 +79,7 @@
                     :rules="collectionForm.rules.itemName"
                     :disabled="collection.archived"
                     label="Item name"
-                    counter="20"
-                    maxlength="20"
+                    counter="15"
                     required>
                 </v-text-field>
             </div>
@@ -131,7 +128,7 @@ export default class CollectionSettings extends Vue {
             ],
             itemName: [
                 (value: string) => !!value || 'This field is required',
-                (value: string) => value.length <= 20 || 'Max 15 characters',
+                (value: string) => value.length <= 15 || 'Max 15 characters',
             ],
         },
     }

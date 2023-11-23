@@ -9,7 +9,6 @@
                     :error-messages="usernameUniqueError"
                     @input="validateUsername"
                     required
-                    maxlength="100"
                     counter="100"
                     autofocus>
                 </v-text-field>
@@ -22,7 +21,6 @@
                     @input="validateEmail"
                     validate-on-blur
                     required
-                    maxlength="100"
                     counter="100">
                 </v-text-field>
                 <v-text-field

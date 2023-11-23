@@ -78,7 +78,6 @@
                                     :disabled="project.archived"
                                     label="Name"
                                     counter="50"
-                                    maxlength="50"
                                     required
                                     class="mb-2">
                                 </v-text-field>
@@ -89,7 +88,6 @@
                                     @keyup.enter.ctrl="updateProject()"
                                     label="Description"
                                     counter="500"
-                                    maxlength="500"
                                     required
                                     rows="2"
                                     auto-grow

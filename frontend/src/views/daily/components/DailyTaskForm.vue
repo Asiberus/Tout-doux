@@ -11,7 +11,6 @@
                 :rules="dailyTaskForm.rules.name"
                 label="Name"
                 counter="50"
-                maxlength="50"
                 required
                 autofocus
                 class="mb-2">

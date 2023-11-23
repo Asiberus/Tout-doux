@@ -11,7 +11,6 @@
                     :rules="projectForm.rules.name"
                     label="Name"
                     counter="50"
-                    maxlength="50"
                     required
                     autofocus
                     class="mb-2">
@@ -22,7 +21,6 @@
                     @keyup.enter.ctrl="emitSubmitEvent()"
                     label="Description"
                     counter="500"
-                    maxlength="500"
                     required
                     rows="1"
                     auto-grow

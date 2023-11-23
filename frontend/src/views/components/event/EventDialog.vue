@@ -30,7 +30,6 @@
                             :rules="eventForm.rules.name"
                             label="Name"
                             counter="50"
-                            maxlength="50"
                             requried
                             :autofocus="!event">
                         </v-text-field>
@@ -44,7 +43,6 @@
                             @keyup.enter.ctrl="emitSubmitEvent()"
                             label="Description"
                             counter="150"
-                            maxlength="150"
                             rows="1"
                             auto-grow>
                         </v-textarea>

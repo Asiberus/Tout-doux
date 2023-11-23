@@ -11,7 +11,6 @@
                     :rules="collectionForm.rules.name"
                     label="Name"
                     counter="50"
-                    maxlength="50"
                     required
                     autofocus
                     class="mb-2">
@@ -23,7 +22,6 @@
                     @keyup.enter.ctrl="emitSubmitEvent()"
                     label="Description"
                     counter="500"
-                    maxlength="500"
                     required
                     rows="1"
                     auto-grow
@@ -35,8 +33,7 @@
                         v-model="collectionForm.data.itemName"
                         :rules="collectionForm.rules.itemName"
                         label="Item name"
-                        counter="20"
-                        maxlength="20"
+                        counter="15"
                         required>
                     </v-text-field>
                 </div>
@@ -79,7 +76,7 @@ export default class CollectionFormDialog extends Vue {
             ],
             itemName: [
                 (value: string) => !!value || 'This field is required',
-                (value: string) => value.length <= 20 || 'Max 15 characters',
+                (value: string) => value.length <= 15 || 'Max 15 characters',
             ],
         },
     }

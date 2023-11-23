@@ -22,7 +22,6 @@
                             @input="validateName"
                             label="Name"
                             counter="20"
-                            maxlength="20"
                             requried
                             :loading="inputNameLoading"
                             :rules="tagForm.rules.name"

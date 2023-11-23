@@ -10,7 +10,6 @@
                     v-model="taskForm.data.name"
                     label="Name"
                     counter="50"
-                    maxlength="50"
                     requried
                     :rules="taskForm.rules.name"
                     autofocus

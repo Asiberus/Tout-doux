@@ -15,7 +15,6 @@
                         @input="validateName"
                         label="Name"
                         counter="50"
-                        maxlength="50"
                         requried
                         :loading="inputNameLoading"
                         :rules="commonTaskForm.rules.name"

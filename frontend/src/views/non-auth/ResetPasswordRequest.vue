@@ -9,7 +9,6 @@
                     :rules="form.rules.email"
                     validate-on-blur
                     required
-                    maxlength="100"
                     autofocus>
                 </v-text-field>
 

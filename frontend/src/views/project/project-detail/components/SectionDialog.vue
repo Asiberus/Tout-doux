@@ -21,7 +21,6 @@
                             v-model="sectionForm.data.name"
                             label="Name"
                             counter="50"
-                            maxlength="50"
                             required
                             :rules="sectionForm.rules.name"
                             autofocus>
