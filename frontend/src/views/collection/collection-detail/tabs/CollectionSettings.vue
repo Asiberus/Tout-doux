@@ -2,7 +2,8 @@
     <div>
         <div class="d-flex justify-space-between align-center mb-3">
             <h4 class="text-h5 flex-grow-1">Settings</h4>
-            <v-dialog v-model="archiveProjectDialog" width="50%">
+
+            <ConfirmDialog @confirm="toggleCollectionArchiveState()">
                 <template #activator="{ attrs, on }">
                     <v-btn
                         v-bind="attrs"
@@ -10,43 +11,33 @@
                         :outlined="!collection.archived"
                         color="accent mr-3">
                         <v-icon small left>mdi-archive</v-icon>
-                        {{ collection.archived ? 'archived' : 'archive' }}
+                        {{ collection.archived ? 'unarchive' : 'archive' }}
                     </v-btn>
                 </template>
-                <ConfirmDialog
-                    color="accent"
-                    @confirm="toggleCollectionArchiveState()"
-                    @cancel="archiveProjectDialog = false">
-                    <template #icon>
-                        <v-icon x-large>mdi-archive</v-icon>
-                    </template>
-                    <p>
-                        Are you sure to
-                        {{ this.collection.archived ? 'unarchive' : 'archive' }} this collection ?
-                    </p>
-                </ConfirmDialog>
-            </v-dialog>
+                <template #icon>
+                    <v-icon x-large>mdi-archive</v-icon>
+                </template>
+                <p>
+                    Are you sure to
+                    {{ this.collection.archived ? 'unarchive' : 'archive' }} this collection ?
+                </p>
+            </ConfirmDialog>
             <template v-if="collection.archived">
-                <v-dialog v-model="deleteCollectionDialog" width="50%">
+                <ConfirmDialog @confirm="deleteCollection()">
                     <template #activator="{ attrs, on }">
                         <v-btn v-bind="attrs" v-on="on" outlined color="error">
                             <v-icon small left>mdi-trash-can</v-icon>
                             delete
                         </v-btn>
                     </template>
-                    <ConfirmDialog
-                        color="error"
-                        @confirm="deleteCollection()"
-                        @cancel="deleteCollectionDialog = false">
-                        <template #icon>
-                            <v-icon x-large>mdi-trash-can</v-icon>
-                        </template>
-                        <p>Are you sure to delete this collection ?</p>
-                        <p class="mb-0 font-italic" style="font-size: 1.1rem">
-                            All related tasks will be deleted
-                        </p>
-                    </ConfirmDialog>
-                </v-dialog>
+                    <template #icon>
+                        <v-icon x-large>mdi-trash-can</v-icon>
+                    </template>
+                    <p>Are you sure to delete this collection ?</p>
+                    <p class="mb-0 font-italic" style="font-size: 1.1rem">
+                        All related tasks will be deleted
+                    </p>
+                </ConfirmDialog>
             </template>
         </div>
         <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="updateCollection()">
@@ -98,18 +89,16 @@
 
 <script lang="ts">
 import { collectionService } from '@/api/collection.api'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { collectionActions } from '@/store/modules/collection.store'
 import { Component, Vue } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 @Component({
     components: { ConfirmDialog },
 })
 export default class CollectionSettings extends Vue {
-    archiveProjectDialog = false
-    deleteCollectionDialog = false
     collectionForm: Form<CollectionPatch> = {
         valid: false,
         data: {
@@ -150,7 +139,6 @@ export default class CollectionSettings extends Vue {
     }
 
     toggleCollectionArchiveState(): void {
-        this.archiveProjectDialog = false
         this.$store.dispatch(collectionActions.updateProperties, {
             id: this.collection.id,
             data: { archived: !this.collection.archived },
@@ -175,7 +163,6 @@ export default class CollectionSettings extends Vue {
     }
 
     deleteCollection(): void {
-        this.deleteCollectionDialog = false
         collectionService
             .deleteCollection(this.collection.id)
             .then(() => {

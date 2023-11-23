@@ -43,14 +43,12 @@
             @update="emitUpdateEvent($event)">
         </CommonTaskDialog>
 
-        <v-dialog v-model="deleteConfirmDialog" width="50%">
-            <ConfirmDialog @confirm="emitDeleteEvent()" @cancel="deleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trash-can</v-icon>
-                </template>
-                <p>Are you sure to delete this common task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trash-can</v-icon>
+            </template>
+            <p>Are you sure to delete this common task ?</p>
+        </ConfirmDialog>
     </div>
 </template>
 

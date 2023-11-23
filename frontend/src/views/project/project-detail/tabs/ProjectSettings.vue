@@ -18,7 +18,8 @@
                     <div class="d-flex align-center mb-3">
                         <h4 class="text-h5">General</h4>
                         <v-spacer></v-spacer>
-                        <v-dialog v-model="archiveProjectDialog" width="50%">
+
+                        <ConfirmDialog @confirm="toggleProjectArchiveState()">
                             <template #activator="{ attrs, on }">
                                 <v-btn
                                     v-bind="attrs"
@@ -26,44 +27,33 @@
                                     :outlined="!project.archived"
                                     color="accent mr-3">
                                     <v-icon small left>mdi-archive</v-icon>
-                                    {{ project.archived ? 'archived' : 'archive' }}
+                                    {{ project.archived ? 'unarchive' : 'archive' }}
                                 </v-btn>
                             </template>
-                            <ConfirmDialog
-                                color="accent"
-                                @confirm="toggleProjectArchiveState()"
-                                @cancel="archiveProjectDialog = false">
-                                <template #icon>
-                                    <v-icon x-large>mdi-archive</v-icon>
-                                </template>
-                                <p>
-                                    Are you sure to
-                                    {{ this.project.archived ? 'unarchive' : 'archive' }} this
-                                    project ?
-                                </p>
-                            </ConfirmDialog>
-                        </v-dialog>
+                            <template #icon>
+                                <v-icon x-large>mdi-archive</v-icon>
+                            </template>
+                            <p>
+                                Are you sure to
+                                {{ this.project.archived ? 'unarchive' : 'archive' }} this project ?
+                            </p>
+                        </ConfirmDialog>
                         <template v-if="project.archived">
-                            <v-dialog v-model="deleteProjectDialog" width="50%">
+                            <ConfirmDialog @confirm="deleteProject()">
                                 <template #activator="{ attrs, on }">
-                                    <v-btn v-bind="attrs" v-on="on" color="error">
+                                    <v-btn v-bind="attrs" v-on="on" outlined color="error">
                                         <v-icon small left>mdi-trash-can</v-icon>
                                         delete
                                     </v-btn>
                                 </template>
-                                <ConfirmDialog
-                                    color="error"
-                                    @confirm="deleteProject()"
-                                    @cancel="deleteProjectDialog = false">
-                                    <template #icon>
-                                        <v-icon x-large>mdi-trash-can</v-icon>
-                                    </template>
-                                    <p>Are you sure to delete this project ?</p>
-                                    <p class="mb-0 font-italic" style="font-size: 1.1rem">
-                                        All related tasks will be deleted
-                                    </p>
-                                </ConfirmDialog>
-                            </v-dialog>
+                                <template #icon>
+                                    <v-icon x-large>mdi-trash-can</v-icon>
+                                </template>
+                                <p>Are you sure to delete this project ?</p>
+                                <p class="mb-0 font-italic" style="font-size: 1.1rem">
+                                    All related tasks will be deleted
+                                </p>
+                            </ConfirmDialog>
                         </template>
                     </div>
                     <v-row>
@@ -149,7 +139,6 @@
 
 <script lang="ts">
 import { projectService } from '@/api/project.api'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
 import { projectActions } from '@/store/modules/project.store'
 import { Component, Vue, Watch } from 'vue-property-decorator'
@@ -158,6 +147,7 @@ import TagChip from '@/views/components/tag/TagChip.vue'
 import { Tag } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
 import deepEqual from 'deep-equal'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 @Component({ components: { TagSearch, TagChip, ConfirmDialog } })
 export default class ProjectSettings extends Vue {

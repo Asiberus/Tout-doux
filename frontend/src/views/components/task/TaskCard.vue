@@ -76,34 +76,28 @@
             </TaskDialog>
         </v-dialog>
 
-        <v-dialog v-model="uncompleteConfirmDialog" width="50%">
-            <ConfirmDialog
-                @confirm="emitToggleStateEvent()"
-                @cancel="uncompleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trophy</v-icon>
-                </template>
-                <p>Are you sure to uncomplete this task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="uncompleteConfirmDialog" @confirm="emitToggleStateEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trophy</v-icon>
+            </template>
+            <p>Are you sure to uncomplete this task ?</p>
+        </ConfirmDialog>
 
-        <v-dialog v-model="deleteConfirmDialog" width="50%">
-            <ConfirmDialog @confirm="emitDeleteEvent()" @cancel="deleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trash-can</v-icon>
-                </template>
-                <p>Are you sure to delete this task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trash-can</v-icon>
+            </template>
+            <p>Are you sure to delete this task ?</p>
+        </ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts">
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 @Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
 export default class TaskCard extends Vue {

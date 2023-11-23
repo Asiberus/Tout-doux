@@ -20,7 +20,7 @@
                         title="Mark as unread">
                         <v-icon>mdi-email-mark-as-unread</v-icon>
                     </v-btn>
-                    <ConfirmDialog2 @confirm="deleteFeedback(item.id)">
+                    <ConfirmDialog @confirm="deleteFeedback(item.id)">
                         <template #activator="{ attrs, on }">
                             <v-btn v-bind="attrs" v-on="on" icon title="Delete">
                                 <v-icon>mdi-trash-can</v-icon>
@@ -30,7 +30,7 @@
                             <v-icon x-large>mdi-trash-can</v-icon>
                         </template>
                         <p>Are you sure to delete this feedback ?</p>
-                    </ConfirmDialog2>
+                    </ConfirmDialog>
                 </div>
             </template>
 
@@ -49,10 +49,10 @@ import { feedbackApi } from '@/api'
 import { Feedback } from '@/models/feedback.model'
 import { DataTableHeader } from 'vuetify'
 import { dateFormat } from '@/pipes'
-import ConfirmDialog2 from '@/components/ConfirmDialog2.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 @Component({
-    components: { ConfirmDialog2 },
+    components: { ConfirmDialog },
 })
 export default class AdministrationFeedback extends Vue {
     feedbackList: Feedback[] = []
