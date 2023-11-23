@@ -158,7 +158,10 @@ export default class TagDialog extends Vue {
     validateName(value: string): void {
         clearTimeout(this.validationTimer)
 
-        if (value === '') return
+        if (value === '') {
+            this.nameUniqueError = null
+            return
+        }
 
         this.tagForm.pending = true
         this.validationTimer = setTimeout(() => this.isNameUnique(value), 300)

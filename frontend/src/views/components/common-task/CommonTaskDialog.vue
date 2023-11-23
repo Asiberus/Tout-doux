@@ -135,7 +135,10 @@ export default class CommonTaskDialog extends Vue {
     validateName(value: string): void {
         clearTimeout(this.validationTimer)
 
-        if (value === '') return
+        if (value === '') {
+            this.nameUniqueError = null
+            return
+        }
 
         this.commonTaskForm.pending = true
         this.validationTimer = setTimeout(() => this.isNameUnique(value), 300)
