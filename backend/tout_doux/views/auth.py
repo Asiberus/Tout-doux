@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from tout_doux.auth.json_authentication import JsonAuthentication
+from tout_doux.auth.json_authentication import EmailPasswordAuthentication
 from tout_doux.serializers.auth import ResetPasswordRequestSerializer, ResetPasswordSerializer, \
     ConfirmEmailChangeSerializer, CheckPasswordSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
@@ -18,7 +18,7 @@ from tout_doux.utils.token import decode_uid, check_token
 
 
 class LoginView(KnoxLoginView):
-    authentication_classes = [JsonAuthentication]
+    authentication_classes = [EmailPasswordAuthentication]
     permission_classes = [AllowAny]
 
 
