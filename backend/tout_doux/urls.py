@@ -5,7 +5,7 @@ from rest_framework import routers
 
 from tout_doux.views import ProjectViewSet, CollectionViewSet, TaskViewSet, DailyTaskViewSet, SectionViewSet, \
     EventViewSet, TagViewSet, CommonTaskViewSet, PreferencesViewSet, LoginView, UserRegisterView, UserActivationView, \
-    PasswordResetRequestView, PasswordResetView, UserViewSet, ValidatePasswordView, ConfirmEmailView, CheckTokenView, \
+    ResetPasswordRequestView, ResetPasswordView, UserViewSet, ValidatePasswordView, ConfirmEmailView, CheckTokenView, \
     ResendActivationEmailView, CheckPasswordView, FeedbackViewSet
 
 router = routers.DefaultRouter()
@@ -27,8 +27,8 @@ urlpatterns = [
     url('auth/register/', UserRegisterView.as_view(), name='register'),
     url('auth/activate/', UserActivationView.as_view(), name='activate'),
     url('auth/resend-activation-email/', ResendActivationEmailView.as_view(), name='resend_activation_email'),
-    url('auth/password-reset-request/', PasswordResetRequestView.as_view(), name='password_reset_request'),
-    url('auth/password-reset/', PasswordResetView.as_view(), name='password_reset'),
+    url('auth/reset-password-request/', ResetPasswordRequestView.as_view(), name='reset_password_request'),
+    url('auth/reset-password/', ResetPasswordView.as_view(), name='reset_password'),
     url('auth/validate-password/', ValidatePasswordView.as_view(), name='validate_password'),
     url('auth/confirm-email-change/', ConfirmEmailView.as_view(), name='confirm_email_change'),
     url('auth/check-token/', CheckTokenView.as_view(), name='check_token'),

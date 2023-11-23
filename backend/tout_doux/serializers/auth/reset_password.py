@@ -6,7 +6,7 @@ from rest_framework import serializers
 from tout_doux.utils.token import decode_uid, check_token
 
 
-class PasswordResetSerializer(serializers.Serializer):
+class ResetPasswordSerializer(serializers.Serializer):
     uidb64 = serializers.CharField(write_only=True)
     token = serializers.CharField(write_only=True)
     password = serializers.CharField(max_length=64, write_only=True)

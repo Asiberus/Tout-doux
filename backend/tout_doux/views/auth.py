@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from tout_doux.auth.json_authentication import JsonAuthentication
-from tout_doux.serializers.auth import PasswordResetRequestSerializer, PasswordResetSerializer, \
+from tout_doux.serializers.auth import ResetPasswordRequestSerializer, ResetPasswordSerializer, \
     ConfirmEmailChangeSerializer, CheckPasswordSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
@@ -57,11 +57,11 @@ class ResendActivationEmailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class PasswordResetRequestView(APIView):
+class ResetPasswordRequestView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer = ResetPasswordRequestSerializer(data=request.data)
         if serializer.is_valid(raise_exception=False):
             user = serializer.validated_data
             EmailService.send_reset_password_email(user)
@@ -69,8 +69,8 @@ class PasswordResetRequestView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class PasswordResetView(CreateAPIView):
-    serializer_class = PasswordResetSerializer
+class ResetPasswordView(CreateAPIView):
+    serializer_class = ResetPasswordSerializer
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):

@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 
-class PasswordResetRequestSerializer(serializers.Serializer):
+class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def validate(self, data):

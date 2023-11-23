@@ -1,6 +1,6 @@
 <template>
     <div>
-        <template v-if="!passwordResetRequested">
+        <template v-if="!resetPasswordRequested">
             <v-form ref="formRef" v-model="form.valid" @submit.prevent="submit()">
                 <v-text-field
                     label="Email"
@@ -62,7 +62,7 @@ export default class ResetPasswordRequest extends Vue {
         },
     }
 
-    passwordResetRequested = false
+    resetPasswordRequested = false
 
     created() {
         if (this.email) this.form.data.email = this.email
@@ -77,7 +77,7 @@ export default class ResetPasswordRequest extends Vue {
 
         authApi
             .resetPasswordRequest(this.form.data)
-            .then(() => (this.passwordResetRequested = true))
+            .then(() => (this.resetPasswordRequested = true))
             .catch((error: any) => console.error(error))
     }
 }

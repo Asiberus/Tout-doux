@@ -1,4 +1,4 @@
-from .auth import LoginView, UserRegisterView, UserActivationView, PasswordResetView, PasswordResetRequestView, \
+from .auth import LoginView, UserRegisterView, UserActivationView, ResetPasswordView, ResetPasswordRequestView, \
     ValidatePasswordView, ConfirmEmailView, CheckTokenView, ResendActivationEmailView, CheckPasswordView
 from .collection import CollectionViewSet
 from .common_task import CommonTaskViewSet
