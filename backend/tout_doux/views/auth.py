@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
@@ -11,10 +10,9 @@ from rest_framework.views import APIView
 
 from tout_doux.auth.json_authentication import EmailPasswordAuthentication
 from tout_doux.serializers.auth import ResetPasswordRequestSerializer, ResetPasswordSerializer, \
-    ConfirmEmailChangeSerializer, CheckPasswordSerializer
+    ConfirmEmailChangeSerializer, CheckPasswordSerializer, CheckTokenSerializer, ResendActivationEmailSerializer
 from tout_doux.serializers.user import UserRegisterSerializer, UserActivationSerializer
 from tout_doux.services.email import EmailService
-from tout_doux.utils.token import decode_uid, check_token
 
 
 class LoginView(KnoxLoginView):
@@ -41,19 +39,12 @@ class ResendActivationEmailView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user_model = get_user_model()
-        uidb64 = request.data.get('uidb64')
-
-        if not uidb64 or type(uidb64) != str:
-            raise ParseError('You must provide an uidb64')
-
-        try:
-            uid = decode_uid(uidb64)
-            user = user_model.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
-            raise ParseError('User not found')
+        serializer = ResendActivationEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.get_user()
 
         EmailService.send_user_creation_email(user)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -103,7 +94,6 @@ class ConfirmEmailView(CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -111,19 +101,10 @@ class CheckTokenView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user_model = get_user_model()
-        uidb64, token = request.data.get('uidb64'), request.data.get('token')
+        serializer = CheckTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not uidb64 or not token or type(uidb64) != str or type(token) != str:
-            raise ParseError('You must provide an id and a token')
-
-        try:
-            uid = decode_uid(uidb64)
-            user = user_model.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
-            raise ParseError('User not found')
-
-        return Response({'valid': check_token(user, token)})
+        return Response({'valid': serializer.check_token()})
 
 
 class CheckPasswordView(APIView):
