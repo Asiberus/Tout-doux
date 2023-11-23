@@ -12,8 +12,9 @@ import { projectService } from '@/api/project.api'
 import { Tag } from '@/models/tag.model'
 import { sortByCompletionDate } from '@/utils/task.utils'
 
-export const projectMutations = {
+const projectMutations = {
     setCurrentProject: 'SET_CURRENT_PROJECT',
+    removeCurrentProject: 'REMOVE_CURRENT_PROJECT',
     updateProperties: 'UPDATE_PROJECT_PROPERTIES',
     sortTasks: 'SORT_TASKS',
     section: {
@@ -35,6 +36,7 @@ export const projectMutations = {
 
 export const projectActions = {
     retrieveProject: 'retrieveProject',
+    removeCurrentProject: 'removeCurrentProject',
     updateProperties: 'updateProjectProperties',
     section: {
         addSection: 'projectAddSection',
@@ -66,6 +68,11 @@ export class ProjectModule extends VuexModule {
 
         // Due to Vue reactivity lack with undefined properties we need to call the Vue.set function
         Vue.set(this, 'currentProject', project)
+    }
+
+    @Mutation
+    private [projectMutations.removeCurrentProject](): void {
+        this.currentProject = undefined
     }
 
     @Mutation
@@ -217,6 +224,11 @@ export class ProjectModule extends VuexModule {
     }
 
     @Action
+    [projectActions.removeCurrentProject](): void {
+        this.context.commit(projectMutations.removeCurrentProject)
+    }
+
+    @Action
     async [projectActions.updateProperties](payload: {
         id: number
         data: ProjectPostOrPatch
@@ -355,7 +367,7 @@ export class ProjectModule extends VuexModule {
     @Action
     async [projectActions.event.deleteEvent](id: number): Promise<void> {
         await eventService.deleteEventById(id).then(
-            (response: any) => this.context.commit(projectMutations.event.deleteEvent, id),
+            () => this.context.commit(projectMutations.event.deleteEvent, id),
             (error: any) => console.error(error)
         )
     }

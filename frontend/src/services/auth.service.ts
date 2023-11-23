@@ -1,7 +1,5 @@
 import { authApi } from '@/api'
 import { LoginPost } from '@/models/login.model'
-import { userActions } from '@/store/modules/user.store'
-import { preferencesActions } from '@/store/modules/preferences.store'
 import Vue from 'vue'
 
 const TOKEN_KEY = 'td_token'
@@ -16,11 +14,10 @@ export function login(data: LoginPost) {
 }
 
 export function logout() {
-    return authApi.logout().then((response: any) => {
-        removeToken()
-        resetStore()
-        return response
-    })
+    return authApi
+        .logout()
+        .then(() => removeToken())
+        .then(() => resetStore())
 }
 
 export function isAuthenticated(): boolean {
@@ -40,7 +37,6 @@ export function removeToken(): void {
     localStorage.removeItem(TOKEN_KEY)
 }
 
-export function resetStore(): void {
-    Vue.store.dispatch(userActions.removeUser)
-    Vue.store.dispatch(preferencesActions.removePreferences)
+export async function resetStore(): Promise<any> {
+    return Vue.store.dispatch('exit')
 }

@@ -6,8 +6,9 @@ import { Vue } from 'vue-property-decorator'
 import { Action, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 import { sortByCompletionDate } from '@/utils/task.utils'
 
-export const collectionMutations = {
+const collectionMutations = {
     setCurrentCollection: 'SET_CURRENT_COLLECTION',
+    removeCurrentCollection: 'REMOVE_CURRENT_COLLECTION',
     updateProperties: 'UPDATE_COLLECTION_PROPERTIES',
     sortTasks: 'SORT_TASKS',
     task: {
@@ -19,6 +20,7 @@ export const collectionMutations = {
 
 export const collectionActions = {
     retrieveCollection: 'retrieveCollection',
+    removeCurrentCollection: 'removeCurrentCollection',
     updateProperties: 'updateCollectionProperties',
     task: {
         addTask: 'collectionAddTask',
@@ -39,6 +41,11 @@ export class CollectionModule extends VuexModule {
     ): void {
         // Due to Vue reactivity lack with undefined properties with need to call the Vue.set function
         Vue.set(this, 'currentCollection', collection)
+    }
+
+    @Mutation
+    private [collectionMutations.removeCurrentCollection](): void {
+        this.currentCollection = undefined
     }
 
     @Mutation
@@ -96,6 +103,11 @@ export class CollectionModule extends VuexModule {
                 this.context.commit(collectionMutations.setCurrentCollection, undefined)
             }
         )
+    }
+
+    @Action
+    [collectionActions.removeCurrentCollection](): void {
+        this.context.commit(collectionMutations.removeCurrentCollection)
     }
 
     @Action
