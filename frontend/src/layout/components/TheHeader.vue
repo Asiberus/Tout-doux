@@ -1,6 +1,16 @@
 <template>
-    <div class="flex-fill d-flex justify-end align-center">
-        <v-menu v-if="user" offset-y>
+    <div class="flex-fill d-flex align-center">
+        <v-btn
+            v-if="$vuetify.breakpoint.smAndDown"
+            @click="$emit('update:display-navbar', !displayNavbar)"
+            icon
+            small>
+            <v-icon>mdi-menu</v-icon>
+        </v-btn>
+
+        <v-spacer></v-spacer>
+
+        <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn v-bind="attrs" v-on="on" depressed class="header-menu-btn text-body-1">
                     <v-avatar size="24" left class="mr-1">
@@ -49,16 +59,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { config } from '@/config'
 import { authService } from '@/services'
 import { User } from '@/models/user.model'
+import vuetify from '../../plugins/vuetify'
 
 @Component
 export default class TheHeader extends Vue {
+    @Prop({ required: true }) displayNavbar!: boolean
+
     appVersion = config.VERSION
 
-    get user(): User | undefined {
+    get user(): User {
         return this.$store.state.user.user
     }
 

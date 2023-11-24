@@ -1,10 +1,13 @@
 <template>
     <v-app>
-        <v-navigation-drawer app>
-            <TheNavbar></TheNavbar>
+        <v-navigation-drawer
+            v-model="displayNavbar"
+            app
+            :mobile-breakpoint="$vuetify.breakpoint.thresholds.sm">
+            <TheNavbar :display-navbar.sync="displayNavbar"></TheNavbar>
         </v-navigation-drawer>
         <v-app-bar app dense>
-            <TheHeader></TheHeader>
+            <TheHeader :display-navbar.sync="displayNavbar"></TheHeader>
         </v-app-bar>
         <v-main>
             <v-container fluid class="pa-8 h-100">
@@ -20,7 +23,9 @@ import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 
 @Component({ components: { TheNavbar, TheHeader } })
-export default class AuthenticatedLayout extends Vue {}
+export default class AuthenticatedLayout extends Vue {
+    displayNavbar = true
+}
 </script>
 
 <style scoped lang="scss">
