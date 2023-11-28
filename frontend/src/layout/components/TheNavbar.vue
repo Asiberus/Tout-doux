@@ -9,12 +9,12 @@
         </v-list-item>
 
         <v-btn
-            v-if="$vuetify.breakpoint.smAndDown"
+            v-if="$vuetify.breakpoint.mobile"
             @click="$emit('update:display-navbar', false)"
             icon
             small
             class="close-navbar">
-            <v-icon>mdi-close</v-icon>
+            <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
 
         <v-divider></v-divider>

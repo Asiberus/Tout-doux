@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-center mb-6">
-            <h1 class="text-h3">Daily Summary</h1>
+        <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-3 mb-sm-6">
+            <MainTitle class="mb-3 mb-sm-0">Daily Summary</MainTitle>
             <v-btn
                 :to="{ name: 'daily-update', params: { date: this.today, step: 'task' } }"
                 color="accent"
@@ -49,8 +49,9 @@ import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
 import moment from 'moment'
 import { Component, Vue, Watch } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
 
-@Component({ components: { DailySummaryCardComponent, DailyDetail } })
+@Component({ components: { MainTitle, DailySummaryCardComponent, DailyDetail } })
 export default class DailySummaryComponent extends Vue {
     dailySummaryList: DailySummary[] = []
     dailyOverviewLoading = false
@@ -125,10 +126,16 @@ export default class DailySummaryComponent extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-wrapper {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+        grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+    }
 
     & > * {
         min-width: 0;

@@ -1,7 +1,7 @@
 <template>
     <div class="flex-fill d-flex align-center">
         <v-btn
-            v-if="$vuetify.breakpoint.smAndDown"
+            v-if="$vuetify.breakpoint.mobile"
             @click="$emit('update:display-navbar', !displayNavbar)"
             icon
             small>
