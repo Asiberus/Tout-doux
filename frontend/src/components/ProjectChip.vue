@@ -7,9 +7,10 @@
         :small="small"
         :title="title"
         :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
-        @click="click($event)">
-        <v-icon small left>mdi-briefcase-variant</v-icon>
-        <div class="text-truncate">
+        @click="click($event)"
+        class="project-chip px-0">
+        <v-icon small class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
+        <div class="text-truncate mr-2">
             {{ project.name }}
         </div>
     </v-chip>
@@ -45,3 +46,9 @@ export default class ProjectChip extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.project-chip {
+    min-width: 32px;
+}
+</style>

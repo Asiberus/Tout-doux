@@ -10,6 +10,9 @@
 
         <v-spacer></v-spacer>
 
+        {{ $vuetify.breakpoint.width }}
+        {{ $vuetify.breakpoint.height }}
+
         <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn v-bind="attrs" v-on="on" depressed class="header-menu-btn text-body-1">
@@ -52,7 +55,7 @@
             </v-list>
         </v-menu>
 
-        <span class="version ml-4 mr-2" :title="`Tout Doux version : ${appVersion}`">
+        <span class="version mx-2" :title="`Tout Doux version : ${appVersion}`">
             v{{ appVersion }}
         </span>
     </div>

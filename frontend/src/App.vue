@@ -109,6 +109,10 @@ input:autofill {
     overflow-y: hidden !important;
 }
 
+.background-black {
+    background-color: #0a0a0a;
+}
+
 .two-row-error.v-input {
     .v-messages {
         min-height: 26px;

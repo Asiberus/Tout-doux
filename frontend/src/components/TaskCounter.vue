@@ -41,6 +41,7 @@ export default class TaskCounter extends Vue {
     font-size: 1.5rem;
     line-height: 1.5rem;
     color: #{map-get($grey, 'lighten-2')};
+    transform: translateY(1px);
 }
 
 @media #{map-get($display-breakpoints, 'sm-and-down')} {

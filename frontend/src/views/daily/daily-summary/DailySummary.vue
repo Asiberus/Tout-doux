@@ -26,29 +26,22 @@
             </v-btn>
         </div>
 
-        <v-dialog
+        <DailyDetail
             v-model="dailyDetailDialog"
-            fullscreen
-            hide-overlay
-            scrollable
-            transition="dialog-bottom-transition">
-            <DailyDetail
-                :date="dateSelected"
-                @daily-task-completed="updateDailyTaskCompleted"
-                @close="dailyDetailDialog = false">
-            </DailyDetail>
-        </v-dialog>
+            :date="dateSelected"
+            @daily-task-completed="updateDailyTaskCompleted">
+        </DailyDetail>
     </div>
 </template>
 
 <script lang="ts">
 import { dailyTaskService } from '@/api/daily-task.api'
 import { DailySummary } from '@/models/daily-summary.model'
-import { hideScroll, showScroll } from '@/utils/document.utils'
+import { showScroll } from '@/utils/document.utils'
 import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
 import moment from 'moment'
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import MainTitle from '@/components/MainTitle.vue'
 
 @Component({ components: { MainTitle, DailySummaryCardComponent, DailyDetail } })
@@ -81,12 +74,6 @@ export default class DailySummaryComponent extends Vue {
         showScroll()
     }
 
-    @Watch('dailyDetailDialog')
-    private onDailyDetailDialogChanges(value: boolean): void {
-        if (value) hideScroll()
-        else showScroll()
-    }
-
     private retrieveDailySummaryList(startDate: string, endDate: string): void {
         this.dailyOverviewLoading = true
         dailyTaskService.getDailySummary(startDate, endDate).then(
@@ -114,8 +101,8 @@ export default class DailySummaryComponent extends Vue {
     }
 
     openDailyDetailDialog(date: string): void {
-        this.dailyDetailDialog = true
         this.dateSelected = date
+        this.dailyDetailDialog = true
     }
 
     updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {

@@ -2,19 +2,19 @@
     <v-card
         @click="emitDailyTaskToggle()"
         :color="dailyTask.completed ? 'green darken-2' : null"
-        class="daily-task-card rounded-lg">
+        class="daily-task-card rounded-lg pa-3 pa-sm-4">
         <div class="daily-task-card__header">
-            <DailyTaskActionChip
-                v-if="dailyTask.action"
-                :action="dailyTask.action"
-                class="flex-shrink-0">
-            </DailyTaskActionChip>
+            <div class="flex-grow-1 d-flex align-center gap-2">
+                <DailyTaskActionChip
+                    v-if="dailyTask.action"
+                    :action="dailyTask.action"
+                    class="daily-task-card__header__action">
+                </DailyTaskActionChip>
 
-            <h4 class="text-body-1 font-weight-medium text-truncate">
-                {{ name }}
-            </h4>
-
-            <v-spacer></v-spacer>
+                <h4 class="flex-grow-1 text-body-2 text-sm-body-1 font-weight-medium">
+                    {{ name }}
+                </h4>
+            </div>
 
             <template v-if="dailyTask.task">
                 <template v-if="dailyTask.task.project">
@@ -22,7 +22,7 @@
                         v-if="dailyTask.task.project"
                         :project="dailyTask.task.project"
                         @click.native.stop
-                        :small="true"
+                        small
                         class="daily-task-card__header__link">
                     </ProjectChip>
                 </template>
@@ -31,7 +31,7 @@
                         v-if="dailyTask.task.section"
                         :section="dailyTask.task.section"
                         @click.native.stop
-                        :small="true"
+                        small
                         class="daily-task-card__header__link">
                     </SectionChip>
                 </template>
@@ -40,7 +40,7 @@
                         v-if="dailyTask.task.collection"
                         :collection="dailyTask.task.collection"
                         @click.native.stop
-                        :small="true"
+                        small
                         class="daily-task-card__header__link">
                     </CollectionChip>
                 </template>
@@ -90,22 +90,24 @@ export default class DailyTaskCard extends Vue {
 
 <style scoped lang="scss">
 .daily-task-card {
-    padding: 16px;
     display: flex;
     flex-direction: column;
     row-gap: 8px;
 
     &__header {
         display: flex;
+        flex-wrap: wrap-reverse;
         align-items: center;
-        column-gap: 8px;
+        gap: 8px;
 
         &__action {
             flex-shrink: 0;
+            align-self: flex-start;
         }
 
         &__link {
-            max-width: 15rem;
+            flex-shrink: 1;
+            max-width: 12rem;
         }
     }
 }

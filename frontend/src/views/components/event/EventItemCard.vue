@@ -22,7 +22,7 @@
                         </v-icon>
                     </template>
 
-                    <div class="flex-grow-1 d-flex flex-column overflow-hidden mr-4">
+                    <div class="flex-grow-1 d-flex flex-column overflow-hidden">
                         <div
                             class="d-flex align-center grey--text font-weight-bold"
                             :class="[getTextColor('date')]">
@@ -65,7 +65,7 @@
                         </div>
 
                         <h3
-                            class="text-truncate white--text"
+                            class="text-body-2 text-sm-body-1 font-weight-bold white--text"
                             :class="[getTextColor('name')]"
                             :title="event.name">
                             {{ event.name }}
@@ -73,16 +73,25 @@
 
                         <span
                             v-if="event.description"
-                            class="text-truncate"
-                            :class="[getTextColor('description')]"
+                            class="text-caption text-sm-body-2"
+                            :class="[
+                                { 'text-truncate': !displayDescription },
+                                getTextColor('description'),
+                            ]"
                             :title="event.description">
                             {{ event.description }}
                         </span>
                     </div>
 
                     <template v-if="project">
-                        <router-link :to="{ name: 'project-detail', params: { id: project.id } }">
-                            <ProjectAvatar :project="project" :hover="hover"></ProjectAvatar>
+                        <router-link
+                            :to="{ name: 'project-detail', params: { id: project.id } }"
+                            class="ml-2">
+                            <ProjectAvatar
+                                :project="project"
+                                :hover="hover || $vuetify.breakpoint.xsOnly"
+                                :small="$vuetify.breakpoint.xsOnly">
+                            </ProjectAvatar>
                         </router-link>
                     </template>
                 </v-card-text>
@@ -127,6 +136,7 @@ export default class EventItemCard extends Vue {
     @Prop({ required: false }) relatedToDate?: string
 
     eventDialog = false
+    displayDescription = false
 
     get cardColor(): string | null {
         if (this.color) return this.color
@@ -136,9 +146,13 @@ export default class EventItemCard extends Vue {
     }
 
     openEventDialog(): void {
-        if (this.disabled || !this.clickable) return
+        if (!this.clickable) {
+            if (!this.event.description) return
 
-        this.eventDialog = true
+            this.displayDescription = !this.displayDescription
+        } else if (!this.disabled) {
+            this.eventDialog = true
+        }
     }
 
     emitUpdateEvent(data: EventPostOrPatch): void {

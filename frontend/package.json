@@ -26,7 +26,7 @@
         "vue-property-decorator": "^9.1.2",
         "vue-resource": "^1.5.2",
         "vue-router": "^3.5.0",
-        "vuetify": "^2.6.4",
+        "vuetify": "^2.7.1",
         "vuex": "^3.4.0",
         "vuex-module-decorators": "^1.0.1"
     },
