@@ -49,7 +49,7 @@
                 </template>
 
                 <div
-                    class="flex-grow-1 font-weight-medium white--text text-truncate"
+                    class="flex-grow-1 font-weight-medium white--text"
                     :class="{ 'text-body-2': small, 'text-body-1': !small }"
                     :title="task.name">
                     {{ task.name }}
@@ -150,6 +150,7 @@ export default class TaskCard extends Vue {
 <style scoped lang="scss">
 .task-card {
     min-height: 72px;
+    height: 100%;
     padding: 8px;
     display: flex;
     flex-direction: column;

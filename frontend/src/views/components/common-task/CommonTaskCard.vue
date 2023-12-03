@@ -8,7 +8,7 @@
             <v-icon>mdi-timeline</v-icon>
             <div class="content">
                 <div class="content__body">
-                    <h5 class="text-h6 white--text text-truncate" :title="commonTask.name">
+                    <h5 class="text-body-1 text-sm-h6 white--text" :title="commonTask.name">
                         {{ commonTask.name }}
                     </h5>
                 </div>
@@ -90,12 +90,20 @@ export default class CommonTaskCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .wrapper {
     display: flex;
     align-items: center;
     column-gap: 16px;
-    padding: 12px 8px 12px 20px;
+    padding: 12px 12px 12px 20px;
     min-height: 80px;
+    height: 100%;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        padding: 12px;
+        column-gap: 8px;
+    }
 
     .content {
         flex-grow: 1;

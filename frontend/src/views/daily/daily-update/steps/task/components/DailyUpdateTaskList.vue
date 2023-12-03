@@ -41,9 +41,12 @@
         </template>
 
         <template v-else>
-            <EmptyListDisplay message="You didn't add any task yet!">
+            <EmptyListDisplay message="You didn't add any task yet!" class="empty-list-display">
                 <template #img>
-                    <img src="../../../../../../assets/no_tasks.svg" alt="No tasks" height="300" />
+                    <img
+                        src="../../../../../../assets/no_tasks.svg"
+                        alt="No tasks"
+                        class="empty-list-display__img" />
                 </template>
             </EmptyListDisplay>
         </template>
@@ -98,12 +101,25 @@ export default class DailyUpdateTaskList extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-task-wrapper {
-    flex: 1 0 0;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'md-and-up')} {
+        flex: 1 0 0;
+    }
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>

@@ -99,9 +99,15 @@ export default class DailyTaskForm extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .tag-wrapper {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+        gap: 4px;
+    }
 }
 </style>

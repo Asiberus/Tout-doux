@@ -30,6 +30,7 @@ export default class EmptyListDisplay extends Vue {
 
     .img-description {
         margin-top: 1.5rem;
+        text-align: center;
     }
 }
 </style>

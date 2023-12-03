@@ -1,9 +1,18 @@
 <template>
     <div class="daily-update">
-        <div class="d-flex justify-space-between align-center mb-4">
-            <h2 class="text-h3">
+        <div
+            class="
+                d-flex
+                flex-column flex-sm-row
+                justify-space-between
+                align-center
+                gap-2
+                mb-2 mb-sm-4
+            ">
+            <MainTitle class="mb-2 mb-sm-0 text-center text-sm-start">
                 <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
-            </h2>
+            </MainTitle>
+
             <v-btn
                 @click="goToDailyDetail()"
                 :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
@@ -54,8 +63,9 @@ import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
 
-@Component({ components: { DailyUpdateTask, DailyUpdateEvent } })
+@Component({ components: { MainTitle, DailyUpdateTask, DailyUpdateEvent } })
 export default class DailyUpdate extends Vue {
     @Prop({ required: true }) readonly date!: string
     @Prop({ validator: value => value === 'task' || value === 'event' })

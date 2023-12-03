@@ -3,7 +3,7 @@
         <span class="value">{{ value }}</span>
         <span class="separator">/</span>
         <span class="max">{{ max }}</span>
-        <v-icon>mdi-trophy</v-icon>
+        <v-icon v-if="showIcon">mdi-trophy</v-icon>
     </div>
 </template>
 
@@ -14,6 +14,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 export default class TaskCounter extends Vue {
     @Prop({ required: true }) value!: number
     @Prop({ required: true }) max!: number
+    @Prop({ required: false, default: true }) showIcon!: boolean
 }
 </script>
 

@@ -23,6 +23,10 @@ body {
     background: #121212; // Background color of vuetify dark theme
 }
 
+.h-100 {
+    height: 100%;
+}
+
 input:autofill {
     background: none;
 }

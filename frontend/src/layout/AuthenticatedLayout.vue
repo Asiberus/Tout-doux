@@ -24,9 +24,3 @@ export default class AuthenticatedLayout extends Vue {
     displayNavbar = !this.$vuetify.breakpoint.mobile
 }
 </script>
-
-<style scoped lang="scss">
-.h-100 {
-    height: 100%;
-}
-</style>

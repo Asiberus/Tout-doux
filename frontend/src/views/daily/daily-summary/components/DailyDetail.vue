@@ -40,7 +40,7 @@
                         <v-tab tab-value="event">Events</v-tab>
                     </v-tabs>
 
-                    <v-tabs-items v-model="tab" class="transparent py-2 pa-sm-2 pa-md-4">
+                    <v-tabs-items v-model="tab" touchless class="transparent py-2 pa-sm-2 pa-md-4">
                         <v-tab-item value="task">
                             <DailyDetailTaskTimeline
                                 :daily-task-list="dailyTaskList"

@@ -10,39 +10,32 @@
                 height="4"
                 class="flex-shrink-0">
             </v-progress-linear>
-            <v-card-text>
+            <v-card-text class="pa-3 pa-sm-4">
                 <div class="d-flex align-center">
                     <div class="min-width-0">
-                        <h3 class="text-h6 white--text text-truncate" :title="project.name">
+                        <h3
+                            class="text-body-h1 text-sm-h6 white--text"
+                            :class="{ 'text-truncate': !selected }"
+                            :title="project.name">
                             {{ project.name }}
                         </h3>
 
                         <template v-if="!selected">
-                            <div class="mt-1">
-                                <template v-if="project.tags.length > 0">
-                                    <TagGroup :tag-list="project.tags" max-tag="1" :small="true">
-                                    </TagGroup>
-                                </template>
-                            </div>
+                            <template v-if="project.tags.length > 0">
+                                <TagGroup :tag-list="project.tags" :small="true" class="mt-1">
+                                </TagGroup>
+                            </template>
                         </template>
                     </div>
 
                     <template v-if="!selected">
                         <v-spacer></v-spacer>
-                        <div class="mx-2 mt-1 flex-shrink-0">
-                            <span style="font-size: 1.8em" class="white--text">
-                                {{ allTasksCompleted.length }}
-                            </span>
-                            /
-                            <span
-                                style="
-                                    font-size: 1.1em;
-                                    transform: translateY(0.3em);
-                                    display: inline-block;
-                                ">
-                                {{ allTasks.length }}
-                            </span>
-                        </div>
+                        <TaskCounter
+                            :value="allTasksCompleted.length"
+                            :max="allTasks.length"
+                            :show-icon="false"
+                            class="ml-2">
+                        </TaskCounter>
                     </template>
                     <template v-if="selected">
                         <v-hover v-slot="{ hover }">
@@ -56,11 +49,9 @@
                                 <v-icon small>mdi-open-in-new</v-icon>
                             </v-btn>
                         </v-hover>
-                        <template v-if="project.tags.length > 0">
-                            <TagGroup :tag-list="project.tags" max-tag="3"></TagGroup>
-                        </template>
 
                         <v-spacer></v-spacer>
+
                         <v-btn @click.stop="unselectProject()" color="red" icon>
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
@@ -68,6 +59,10 @@
                 </div>
 
                 <template v-if="selected">
+                    <template v-if="project.tags.length > 0">
+                        <TagGroup :tag-list="project.tags" class="my-1 flex-shrink-0"></TagGroup>
+                    </template>
+
                     <v-tabs
                         v-if="taskBySection.length > 1 || taskBySection[0].id !== 0"
                         v-model="sectionTab"
@@ -95,9 +90,10 @@
                     <v-divider
                         :class="{
                             'mt-2': taskBySection.length === 1 && taskBySection[0].id === 0,
-                        }"></v-divider>
+                        }">
+                    </v-divider>
 
-                    <v-tabs-items v-model="sectionTab" class="tab-item-wrapper">
+                    <v-tabs-items v-model="sectionTab" touchless class="tab-item-wrapper">
                         <v-tab-item
                             v-for="section of taskBySection"
                             :key="`tab-item-${section.id}`">
@@ -134,8 +130,9 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
+import TaskCounter from '@/components/TaskCounter.vue'
 
-@Component({ components: { TaskCard, TagGroup, ProgressDisk } })
+@Component({ components: { TaskCounter, TaskCard, TagGroup, ProgressDisk } })
 export default class DailyUpdateProjectListItem extends Vue {
     @Prop({ required: true }) project!: ProjectDetail
     @Prop({ required: true }) dailyTaskList!: DailyTask[]
@@ -208,6 +205,8 @@ export default class DailyUpdateProjectListItem extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .project-card {
     min-height: 88px;
     display: flex;
@@ -223,6 +222,20 @@ export default class DailyUpdateProjectListItem extends Vue {
         .min-width-0 {
             min-width: 0;
         }
+    }
+}
+
+.v-tabs::v-deep {
+    .v-slide-group__prev,
+    .v-slide-group__next {
+        min-width: initial;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'xs-only')} {
+    .v-tabs::v-deep .v-tab {
+        font-size: 0.7rem;
+        padding: 0 8px;
     }
 }
 
@@ -249,9 +262,13 @@ export default class DailyUpdateProjectListItem extends Vue {
 
             .task-wrapper {
                 overflow-y: auto;
-                padding: 12px 8px 8px;
+                padding: 12px 0;
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
+                // auto fit with 260px min size but max 2 column
+                grid-template-columns: repeat(
+                    auto-fill,
+                    minmax(max(260px, calc((100% - 8px) / 2)), 1fr)
+                );
                 gap: 8px;
             }
         }

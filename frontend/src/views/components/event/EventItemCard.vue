@@ -2,14 +2,18 @@
     <div>
         <v-hover v-slot="{ hover }">
             <v-card
-                @click="openEventDialog()"
+                @click="onEventCardClick()"
                 :color="cardColor"
                 :disabled="disabled"
                 :ripple="false"
                 class="rounded-lg"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
-                <v-card-text class="d-flex align-center">
-                    <v-icon v-if="showIcon" :class="[getTextColor('icon')]" large class="mr-4">
+                <v-card-text class="d-flex align-center pa-3 pa-sm-4">
+                    <v-icon
+                        v-if="showIcon"
+                        :class="[getTextColor('icon')]"
+                        :large="$vuetify.breakpoint.smAndUp"
+                        class="mr-2 mr-sm-3 mr-md-4">
                         mdi-calendar-clock
                     </v-icon>
 
@@ -24,7 +28,7 @@
 
                     <div class="flex-grow-1 d-flex flex-column overflow-hidden">
                         <div
-                            class="d-flex align-center grey--text font-weight-bold"
+                            class="date-text grey--text font-weight-bold"
                             :class="[getTextColor('date')]">
                             <template v-if="event.takesWholeDay && !daySelected">
                                 <span title="Date">
@@ -145,7 +149,7 @@ export default class EventItemCard extends Vue {
         return 'event'
     }
 
-    openEventDialog(): void {
+    onEventCardClick(): void {
         if (!this.clickable) {
             if (!this.event.description) return
 
@@ -192,6 +196,8 @@ export default class EventItemCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .caret::after {
     content: '';
     position: absolute;
@@ -201,5 +207,14 @@ export default class EventItemCard extends Vue {
     border-bottom: 10px solid transparent;
     border-right: 10px solid #000;
     border-right-color: inherit;
+}
+
+.date-text {
+    display: flex;
+    align-items: center;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        font-size: 0.8rem;
+    }
 }
 </style>

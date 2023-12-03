@@ -4,8 +4,11 @@
             v-model="tab"
             background-color="transparent"
             color="accent variant-1"
-            vertical
-            @change="resetSelectedItem()">
+            :vertical="$vuetify.breakpoint.mdAndUp"
+            :grow="$vuetify.breakpoint.smAndDown"
+            show-arrows
+            @change="resetSelectedItem()"
+            class="daily-update-task__tabs">
             <v-tab>
                 <v-icon>mdi-briefcase-variant</v-icon>
             </v-tab>
@@ -23,7 +26,7 @@
             </v-tab>
         </v-tabs>
 
-        <v-tabs-items v-model="tab" class="transparent">
+        <v-tabs-items v-model="tab" touchless class="daily-update-task__tabs-items transparent">
             <v-tab-item :transition="false">
                 <div class="d-flex align-center mb-3">
                     <h5 class="text-h5 mr-2">Project</h5>
@@ -39,29 +42,33 @@
                         </v-btn>
                     </v-hover>
                 </div>
-                <template v-if="projectList.length">
-                    <div class="project-wrapper">
-                        <DailyUpdateProjectListItem
-                            v-for="project in projectList"
-                            :key="'project-' + project.content.id"
-                            :project="project.content"
-                            :daily-task-list="dailyTaskList"
-                            :selected.sync="project.selected"
-                            :section-selected="projectSectionSelected"
-                            @select-task="createDailyTask($event)">
-                        </DailyUpdateProjectListItem>
-                    </div>
-                </template>
-                <template v-else>
-                    <EmptyListDisplay message="No project available">
-                        <template #img>
-                            <img
-                                src="../../../../../assets/project.svg"
-                                alt="No Project"
-                                height="250" />
-                        </template>
-                    </EmptyListDisplay>
-                </template>
+                <div
+                    class="daily-update-task__tabs-items__content"
+                    :class="{ overflow: !isSomeProjectSelected }">
+                    <template v-if="projectList.length">
+                        <div class="project-wrapper">
+                            <DailyUpdateProjectListItem
+                                v-for="project in projectList"
+                                :key="'project-' + project.content.id"
+                                :project="project.content"
+                                :daily-task-list="dailyTaskList"
+                                :selected.sync="project.selected"
+                                :section-selected="projectSectionSelected"
+                                @select-task="createDailyTask($event)">
+                            </DailyUpdateProjectListItem>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <EmptyListDisplay message="No project available" class="empty-list-display">
+                            <template #img>
+                                <img
+                                    src="../../../../../assets/project.svg"
+                                    alt="No Project"
+                                    class="empty-list-display__img" />
+                            </template>
+                        </EmptyListDisplay>
+                    </template>
+                </div>
             </v-tab-item>
             <v-tab-item :transition="false">
                 <div class="d-flex align-center mb-3">
@@ -78,28 +85,34 @@
                         </v-btn>
                     </v-hover>
                 </div>
-                <template v-if="collectionList.length">
-                    <div class="collection-wrapper">
-                        <DailyUpdateCollectionListItem
-                            v-for="collection in collectionList"
-                            :key="'collection-' + collection.content.id"
-                            :collection="collection.content"
-                            :daily-task-list="dailyTaskList"
-                            :selected.sync="collection.selected"
-                            @select-task="createDailyTask($event)">
-                        </DailyUpdateCollectionListItem>
-                    </div>
-                </template>
-                <template v-else>
-                    <EmptyListDisplay message="No collection available">
-                        <template #img>
-                            <img
-                                src="../../../../../assets/project.svg"
-                                alt="No Collection"
-                                height="250" />
-                        </template>
-                    </EmptyListDisplay>
-                </template>
+                <div
+                    class="daily-update-task__tabs-items__content"
+                    :class="{ overflow: !isSomeCollectionSelected }">
+                    <template v-if="collectionList.length">
+                        <div class="collection-wrapper">
+                            <DailyUpdateCollectionListItem
+                                v-for="collection in collectionList"
+                                :key="'collection-' + collection.content.id"
+                                :collection="collection.content"
+                                :daily-task-list="dailyTaskList"
+                                :selected.sync="collection.selected"
+                                @select-task="createDailyTask($event)">
+                            </DailyUpdateCollectionListItem>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <EmptyListDisplay
+                            message="No collection available"
+                            class="empty-list-display">
+                            <template #img>
+                                <img
+                                    src="../../../../../assets/project.svg"
+                                    alt="No Collection"
+                                    class="empty-list-display__img" />
+                            </template>
+                        </EmptyListDisplay>
+                    </template>
+                </div>
             </v-tab-item>
             <v-tab-item :transition="false">
                 <div class="d-flex align-center mb-3">
@@ -116,11 +129,13 @@
                         </v-btn>
                     </v-hover>
                 </div>
-                <DailyUpdateCommonTask
-                    :common-task-list="commonTaskList"
-                    :daily-task-list="dailyTaskList"
-                    @select-common-task="createDailyTask($event)">
-                </DailyUpdateCommonTask>
+                <div class="daily-update-task__tabs-items__content overflow">
+                    <DailyUpdateCommonTask
+                        :common-task-list="commonTaskList"
+                        :daily-task-list="dailyTaskList"
+                        @select-common-task="createDailyTask($event)">
+                    </DailyUpdateCommonTask>
+                </div>
             </v-tab-item>
             <v-tab-item :transition="false">
                 <h5 class="text-h5 mb-3">Weekly task</h5>
@@ -135,7 +150,8 @@
             @create="createDailyTask($event)"
             @update="updateDailyTask($event)"
             @delete="deleteDailyTask($event)"
-            @select="select($event)">
+            @select="select($event)"
+            class="daily-update-task__list">
         </DailyUpdateTaskList>
     </div>
 </template>
@@ -184,6 +200,14 @@ export default class DailyUpdateTask extends Vue {
 
     tab: DailyUpdateTaskTab = DailyUpdateTaskTab.Project
     projectSectionSelected: number = 0
+
+    get isSomeProjectSelected(): boolean {
+        return this.projectList.some(({ selected }) => selected)
+    }
+
+    get isSomeCollectionSelected(): boolean {
+        return this.collectionList.some(({ selected }) => selected)
+    }
 
     created(): void {
         this.retrieveDailyTaskList()
@@ -318,26 +342,98 @@ export default class DailyUpdateTask extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-update-task {
     height: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr 33%;
-    grid-template-rows: auto;
+    display: flex;
     gap: 16px;
+
+    &__tabs {
+        flex: 0 0 0;
+    }
+
+    &__tabs-items {
+        flex: 1 1 auto;
+
+        &__content {
+            position: relative;
+
+            @media #{map-get($display-breakpoints, 'md-and-up')} {
+                flex: 1 0 0;
+            }
+
+            &.overflow {
+                overflow: auto;
+            }
+
+            .project-wrapper,
+            .collection-wrapper {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+                grid-auto-rows: min-content;
+                gap: 8px;
+
+                @media only screen and (min-width: 1600px) {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(max(260px, calc((100% - 16px) / 3)), 1fr)
+                    );
+                }
+
+                & > * {
+                    min-width: 0;
+                }
+            }
+
+            .empty-list-display {
+                height: 100%;
+
+                &__img {
+                    width: clamp(200px, 50%, 300px);
+                }
+            }
+        }
+    }
+
+    &__list {
+        flex: 0 0 33%;
+        width: 33%;
+    }
 }
 
-.project-wrapper,
-.collection-wrapper {
-    flex-grow: 1;
-    min-height: 30rem;
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: min-content;
-    gap: 8px;
+@media #{map-get($display-breakpoints, 'lg-and-down')} {
+    .daily-update-task__tabs {
+        .v-tab {
+            min-width: initial;
+            height: 40px;
+        }
+    }
+}
 
-    & > * {
-        min-width: 0;
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+    .daily-update-task {
+        flex-direction: column;
+
+        &__tabs {
+            .v-tab {
+                min-width: initial;
+                height: 48px;
+            }
+        }
+
+        &__tabs-items {
+            flex: 0 1 auto;
+
+            &__content {
+                flex-grow: 0;
+                height: 50svh;
+            }
+        }
+
+        &__list {
+            width: auto;
+        }
     }
 }
 </style>

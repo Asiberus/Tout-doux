@@ -1,8 +1,5 @@
 <template>
-    <div
-        ref="tagGroup"
-        class="tag-group d-flex align-center gap-1 overflow-auto"
-        :class="{ small, large }">
+    <div ref="tagGroup" class="tag-group" :class="{ small, large }">
         <v-icon
             v-if="displayedTags.length > 0"
             :small="!small && !large"
@@ -28,7 +25,12 @@
                 :close-on-content-click="false"
                 :z-index="zIndex">
                 <template #activator="{ attrs, on }">
-                    <v-chip v-bind="attrs" v-on="on" :small="!large" class="flex-shrink-0">
+                    <v-chip
+                        v-bind="attrs"
+                        v-on="on"
+                        :small="!large"
+                        class="flex-shrink-0"
+                        @click.prevent.stop>
                         <template v-if="smallMenuChip">
                             <template v-if="displayedTags.length > 0">+</template>
                             <span>{{ hiddenTags.length }}</span>
@@ -116,7 +118,8 @@ export default class TagGroup extends Vue {
     display: flex;
     align-items: center;
     column-gap: 4px;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
 
     &:not(.small):not(.large) {
         .v-chip {

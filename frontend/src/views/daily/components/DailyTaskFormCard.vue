@@ -1,111 +1,122 @@
 <template>
-    <v-hover v-slot="{ hover }">
-        <v-card class="daily-task-form-card rounded-lg">
-            <template v-if="!editMode && dailyTask">
-                <div class="daily-task-form-card__content">
-                    <div class="daily-task-form-card__content__header">
-                        <DailyTaskActionChip
-                            :action="dailyTask.action"
-                            :editable="true"
-                            @update="updateDailyTask({ action: $event })"
-                            class="flex-shrink-0">
-                        </DailyTaskActionChip>
+    <v-card class="daily-task-form-card rounded-lg">
+        <template v-if="!editMode && dailyTask">
+            <div class="daily-task-form-card__content">
+                <div class="daily-task-form-card__actions">
+                    <v-menu offset-y>
+                        <template #activator="{ attrs, on }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                small
+                                plain
+                                color="white"
+                                class="daily-task-form-card__actions__btn">
+                                <v-icon small>mdi-dots-vertical</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list dense>
+                            <v-list-item
+                                v-if="!dailyTask.task && !dailyTask.commonTask"
+                                @click="showEditMode()">
+                                <v-icon small left color="accent">mdi-pencil</v-icon>
+                                <v-list-item-title>Edit</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="deleteDailyTask()">
+                                <v-icon small left color="error">mdi-trash-can</v-icon>
+                                <v-list-item-title>Delete</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
 
-                        <h4 class="text-body-1 font-weight-medium text-truncate" :title="name">
-                            {{ name }}
-                        </h4>
+                <div class="daily-task-form-card__content__header">
+                    <DailyTaskActionChip
+                        :action="dailyTask.action"
+                        :editable="true"
+                        @update="updateDailyTask({ action: $event })"
+                        class="flex-shrink-0">
+                    </DailyTaskActionChip>
+
+                    <h4 class="text-body-2 text-sm-body-1 font-weight-medium" :title="name">
+                        {{ name }}
+                    </h4>
+                </div>
+                <template
+                    v-if="
+                        dailyTask.task ||
+                        (dailyTask.commonTask && dailyTask.commonTask.tags.length > 0) ||
+                        dailyTask.tags.length > 0
+                    ">
+                    <div class="daily-task-form-card__content__footer">
+                        <template v-if="dailyTask.task">
+                            <ProjectChip
+                                v-if="dailyTask.task.project"
+                                :project="dailyTask.task.project"
+                                :small="true"
+                                :navigate-to-detail="false"
+                                @click="
+                                    select(
+                                        dailyTaskUpdateTabEnum.Project,
+                                        dailyTask.task.project.id
+                                    )
+                                "
+                                class="daily-task-form-card__content__footer__chip">
+                            </ProjectChip>
+                            <SectionChip
+                                v-if="dailyTask.task.section"
+                                :section="dailyTask.task.section"
+                                :small="true"
+                                :navigate-to-detail="false"
+                                @click="
+                                    select(
+                                        dailyTaskUpdateTabEnum.Project,
+                                        dailyTask.task.section.project.id,
+                                        dailyTask.task.section.id
+                                    )
+                                "
+                                class="daily-task-form-card__content__footer__chip">
+                            </SectionChip>
+                            <CollectionChip
+                                v-if="dailyTask.task.collection"
+                                :collection="dailyTask.task.collection"
+                                :small="true"
+                                :navigate-to-detail="false"
+                                @click="
+                                    select(
+                                        dailyTaskUpdateTabEnum.Collection,
+                                        dailyTask.task.collection.id
+                                    )
+                                "
+                                class="daily-task-form-card__content__footer__chip">
+                            </CollectionChip>
+                        </template>
+
+                        <template v-if="dailyTask.tags.length > 0">
+                            <TagGroup :tag-list="dailyTask.tags" :max-tag="2"></TagGroup>
+                        </template>
+                        <template v-if="dailyTask.task && dailyTask.task.tags.length > 0">
+                            <TagGroup :tag-list="dailyTask.task.tags" :max-tag="2"></TagGroup>
+                        </template>
+                        <template
+                            v-if="dailyTask.commonTask && dailyTask.commonTask.tags.length > 0">
+                            <TagGroup :tag-list="dailyTask.commonTask.tags" :max-tag="2">
+                            </TagGroup>
+                        </template>
                     </div>
-                    <template
-                        v-if="
-                            dailyTask.task ||
-                            (dailyTask.commonTask && dailyTask.commonTask.tags.length > 0) ||
-                            dailyTask.tags.length > 0
-                        ">
-                        <div class="daily-task-form-card__content__footer">
-                            <template v-if="dailyTask.task">
-                                <ProjectChip
-                                    v-if="dailyTask.task.project"
-                                    :project="dailyTask.task.project"
-                                    :small="true"
-                                    :navigate-to-detail="false"
-                                    @click="
-                                        select(
-                                            dailyTaskUpdateTabEnum.Project,
-                                            dailyTask.task.project.id
-                                        )
-                                    "
-                                    class="daily-task-form-card__content__footer__chip">
-                                </ProjectChip>
-                                <SectionChip
-                                    v-if="dailyTask.task.section"
-                                    :section="dailyTask.task.section"
-                                    :small="true"
-                                    :navigate-to-detail="false"
-                                    @click="
-                                        select(
-                                            dailyTaskUpdateTabEnum.Project,
-                                            dailyTask.task.section.project.id,
-                                            dailyTask.task.section.id
-                                        )
-                                    "
-                                    class="daily-task-form-card__content__footer__chip">
-                                </SectionChip>
-                                <CollectionChip
-                                    v-if="dailyTask.task.collection"
-                                    :collection="dailyTask.task.collection"
-                                    :small="true"
-                                    :navigate-to-detail="false"
-                                    @click="
-                                        select(
-                                            dailyTaskUpdateTabEnum.Collection,
-                                            dailyTask.task.collection.id
-                                        )
-                                    "
-                                    class="daily-task-form-card__content__footer__chip">
-                                </CollectionChip>
-                            </template>
+                </template>
+            </div>
+        </template>
 
-                            <template v-if="dailyTask.tags.length > 0">
-                                <TagGroup :tag-list="dailyTask.tags" :max-tag="2"></TagGroup>
-                            </template>
-                            <template v-if="dailyTask.task && dailyTask.task.tags.length > 0">
-                                <TagGroup :tag-list="dailyTask.task.tags" :max-tag="2"></TagGroup>
-                            </template>
-                            <template
-                                v-if="dailyTask.commonTask && dailyTask.commonTask.tags.length > 0">
-                                <TagGroup :tag-list="dailyTask.commonTask.tags" :max-tag="2">
-                                </TagGroup>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="daily-task-form-card__actions" :class="{ 'is-hover': hover }">
-                    <v-btn
-                        v-if="!dailyTask.task && !dailyTask.commonTask"
-                        @click="showEditMode()"
-                        color="accent"
-                        icon
-                        small>
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-
-                    <v-btn @click="deleteDailyTask()" color="error" icon small>
-                        <v-icon>mdi-trash-can</v-icon>
-                    </v-btn>
-                </div>
-            </template>
-
-            <template v-else>
-                <DailyTaskForm
-                    :daily-task="dailyTask"
-                    @submit="updateDailyTask($event)"
-                    @close="hideEditMode()"
-                    class="flex-grow-1">
-                </DailyTaskForm>
-            </template>
-        </v-card>
-    </v-hover>
+        <template v-else>
+            <DailyTaskForm
+                :daily-task="dailyTask"
+                @submit="updateDailyTask($event)"
+                @close="hideEditMode()"
+                class="flex-grow-1">
+            </DailyTaskForm>
+        </template>
+    </v-card>
 </template>
 
 <script lang="ts">
@@ -163,11 +174,28 @@ export default class DailyTaskFormCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-task-form-card {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 16px;
+
+    padding: 12px 20px 12px 12px;
+
+    &__actions {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        display: flex;
+        align-items: center;
+        column-gap: 8px;
+
+        &__btn {
+            min-width: 0 !important;
+            padding: 0 !important;
+        }
+    }
 
     &__content {
         flex-grow: 1;
@@ -178,7 +206,7 @@ export default class DailyTaskFormCard extends Vue {
 
         &__header {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             column-gap: 8px;
         }
 
@@ -188,25 +216,20 @@ export default class DailyTaskFormCard extends Vue {
             column-gap: 8px;
 
             &__chip {
+                flex-shrink: 1;
                 max-width: 10rem;
                 cursor: pointer;
             }
         }
     }
+}
 
-    &__actions {
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        column-gap: 8px;
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .daily-task-form-card {
+        padding: 16px 24px 16px 16px;
 
-        opacity: 0;
-        transform: translateX(15px);
-        transition: all 0.2s ease-in-out;
-
-        &.is-hover {
-            transform: translateX(0);
-            opacity: 1;
+        &__actions {
+            right: 8px;
         }
     }
 }
