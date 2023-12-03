@@ -102,7 +102,10 @@
             </v-card>
         </v-hover>
 
-        <v-dialog v-model="eventDialog" width="60%">
+        <v-dialog
+            v-model="eventDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <EventDialog
                 :event="event"
                 :is-dialog-open="eventDialog"
@@ -124,8 +127,12 @@ import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { EventDialog, ProjectAvatar } })
+@Component({
+    methods: { getDialogWidth },
+    components: { EventDialog, ProjectAvatar },
+})
 export default class EventItemCard extends Vue {
     @Prop({ required: true }) event!: EventModel
     @Prop({ default: null }) project!: Project | null
