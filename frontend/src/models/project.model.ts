@@ -22,6 +22,7 @@ export interface Project {
 export interface ProjectList extends Project {
     taskCount: number
     completedTaskCount: number
+    eventsToCome: number
 }
 
 export interface ProjectDetail extends Project {
