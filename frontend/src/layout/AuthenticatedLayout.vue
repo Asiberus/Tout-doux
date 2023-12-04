@@ -7,7 +7,7 @@
             <TheHeader :display-navbar.sync="displayNavbar"></TheHeader>
         </v-app-bar>
         <v-main>
-            <v-container fluid class="pa-4 pa-sm-6 pa-lg-8 h-100">
+            <v-container fluid class="pa-3 pa-sm-5 pa-lg-7 h-100">
                 <router-view />
             </v-container>
         </v-main>
