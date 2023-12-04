@@ -56,7 +56,10 @@
                     Completed
                 </FilterChip>
 
-                <v-dialog v-model="taskDialog" width="60%">
+                <v-dialog
+                    v-model="taskDialog"
+                    :width="getDialogWidth()"
+                    :fullscreen="$vuetify.breakpoint.smAndDown">
                     <template #activator="{ on, attrs }">
                         <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
                             <v-icon left>mdi-plus</v-icon>
@@ -157,8 +160,10 @@ import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import { Preferences } from '@/models/preferences.model'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
 @Component({
+    methods: { getDialogWidth },
     components: {
         TagGroup,
         TaskCard,

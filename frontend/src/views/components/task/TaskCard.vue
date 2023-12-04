@@ -66,7 +66,10 @@
             </template>
         </v-card>
 
-        <v-dialog v-model="taskDialog" width="60%">
+        <v-dialog
+            v-model="taskDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <TaskDialog
                 :task="task"
                 :is-dialog-open="taskDialog"
@@ -80,14 +83,14 @@
             <template #icon>
                 <v-icon x-large>mdi-trophy</v-icon>
             </template>
-            <p>Are you sure to uncomplete this task ?</p>
+            <span>Are you sure to uncomplete this task ?</span>
         </ConfirmDialog>
 
         <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
             <template #icon>
                 <v-icon x-large>mdi-trash-can</v-icon>
             </template>
-            <p>Are you sure to delete this task ?</p>
+            <span>Are you sure to delete this task ?</span>
         </ConfirmDialog>
     </div>
 </template>
@@ -98,8 +101,12 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
+@Component({
+    methods: { getDialogWidth },
+    components: { TaskDialog, ConfirmDialog, TagGroup },
+})
 export default class TaskCard extends Vue {
     @Prop({ required: true }) task!: Task
     @Prop({ default: false }) disabled!: boolean

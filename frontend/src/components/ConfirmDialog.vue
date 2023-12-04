@@ -1,23 +1,34 @@
 <template>
-    <v-dialog :value="dialogState" @input="setDialogStateTo($event)" width="50%">
+    <v-dialog
+        :value="dialogState"
+        @input="setDialogStateTo($event)"
+        :width="getConfirmDialogWidth()"
+        :fullscreen="$vuetify.breakpoint.xsOnly">
         <template #activator="{ attrs, on }">
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
-        <v-card>
-            <v-card-text>
-                <div class="d-flex flex-column justify-center align-center">
-                    <div class="icon-wrapper white--text">
-                        <span class="icon-content">
-                            <slot name="icon">!</slot>
-                        </span>
-                    </div>
-                    <div class="dialog-message white--text">
-                        <slot></slot>
-                    </div>
-                    <div class="d-flex justify-center mb-3">
-                        <v-btn color="success" class="mr-2" @click="confirm()">Confirm</v-btn>
-                        <v-btn color="error" @click="setDialogStateTo(false)">Cancel</v-btn>
-                    </div>
+        <v-card class="d-flex flex-column">
+            <v-card-text class="flex-grow-1 d-flex flex-column justify-center align-stretch">
+                <div class="icon-wrapper white--text">
+                    <span class="icon-content">
+                        <slot name="icon">!</slot>
+                    </span>
+                </div>
+
+                <div class="dialog-message white--text">
+                    <slot></slot>
+                </div>
+
+                <div class="d-flex justify-center gap-2">
+                    <v-btn @click="confirm()" color="success" class="flex-grow-1 flex-md-grow-0">
+                        Confirm
+                    </v-btn>
+                    <v-btn
+                        @click="setDialogStateTo(false)"
+                        color="error"
+                        class="flex-grow-1 flex-md-grow-0">
+                        Cancel
+                    </v-btn>
                 </div>
             </v-card-text>
         </v-card>
@@ -26,8 +37,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { getConfirmDialogWidth } from '@/utils/dialog.utils'
 
-@Component
+@Component({ methods: { getConfirmDialogWidth } })
 export default class ConfirmDialog extends Vue {
     @Prop({ default: false }) value!: boolean
     dialogState = false
@@ -72,12 +84,6 @@ export default class ConfirmDialog extends Vue {
     }
 }
 
-.dialog-message {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-
 .icon-wrapper {
     display: flex;
     justify-content: center;
@@ -99,5 +105,12 @@ export default class ConfirmDialog extends Vue {
 
         animation: animate-icon-content 0.4s cubic-bezier(0.63, 0, 0.39, 1.78);
     }
+}
+
+.dialog-message {
+    font-size: 1.8rem;
+    line-height: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 </style>

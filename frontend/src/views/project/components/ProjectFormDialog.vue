@@ -61,9 +61,9 @@
                         class="flex-grow-1 flex-md-grow-0">
                         create
                     </v-btn>
-                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0"
-                        >cancel</v-btn
-                    >
+                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
                 </div>
             </v-form>
         </v-card-text>
