@@ -1,5 +1,5 @@
 <template>
-    <div ref="tagGroup" class="tag-group" :class="{ small, large }">
+    <div ref="tagGroup" class="tag-group" :class="{ small, large, 'multi-row': multiRow }">
         <v-icon
             v-if="displayedTags.length > 0"
             :small="!small && !large"
@@ -73,6 +73,7 @@ export default class TagGroup extends Vue {
     @Prop({ default: true }) iconTransparent!: boolean
     @Prop({ default: 4 }) zIndex!: number
     @Prop({ default: true }) autoShrink!: boolean
+    @Prop({ default: false }) multiRow!: boolean
 
     smallMenuChip = false
     internalMaxTag: number | null = null
@@ -117,9 +118,13 @@ export default class TagGroup extends Vue {
 .tag-group {
     display: flex;
     align-items: center;
-    column-gap: 4px;
+    gap: 4px;
     overflow-x: auto;
     overflow-y: hidden;
+
+    &.multi-row {
+        flex-wrap: wrap;
+    }
 
     &:not(.small):not(.large) {
         .v-chip {

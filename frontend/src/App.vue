@@ -109,6 +109,14 @@ input:autofill {
     gap: 16px;
 }
 
+.row-gap-1 {
+    row-gap: 4px;
+}
+
+.column-gap-2 {
+    column-gap: 8px;
+}
+
 .column-gap-6 {
     column-gap: 24px;
 }

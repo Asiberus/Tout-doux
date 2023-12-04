@@ -22,7 +22,7 @@
 
                     <ProgressWheel
                         :mode="mode"
-                        size="large"
+                        size="x-large"
                         value="14"
                         max="20"
                         color="green accent-2">

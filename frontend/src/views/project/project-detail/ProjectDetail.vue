@@ -1,5 +1,5 @@
 <template>
-    <div v-if="project">
+    <div v-if="project" class="d-flex flex-column h-100">
         <div class="d-flex flex-column flex-sm-row align-center gap-2">
             <v-icon v-if="$vuetify.breakpoint.xsOnly">mdi-briefcase-variant</v-icon>
             <SecondaryTitle class="text-center text-sm-start">
@@ -12,9 +12,9 @@
             </v-chip>
         </div>
 
-        <v-divider class="my-4" />
+        <v-divider class="my-2 my-sm-4" />
 
-        <v-tabs background-color="transparent" color="accent" class="mb-3" show-arrows>
+        <v-tabs background-color="transparent" color="accent" class="flex-grow-0 mb-3" show-arrows>
             <v-tab :to="{ name: 'project-detail' }" exact>Description</v-tab>
             <v-tab :to="{ name: 'project-detail-section' }">Section</v-tab>
             <v-tab :to="{ name: 'project-detail-event' }">Event</v-tab>
@@ -42,6 +42,10 @@ export default class ProjectDetailComponent extends Vue {
 
     mounted(): void {
         this.$store.dispatch(projectActions.retrieveProject, this.projectId)
+    }
+
+    destroyed(): void {
+        this.$store.dispatch(projectActions.removeCurrentProject)
     }
 }
 </script>

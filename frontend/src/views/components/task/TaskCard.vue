@@ -148,10 +148,12 @@ export default class TaskCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .task-card {
     min-height: 72px;
     height: 100%;
-    padding: 8px;
+    padding: 8px 20px 8px 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -163,7 +165,7 @@ export default class TaskCard extends Vue {
     &__actions {
         position: absolute;
         top: 4px;
-        right: 8px;
+        right: 4px;
 
         &__btn {
             min-width: 0 !important;
@@ -175,6 +177,16 @@ export default class TaskCard extends Vue {
         display: flex;
         align-items: center;
         column-gap: 4px;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .task-card {
+        padding: 8px 24px 8px 8px;
+
+        &__actions {
+            right: 8px;
+        }
     }
 }
 </style>

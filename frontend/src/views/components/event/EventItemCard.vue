@@ -77,9 +77,13 @@
 
                         <span
                             v-if="event.description"
+                            ref="description"
                             class="text-caption text-sm-body-2"
                             :class="[
-                                { 'text-truncate': !displayDescription },
+                                {
+                                    'text-truncate': !displayDescription,
+                                    'cursor-pointer': isDescriptionOverflowing,
+                                },
                                 getTextColor('description'),
                             ]"
                             :title="event.description">
@@ -148,12 +152,21 @@ export default class EventItemCard extends Vue {
 
     eventDialog = false
     displayDescription = false
+    isDescriptionOverflowing = false
+    descriptionElement?: HTMLElement
 
     get cardColor(): string | null {
         if (this.color) return this.color
         if (isPassed(this.event)) return 'null'
 
         return 'event'
+    }
+
+    mounted(): void {
+        this.descriptionElement = this.$refs.description as HTMLElement
+        if (this.descriptionElement && this.$vuetify.breakpoint.xsOnly)
+            this.isDescriptionOverflowing =
+                this.descriptionElement.scrollWidth > this.descriptionElement.clientWidth
     }
 
     onEventCardClick(): void {
