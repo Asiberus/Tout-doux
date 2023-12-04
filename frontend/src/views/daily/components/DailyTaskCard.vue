@@ -48,15 +48,15 @@
         </div>
 
         <template v-if="dailyTask.task && dailyTask.task.tags.length > 0">
-            <TagGroup :tag-list="dailyTask.task.tags" max-tag="3" z-index="300"></TagGroup>
+            <TagGroup :tag-list="dailyTask.task.tags" z-index="300"></TagGroup>
         </template>
 
         <template v-if="dailyTask.commonTask && dailyTask.commonTask.tags.length > 0">
-            <TagGroup :tag-list="dailyTask.commonTask.tags" max-tag="3" z-index="300"></TagGroup>
+            <TagGroup :tag-list="dailyTask.commonTask.tags" z-index="300"></TagGroup>
         </template>
 
         <template v-if="dailyTask.tags.length > 0">
-            <TagGroup :tag-list="dailyTask.tags" max-tag="3" z-index="300"></TagGroup>
+            <TagGroup :tag-list="dailyTask.tags" z-index="300"></TagGroup>
         </template>
     </v-card>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-3 mb-sm-6">
+        <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-3 mb-md-6">
             <MainTitle class="mb-3 mb-sm-0">Daily Summary</MainTitle>
             <v-btn
                 :to="{ name: 'daily-update', params: { date: this.today, step: 'task' } }"
@@ -121,7 +121,7 @@ export default class DailySummaryComponent extends Vue {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 
     @media #{map-get($display-breakpoints, 'sm-and-down')} {
-        grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
     }
 
     & > * {

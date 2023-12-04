@@ -59,7 +59,9 @@
                         </div>
                     </template>
                     <template v-else>
-                        <EmptyListDisplay message="No project available" class="empty-list-display">
+                        <EmptyListDisplay
+                            message="No project available."
+                            class="empty-list-display">
                             <template #img>
                                 <img
                                     src="../../../../../assets/project.svg"
@@ -102,7 +104,7 @@
                     </template>
                     <template v-else>
                         <EmptyListDisplay
-                            message="No collection available"
+                            message="No collection available."
                             class="empty-list-display">
                             <template #img>
                                 <img

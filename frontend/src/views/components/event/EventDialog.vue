@@ -443,7 +443,7 @@ export default class EventDialog extends Vue {
 <style scoped lang="scss">
 @import '~vuetify/src/styles/styles.sass';
 
-@media #{map-get($display-breakpoints, 'md-and-down')} {
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
     .inputs-wrapper {
         flex: 1 0 0;
         overflow-y: auto;

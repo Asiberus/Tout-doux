@@ -1,30 +1,34 @@
 <template>
-    <div>
-        <div class="d-flex justify-end align-end mb-4">
-            <h1 class="flex-grow-1 text-h3 mb-3">Projects</h1>
+    <div class="d-flex flex-column h-100">
+        <div class="d-flex flex-column flex-sm-row align-center gap-2 mb-3 mb-md-6">
+            <MainTitle class="flex-grow-1">Projects</MainTitle>
 
-            <FilterChip
-                :value="archived"
-                @input="toggleArchivedProject()"
-                color="accent"
-                icon="mdi-archive"
-                class="mr-3">
-                Archived
-            </FilterChip>
+            <div class="d-flex align-center gap-2">
+                <FilterChip
+                    :value="archived"
+                    @input="toggleArchivedProject()"
+                    color="accent"
+                    icon="mdi-archive">
+                    Archived
+                </FilterChip>
 
-            <v-dialog v-model="projectDialog" width="60%">
-                <template #activator="{ on, attrs }">
-                    <v-btn v-bind="attrs" v-on="on">
-                        <v-icon left>mdi-plus</v-icon>
-                        project
-                    </v-btn>
-                </template>
-                <ProjectFormDialog
-                    :isDialogOpen="projectDialog"
-                    @submit="createProject($event)"
-                    @close="projectDialog = false">
-                </ProjectFormDialog>
-            </v-dialog>
+                <v-dialog
+                    v-model="projectDialog"
+                    :width="getDialogWidth()"
+                    :fullscreen="$vuetify.breakpoint.smAndDown">
+                    <template #activator="{ on, attrs }">
+                        <v-btn v-bind="attrs" v-on="on">
+                            <v-icon left>mdi-plus</v-icon>
+                            project
+                        </v-btn>
+                    </template>
+                    <ProjectFormDialog
+                        :isDialogOpen="projectDialog"
+                        @submit="createProject($event)"
+                        @close="projectDialog = false">
+                    </ProjectFormDialog>
+                </v-dialog>
+            </div>
         </div>
 
         <template v-if="projectList.length > 0">
@@ -33,28 +37,28 @@
             </div>
         </template>
         <template v-else>
-            <EmptyListDisplay>
+            <EmptyListDisplay class="empty-list-display">
                 <template #img>
                     <img
+                        v-if="!archived"
                         src="../../../assets/project.svg"
                         alt="No project"
-                        style="max-width: 450px"
-                        v-if="!archived" />
+                        class="empty-list-display__img" />
                     <img
+                        v-else
                         src="../../../assets/project_archived.svg"
                         alt="No archived project"
-                        style="max-width: 450px"
-                        v-else />
+                        class="empty-list-display__img" />
                 </template>
                 <template #message>
-                    <div class="d-flex align-center" v-if="!archived">
+                    <div class="d-flex flex-column align-center gap-2" v-if="!archived">
                         <span>You don't have any project yet !</span>
-                        <v-btn @click="projectDialog = true" small class="ml-2">
+                        <v-btn @click="projectDialog = true">
                             <v-icon left>mdi-plus</v-icon>
                             project
                         </v-btn>
                     </div>
-                    <div v-else>You don't have any archived project</div>
+                    <div v-else>You don't have any archived project.</div>
                 </template>
             </EmptyListDisplay>
         </template>
@@ -69,9 +73,12 @@ import { ProjectList, ProjectPostOrPatch } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectCard from '@/views/project/components/ProjectCard.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
 @Component({
-    components: { ProjectCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
+    methods: { getDialogWidth },
+    components: { MainTitle, ProjectCard, ProjectFormDialog, EmptyListDisplay, FilterChip },
 })
 export default class ProjectListComponent extends Vue {
     @Prop({ default: false }) archived!: boolean
@@ -120,11 +127,19 @@ export default class ProjectListComponent extends Vue {
 <style scoped lang="scss">
 .project-wrapper {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(max(288px, calc((100% - 2 * 12px) / 3)), 1fr));
     gap: 12px;
 
     & > * {
         min-width: 0;
+    }
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(250px, 50%, 450px);
     }
 }
 </style>

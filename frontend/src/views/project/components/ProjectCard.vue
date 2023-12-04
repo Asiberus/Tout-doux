@@ -6,29 +6,30 @@
         class="project-card rounded-lg">
         <v-progress-linear :value="percentageOfCompletedTask" color="green accent-2" height="6">
         </v-progress-linear>
-        <v-card-text class="d-flex justify-space-between align-center">
+        <v-card-text class="d-flex justify-space-between align-center gap-2 pa-3 pa-sm-4">
             <div class="flex-shrink-1 overflow-hidden">
                 <h5
-                    class="text-h5 white--text font-weight-bold text-truncate"
+                    class="text-h6 text-sm-h5 white--text font-weight-bold text-truncate"
                     :title="project.name">
                     {{ project.name }}
                 </h5>
-                <p class="text-subtitle text-truncate mb-1" :title="project.description">
+                <p
+                    class="text-subtitle-2 text-sm-subtitle-1 text-truncate mb-0"
+                    :title="project.description">
                     {{ project.description }}
                 </p>
-                <template v-if="project.tags.length > 0">
-                    <TagGroup :tag-list="project.tags" max-tag="2"></TagGroup>
-                </template>
+
+                <TagGroup
+                    v-if="project.tags.length > 0"
+                    :tag-list="project.tags"
+                    class="mt-1"></TagGroup>
             </div>
-            <div class="px-3 flex-shrink-0">
-                <span style="font-size: 2.5em" class="white--text">{{
-                    project.completedTaskCount
-                }}</span>
-                /
-                <span style="font-size: 1.5em; transform: translateY(0.3em); display: inline-block">
-                    {{ project.taskCount }}
-                </span>
-            </div>
+
+            <TaskCounter
+                :value="project.completedTaskCount"
+                :max="project.taskCount"
+                :show-icon="false">
+            </TaskCounter>
         </v-card-text>
     </v-card>
 </template>
@@ -37,8 +38,9 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProjectList } from '@/models/project.model'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import TaskCounter from '@/components/TaskCounter.vue'
 
-@Component({ components: { TagGroup } })
+@Component({ components: { TaskCounter, TagGroup } })
 export default class ProjectCard extends Vue {
     @Prop() private project!: ProjectList
 
@@ -50,7 +52,7 @@ export default class ProjectCard extends Vue {
 
 <style scoped lang="scss">
 .project-card {
-    min-height: 110px;
+    min-height: 118px;
     display: grid;
     grid-template-rows: auto 1fr;
 

@@ -24,10 +24,6 @@ export default class EmptyListDisplay extends Vue {
     justify-content: center;
     align-items: center;
 
-    img {
-        max-width: 350px;
-    }
-
     .img-description {
         margin-top: 1.5rem;
         text-align: center;
