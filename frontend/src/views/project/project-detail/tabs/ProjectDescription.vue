@@ -98,7 +98,7 @@
                     project.tasks.length > 0 && project.tasks.length === completedTasks.length
                 ">
                 <EmptyListDisplay
-                    message="You completed all general tasks of this project!"
+                    message="You completed all the general tasks of this project!"
                     class="empty-list-display">
                     <template #img>
                         <img

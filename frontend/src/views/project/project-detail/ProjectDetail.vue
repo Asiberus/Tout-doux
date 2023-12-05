@@ -1,11 +1,13 @@
 <template>
     <div v-if="project" class="d-flex flex-column h-100">
-        <div class="d-flex flex-column flex-sm-row align-center gap-2">
+        <div class="d-flex flex-column flex-sm-row align-center colum-gap-2 row-gap-1">
             <v-icon v-if="$vuetify.breakpoint.xsOnly">mdi-briefcase-variant</v-icon>
+
             <SecondaryTitle class="text-center text-sm-start">
                 <span v-if="$vuetify.breakpoint.smAndUp" class="grey--text">Project : </span>
                 {{ project.name }}
             </SecondaryTitle>
+
             <v-chip v-if="project.archived" color="accent" class="flex-shrink-0">
                 <v-icon small class="mr-1"> mdi-archive </v-icon>
                 Archived
