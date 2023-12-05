@@ -52,7 +52,7 @@
                 </template>
                 <template #message>
                     <div class="d-flex flex-column align-center gap-2" v-if="!archived">
-                        <span>You don't have any project yet !</span>
+                        <span>You don't have any project yet!</span>
                         <v-btn @click="projectDialog = true">
                             <v-icon left>mdi-plus</v-icon>
                             project
@@ -125,10 +125,26 @@ export default class ProjectListComponent extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .project-wrapper {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(max(288px, calc((100% - 2 * 12px) / 3)), 1fr));
     gap: 12px;
+
+    @media #{map-get($display-breakpoints, 'md-and-up')} {
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(max(420px, calc((100% - 2 * 12px) / 3)), 1fr)
+        );
+    }
+
+    @media #{map-get($display-breakpoints, 'xl-only')} {
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(max(500px, calc((100% - 2 * 12px) / 3)), 1fr)
+        );
+    }
 
     & > * {
         min-width: 0;

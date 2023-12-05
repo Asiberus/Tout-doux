@@ -17,7 +17,11 @@
                     :width="getDialogWidth()"
                     :fullscreen="$vuetify.breakpoint.smAndDown">
                     <template #activator="{ on, attrs }">
-                        <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
+                        <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            :disabled="project.archived"
+                            :block="$vuetify.breakpoint.xsOnly && project.events.length === 0">
                             <v-icon left>mdi-plus</v-icon>
                             event
                         </v-btn>
