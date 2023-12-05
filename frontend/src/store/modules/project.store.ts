@@ -103,7 +103,7 @@ export class ProjectModule extends VuexModule {
     private [projectMutations.section.addSection](section: SectionTask): void {
         if (!this.currentProject) return
 
-        this.currentProject.sections.push(section)
+        this.currentProject.sections.unshift(section)
     }
 
     @Mutation

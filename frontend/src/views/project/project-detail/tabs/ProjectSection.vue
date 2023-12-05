@@ -1,67 +1,66 @@
 <template>
-    <div>
+    <div class="flex-grow-1 d-flex flex-column">
         <template v-if="sections.length > 0">
-            <div class="d-flex align-center mb-2">
-                <v-tabs
-                    v-model="sectionTabs"
-                    @change="changeRouteParam($event)"
-                    color="accent"
-                    hide-slider
-                    show-arrows
-                    background-color="transparent">
-                    <v-tab v-for="section of sections" :key="'tab-' + section.id">
-                        {{ section.name }}
-                        <ProgressDisk
-                            v-if="section.tasks.length > 0"
-                            :value="section.tasks.filter(({ completed }) => completed).length"
-                            :max="section.tasks.length"
-                            color="green accent-2"
-                            class="ml-1 flex-shrink-0"
-                            :title="`${
-                                section.tasks.filter(({ completed }) => completed).length
-                            } of ${section.tasks.length} tasks completed`">
-                        </ProgressDisk>
-                    </v-tab>
-                </v-tabs>
+            <v-tabs
+                v-model="sectionTabs"
+                @change="changeRouteParam($event)"
+                color="accent"
+                hide-slider
+                show-arrows
+                background-color="transparent"
+                class="mb-2 flex-grow-0">
+                <v-tab v-for="section of sections" :key="'tab-' + section.id">
+                    <span class="text-truncate">{{ section.name }}</span>
 
-                <v-btn
-                    v-if="sections.length > 0"
-                    @click="sectionDialog = true"
-                    :disabled="project.archived">
-                    <v-icon left>mdi-plus</v-icon>
-                    section
-                </v-btn>
-            </div>
+                    <ProgressDisk
+                        v-if="section.tasks.length > 0"
+                        :value="section.tasks.filter(({ completed }) => completed).length"
+                        :max="section.tasks.length"
+                        color="green accent-2"
+                        class="ml-1 flex-shrink-0"
+                        :title="`${section.tasks.filter(({ completed }) => completed).length} of ${
+                            section.tasks.length
+                        } tasks completed`">
+                    </ProgressDisk>
+                </v-tab>
+            </v-tabs>
 
-            <v-tabs-items v-model="sectionTabs" class="transparent pa-3">
+            <v-tabs-items v-model="sectionTabs" class="transparent">
                 <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
-                    <ProjectSectionItem :section="section" :disabled="project.archived">
+                    <ProjectSectionItem
+                        :section="section"
+                        :disabled="project.archived"
+                        @new-section="sectionDialog = true">
                     </ProjectSectionItem>
                 </v-tab-item>
             </v-tabs-items>
         </template>
         <template v-else>
-            <EmptyListDisplay class="mt-15">
+            <EmptyListDisplay class="empty-list-display">
                 <template #img>
-                    <img src="../../../../assets/project_section.svg" alt="No sections" />
+                    <img
+                        src="../../../../assets/project_section.svg"
+                        alt="No sections"
+                        width="200"
+                        class="empty-list-display__img" />
                 </template>
                 <template #message>
-                    <div class="d-flex align-center mt-2">
-                        <span>This project has no section</span>
-                        <v-btn
-                            v-if="!project.archived"
-                            @click="sectionDialog = true"
-                            small
-                            class="ml-3">
-                            <v-icon left small>mdi-plus</v-icon>
-                            section
-                        </v-btn>
-                    </div>
+                    <div class="mb-2">This project has no section yet!</div>
+                    <v-btn
+                        v-if="!project.archived"
+                        @click="sectionDialog = true"
+                        :small="$vuetify.breakpoint.smAndDown">
+                        <v-icon left small>mdi-plus</v-icon>
+                        add a section
+                    </v-btn>
                 </template>
             </EmptyListDisplay>
         </template>
 
-        <v-dialog v-model="sectionDialog" width="60%">
+        <v-dialog
+            v-model="sectionDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <SectionDialog
                 :is-dialog-open="sectionDialog"
                 @submit="createSection($event)"
@@ -80,8 +79,10 @@ import ProjectSectionItem from '@/views/project/project-detail/components/Projec
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import ProgressDisk from '@/components/ProgressDisk.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
 @Component({
+    methods: { getDialogWidth },
     components: {
         ProgressDisk,
         ProjectSectionItem,
@@ -127,3 +128,40 @@ export default class ProjectSection extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.v-tab {
+    max-width: 300px;
+}
+
+.v-tabs::v-deep {
+    .v-slide-group__prev,
+    .v-slide-group__next {
+        min-width: initial;
+        flex: 0 1 auto;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'xs-only')} {
+    .v-tab {
+        max-width: 150px;
+        font-size: 0.7rem;
+        padding: 0 8px;
+    }
+}
+
+.empty-list-display {
+    padding-top: 20px;
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+
+        @media #{map-get($display-breakpoints, 'xl-only')} {
+            width: clamp(200px, 50%, 400px);
+        }
+    }
+}
+</style>

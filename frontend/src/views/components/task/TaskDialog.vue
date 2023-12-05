@@ -9,34 +9,34 @@
                 v-model="taskForm.valid"
                 @submit.prevent="emitSubmitEvent()"
                 class="flex-grow-1 d-flex flex-column">
-                <div class="inputs-wrapper">
-                    <v-text-field
-                        ref="name"
-                        v-model="taskForm.data.name"
-                        label="Name"
-                        counter="50"
-                        requried
-                        :rules="taskForm.rules.name"
-                        autofocus
-                        class="mb-2">
-                    </v-text-field>
+                <v-text-field
+                    ref="name"
+                    v-model="taskForm.data.name"
+                    label="Name"
+                    counter="50"
+                    requried
+                    :rules="taskForm.rules.name"
+                    autofocus
+                    class="mb-2 flex-grow-0">
+                </v-text-field>
 
-                    <h6 class="text-h6 grey--text text--lighten-2">
-                        <v-icon small>mdi-tag</v-icon>
-                        Tags
-                    </h6>
-                    <TagSearch :selected-tags.sync="tagList" type="task" class="mb-5"></TagSearch>
+                <h6 class="text-h6 grey--text text--lighten-2">
+                    <v-icon small>mdi-tag</v-icon>
+                    Tags
+                </h6>
+                <TagSearch :selected-tags.sync="tagList" type="task" class="mb-5"></TagSearch>
 
-                    <div class="tag-wrapper mb-3">
-                        <TagChip
-                            v-for="tag of tagList"
-                            :key="tag.id"
-                            :tag="tag"
-                            clearable
-                            @clear="removeTag($event)">
-                        </TagChip>
-                    </div>
+                <div class="tag-wrapper mb-3">
+                    <TagChip
+                        v-for="tag of tagList"
+                        :key="tag.id"
+                        :tag="tag"
+                        clearable
+                        @clear="removeTag($event)">
+                    </TagChip>
                 </div>
+
+                <v-spacer></v-spacer>
 
                 <div class="d-flex justify-end gap-2">
                     <v-btn
@@ -143,16 +143,6 @@ export default class TaskDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
-
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
-    .inputs-wrapper {
-        flex: 1 0 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-}
-
 .tag-wrapper {
     min-height: 32px;
     display: flex;
