@@ -1,45 +1,56 @@
 <template>
     <div>
-        <div class="d-flex justify-space-between align-center mb-3">
-            <h4 class="text-h5 flex-grow-1">Settings</h4>
+        <div class="d-flex flex-column flex-sm-row align-stretch column-gap-2 row-gap-1 mb-3">
+            <h4 class="text-h6 text-sm-h5 flex-grow-1">Settings</h4>
 
-            <ConfirmDialog @confirm="toggleCollectionArchiveState()">
-                <template #activator="{ attrs, on }">
-                    <v-btn
-                        v-bind="attrs"
-                        v-on="on"
-                        :outlined="!collection.archived"
-                        color="accent mr-3">
-                        <v-icon small left>mdi-archive</v-icon>
-                        {{ collection.archived ? 'unarchive' : 'archive' }}
-                    </v-btn>
-                </template>
-                <template #icon>
-                    <v-icon x-large>mdi-archive</v-icon>
-                </template>
-                <p>
-                    Are you sure to
-                    {{ this.collection.archived ? 'unarchive' : 'archive' }} this collection ?
-                </p>
-            </ConfirmDialog>
-            <template v-if="collection.archived">
-                <ConfirmDialog @confirm="deleteCollection()">
+            <div class="d-flex gap-2">
+                <ConfirmDialog @confirm="toggleCollectionArchiveState()">
                     <template #activator="{ attrs, on }">
-                        <v-btn v-bind="attrs" v-on="on" outlined color="error">
-                            <v-icon small left>mdi-trash-can</v-icon>
-                            delete
+                        <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            :outlined="!collection.archived"
+                            :small="$vuetify.breakpoint.xsOnly"
+                            color="accent"
+                            class="flex-grow-1 flex-sm-grow-0">
+                            <v-icon small left>mdi-archive</v-icon>
+                            {{ collection.archived ? 'unarchive' : 'archive' }}
                         </v-btn>
                     </template>
                     <template #icon>
-                        <v-icon x-large>mdi-trash-can</v-icon>
+                        <v-icon x-large>mdi-archive</v-icon>
                     </template>
-                    <p>Are you sure to delete this collection ?</p>
-                    <p class="mb-0 font-italic" style="font-size: 1.1rem">
-                        All related tasks will be deleted
-                    </p>
+                    <span>
+                        Are you sure to
+                        {{ this.collection.archived ? 'unarchive' : 'archive' }} this collection ?
+                    </span>
                 </ConfirmDialog>
-            </template>
+                <template v-if="collection.archived">
+                    <ConfirmDialog @confirm="deleteCollection()">
+                        <template #activator="{ attrs, on }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                outlined
+                                color="error"
+                                :small="$vuetify.breakpoint.xsOnly"
+                                class="flex-grow-1 flex-sm-grow-0">
+                                <v-icon small left>mdi-trash-can</v-icon>
+                                delete
+                            </v-btn>
+                        </template>
+                        <template #icon>
+                            <v-icon x-large>mdi-trash-can</v-icon>
+                        </template>
+                        <p class="mb-1">Are you sure to delete this collection ?</p>
+                        <p class="mb-0 font-italic" style="font-size: 1.1rem">
+                            All related {{ collection.itemName }} will be deleted
+                        </p>
+                    </ConfirmDialog>
+                </template>
+            </div>
         </div>
+
         <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="updateCollection()">
             <v-text-field
                 v-model="collectionForm.data.name"
@@ -59,7 +70,7 @@
                 label="Description"
                 counter="500"
                 required
-                rows="1"
+                rows="2"
                 auto-grow
                 class="mb-2">
             </v-textarea>
@@ -75,10 +86,11 @@
                 </v-text-field>
             </div>
 
-            <div v-if="!collection.archived" class="float-right">
+            <div v-if="!collection.archived" class="d-flex justify-end mb-5">
                 <v-btn
                     color="success"
                     type="submit"
+                    :block="$vuetify.breakpoint.xsOnly"
                     :disabled="!collectionForm.valid || isFormUntouched">
                     update
                 </v-btn>
@@ -174,7 +186,17 @@ export default class CollectionSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
-.item-name-wrapper {
-    width: calc(100% / 3);
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'sm-only')} {
+    .item-name-wrapper {
+        width: 50%;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .item-name-wrapper {
+        width: calc(100% / 3);
+    }
 }
 </style>

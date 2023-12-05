@@ -50,6 +50,7 @@
                 </template>
             </div>
         </div>
+
         <v-form ref="form" v-model="projectForm.valid" @submit.prevent="updateProject()">
             <v-text-field
                 v-model="projectForm.data.name"
