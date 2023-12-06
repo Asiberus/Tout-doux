@@ -1,9 +1,11 @@
 <template>
-    <div>
+    <div class="fill-height d-flex flex-column">
         <MainTitle class="mb-2 mb-md-6">Settings</MainTitle>
 
-        <v-row :no-gutters="$vuetify.breakpoint.smAndDown">
-            <v-col :cols="$vuetify.breakpoint.smAndDown ? 12 : 2">
+        <v-row :no-gutters="$vuetify.breakpoint.smAndDown" class="flex-column flex-md-row">
+            <v-col
+                :cols="$vuetify.breakpoint.smAndDown ? null : 2"
+                class="flex-grow-0 flex-md-grow-1">
                 <v-tabs
                     :vertical="$vuetify.breakpoint.mdAndUp"
                     color="accent"
@@ -34,9 +36,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import MainTitle from '@/components/MainTitle.vue'
 
-@Component({
-    components: { MainTitle },
-})
+@Component({ components: { MainTitle } })
 export default class SettingsComponent extends Vue {}
 </script>
 

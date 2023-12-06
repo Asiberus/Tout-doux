@@ -17,7 +17,7 @@
                     requried
                     :rules="taskForm.rules.name"
                     autofocus
-                    class="mb-2 flex-grow-0">
+                    class="flex-grow-0 mb-2">
                 </v-text-field>
 
                 <h6 class="text-h6 grey--text text--lighten-2">
