@@ -1,10 +1,14 @@
 <template>
     <div>
-        <h1 class="text-h3 mb-5">Settings</h1>
+        <MainTitle class="mb-2 mb-md-6">Settings</MainTitle>
 
-        <v-row>
-            <v-col cols="2">
-                <v-tabs vertical color="accent" background-color="transparent">
+        <v-row :no-gutters="$vuetify.breakpoint.smAndDown">
+            <v-col :cols="$vuetify.breakpoint.smAndDown ? 12 : 2">
+                <v-tabs
+                    :vertical="$vuetify.breakpoint.mdAndUp"
+                    color="accent"
+                    show-arrows
+                    background-color="transparent">
                     <v-tab :to="{ name: 'settings-preferences' }" exact class="justify-start">
                         <v-icon left small>mdi-cog</v-icon>
                         Preferences
@@ -19,7 +23,7 @@
                     </v-tab>
                 </v-tabs>
             </v-col>
-            <v-col>
+            <v-col class="pt-3 pt-md-0">
                 <router-view />
             </v-col>
         </v-row>
@@ -28,7 +32,29 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
 
-@Component
+@Component({
+    components: { MainTitle },
+})
 export default class SettingsComponent extends Vue {}
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.v-tabs::v-deep {
+    .v-slide-group__prev,
+    .v-slide-group__next {
+        min-width: initial;
+        flex-basis: auto;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'xs-only')} {
+    .v-tabs::v-deep .v-tab {
+        font-size: 0.7rem;
+        padding: 0 8px;
+    }
+}
+</style>

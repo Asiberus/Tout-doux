@@ -1,6 +1,7 @@
 <template>
     <div v-if="preferences">
-        <h4 class="text-h4 mb-4">Preferences</h4>
+        <h4 class="text-h5 text-md-h4 mb-2 mb-md-3">Preferences</h4>
+
         <p class="text-subtitle-1 mb-1">
             You can here personalize the layout and the behavior of some components.
         </p>
@@ -22,7 +23,7 @@
 
                     <ProgressWheel
                         :mode="mode"
-                        size="x-large"
+                        :size="progressWheelSize"
                         value="14"
                         max="20"
                         color="green accent-2">
@@ -47,6 +48,13 @@ export default class SettingsPreferences extends Vue {
         return this.$store.state.preferences.preferences
     }
 
+    get progressWheelSize(): 'x-small' | 'small' | 'medium' | 'large' | 'x-large' {
+        if (this.$vuetify.breakpoint.xsOnly) return 'x-small'
+        if (this.$vuetify.breakpoint.smAndDown) return 'small'
+        else if (this.$vuetify.breakpoint.width < 1600) return 'medium'
+        else return 'x-large'
+    }
+
     updatePreferences(progressWheelMode: ProgressWheelMode): void {
         this.$store.dispatch(preferencesActions.updatePreferences, { progressWheelMode })
     }
@@ -54,12 +62,18 @@ export default class SettingsPreferences extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .progress-wheel-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 50%);
-    column-gap: 8px;
+    display: flex;
+    gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        flex-direction: column;
+    }
 
     .progress-wheel-card {
+        flex-grow: 1;
         position: relative;
         display: flex;
         justify-content: center;
@@ -68,8 +82,11 @@ export default class SettingsPreferences extends Vue {
         border: 2px solid var(--v-secondary-base);
         cursor: pointer;
 
-        &:hover {
-            background-color: var(--v-secondary-darken1);
+        @media #{map-get($display-breakpoints, 'md-and-up')} {
+            // We don't display hover for mobile
+            &:hover {
+                background-color: var(--v-secondary-darken1);
+            }
         }
 
         &.selected {

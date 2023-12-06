@@ -5,7 +5,7 @@
         <v-row v-if="user" :no-gutters="$vuetify.breakpoint.smAndDown">
             <v-col :cols="$vuetify.breakpoint.smAndDown ? 12 : 2">
                 <v-tabs
-                    :vertical="$vuetify.breakpoint.mdAndUp || false"
+                    :vertical="$vuetify.breakpoint.mdAndUp"
                     color="accent"
                     show-arrows
                     background-color="transparent">
