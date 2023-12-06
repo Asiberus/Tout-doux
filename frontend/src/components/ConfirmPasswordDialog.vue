@@ -1,16 +1,28 @@
 <template>
-    <v-dialog :value="dialogState" @input="setDialogStateTo($event)" width="50%">
+    <v-dialog
+        :value="dialogState"
+        @input="setDialogStateTo($event)"
+        :width="getConfirmDialogWidth()"
+        :fullscreen="$vuetify.breakpoint.xsOnly">
         <template #activator="{ attrs, on }">
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
-        <v-card>
-            <v-card-text class="pa-6">
+        <v-card class="d-flex flex-column">
+            <v-card-text class="flex-grow-1 d-flex flex-column px-6 py-10">
                 <v-form
                     ref="form"
                     v-model="form.valid"
                     @submit.prevent="submit()"
-                    class="d-flex flex-column justify-center align-center white--text gap-4">
-                    <div class="icon-wrapper mb-2">
+                    class="
+                        flex-grow-1
+                        d-flex
+                        flex-column
+                        justify-center
+                        align-stretch align-sm-center
+                        white--text
+                        gap-3
+                    ">
+                    <div class="icon-wrapper">
                         <span class="icon-content">
                             <slot name="icon">
                                 <v-icon x-large>mdi-lock</v-icon>
@@ -18,7 +30,9 @@
                         </span>
                     </div>
 
-                    <h1 class="text-h6">You must confirm your password to validate this action</h1>
+                    <h1 class="text-h6 text-center">
+                        You must confirm your password to validate this action.
+                    </h1>
 
                     <v-text-field
                         ref="passwordInput"
@@ -27,6 +41,7 @@
                         :error-messages="passwordError"
                         @input="passwordError = null"
                         required
+                        dense
                         placeholder="Enter your password"
                         autocomplete="current-password"
                         autofocus
@@ -36,9 +51,16 @@
                         class="password-input">
                     </v-text-field>
 
-                    <div class="d-flex justify-center gap-3">
-                        <v-btn type="submit" color="success">Submit</v-btn>
-                        <v-btn plain @click="setDialogStateTo(false)">Cancel</v-btn>
+                    <div class="d-flex justify-center gap-2">
+                        <v-btn type="submit" color="success" class="flex-grow-1 flex-sm-grow-0">
+                            Submit
+                        </v-btn>
+                        <v-btn
+                            @click="setDialogStateTo(false)"
+                            plain
+                            class="flex-grow-1 flex-sm-grow-0">
+                            Cancel
+                        </v-btn>
                     </div>
                 </v-form>
             </v-card-text>
@@ -51,8 +73,11 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { CheckPasswordBody } from '@/models/auth.model'
 import { authApi } from '@/api'
+import { getConfirmDialogWidth } from '@/utils/dialog.utils'
 
-@Component
+@Component({
+    methods: { getConfirmDialogWidth },
+})
 export default class ConfirmPasswordDialog extends Vue {
     @Prop({ default: false }) value!: boolean
     dialogState = false
@@ -118,6 +143,8 @@ export default class ConfirmPasswordDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 @keyframes animate-icon-circle {
     from {
         opacity: 0;
@@ -148,6 +175,7 @@ export default class ConfirmPasswordDialog extends Vue {
     width: 10rem;
     border-radius: 50%;
     border: 0.4rem solid;
+    margin: 0 auto;
     user-select: none;
 
     animation: animate-icon-circle 0.2s ease-in;
@@ -162,6 +190,14 @@ export default class ConfirmPasswordDialog extends Vue {
 }
 
 .password-input {
-    width: 50%;
+    flex-grow: 0;
+
+    @media #{map-get($display-breakpoints, 'sm-only')} {
+        width: 75%;
+    }
+
+    @media #{map-get($display-breakpoints, 'md-and-up')} {
+        width: 50%;
+    }
 }
 </style>

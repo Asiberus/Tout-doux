@@ -1,7 +1,7 @@
 <template>
     <div class="profile-email">
-        <div class="text-h4 mb-4">Email Management</div>
-        <p class="text-subtitle-1 mb-2">
+        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Email Management</div>
+        <p class="text-subtitle-1 mb-1">
             Your current email address is : <span class="font-weight-bold">{{ user.email }}</span>
         </p>
         <p class="text-subtitle-1">
@@ -114,14 +114,25 @@ export default class ProfileEmail extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .profile-email {
-    width: 75%;
+    @media #{map-get($display-breakpoints, 'sm-and-up')} {
+        width: 75%;
+    }
 
     &__form {
-        width: 50%;
         display: flex;
         align-items: center;
         column-gap: 8px;
+
+        @media #{map-get($display-breakpoints, 'md-and-up')} {
+            width: 75%;
+        }
+
+        @media only screen and (width > 1600px) {
+            width: 50%;
+        }
     }
 }
 </style>

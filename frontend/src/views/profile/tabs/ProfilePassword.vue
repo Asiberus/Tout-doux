@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div class="text-h4 mb-4">Change Password</div>
+        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Change Password</div>
+
         <v-form ref="form" v-model="form.valid" @submit.prevent="submit()" class="password-form">
             <v-text-field
                 label="Current Password"
@@ -45,10 +46,11 @@
             </v-text-field>
 
             <v-btn
-                :disabled="!form.valid || form.pending"
                 type="submit"
+                :disabled="!form.valid || form.pending"
+                :block="$vuetify.breakpoint.xsOnly"
                 color="green"
-                class="mt-2 float-right">
+                class="mt-5 float-sm-right">
                 Change Password
             </v-btn>
         </v-form>
@@ -157,7 +159,11 @@ export default class ProfilePassword extends Vue {
 </script>
 
 <style scoped lang="scss">
-.password-form {
-    width: 75%;
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .password-form {
+        width: 75%;
+    }
 }
 </style>

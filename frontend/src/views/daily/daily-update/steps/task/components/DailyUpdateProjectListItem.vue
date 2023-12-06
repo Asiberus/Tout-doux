@@ -229,6 +229,7 @@ export default class DailyUpdateProjectListItem extends Vue {
     .v-slide-group__prev,
     .v-slide-group__next {
         min-width: initial;
+        flex-basis: auto;
     }
 }
 

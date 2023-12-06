@@ -8,14 +8,15 @@
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
         <v-card class="d-flex flex-column">
-            <v-card-text class="flex-grow-1 d-flex flex-column justify-center align-stretch">
+            <v-card-text
+                class="flex-grow-1 d-flex flex-column justify-center align-stretch px-6 py-10">
                 <div class="icon-wrapper white--text">
                     <span class="icon-content">
                         <slot name="icon">!</slot>
                     </span>
                 </div>
 
-                <div class="dialog-message white--text">
+                <div class="dialog-message text-h6 text-md-h5 white--text">
                     <slot></slot>
                 </div>
 
@@ -93,7 +94,7 @@ export default class ConfirmDialog extends Vue {
     border-radius: 50%;
     border: 0.4rem solid;
     line-height: 7em;
-    margin: 2rem auto 2rem;
+    margin: 0 auto 1rem;
     user-select: none;
 
     animation: animate-icon-circle 0.2s ease-in;
@@ -110,7 +111,7 @@ export default class ConfirmDialog extends Vue {
 .dialog-message {
     font-size: 1.8rem;
     line-height: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: center;
 }
 </style>

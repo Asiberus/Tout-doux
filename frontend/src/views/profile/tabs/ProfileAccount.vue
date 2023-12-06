@@ -1,6 +1,6 @@
 <template>
     <div class="profile-account">
-        <div class="text-h4 mb-4">Delete your account</div>
+        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Delete your account</div>
         <p class="text-subtitle-1 mb-1">
             You can delete your account by clicking on the button bellow. This action will delete
             all your <span class="font-weight-bold">projects, collections, tasks and events</span>.
@@ -9,7 +9,9 @@
 
         <ConfirmPasswordDialog @password-confirmed="deleteAccount()">
             <template #activator="{ attrs, on }">
-                <v-btn v-bind="attrs" v-on="on" color="error">Delete my account</v-btn>
+                <v-btn v-bind="attrs" v-on="on" color="error" :block="$vuetify.breakpoint.xsOnly">
+                    Delete my account
+                </v-btn>
             </template>
         </ConfirmPasswordDialog>
     </div>
@@ -39,7 +41,11 @@ export default class ProfileAccount extends Vue {
 </script>
 
 <style scoped lang="scss">
-.profile-account {
-    width: 75%;
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .profile-account {
+        width: 75%;
+    }
 }
 </style>

@@ -1,15 +1,24 @@
 <template>
     <div class="profile-user">
         <v-form v-model="form.valid" @submit.prevent="submit()" class="flex-grow-1">
-            <v-text-field
-                label="Username"
-                v-model="form.data.username"
-                :rules="form.rules.username"
-                :error-messages="usernameUniqueError"
-                @input="validateUsername"
-                required
-                counter="100">
-            </v-text-field>
+            <div class="profile-user__username">
+                <v-avatar
+                    v-if="$vuetify.breakpoint.smAndDown"
+                    :size="avatarSize"
+                    color="grey lighten-3"
+                    class="avatar">
+                    <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
+                </v-avatar>
+                <v-text-field
+                    label="Username"
+                    v-model="form.data.username"
+                    :rules="form.rules.username"
+                    :error-messages="usernameUniqueError"
+                    @input="validateUsername"
+                    required
+                    counter="100">
+                </v-text-field>
+            </div>
 
             <v-text-field
                 label="First Name"
@@ -33,15 +42,24 @@
                 counter="500"
                 rows="4"
                 auto-grow
-                class="mb-8">
+                class="mb-5">
             </v-textarea>
 
-            <v-btn color="success" type="submit" :disabled="!canSubmit" class="float-right">
+            <v-btn
+                color="success"
+                type="submit"
+                :disabled="!canSubmit"
+                :block="$vuetify.breakpoint.xsOnly"
+                class="float-sm-right">
                 update
             </v-btn>
         </v-form>
 
-        <v-avatar size="250" color="grey lighten-3" class="profile-user__avatar">
+        <v-avatar
+            v-if="$vuetify.breakpoint.mdAndUp"
+            :size="avatarSize"
+            color="grey lighten-3"
+            class="avatar">
             <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
         </v-avatar>
     </div>
@@ -96,6 +114,14 @@ export default class ProfileUser extends Vue {
         return this.form.valid && !this.form.pending && !this.isFormUntouched
     }
 
+    get avatarSize(): number {
+        if (this.$vuetify.breakpoint.xsOnly) return 75
+        else if (this.$vuetify.breakpoint.smOnly) return 125
+        else if (this.$vuetify.breakpoint.mdOnly) return 175
+        else if (this.$vuetify.breakpoint.width <= 1600) return 225
+        else return 250
+    }
+
     validateUsername(value: string): void {
         clearTimeout(this.usernameValidationTimer)
         if (value === '') {
@@ -128,15 +154,39 @@ export default class ProfileUser extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .profile-user {
     display: flex;
-    column-gap: 48px;
 
-    &__avatar {
-        margin-right: 24px;
+    &__username {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
 
-        img {
-            width: 175px;
+        @media #{map-get($display-breakpoints, 'sm-and-up')} {
+            gap: 16px;
+        }
+    }
+
+    .avatar img {
+        width: 66.6%;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .profile-user {
+        column-gap: 24px;
+    }
+}
+
+@media only screen and (width > 1600px) {
+    .profile-user {
+        column-gap: 48px;
+
+        .avatar {
+            margin-right: 24px;
         }
     }
 }
