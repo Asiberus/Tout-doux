@@ -1,13 +1,16 @@
 <template>
     <HalfDialog :value="value" @input="$emit('input', $event)">
-        <v-card height="100%" class="d-flex flex-column">
+        <v-card
+            v-touch="{ right: () => $emit('input', false) }"
+            height="100%"
+            class="d-flex flex-column">
             <v-toolbar class="flex-grow-0">
                 <v-toolbar-title class="text-body-1 text-sm-h6 mr-2">
                     Events : {{ dateFormat(date, 'D MMMM YYYY') }}
                 </v-toolbar-title>
 
                 <v-btn
-                    @click="openEventDialog()"
+                    @click="$emit('open-event-dialog', date)"
                     :small="$vuetify.breakpoint.xsOnly"
                     :icon="$vuetify.breakpoint.xsOnly"
                     class="new-event-btn">
@@ -71,10 +74,6 @@ export default class EventDayDialog extends Vue {
     @Prop({ required: true }) value!: boolean
     @Prop({ required: true }) date!: string
     @Prop({ required: true }) events!: EventModel[]
-
-    openEventDialog(): void {
-        this.$emit('open-event-dialog', this.date)
-    }
 
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
