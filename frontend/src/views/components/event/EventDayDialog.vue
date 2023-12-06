@@ -2,8 +2,21 @@
     <HalfDialog :value="value" @input="$emit('input', $event)">
         <v-card height="100%" class="d-flex flex-column">
             <v-toolbar class="flex-grow-0">
-                <v-toolbar-title> Events : {{ dateFormat(date, 'D MMMM YYYY') }} </v-toolbar-title>
+                <v-toolbar-title class="text-body-1 text-sm-h6 mr-2">
+                    Events : {{ dateFormat(date, 'D MMMM YYYY') }}
+                </v-toolbar-title>
+
+                <v-btn
+                    @click="openEventDialog()"
+                    :small="$vuetify.breakpoint.xsOnly"
+                    :icon="$vuetify.breakpoint.xsOnly"
+                    class="new-event-btn">
+                    <v-icon>mdi-plus</v-icon>
+                    <template v-if="$vuetify.breakpoint.smAndUp">event</template>
+                </v-btn>
+
                 <v-spacer></v-spacer>
+
                 <v-btn @click="$emit('input', false)" icon>
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
@@ -26,11 +39,17 @@
                     </div>
                 </template>
                 <template v-else>
-                    <EmptyListDisplay
-                        message="No event for that day."
-                        class="d-flex justify-center align-center fill-height">
+                    <EmptyListDisplay class="d-flex justify-center align-center fill-height">
                         <template #img>
-                            <img src="../../../assets/no_events.svg" width="300" alt="No events" />
+                            <img
+                                src="../../../assets/no_events.svg"
+                                alt="No events"
+                                class="empty-img" />
+                        </template>
+                        <template #message>
+                            <p class="text-body-1 text-sm-h6 white--text mb-0">
+                                No event for that day.
+                            </p>
                         </template>
                     </EmptyListDisplay>
                 </template>
@@ -53,8 +72,26 @@ export default class EventDayDialog extends Vue {
     @Prop({ required: true }) date!: string
     @Prop({ required: true }) events!: EventModel[]
 
+    openEventDialog(): void {
+        this.$emit('open-event-dialog', this.date)
+    }
+
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
     }
 }
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.empty-img {
+    width: clamp(250px, 50%, 350px);
+}
+
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .new-event-btn {
+        background-color: #353535 !important;
+    }
+}
+</style>

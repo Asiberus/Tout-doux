@@ -23,5 +23,3 @@ export default class HalfDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

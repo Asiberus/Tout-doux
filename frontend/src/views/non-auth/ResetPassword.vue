@@ -66,7 +66,6 @@ import { Form } from '@/models/common.model'
 import { ResetPasswordBody } from '@/models/auth.model'
 import { authApi } from '@/api'
 import { authService } from '@/services'
-import { checkToken } from '@/api/auth.api'
 
 @Component
 export default class ResetPassword extends Vue {

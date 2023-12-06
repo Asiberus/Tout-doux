@@ -44,9 +44,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Form } from '@/models/common.model'
 import { authService } from '@/services'
-import { preferencesActions } from '@/store/modules/preferences.store'
 import { LoginPost } from '@/models/login.model'
-import { userActions } from '@/store/modules/user.store'
 
 @Component
 export default class Login extends Vue {

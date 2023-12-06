@@ -243,6 +243,7 @@ export default class EventDialog extends Vue {
     @Prop({ required: true }) isDialogOpen!: boolean
     @Prop({ required: false }) event?: EventModel
     @Prop({ required: false }) relatedToDate?: string
+    @Prop({ required: false }) startDatePlaceholder?: string
 
     confirmDelete = false
     eventForm = {
@@ -250,7 +251,7 @@ export default class EventDialog extends Vue {
         data: {
             name: '',
             description: '',
-            startDate: moment().format('YYYY-MM-DD'),
+            startDate: '',
             startTime: '',
             endDate: '',
             endTime: '',
@@ -323,7 +324,7 @@ export default class EventDialog extends Vue {
     }
 
     beforeMount(): void {
-        if (this.event) this.populateForm(this.event)
+        this.populateForm(this.event)
     }
 
     @Watch('isDialogOpen')
@@ -373,16 +374,21 @@ export default class EventDialog extends Vue {
                 endTime: event.endTime ?? '',
                 takesWholeDay: event.takesWholeDay,
             }
-        } else
+        } else {
+            const startDate = this.startDatePlaceholder
+                ? moment(this.startDatePlaceholder)
+                : moment()
+
             this.eventForm.data = {
                 name: '',
                 description: '',
-                startDate: moment().format('YYYY-MM-DD'),
+                startDate: startDate.format('YYYY-MM-DD'),
                 startTime: '',
                 endDate: '',
                 endTime: '',
                 takesWholeDay: false,
             }
+        }
     }
 
     emitSubmitEvent(): void {

@@ -11,6 +11,8 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 #app {
     font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -87,10 +89,30 @@ input:autofill {
     right: 0;
     height: 100% !important;
     max-height: 100% !important;
-    width: 40% !important;
-    left: 60% !important;
+    width: 100% !important;
+    left: 0 !important;
     border-radius: 0 !important;
     margin: 0 !important;
+
+    @media only screen and (400px < width < 600px) {
+        width: 90% !important;
+        left: 10% !important;
+    }
+
+    @media #{map-get($display-breakpoints, 'sm-only')} {
+        width: 80% !important;
+        left: 20% !important;
+    }
+
+    @media #{map-get($display-breakpoints, 'md-only')} {
+        width: 60% !important;
+        left: 40% !important;
+    }
+
+    @media #{map-get($display-breakpoints, 'lg-and-up')} {
+        width: 40% !important;
+        left: 60% !important;
+    }
 }
 
 .gap-1 {
