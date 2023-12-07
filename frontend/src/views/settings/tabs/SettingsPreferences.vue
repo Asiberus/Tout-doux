@@ -1,6 +1,6 @@
 <template>
     <div v-if="preferences">
-        <h4 class="text-h5 text-md-h4 mb-2 mb-md-3">Preferences</h4>
+        <TertiaryTitle>Preferences</TertiaryTitle>
 
         <p class="text-subtitle-1 mb-1">
             You can here personalize the layout and the behavior of some components.
@@ -39,8 +39,9 @@ import { Component, Vue } from 'vue-property-decorator'
 import ProgressWheel from '@/components/ProgressWheel.vue'
 import { ProgressWheelMode, Preferences } from '@/models/preferences.model'
 import { preferencesActions } from '@/store/modules/preferences.store'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
-@Component({ components: { ProgressWheel } })
+@Component({ components: { TertiaryTitle, ProgressWheel } })
 export default class SettingsPreferences extends Vue {
     ProgressWheelMode = ProgressWheelMode
 

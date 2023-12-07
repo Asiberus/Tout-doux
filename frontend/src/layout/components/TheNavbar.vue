@@ -43,12 +43,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class TheNavbar extends Vue {
-    @Prop({ required: true }) displayNavbar!: boolean
-
     private menu = [
         { name: 'Dashboard', icon: 'mdi-view-dashboard' },
         { name: 'Daily', link: { name: 'daily-summary' }, icon: 'mdi-trophy' },

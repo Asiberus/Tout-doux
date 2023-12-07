@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Change Password</div>
+        <TertiaryTitle>Change Password</TertiaryTitle>
 
         <v-form ref="form" v-model="form.valid" @submit.prevent="submit()" class="password-form">
             <v-text-field
@@ -62,8 +62,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { UserChangePassword } from '@/models/user.model'
 import { Form } from '@/models/common.model'
 import { authApi, userApi } from '@/api'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
-@Component
+@Component({
+    components: { TertiaryTitle },
+})
 export default class ProfilePassword extends Vue {
     form: Form<UserChangePassword> = {
         valid: false,

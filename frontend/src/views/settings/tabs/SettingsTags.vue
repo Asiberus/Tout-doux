@@ -1,6 +1,6 @@
 <template>
     <div class="fill-height d-flex flex-column">
-        <h4 class="text-h5 text-md-h4 mb-2 mb-md-3">Tags</h4>
+        <TertiaryTitle>Tags</TertiaryTitle>
         <p class="text-subtitle-2 text-sm-subtitle-1 mb-1">
             Tags are useful to group or filter items. Two types of tag are available : project tag
             and task tag (used for Task, Common Task and Daily Task).
@@ -35,9 +35,10 @@ import TagCard from '@/views/components/tag/TagCard.vue'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import SettingsTagList from '@/views/settings/components/SettingsTagList.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
 @Component({
-    components: { TagCard, TagDialog, EmptyListDisplay, SettingsTagList },
+    components: { TertiaryTitle, TagCard, TagDialog, EmptyListDisplay, SettingsTagList },
 })
 export default class SettingsTags extends Vue {
     tagTypes: TagType[] = ['project', 'task']

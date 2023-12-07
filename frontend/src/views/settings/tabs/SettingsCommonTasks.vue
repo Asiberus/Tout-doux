@@ -1,6 +1,7 @@
 <template>
     <div class="fill-height d-flex flex-column">
-        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Common task</div>
+        <TertiaryTitle>Common task</TertiaryTitle>
+
         <div class="d-flex flex-wrap flex-md-nowrap justify-end align-center gap-2 mb-2">
             <h3 class="flex-grow-1 text-subtitle-2 text-sm-subtitle-1 mr-md-5">
                 A common task represent a task that can be done frequently (e.g. take the dog out,
@@ -49,8 +50,9 @@ import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import CommonTaskCard from '@/views/components/common-task/CommonTaskCard.vue'
 import CommonTaskDialog from '@/views/components/common-task/CommonTaskDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
-@Component({ components: { CommonTaskCard, CommonTaskDialog, EmptyListDisplay } })
+@Component({ components: { TertiaryTitle, CommonTaskCard, CommonTaskDialog, EmptyListDisplay } })
 export default class SettingsCommonTasks extends Vue {
     commonTaskList: CommonTask[] = []
 

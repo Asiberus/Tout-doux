@@ -1,6 +1,7 @@
 <template>
     <div class="profile-email">
-        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Email Management</div>
+        <TertiaryTitle>Email Management</TertiaryTitle>
+
         <p class="text-subtitle-1 mb-1">
             Your current email address is : <span class="font-weight-bold">{{ user.email }}</span>
         </p>
@@ -39,9 +40,10 @@ import { User, UserChangeEmail } from '@/models/user.model'
 import { userApi } from '@/api'
 import { Form } from '@/models/common.model'
 import ConfirmPasswordDialog from '@/components/ConfirmPasswordDialog.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
 @Component({
-    components: { ConfirmPasswordDialog },
+    components: { TertiaryTitle, ConfirmPasswordDialog },
 })
 export default class ProfileEmail extends Vue {
     form: Form<UserChangeEmail> = {

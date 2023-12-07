@@ -1,6 +1,7 @@
 <template>
     <div class="profile-account">
-        <div class="text-h5 text-md-h4 mb-2 mb-md-3">Delete your account</div>
+        <TertiaryTitle>Delete your account</TertiaryTitle>
+
         <p class="text-subtitle-1 mb-1">
             You can delete your account by clicking on the button bellow. This action will delete
             all your <span class="font-weight-bold">projects, collections, tasks and events</span>.
@@ -22,9 +23,10 @@ import { Component, Vue } from 'vue-property-decorator'
 import ConfirmPasswordDialog from '@/components/ConfirmPasswordDialog.vue'
 import { userApi } from '@/api'
 import { authService } from '@/services'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
 @Component({
-    components: { ConfirmPasswordDialog },
+    components: { TertiaryTitle, ConfirmPasswordDialog },
 })
 export default class ProfileAccount extends Vue {
     deleteAccount(): void {

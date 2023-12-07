@@ -13,7 +13,7 @@
         {{ $vuetify.breakpoint.width }}
         {{ $vuetify.breakpoint.height }}
 
-        <v-menu offset-y>
+        <v-menu v-model="headerMenu" offset-y>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn v-bind="attrs" v-on="on" depressed class="header-menu-btn text-body-1">
                     <v-avatar size="24" left class="mr-1">
@@ -71,6 +71,7 @@ import vuetify from '../../plugins/vuetify'
 @Component
 export default class TheHeader extends Vue {
     @Prop({ required: true }) displayNavbar!: boolean
+    @Prop({ required: true }) headerMenu!: boolean
 
     appVersion = config.VERSION
 
