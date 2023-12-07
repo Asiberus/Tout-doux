@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="text-h4 mb-4">Feedback</div>
+        <TertiaryTitle>Feedback</TertiaryTitle>
 
         <v-data-table
             :items="feedbackList"
@@ -35,7 +35,7 @@
             </template>
 
             <template #expanded-item="{ headers, item }">
-                <td :colspan="headers.length" :class="getItemClass(item)" class="pa-5">
+                <td :colspan="headers.length" class="pa-5">
                     {{ item.message }}
                 </td>
             </template>
@@ -50,9 +50,10 @@ import { Feedback } from '@/models/feedback.model'
 import { DataTableHeader } from 'vuetify'
 import { dateFormat } from '@/pipes'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
 @Component({
-    components: { ConfirmDialog },
+    components: { TertiaryTitle, ConfirmDialog },
 })
 export default class AdministrationFeedback extends Vue {
     feedbackList: Feedback[] = []
@@ -105,7 +106,7 @@ export default class AdministrationFeedback extends Vue {
 
     getItemClass(item: Feedback): string {
         return item.isRead
-            ? 'grey--text text--lighten-2 font-weight-thin'
+            ? 'grey--text text--lighten-2 font-weight-light'
             : 'white--text font-weight-bold'
     }
 

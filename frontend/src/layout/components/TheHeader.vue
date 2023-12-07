@@ -47,9 +47,9 @@
                         <router-link
                             :to="{ name: 'feedback' }"
                             class="font-italic text-body-2 text-link"
-                            :class="{ 'grey--text': !hover, 'white--text': hover }"
-                            >Give a feedback!</router-link
-                        >
+                            :class="{ 'grey--text': !hover, 'white--text': hover }">
+                            Give a feedback!
+                        </router-link>
                     </v-hover>
                 </v-list-item>
             </v-list>

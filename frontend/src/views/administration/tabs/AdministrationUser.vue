@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div class="text-h4 mb-4">User list</div>
+        <TertiaryTitle>User list</TertiaryTitle>
+
         <v-data-table :headers="headers" :items="userList" :loading="loading">
             <template #item.username="{ item, value }">
                 {{ value }}
@@ -77,9 +78,10 @@ import { dateFormat } from '@/pipes'
 import { User } from '@/models/user.model'
 import { DataTableHeader } from 'vuetify'
 import ConfirmPasswordDialog from '@/components/ConfirmPasswordDialog.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
 @Component({
-    components: { ConfirmPasswordDialog },
+    components: { TertiaryTitle, ConfirmPasswordDialog },
 })
 export default class AdministrationUser extends Vue {
     userList: User[] = []
