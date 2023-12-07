@@ -16,7 +16,7 @@
                     counter="50"
                     requried
                     :rules="taskForm.rules.name"
-                    autofocus
+                    :autofocus="!task"
                     class="flex-grow-0 mb-2">
                 </v-text-field>
 
@@ -102,7 +102,7 @@ export default class TaskDialog extends Vue {
         if (value) {
             this.populateForm(this.task)
             this.form.resetValidation()
-            this.inputName.focus()
+            if (!this.task) this.inputName.focus()
         }
     }
 

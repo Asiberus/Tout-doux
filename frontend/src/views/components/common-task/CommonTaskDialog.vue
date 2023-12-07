@@ -27,7 +27,7 @@
                         :loading="inputNameLoading"
                         :rules="commonTaskForm.rules.name"
                         :error-messages="nameUniqueError"
-                        autofocus
+                        :autofocus="!commonTask"
                         class="flex-grow-0 mb-2">
                     </v-text-field>
 
@@ -126,8 +126,8 @@ export default class CommonTaskDialog extends Vue {
             this.$nextTick(() => {
                 this.nameUniqueError = null
                 this.form.resetValidation()
-                this.inputName.focus()
                 this.populateForm()
+                if (!this.commonTask) this.inputName.focus()
             })
         }
     }

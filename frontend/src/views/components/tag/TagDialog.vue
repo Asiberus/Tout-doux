@@ -29,7 +29,7 @@
                         :loading="inputNameLoading"
                         :rules="tagForm.rules.name"
                         :error-messages="nameUniqueError"
-                        autofocus
+                        :autofocus="!tag"
                         class="flex-grow-1 mb-3 mb-md-0">
                     </v-text-field>
                     <div class="ml-md-6 mr-md-3 pt-md-3 d-flex align-center">
@@ -149,7 +149,7 @@ export default class TagDialog extends Vue {
             this.nameUniqueError = null
             this.form.resetValidation()
             this.populateForm()
-            this.inputName.focus()
+            if (!this.tag) this.inputName.focus()
         }
     }
 
