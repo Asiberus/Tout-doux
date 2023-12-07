@@ -64,7 +64,7 @@ export default class NonAuthenticatedLayout extends Vue {}
 
         &__content {
             padding-bottom: 6rem; // use to center the content
-            min-width: 400px;
+            width: 400px;
         }
     }
 }

@@ -1,7 +1,16 @@
 <template>
-    <div>
+    <div class="password-reset-requested">
         <template v-if="!resetPasswordRequested">
-            <v-form ref="formRef" v-model="form.valid" @submit.prevent="submit()">
+            <img
+                src="../../assets/forgot-password.svg"
+                alt="mail sent"
+                class="password-reset-requested__img" />
+
+            <v-form
+                ref="formRef"
+                v-model="form.valid"
+                @submit.prevent="submit()"
+                class="password-reset-requested__form">
                 <v-text-field
                     label="Email"
                     type="email"
@@ -21,21 +30,19 @@
             </v-form>
         </template>
         <template v-else>
-            <div class="password-reset-requested">
-                <img
-                    src="../../assets/mail-sent.svg"
-                    alt="mail sent"
-                    class="password-reset-requested__success-img" />
-                <p class="text-body-1 text-center mb-0">
-                    An email has been sent to you ! <br />
-                    Check your inbox to reset your password.
-                </p>
-                <router-link
-                    :to="{ name: 'login' }"
-                    class="text-body-1 text-link green--text text--lighten-1">
-                    Go back to login
-                </router-link>
-            </div>
+            <img
+                src="../../assets/mail-sent.svg"
+                alt="mail sent"
+                class="password-reset-requested__img" />
+            <p class="text-body-1 text-center mb-0">
+                An email has been sent to you ! <br />
+                Check your inbox to reset your password.
+            </p>
+            <router-link
+                :to="{ name: 'login' }"
+                class="text-body-1 text-link green--text text--lighten-1">
+                Go back to login
+            </router-link>
         </template>
     </div>
 </template>
@@ -93,7 +100,11 @@ export default class ResetPasswordRequest extends Vue {
     align-items: center;
     row-gap: 16px;
 
-    &__success-img {
+    &__form {
+        width: 100%;
+    }
+
+    &__img {
         width: clamp(200px, 50%, 300px);
     }
 }
