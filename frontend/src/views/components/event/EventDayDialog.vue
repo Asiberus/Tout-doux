@@ -1,7 +1,11 @@
 <template>
     <HalfDialog :value="value" @input="$emit('input', $event)">
         <v-card
-            v-touch="{ right: () => $emit('input', false) }"
+            v-touch="{
+                start: () => touchStartEvent(),
+                right: () => handleTouchEvent('right'),
+                down: () => handleTouchEvent('down'),
+            }"
             height="100%"
             class="d-flex flex-column">
             <v-toolbar class="flex-grow-0">
@@ -24,9 +28,9 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
             </v-toolbar>
-            <v-card-text class="overflow-auto flex-grow-1">
+            <v-card-text ref="dialogContent" class="overflow-auto flex-grow-1">
                 <template v-if="events.length > 0">
-                    <div class="pt-3">
+                    <div class="d-flex flex-column gap-3 pt-3">
                         <EventItemCard
                             v-for="event of events"
                             :key="event.id"
@@ -36,6 +40,7 @@
                             color="event"
                             :daySelected="true"
                             :change-passed-text-color="false"
+                            :margin-bottom="false"
                             @update="$emit('update', $event)"
                             @delete="$emit('delete', $event)">
                         </EventItemCard>
@@ -74,6 +79,26 @@ export default class EventDayDialog extends Vue {
     @Prop({ required: true }) value!: boolean
     @Prop({ required: true }) date!: string
     @Prop({ required: true }) events!: EventModel[]
+
+    isScrollingOnContent = false
+
+    get scrollableElement(): Element {
+        return this.$refs.dialogContent as Element
+    }
+
+    touchStartEvent() {
+        // We detect if the touch-down is a scroll on the content
+        this.isScrollingOnContent = this.scrollableElement.scrollTop > 0
+    }
+
+    handleTouchEvent(type: string): void {
+        if (type === 'right' && this.$vuetify.breakpoint.width >= 400) this.$emit('input', false)
+        else if (type === 'down' && this.$vuetify.breakpoint.width < 400) this.scrollDownEvent()
+    }
+
+    scrollDownEvent(): void {
+        if (!this.isScrollingOnContent) this.$emit('input', false)
+    }
 
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)

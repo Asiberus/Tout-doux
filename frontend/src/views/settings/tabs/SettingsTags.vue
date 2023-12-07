@@ -44,7 +44,7 @@ export default class SettingsTags extends Vue {
     tab: TagType = 'project'
 
     get tagList(): SettingsTagList {
-        return this.$refs.settingTag as SettingsTagList
+        return this.$refs.tagList as SettingsTagList
     }
 
     openTagDialog(): void {

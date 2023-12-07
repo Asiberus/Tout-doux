@@ -147,6 +147,10 @@ input:autofill {
     overflow-y: hidden !important;
 }
 
+.overscroll-behavior-none {
+    overscroll-behavior: none;
+}
+
 .background-black {
     background-color: #0a0a0a;
 }

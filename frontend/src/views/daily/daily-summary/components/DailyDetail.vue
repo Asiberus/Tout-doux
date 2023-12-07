@@ -5,9 +5,16 @@
         fullscreen
         hide-overlay
         scrollable
-        content-class="background-black"
+        content-class="background-black flex-column"
         transition="dialog-bottom-transition">
-        <div class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12">
+        <div
+            class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12"
+            v-touch="{
+                start: touchStartEvent,
+                left: () => switchTab('left'),
+                right: () => switchTab('right'),
+                down: scrollDownEvent,
+            }">
             <div class="actions-wrapper">
                 <v-btn @click="setDialogStateTo(false)" icon>
                     <v-icon>mdi-close</v-icon>
@@ -95,7 +102,7 @@ import { eventService } from '@/api/event.api'
 import { DailyTask } from '@/models/daily-task.model'
 import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
-import { isPassed, sortEvents } from '@/utils/event.utils'
+import { sortEvents } from '@/utils/event.utils'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
@@ -115,7 +122,8 @@ export default class DailyDetail extends Vue {
     dailyTaskList: DailyTask[] = []
     events: EventModel[] = []
 
-    tab = 'task'
+    tab: 'task' | 'event' = 'task'
+    isScrollingOnContent = false
 
     get numberOfDailyTaskCompleted(): number {
         return this.dailyTaskList.filter(dailyTask => dailyTask.completed).length
@@ -123,11 +131,6 @@ export default class DailyDetail extends Vue {
 
     get isToday(): boolean {
         return moment().isSame(this.date, 'day')
-    }
-
-    setDialogStateTo(value: boolean): void {
-        this.dialogState = value
-        this.$emit('input', value)
     }
 
     @Watch('value')
@@ -162,6 +165,33 @@ export default class DailyDetail extends Vue {
         )
     }
 
+    touchStartEvent() {
+        // We detect if the touch-down is a scroll on the content
+        const scrollableElement = document.querySelector('.v-dialog--scrollable')
+        this.isScrollingOnContent = scrollableElement.scrollTop > 0
+    }
+
+    scrollDownEvent(): void {
+        if (!this.isScrollingOnContent) this.setDialogStateTo(false)
+    }
+
+    switchTab(direction: 'right' | 'left'): void {
+        if (
+            !this.$vuetify.breakpoint.mdAndDown ||
+            !this.dailyTaskList.length > 0 ||
+            !this.events.length > 0
+        )
+            return
+
+        if (direction === 'right') this.tab = 'task'
+        else if (direction === 'left') this.tab = 'event'
+    }
+
+    setDialogStateTo(value: boolean): void {
+        this.dialogState = value
+        this.$emit('input', value)
+    }
+
     toggleDailyTask(dailyTask: DailyTask): void {
         dailyTaskService.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
             (response: any) => {
@@ -186,7 +216,7 @@ export default class DailyDetail extends Vue {
 @import '~vuetify/src/styles/styles.sass';
 
 .content {
-    height: fit-content;
+    flex-grow: 1;
 }
 
 .actions-wrapper {

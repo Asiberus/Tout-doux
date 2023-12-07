@@ -74,11 +74,7 @@ export default class SettingsComponent extends Vue {}
         flex-direction: row;
 
         &__tabs {
-            flex: 0 1 calc(100% / 6 - 12px);
-        }
-
-        &__content {
-            padding-top: 0;
+            flex: 0 0 calc(100% / 6 - 12px);
         }
     }
 }
