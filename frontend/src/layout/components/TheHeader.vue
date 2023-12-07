@@ -23,26 +23,33 @@
                 </v-btn>
             </template>
             <v-list>
-                <v-list-item :to="{ name: 'profile-user' }" class="header-menu-link">
+                <v-list-item
+                    :to="{ name: 'profile-user' }"
+                    class="header-menu-link"
+                    :ripple="false">
                     <v-icon small left>mdi-account-circle</v-icon>
                     <v-list-item-title>Profile</v-list-item-title>
                 </v-list-item>
-                <v-list-item :to="{ name: 'settings-preferences' }" class="header-menu-link">
+                <v-list-item
+                    :to="{ name: 'settings-preferences' }"
+                    class="header-menu-link"
+                    :ripple="false">
                     <v-icon small left>mdi-cog</v-icon>
                     <v-list-item-title>Settings</v-list-item-title>
                 </v-list-item>
                 <v-list-item
                     v-if="user.isStaff"
                     :to="{ name: 'administration-user-list' }"
-                    class="header-menu-link">
+                    class="header-menu-link"
+                    :ripple="false">
                     <v-icon small left>mdi-security</v-icon>
                     <v-list-item-title>Administration</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="logout()">
+                <v-list-item @click="logout()" :ripple="false">
                     <v-icon small left>mdi-logout</v-icon>
                     <v-list-item-title>Logout</v-list-item-title>
                 </v-list-item>
-                <v-list-item class="justify-center" dense>
+                <v-list-item class="justify-center" dense :ripple="false">
                     <v-hover v-slot="{ hover }">
                         <router-link
                             :to="{ name: 'feedback' }"
