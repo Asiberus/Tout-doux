@@ -2,10 +2,8 @@
     <div class="fill-height d-flex flex-column">
         <MainTitle class="mb-2 mb-md-6">Settings</MainTitle>
 
-        <v-row :no-gutters="$vuetify.breakpoint.smAndDown" class="flex-column flex-md-row">
-            <v-col
-                :cols="$vuetify.breakpoint.smAndDown ? null : 2"
-                class="flex-grow-0 flex-md-grow-1">
+        <div class="settings">
+            <div class="settings__tabs">
                 <v-tabs
                     :vertical="$vuetify.breakpoint.mdAndUp"
                     color="accent"
@@ -24,11 +22,11 @@
                         Tags
                     </v-tab>
                 </v-tabs>
-            </v-col>
-            <v-col class="pt-3 pt-md-0">
+            </div>
+            <div class="settings__content">
                 <router-view />
-            </v-col>
-        </v-row>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -43,18 +41,45 @@ export default class SettingsComponent extends Vue {}
 <style scoped lang="scss">
 @import '~vuetify/src/styles/styles.sass';
 
-.v-tabs::v-deep {
-    .v-slide-group__prev,
-    .v-slide-group__next {
-        min-width: initial;
-        flex-basis: auto;
+.settings {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &__tabs {
+        .v-tabs::v-deep {
+            .v-slide-group__prev,
+            .v-slide-group__next {
+                min-width: initial;
+                flex-basis: auto;
+            }
+        }
+
+        @media #{map-get($display-breakpoints, 'xs-only')} {
+            .v-tabs::v-deep .v-tab {
+                font-size: 0.7rem;
+                padding: 0 8px;
+            }
+        }
+    }
+
+    &__content {
+        flex-grow: 1;
     }
 }
 
-@media #{map-get($display-breakpoints, 'xs-only')} {
-    .v-tabs::v-deep .v-tab {
-        font-size: 0.7rem;
-        padding: 0 8px;
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .settings {
+        flex-direction: row;
+
+        &__tabs {
+            flex: 0 1 calc(100% / 6 - 12px);
+        }
+
+        &__content {
+            padding-top: 0;
+        }
     }
 }
 </style>

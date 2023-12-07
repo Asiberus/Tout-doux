@@ -1,19 +1,19 @@
 <template>
-    <div>
-        <h4 class="text-h4 mb-4">Tags</h4>
-        <p class="text-subtitle-1 mb-1">
-            Tags are useful to group or filter items. Two types of tag are available : project
-            related tag and task related tag (Task, Common Task, Daily Task).
+    <div class="fill-height d-flex flex-column">
+        <h4 class="text-h5 text-md-h4 mb-2 mb-md-3">Tags</h4>
+        <p class="text-subtitle-2 text-sm-subtitle-1 mb-1">
+            Tags are useful to group or filter items. Two types of tag are available : project tag
+            and task tag (used for Task, Common Task and Daily Task).
         </p>
 
-        <div class="d-flex justify-space-between align-center mb-2">
+        <div class="d-flex justify-space-between align-center mb-1">
             <v-chip-group v-model="tab" mandatory active-class="active">
                 <v-chip
                     v-for="type of tagTypes"
                     :key="type"
                     :value="type"
                     :ripple="false"
-                    class="px-6 py-3 text-overline outlined">
+                    class="text-overline outlined px-3 px-sm-6 py-3">
                     {{ type }}
                 </v-chip>
             </v-chip-group>
@@ -24,9 +24,7 @@
             </v-btn>
         </div>
 
-        <SettingsTagList v-show="tab === 'project'" type="project" ref="projectTag">
-        </SettingsTagList>
-        <SettingsTagList v-show="tab === 'task'" type="task" ref="taskTag"></SettingsTagList>
+        <SettingsTagList :type="tab" ref="tagList"></SettingsTagList>
     </div>
 </template>
 
@@ -45,17 +43,12 @@ export default class SettingsTags extends Vue {
     tagTypes: TagType[] = ['project', 'task']
     tab: TagType = 'project'
 
-    get projectTag(): SettingsTagList {
-        return this.$refs.projectTag as SettingsTagList
-    }
-
-    get taskTag(): SettingsTagList {
-        return this.$refs.taskTag as SettingsTagList
+    get tagList(): SettingsTagList {
+        return this.$refs.settingTag as SettingsTagList
     }
 
     openTagDialog(): void {
-        if (this.tab === 'project') this.projectTag.openTagDialog()
-        else if (this.tab === 'task') this.taskTag.openTagDialog()
+        this.tagList.openTagDialog()
     }
 }
 </script>

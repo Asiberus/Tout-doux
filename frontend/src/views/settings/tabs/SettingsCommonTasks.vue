@@ -29,8 +29,8 @@
         </template>
         <template v-else>
             <EmptyListDisplay
-                :message="`You didn't create any common task yet`"
-                class="empty-list-display">
+                message="You didn't create any common task yet."
+                class="empty-list-displays">
                 <template #img>
                     <img
                         src="../../../assets/no_common_task.svg"
