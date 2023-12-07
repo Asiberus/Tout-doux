@@ -1,6 +1,6 @@
 <template>
     <div>
-        <MainTitle class="mb-2 mb-md-6">Profile</MainTitle>
+        <MainTitle icon="mdi-account-circle" class="mb-2 mb-md-6">Profile</MainTitle>
 
         <template v-if="user">
             <div class="profile">

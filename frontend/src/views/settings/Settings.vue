@@ -1,6 +1,6 @@
 <template>
     <div class="fill-height d-flex flex-column">
-        <MainTitle class="mb-2 mb-md-6">Settings</MainTitle>
+        <MainTitle icon="mdi-cog" class="mb-2 mb-md-6">Settings</MainTitle>
 
         <div class="settings">
             <div class="settings__tabs">

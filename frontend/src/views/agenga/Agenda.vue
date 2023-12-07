@@ -1,6 +1,6 @@
 <template>
     <div class="fill-height d-flex flex-column">
-        <MainTitle class="mb-2 mb-sm-3">Agenda</MainTitle>
+        <MainTitle icon="mdi-calendar-month" class="mb-2 mb-sm-3">Agenda</MainTitle>
 
         <div class="d-flex align-center flex-wrap gap-1 mb-2 mb-sm-3">
             <div class="mr-sm-1">

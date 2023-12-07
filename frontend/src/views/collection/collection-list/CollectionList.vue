@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex flex-column h-100">
         <div class="d-flex flex-column flex-sm-row align-center gap-2 mb-3 mb-md-6">
-            <MainTitle class="flex-grow-1">Collections</MainTitle>
+            <MainTitle icon="mdi-list-box" class="flex-grow-1">Collections</MainTitle>
 
             <div class="d-flex align-center gap-2">
                 <FilterChip
