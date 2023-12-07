@@ -1,6 +1,8 @@
 <template>
     <div class="feedback">
-        <h1 class="text-h3 mb-5">Give us a Feedback!</h1>
+        <MainTitle :icon="$vuetify.breakpoint.smAndUp ? 'mdi-comment-quote' : null" class="mb-3">
+            Give us a Feedback!
+        </MainTitle>
 
         <p class="text-body-1">
             If you encounter a bug, think about a new amazing functionality or just want to say how
@@ -30,7 +32,12 @@
             </v-textarea>
 
             <div class="d-flex justify-end mt-2">
-                <v-btn type="submit" :disabled="!canSubmit" color="success" class="px-6">
+                <v-btn
+                    type="submit"
+                    :disabled="!canSubmit"
+                    :block="$vuetify.breakpoint.xsOnly"
+                    color="success"
+                    class="px-6">
                     submit
                 </v-btn>
             </div>
@@ -43,8 +50,9 @@ import { Component, Vue } from 'vue-property-decorator'
 import { FeedbackPost } from '@/models/feedback.model'
 import { Form } from '@/models/common.model'
 import { feedbackApi } from '@/api'
+import MainTitle from '@/components/MainTitle.vue'
 
-@Component
+@Component({ components: { MainTitle } })
 export default class FeedbackComponent extends Vue {
     form: Form<FeedbackPost> = {
         valid: false,
@@ -86,7 +94,11 @@ export default class FeedbackComponent extends Vue {
 </script>
 
 <style scoped lang="scss">
-.feedback {
-    width: 75%;
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .feedback {
+        width: 75%;
+    }
 }
 </style>
