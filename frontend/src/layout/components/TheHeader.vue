@@ -104,8 +104,14 @@ export default class TheHeader extends Vue {
 }
 
 .header-menu-link {
-    &.v-list-item--active::before {
-        opacity: 0;
+    &.v-list-item--active {
+        &::before {
+            opacity: 0;
+        }
+
+        &:hover::before {
+            opacity: 0.08;
+        }
     }
 }
 </style>

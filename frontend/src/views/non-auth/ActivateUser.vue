@@ -1,7 +1,7 @@
 <template>
     <div class="activate-user">
         <template v-if="state === 'tokenInvalid'">
-            <img src="../../assets/token-error.svg" width="300" alt="token error" />
+            <img src="../../assets/token-error.svg" alt="token error" class="activate-user__img" />
             <p class="text-body-1 text-center mb-0">
                 The token is invalid or it may be expired. <br />
                 Click on the button bellow to resend an email.
@@ -9,7 +9,7 @@
             <v-btn @click="resendEmail()" outlined color="info">Resend email</v-btn>
         </template>
         <template v-else-if="state === 'mailSent'">
-            <img src="../../assets/mail-sent.svg" width="300" alt="mail sent" />
+            <img src="../../assets/mail-sent.svg" alt="mail sent" class="activate-user__img" />
             <p class="text-body-1 text-center mb-0">
                 An email has been sent to you ! <br />
                 Check your inbox to activate your account.
@@ -58,5 +58,9 @@ export default class ActivateUser extends Vue {
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>

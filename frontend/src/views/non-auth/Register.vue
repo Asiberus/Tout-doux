@@ -67,7 +67,7 @@
             </v-form>
         </template>
         <template v-else>
-            <img src="../../assets/mail-sent.svg" width="300" alt="mail sent" />
+            <img src="../../assets/mail-sent.svg" alt="mail sent" class="register__success-img" />
             <h6 class="text-h6 mb-0">Account successfully created!</h6>
             <p class="text-body-1 text-center mb-0">
                 The last step to the activation of your account is to
@@ -239,6 +239,10 @@ export default class Register extends Vue {
 
     &__form {
         width: 100%;
+    }
+
+    &__success-img {
+        width: clamp(200px, 50%, 300px);
     }
 }
 </style>

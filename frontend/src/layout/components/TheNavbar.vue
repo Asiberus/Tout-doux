@@ -2,9 +2,7 @@
     <v-list>
         <v-list-item>
             <v-list-item-content>
-                <v-list-item-title class="text-h4 font-weight-bold text-center">
-                    Tout Doux
-                </v-list-item-title>
+                <v-list-item-title class="text-h4 text-center">Tout Doux</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
 

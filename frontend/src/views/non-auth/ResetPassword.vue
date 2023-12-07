@@ -44,13 +44,13 @@
         <template v-else-if="state === 'passwordChanged'">
             <img
                 src="../../assets/password-reset-success.svg"
-                width="300"
-                alt="password reset success" />
+                alt="password reset success"
+                class="password-reset__img" />
             <p class="text-body-1 text-center mb-0">Your password has been successfully changed!</p>
             <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
         </template>
         <template v-else-if="state === 'tokenInvalid'">
-            <img src="../../assets/token-error.svg" width="300" alt="token error" />
+            <img src="../../assets/token-error.svg" alt="token error" class="password-reset__img" />
             <p class="text-body-1 text-center mb-0">
                 The token is invalid or it may be expired. <br />
                 Please restart the process to change your password.
@@ -181,6 +181,10 @@ export default class ResetPassword extends Vue {
 
     &__form {
         width: 100%;
+    }
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
     }
 }
 </style>

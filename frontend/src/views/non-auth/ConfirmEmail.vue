@@ -3,13 +3,16 @@
         <template v-if="state === 'valid'">
             <img
                 src="../../assets/confirm-email-success.svg"
-                width="300"
-                alt="confirm email success" />
+                alt="confirm email success"
+                class="confirm-email__img" />
             <p class="text-body-1 text-center mb-0">Your email has been successfully changed!</p>
             <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
         </template>
         <template v-else-if="state === 'invalid'">
-            <img src="../../assets/token-error.svg" width="300" alt="confirm email error" />
+            <img
+                src="../../assets/token-error.svg"
+                alt="confirm email error"
+                class="confirm-email__img" />
             <p class="text-body-1 text-center mb-0">
                 The token is invalid or it may be expired. <br />
                 Please restart the process to change your email.
@@ -51,5 +54,9 @@ export default class ConfirmEmail extends Vue {
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>

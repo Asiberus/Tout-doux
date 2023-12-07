@@ -29,8 +29,21 @@ body {
     height: 100%;
 }
 
+// Remove background color for autofill input in firefox
 input:autofill {
     background: none;
+}
+
+// Remove background color for autofill input in chrome
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #fff;
+    -webkit-box-shadow: none;
+    transition: background-color 5000s ease-in-out 0s;
+    background-color: transparent !important;
 }
 
 .cursor-pointer {
@@ -159,6 +172,10 @@ input:autofill {
     .v-messages {
         min-height: 26px;
     }
+}
+
+.v-application--wrap {
+    min-height: 100svh !important; // take in consideration of the mobile browser navbar
 }
 
 .v-autocomplete__content.background-elevation {

@@ -1,5 +1,5 @@
 <template>
-    <v-form class="login__form" @submit.prevent="login()">
+    <v-form class="login" @submit.prevent="login()">
         <v-text-field label="Email" v-model="form.data.email" autofocus hide-details>
         </v-text-field>
 
@@ -22,7 +22,7 @@
             login
         </v-btn>
 
-        <div class="login__form__links">
+        <div class="login__links">
             <router-link
                 :to="{ name: 'register' }"
                 class="text-body-1 text-link green--text text--lighten-1">
@@ -90,25 +90,23 @@ export default class Login extends Vue {
 
 <style scoped lang="scss">
 .login {
-    &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    row-gap: 8px;
+
+    .error-message {
+        opacity: 0;
+        transition: opacity 0.1s ease-in-out;
+
+        &.active {
+            opacity: 1;
+        }
+    }
+
+    &__links {
         display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        row-gap: 8px;
-
-        .error-message {
-            opacity: 0;
-            transition: opacity 0.1s ease-in-out;
-
-            &.active {
-                opacity: 1;
-            }
-        }
-
-        &__links {
-            display: flex;
-            justify-content: space-between;
-        }
+        justify-content: space-between;
     }
 }
 </style>

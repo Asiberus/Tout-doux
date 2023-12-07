@@ -404,7 +404,7 @@ export default class DailyUpdateTask extends Vue {
     }
 }
 
-@media #{map-get($display-breakpoints, 'lg-and-down')} {
+@media #{map-get($display-breakpoints, 'md-and-down')} {
     .daily-update-task__tabs {
         .v-tab {
             min-width: initial;

@@ -1,14 +1,15 @@
 <template>
-    <v-app class="non-authenticated-layout">
-        <header class="non-authenticated-layout__header">
-            <router-link
-                :to="{ name: 'login' }"
-                class="non-authenticated-layout__header__title green--text text-center">
-                Tout Doux
-            </router-link>
-        </header>
-        <div class="non-authenticated-layout__content">
-            <div class="non-authenticated-layout__content__wrapper">
+    <v-app>
+        <div style="position: absolute; top: 1rem; right: 1rem">
+            {{ $vuetify.breakpoint.width }}
+            {{ $vuetify.breakpoint.height }}
+        </div>
+        <div class="non-authenticated-layout">
+            <router-link :to="{ name: 'login' }" class="non-authenticated-layout__title green--text"
+                >Tout Doux</router-link
+            >
+
+            <div class="non-authenticated-layout__content">
                 <router-view />
             </div>
         </div>
@@ -23,31 +24,46 @@ export default class NonAuthenticatedLayout extends Vue {}
 </script>
 
 <style scoped lang="scss">
-.non-authenticated-layout {
-    &__header {
-        display: flex;
-        justify-content: center;
+@import '~vuetify/src/styles/styles.sass';
 
-        &__title {
-            margin-top: 4rem;
-            text-decoration: none;
-            font-size: 8rem;
-            line-height: 8rem;
-            font-weight: 300;
-            font-family: Roboto, sans-serif;
-            letter-spacing: -0.015625em; // from vuetify text-h1 class
-        }
+.non-authenticated-layout {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 48px 12px 0;
+
+    &__title {
+        text-decoration: none;
+        text-align: center;
+        font-size: 4rem;
+        line-height: 4rem;
+        font-weight: 300;
+        font-family: Roboto, sans-serif;
+        letter-spacing: -0.015625em; // from vuetify text-h1 class
     }
 
     &__content {
-        margin-top: -4rem;
-        flex: 1;
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: center;
+        padding-bottom: 4rem; // use to center the content
+    }
+}
 
-        &__wrapper {
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .non-authenticated-layout {
+        align-items: center;
+        padding: 48px 48px 0;
+
+        &__title {
+            font-size: 6rem;
+            line-height: 6rem;
+        }
+
+        &__content {
+            padding-bottom: 6rem; // use to center the content
             min-width: 400px;
         }
     }

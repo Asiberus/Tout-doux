@@ -22,7 +22,10 @@
         </template>
         <template v-else>
             <div class="password-reset-requested">
-                <img src="../../assets/mail-sent.svg" width="300" alt="mail sent" />
+                <img
+                    src="../../assets/mail-sent.svg"
+                    alt="mail sent"
+                    class="password-reset-requested__success-img" />
                 <p class="text-body-1 text-center mb-0">
                     An email has been sent to you ! <br />
                     Check your inbox to reset your password.
@@ -64,7 +67,7 @@ export default class ResetPasswordRequest extends Vue {
 
     resetPasswordRequested = false
 
-    created() {
+    created(): void {
         if (this.email) this.form.data.email = this.email
     }
 
@@ -89,5 +92,9 @@ export default class ResetPasswordRequest extends Vue {
     flex-direction: column;
     align-items: center;
     row-gap: 16px;
+
+    &__success-img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>
