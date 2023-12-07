@@ -51,7 +51,11 @@
             </div>
         </div>
 
-        <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="updateCollection()">
+        <v-form
+            ref="form"
+            v-model="collectionForm.valid"
+            @submit.prevent="updateCollection()"
+            class="form-wrapper">
             <v-text-field
                 v-model="collectionForm.data.name"
                 :rules="collectionForm.rules.name"
@@ -195,6 +199,10 @@ export default class CollectionSettings extends Vue {
 }
 
 @media #{map-get($display-breakpoints, 'md-and-up')} {
+    .form-wrapper {
+        width: 75%;
+    }
+
     .item-name-wrapper {
         width: calc(100% / 3);
     }

@@ -51,7 +51,11 @@
             </div>
         </div>
 
-        <v-form ref="form" v-model="projectForm.valid" @submit.prevent="updateProject()">
+        <v-form
+            ref="form"
+            v-model="projectForm.valid"
+            @submit.prevent="updateProject()"
+            class="form-wrapper">
             <v-text-field
                 v-model="projectForm.data.name"
                 :rules="projectForm.rules.name"
@@ -222,6 +226,14 @@ export default class ProjectSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .form-wrapper {
+        width: 75%;
+    }
+}
+
 .tag-wrapper {
     min-height: 32px;
     display: flex;
