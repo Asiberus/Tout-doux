@@ -90,9 +90,17 @@ export default class DailyUpdate extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-update {
     height: 100%;
     display: flex;
     flex-direction: column;
+
+    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+        .v-stepper__step--editable:hover {
+            background: inherit;
+        }
+    }
 }
 </style>

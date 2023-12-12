@@ -4,11 +4,10 @@
         @input="setDialogStateTo($event)"
         fullscreen
         hide-overlay
-        scrollable
-        content-class="background-black flex-column"
+        content-class="daily-detail-dialog"
         transition="dialog-bottom-transition">
         <div
-            class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12"
+            class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-8"
             v-touch="{
                 start: touchStartEvent,
                 left: () => switchTab('left'),
@@ -63,11 +62,13 @@
                 </template>
                 <template v-else-if="dailyTaskList.length > 0">
                     <!-- Only tasks -->
-                    <DailyDetailTaskTimeline
-                        :daily-task-list="dailyTaskList"
-                        :date="date"
-                        @toggle-daily-task="toggleDailyTask($event)">
-                    </DailyDetailTaskTimeline>
+                    <div class="overflow-auto">
+                        <DailyDetailTaskTimeline
+                            :daily-task-list="dailyTaskList"
+                            :date="date"
+                            @toggle-daily-task="toggleDailyTask($event)">
+                        </DailyDetailTaskTimeline>
+                    </div>
                 </template>
                 <template v-else-if="events.length > 0">
                     <!-- Only events -->
@@ -167,7 +168,7 @@ export default class DailyDetail extends Vue {
 
     touchStartEvent() {
         // We detect if the touch-down is a scroll on the content
-        const scrollableElement = document.querySelector('.v-dialog--scrollable')
+        const scrollableElement = document.querySelector('.v-dialog')
         this.isScrollingOnContent = scrollableElement.scrollTop > 0
     }
 

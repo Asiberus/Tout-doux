@@ -222,7 +222,7 @@ export default class EventItemCard extends Vue {
     content: '';
     position: absolute;
     top: calc(50% - 10px);
-    left: -10px;
+    left: -9px;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
     border-right: 10px solid #000;

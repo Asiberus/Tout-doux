@@ -164,10 +164,6 @@ input:-webkit-autofill:active {
     overscroll-behavior: none;
 }
 
-.background-black {
-    background-color: #0a0a0a;
-}
-
 .two-row-error.v-input {
     .v-messages {
         min-height: 26px;
@@ -183,6 +179,12 @@ input:-webkit-autofill:active {
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
         0 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
     background-color: #212121;
+}
+
+.daily-detail-dialog {
+    background-color: #0a0a0a;
+    display: flex;
+    flex-direction: column;
 }
 
 .daily-update-stepper {
@@ -216,6 +218,18 @@ input:-webkit-autofill:active {
         height: 100%;
         display: flex;
         flex-direction: column;
+    }
+}
+
+// Remove hover for btn on mobile
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+    .v-btn,
+    .v-chip,
+    .v-tab {
+        &:focus::before,
+        &:hover::before {
+            opacity: 0 !important;
+        }
     }
 }
 

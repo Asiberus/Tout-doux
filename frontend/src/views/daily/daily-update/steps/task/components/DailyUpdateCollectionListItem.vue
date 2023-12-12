@@ -10,7 +10,7 @@
                 height="4"
                 class="flex-shrink-0">
             </v-progress-linear>
-            <v-card-text class="">
+            <v-card-text>
                 <div class="d-flex align-center">
                     <h3
                         class="text-body-h1 text-sm-h6 white--text"
@@ -134,6 +134,13 @@ export default class DailyUpdateCollectionListItem extends Vue {
     & > .v-card {
         height: 100%;
 
+        .v-card__text {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         @media #{map-get($display-breakpoints, 'xs-only')} {
             .v-card__text {
                 padding: 12px;
@@ -141,6 +148,7 @@ export default class DailyUpdateCollectionListItem extends Vue {
         }
 
         .task-wrapper {
+            flex-grow: 1;
             overflow-y: auto;
             padding: 12px 0;
             display: grid;
@@ -149,6 +157,7 @@ export default class DailyUpdateCollectionListItem extends Vue {
                 auto-fill,
                 minmax(max(260px, calc((100% - 8px) / 2)), 1fr)
             );
+            grid-auto-rows: min-content;
             gap: 8px;
         }
     }
