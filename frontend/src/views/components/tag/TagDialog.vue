@@ -69,6 +69,9 @@
                 <v-spacer></v-spacer>
 
                 <div class="d-flex justify-end gap-2">
+                    <v-btn @click="emitCloseEvent()" plain class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
                     <v-btn
                         color="success"
                         text
@@ -76,9 +79,6 @@
                         :disabled="!tagForm.valid || tagForm.pending"
                         class="flex-grow-1 flex-md-grow-0">
                         {{ tag ? 'update' : 'create' }}
-                    </v-btn>
-                    <v-btn @click="emitCloseEvent()" plain class="flex-grow-1 flex-md-grow-0">
-                        cancel
                     </v-btn>
                 </div>
             </v-form>

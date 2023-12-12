@@ -214,6 +214,9 @@
                 </div>
 
                 <div class="d-flex justify-end gap-2">
+                    <v-btn plain class="flex-grow-1 flex-md-grow-0" @click="emitCloseEvent()">
+                        cancel
+                    </v-btn>
                     <v-btn
                         color="success"
                         text
@@ -222,9 +225,6 @@
                         :disabled="!eventForm.valid || relatedToDateError">
                         {{ event ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="flex-grow-1 flex-md-grow-0" @click="emitCloseEvent()"
-                        >cancel</v-btn
-                    >
                 </div>
             </v-form>
         </v-card-text>

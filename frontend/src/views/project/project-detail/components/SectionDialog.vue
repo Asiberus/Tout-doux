@@ -33,6 +33,9 @@
                 <v-spacer></v-spacer>
 
                 <div class="d-flex justify-end gap-2">
+                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
                     <v-btn
                         color="success"
                         text
@@ -40,9 +43,6 @@
                         :disabled="!sectionForm.valid"
                         class="flex-grow-1 flex-md-grow-0">
                         {{ section ? 'update' : 'create' }}
-                    </v-btn>
-                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
-                        cancel
                     </v-btn>
                 </div>
             </v-form>

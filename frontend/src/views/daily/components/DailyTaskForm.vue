@@ -29,10 +29,10 @@
         </div>
 
         <v-card-actions class="justify-end">
+            <v-btn plain small @click="close()">cancel</v-btn>
             <v-btn color="success" text small :disabled="!dailyTaskForm.valid" type="submit">
                 {{ dailyTask ? 'update' : 'create' }}
             </v-btn>
-            <v-btn plain small @click="close()">cancel</v-btn>
         </v-card-actions>
     </v-form>
 </template>

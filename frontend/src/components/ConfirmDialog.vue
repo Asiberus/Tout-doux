@@ -21,14 +21,15 @@
                 </div>
 
                 <div class="d-flex justify-center gap-2">
-                    <v-btn @click="confirm()" color="success" class="flex-grow-1 flex-md-grow-0">
-                        Confirm
-                    </v-btn>
                     <v-btn
                         @click="setDialogStateTo(false)"
                         color="error"
+                        outlined
                         class="flex-grow-1 flex-md-grow-0">
                         Cancel
+                    </v-btn>
+                    <v-btn @click="confirm()" color="success" class="flex-grow-1 flex-md-grow-0">
+                        Confirm
                     </v-btn>
                 </div>
             </v-card-text>

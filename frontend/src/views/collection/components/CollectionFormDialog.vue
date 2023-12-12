@@ -45,6 +45,9 @@
                 </div>
 
                 <div class="d-flex justify-end gap-2">
+                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
                     <v-btn
                         color="success"
                         text
@@ -52,9 +55,6 @@
                         :disabled="!collectionForm.valid"
                         class="flex-grow-1 flex-md-grow-0">
                         create
-                    </v-btn>
-                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
-                        cancel
                     </v-btn>
                 </div>
             </v-form>

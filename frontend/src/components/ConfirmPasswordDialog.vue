@@ -52,14 +52,14 @@
                     </v-text-field>
 
                     <div class="d-flex justify-center gap-2">
-                        <v-btn type="submit" color="success" class="flex-grow-1 flex-sm-grow-0">
-                            Submit
-                        </v-btn>
                         <v-btn
                             @click="setDialogStateTo(false)"
                             plain
                             class="flex-grow-1 flex-sm-grow-0">
                             Cancel
+                        </v-btn>
+                        <v-btn type="submit" color="success" class="flex-grow-1 flex-sm-grow-0">
+                            Submit
                         </v-btn>
                     </div>
                 </v-form>
