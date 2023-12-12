@@ -60,7 +60,7 @@ export default class ActivateUser extends Vue {
     row-gap: 16px;
 
     &__img {
-        width: clamp(200px, 50%, 300px);
+        width: clamp(200px, 40vw, 300px);
     }
 }
 </style>

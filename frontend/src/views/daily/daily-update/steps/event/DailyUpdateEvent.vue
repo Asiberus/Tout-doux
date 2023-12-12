@@ -12,8 +12,8 @@
                 :fullscreen="$vuetify.breakpoint.smAndDown">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
-                        <v-icon left>mdi-plus</v-icon>
-                        event
+                        <v-icon :left="$vuetify.breakpoint.smAndUp">mdi-plus</v-icon>
+                        <template v-if="$vuetify.breakpoint.smAndUp">event</template>
                     </v-btn>
                 </template>
                 <EventDialog

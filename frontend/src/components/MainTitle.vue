@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex align-center gap-2">
+    <div class="d-flex align-center justify-center justify-sm-start gap-2">
         <v-icon
             v-if="icon"
             :large="$vuetify.breakpoint.smOnly"

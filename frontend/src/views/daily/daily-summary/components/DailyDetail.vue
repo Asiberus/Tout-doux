@@ -178,8 +178,8 @@ export default class DailyDetail extends Vue {
     switchTab(direction: 'right' | 'left'): void {
         if (
             !this.$vuetify.breakpoint.mdAndDown ||
-            !this.dailyTaskList.length > 0 ||
-            !this.events.length > 0
+            this.dailyTaskList.length === 0 ||
+            this.events.length === 0
         )
             return
 

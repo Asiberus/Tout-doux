@@ -11,12 +11,17 @@
                 v-model="form.valid"
                 @submit.prevent="submit()"
                 class="password-reset-requested__form">
+                <p class="align-self-start text-body-1 font-weight-bold mb-2">
+                    Enter your email to reset your password.
+                </p>
+
                 <v-text-field
-                    label="Email"
+                    placeholder="Your email"
                     type="email"
                     v-model="form.data.email"
                     :rules="form.rules.email"
                     validate-on-blur
+                    dense
                     required
                     autofocus>
                 </v-text-field>
@@ -105,7 +110,7 @@ export default class ResetPasswordRequest extends Vue {
     }
 
     &__img {
-        width: clamp(200px, 50%, 300px);
+        width: clamp(200px, 40vw, 300px);
     }
 }
 </style>

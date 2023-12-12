@@ -184,7 +184,7 @@ export default class ResetPassword extends Vue {
     }
 
     &__img {
-        width: clamp(200px, 50%, 300px);
+        width: clamp(200px, 40vw, 300px);
     }
 }
 </style>

@@ -242,7 +242,7 @@ export default class Register extends Vue {
     }
 
     &__success-img {
-        width: clamp(200px, 50%, 300px);
+        width: clamp(200px, 40vw, 300px);
     }
 }
 </style>
