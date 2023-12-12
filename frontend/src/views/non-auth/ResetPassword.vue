@@ -122,7 +122,7 @@ export default class ResetPassword extends Vue {
         }
 
         this.form.pending = true
-        this.passwordValidationTimer = setTimeout(() => this.testPasswordStrength(value), 400)
+        this.passwordValidationTimer = setTimeout(() => this.testPasswordStrength(value), 500)
     }
 
     private testPasswordStrength(value: string): void {
