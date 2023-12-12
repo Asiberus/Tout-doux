@@ -132,8 +132,15 @@ EXTENDED_PAGINATION_DEFAULT_SIZE = 20
 EXTENDED_PAGINATION_DEFAULT_SIZE_QUERY_PARAM = 'size'
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp/email')
+DEFAULT_FROM_EMAIL = '"Tout Doux" <no-reply@raphael-beekmann.com>'
+
+if bool(int(os.environ.get('BACKEND_USE_EMAIL_FILE_SYSTEM', 0))):
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'tmp/email')
+else:
+    EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+    MAILJET_API_KEY = os.environ.get('MAILJET_API_KEY')
+    MAILJET_API_SECRET = os.environ.get('MAILJET_API_SECRET')
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
