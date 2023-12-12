@@ -28,7 +28,7 @@ class EventPostOrPatchSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
-    takesWholeDay = serializers.BooleanField(source='takes_whole_day')
+    takesWholeDay = serializers.BooleanField(source='takes_whole_day', default=False)
     projectId = serializers.PrimaryKeyRelatedField(
         source='project',
         queryset=Project.objects.all(),

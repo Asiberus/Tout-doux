@@ -5,7 +5,7 @@ from tout_doux.serializers.collection.collection import CollectionSerializer
 
 
 class CollectionPostOrPatchSerializer(serializers.ModelSerializer):
-    itemName = serializers.CharField(source='item_name')
+    itemName = serializers.CharField(source='item_name', max_length=15, default='task')
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
