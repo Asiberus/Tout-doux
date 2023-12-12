@@ -68,4 +68,17 @@ export default class NonAuthenticatedLayout extends Vue {}
         }
     }
 }
+
+@media #{map-get($display-breakpoints, 'lg-and-up')} {
+    .non-authenticated-layout {
+        &__title {
+            font-size: 8rem;
+            line-height: 8rem;
+        }
+
+        &__content {
+            padding-bottom: 8rem; // use to center the content
+        }
+    }
+}
 </style>

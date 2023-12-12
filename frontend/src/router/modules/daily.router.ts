@@ -5,9 +5,10 @@ import { dailyUpdateGuard } from '@/router/guards'
 
 export const dailyRoutes: Array<RouteConfig> = [
     {
-        path: '/daily',
+        path: '/daily/:date?',
         name: 'daily-summary',
         component: DailySummaryComponent,
+        props: ({ params }) => ({ date: params.date }),
     },
     {
         path: '/daily/:date/update/:step(task|event)',

@@ -16,7 +16,7 @@
                 v-for="dailySummary in dailySummaryList"
                 :key="dailySummary.date"
                 :daily-summary="dailySummary"
-                @open-daily-detail="openDailyDetailDialog(dailySummary.date)">
+                @open-daily-detail="setDateParam(dailySummary.date)">
             </DailySummaryCardComponent>
         </div>
 
@@ -29,6 +29,7 @@
         <DailyDetail
             v-model="dailyDetailDialog"
             :date="dateSelected"
+            @input="dailyDetailDialogInput($event)"
             @daily-task-completed="updateDailyTaskCompleted">
         </DailyDetail>
     </div>
@@ -41,37 +42,59 @@ import { showScroll } from '@/utils/document.utils'
 import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
 import moment from 'moment'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import MainTitle from '@/components/MainTitle.vue'
 
 @Component({ components: { MainTitle, DailySummaryCardComponent, DailyDetail } })
 export default class DailySummaryComponent extends Vue {
+    @Prop({ required: false }) date?: string
+
     dailySummaryList: DailySummary[] = []
     dailyOverviewLoading = false
     dailyDetailDialog = false
     dateSelected = ''
     today = moment().format('YYYY-MM-DD')
 
-    DAYS_PER_PAGE = 21
+    daysPerPage = 21
 
     created(): void {
+        this.daysPerPage = this.calculateDaysPerPage()
         const endDate = moment()
-            .subtract(this.DAYS_PER_PAGE - 1, 'days')
+            .subtract(this.daysPerPage - 1, 'days')
             .format('YYYY-MM-DD')
         this.retrieveDailySummaryList(this.today, endDate)
     }
 
     mounted(): void {
-        const date = localStorage.getItem('openDailyDetailTo')
-        if (date && moment(date).isValid()) {
-            this.openDailyDetailDialog(date)
-            localStorage.removeItem('openDailyDetailTo')
-        }
+        if (!this.date) return
+        if (!moment(this.date).isValid()) this.removeDateParam()
+
+        this.openDailyDetailDialog(this.date)
     }
 
     destroyed(): void {
         // Scroll is reset whenever the user change route.
         showScroll()
+    }
+
+    @Watch('$route', { deep: true })
+    private onRouterChange(): void {
+        if (!this.date) {
+            this.dailyDetailDialog = false
+            return
+        }
+
+        if (!moment(this.date).isValid()) this.removeDateParam()
+
+        this.openDailyDetailDialog(this.date)
+    }
+
+    private calculateDaysPerPage(): number {
+        const { breakpoint } = this.$vuetify
+        if (breakpoint.xsOnly) return 7
+        else if (breakpoint.smAndDown) return 14
+        else if (breakpoint.lgAndDown) return 21
+        else return 42 // for xl only
     }
 
     private retrieveDailySummaryList(startDate: string, endDate: string): void {
@@ -94,7 +117,7 @@ export default class DailySummaryComponent extends Vue {
 
         const startDate = moment(lastDailySummary.date).subtract(1, 'days').format('YYYY-MM-DD')
         const endDate = moment(lastDailySummary.date)
-            .subtract(this.DAYS_PER_PAGE, 'days')
+            .subtract(this.daysPerPage, 'days')
             .format('YYYY-MM-DD')
 
         this.retrieveDailySummaryList(startDate, endDate)
@@ -105,9 +128,23 @@ export default class DailySummaryComponent extends Vue {
         this.dailyDetailDialog = true
     }
 
+    dailyDetailDialogInput(value: boolean): void {
+        if (!value) this.removeDateParam({ push: true })
+    }
+
     updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
         const dailyTaskSummary = this.dailySummaryList.find(d => d.date === date)
         if (dailyTaskSummary) dailyTaskSummary.totalTaskCompleted = numberOfDailyTaskCompleted
+    }
+
+    setDateParam(date: string): void {
+        this.$router.push({ name: 'daily-summary', params: { date } })
+    }
+
+    removeDateParam(options: { push?: boolean } = {}): void {
+        const { push } = options
+        if (push) this.$router.push({ name: 'daily-summary' })
+        else this.$router.replace({ name: 'daily-summary' })
     }
 }
 </script>

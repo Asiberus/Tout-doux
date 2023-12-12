@@ -1,6 +1,6 @@
 <template>
     <div v-if="collection" class="d-flex flex-column h-100">
-        <div class="d-flex flex-column flex-sm-row align-center colum-gap-2 row-gap-1">
+        <div class="d-flex flex-column flex-sm-row align-center column-gap-2 row-gap-1">
             <v-icon v-if="$vuetify.breakpoint.xsOnly">mdi-list-box</v-icon>
 
             <SecondaryTitle class="text-center text-sm-start">

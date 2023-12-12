@@ -125,8 +125,15 @@ export default class ProfileEmail extends Vue {
 
     &__form {
         display: flex;
-        align-items: center;
-        column-gap: 8px;
+
+        gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
+
+        @media only screen and (width > 400px) {
+            flex-direction: row;
+            align-items: center;
+        }
 
         @media #{map-get($display-breakpoints, 'md-and-up')} {
             width: 75%;
