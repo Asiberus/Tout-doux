@@ -79,6 +79,7 @@ export default class TagSearch extends Vue {
     cleanTagList(): void {
         this.tagList = []
         this.search = null
+        this.isLoading = false
     }
 }
 </script>
