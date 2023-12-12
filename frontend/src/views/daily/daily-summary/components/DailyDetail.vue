@@ -38,10 +38,28 @@
                 </v-hover>
             </div>
 
+            <template v-if="dailyTaskList.length === 0 && events.length === 0">
+                <EmptyListDisplay
+                    message="No tasks or events are set on for that day."
+                    class="empty-list-display">
+                    <template #img>
+                        <img
+                            src="../../../../assets/empty-daily-detail.svg"
+                            alt="empty daily detail"
+                            class="empty-list-display__img" />
+                    </template>
+                </EmptyListDisplay>
+            </template>
+
             <template v-if="$vuetify.breakpoint.mdAndDown">
                 <template v-if="dailyTaskList.length > 0 && events.length > 0">
                     <!-- Tabs -->
-                    <v-tabs v-model="tab" background-color="transparent" color="accent" grow>
+                    <v-tabs
+                        v-model="tab"
+                        background-color="transparent"
+                        color="accent"
+                        grow
+                        class="flex-grow-0">
                         <v-tab tab-value="task">Tasks</v-tab>
                         <v-tab tab-value="event">Events</v-tab>
                     </v-tabs>
@@ -77,21 +95,23 @@
                 </template>
             </template>
             <template v-else>
-                <!-- Tasks and events -->
-                <v-row class="pl-4">
-                    <v-col v-if="dailyTaskList.length > 0" :cols="events.length > 0 ? 7 : 8">
-                        <DailyDetailTaskTimeline
-                            :daily-task-list="dailyTaskList"
-                            :date="date"
-                            @toggle-daily-task="toggleDailyTask($event)">
-                        </DailyDetailTaskTimeline>
-                    </v-col>
+                <template v-if="dailyTaskList.length > 0 && events.length > 0">
+                    <!-- Tasks and events -->
+                    <v-row class="pl-4">
+                        <v-col v-if="dailyTaskList.length > 0" :cols="events.length > 0 ? 7 : 8">
+                            <DailyDetailTaskTimeline
+                                :daily-task-list="dailyTaskList"
+                                :date="date"
+                                @toggle-daily-task="toggleDailyTask($event)">
+                            </DailyDetailTaskTimeline>
+                        </v-col>
 
-                    <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
-                        <DailyDetailEventTimeline :events="events" :date="date">
-                        </DailyDetailEventTimeline>
-                    </v-col>
-                </v-row>
+                        <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
+                            <DailyDetailEventTimeline :events="events" :date="date">
+                            </DailyDetailEventTimeline>
+                        </v-col>
+                    </v-row>
+                </template>
             </template>
         </div>
     </v-dialog>
@@ -111,9 +131,16 @@ import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
 import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue'
 import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 
 @Component({
-    components: { DailyDetailEventTimeline, DailyDetailTaskTimeline, DailyTaskCard, EventItemCard },
+    components: {
+        EmptyListDisplay,
+        DailyDetailEventTimeline,
+        DailyDetailTaskTimeline,
+        DailyTaskCard,
+        EventItemCard,
+    },
 })
 export default class DailyDetail extends Vue {
     @Prop({ default: false }) value!: boolean
@@ -218,6 +245,8 @@ export default class DailyDetail extends Vue {
 
 .content {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .actions-wrapper {
@@ -229,6 +258,14 @@ export default class DailyDetail extends Vue {
 
     @media #{map-get($display-breakpoints, 'xs-only')} {
         padding: 0.5rem;
+    }
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 25%, 400px);
     }
 }
 </style>
