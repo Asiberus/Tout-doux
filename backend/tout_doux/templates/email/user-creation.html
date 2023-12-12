@@ -1,15 +1,17 @@
 {% autoescape off %}
-<h1>
-  Bonjour et surtout bienvenu sur Tout Doux, {{ user.username | capfirst }}!
-</h1>
-
-<p>
-  Pour finaliser la création de votre compte veuillez cliquer sur le lien ci
-  dessous :
+<p style="font-size: 14pt">
+  <strong>Hello {{ user.username | capfirst }}!</strong>
 </p>
 
-<a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a>
+<p style="font-size: 11pt">
+  Welcome to the Tout Doux platform! To complete your subscription we need to
+  validate your account. <br />
+  To do so, simply click on the link bellow :
+</p>
 
-<p>Cordialement</p>
-<p>L'Équipe Tout Doux</p>
+<p style="font-size: 11pt">
+  <a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a>
+</p>
+
+<p style="font-size: 11pt">The Tout Doux Team</p>
 {% endautoescape %}

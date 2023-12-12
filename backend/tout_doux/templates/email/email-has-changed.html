@@ -1,12 +1,13 @@
 {% autoescape off %}
-<h1>Bonjour {{ user.username | capfirst }}!</h1>
-
-<p>
-  Une demande de changement d'email a été effectué sur votre compte. Si vous
-  n'êtes pas à l'origine de cette demande merci de contacter au plus tot le
-  service technique Tout Doux.
+<p style="font-size: 14pt">
+  <strong>Hello {{ user.username | capfirst }}!</strong>
 </p>
 
-<p>Cordialement</p>
-<p>L'Équipe Tout Doux</p>
+<p style="font-size: 11pt">
+  A request to change your email address has been made on your account. <br />
+  If you are not at the origin of this request, please contact the Tout Doux
+  team as soon as possible.
+</p>
+
+<p style="font-size: 11pt">The Tout Doux Team</p>
 {% endautoescape %}

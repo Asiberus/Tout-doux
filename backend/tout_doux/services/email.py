@@ -32,7 +32,7 @@ class EmailService:
         html_template = get_template('email/user-creation.html')
         html_body = html_template.render(context)
 
-        subject = 'Tout Doux - Création de compte'
+        subject = 'Tout Doux - Activate your account'
         to = (user.email,)
 
         EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)
@@ -47,7 +47,7 @@ class EmailService:
         html_template = get_template('email/password-reset.html')
         html_body = html_template.render(context)
 
-        subject = 'Tout Doux - Réinitialisation de mot de passe'
+        subject = 'Tout Doux - Reset your password'
         to = (user.email,)
 
         EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)
@@ -60,7 +60,7 @@ class EmailService:
         html_template = get_template('email/change-email.html')
         html_body = html_template.render(context)
 
-        subject = 'Tout Doux - Changement d\'adresse e-mail'
+        subject = 'Tout Doux - Confirm your email address'
         to = (new_email,)
 
         EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)
@@ -72,7 +72,7 @@ class EmailService:
         html_template = get_template('email/email-has-changed.html')
         html_body = html_template.render(context)
 
-        subject = 'Tout Doux - Un changement d\'adresse à été effectué'
+        subject = 'Tout Doux - Your email address has been changed'
         to = (previous_email,)
 
         EmailService._send_mail_async(subject=subject, to=to, html_body=html_body)

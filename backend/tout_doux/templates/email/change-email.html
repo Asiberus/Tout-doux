@@ -1,19 +1,20 @@
 {% autoescape off %}
-<h1>Bonjour {{ user.username | capfirst }}!</h1>
-
-<p>
-  Une demande de changement d'email a été effectué. Pour pouvoir vous connecter
-  en utilisant la nouvelle adresse e-mail, veuillez cliquer sur le lien
-  ci-dessous :
+<p style="font-size: 14pt">
+  <strong>Hello {{ user.username | capfirst }}!</strong>
 </p>
 
-<a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a>
-
-<p>
-  Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer ce
-  mail.&nbsp;
+<p style="font-size: 11pt">
+  A request to change your email address has been made. To log in using the new
+  e-mail address, please click on the link below :
 </p>
 
-<p>Cordialement</p>
-<p>L'Équipe Tout Doux</p>
+<p style="font-size: 11pt">
+  <a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a>
+</p>
+
+<p style="font-size: 11pt">
+  If you did not make this request, please ignore this email.
+</p>
+
+<p style="font-size: 11pt">The Tout Doux Team</p>
 {% endautoescape %}
