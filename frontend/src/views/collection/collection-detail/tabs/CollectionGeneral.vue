@@ -79,7 +79,7 @@
                         class="empty-list-display">
                         <template #img>
                             <img
-                                src="../../../../assets/no_tasks.svg"
+                                src="../../../../assets/collection-no-tasks.svg"
                                 alt="No tasks"
                                 class="empty-list-display__img" />
                         </template>
@@ -106,7 +106,7 @@
                         class="empty-list-display">
                         <template #img>
                             <img
-                                src="../../../../assets/no_tasks.svg"
+                                src="../../../../assets/collection-no-tasks.svg"
                                 alt="No tasks"
                                 class="empty-list-display__img" />
                         </template>

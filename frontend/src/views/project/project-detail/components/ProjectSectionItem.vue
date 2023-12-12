@@ -116,7 +116,7 @@
                         <EmptyListDisplay message="This section has no task yet." class="my-3">
                             <template #img>
                                 <img
-                                    src="../../../../assets/no_tasks.svg"
+                                    src="../../../../assets/project-no-tasks.svg"
                                     alt="No tasks"
                                     class="empty-img" />
                             </template>
@@ -142,7 +142,7 @@
                             class="my-3">
                             <template #img>
                                 <img
-                                    src="../../../../assets/no_tasks.svg"
+                                    src="../../../../assets/project-no-tasks.svg"
                                     alt="No tasks completed"
                                     class="empty-img" />
                             </template>

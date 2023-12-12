@@ -10,9 +10,6 @@
 
         <v-spacer></v-spacer>
 
-        {{ $vuetify.breakpoint.width }}
-        {{ $vuetify.breakpoint.height }}
-
         <v-menu :value="headerMenu" @input="$emit('update:header-menu', $event)" offset-y>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn v-bind="attrs" v-on="on" depressed class="header-menu-btn text-body-1">

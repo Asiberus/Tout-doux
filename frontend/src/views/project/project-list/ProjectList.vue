@@ -41,12 +41,12 @@
                 <template #img>
                     <img
                         v-if="!archived"
-                        src="../../../assets/project.svg"
+                        src="../../../assets/project-empty.svg"
                         alt="No project"
                         class="empty-list-display__img" />
                     <img
                         v-else
-                        src="../../../assets/project_archived.svg"
+                        src="../../../assets/project-archived-empty.svg"
                         alt="No archived project"
                         class="empty-list-display__img" />
                 </template>

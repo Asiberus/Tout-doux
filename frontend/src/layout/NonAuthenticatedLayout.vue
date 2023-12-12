@@ -1,9 +1,5 @@
 <template>
     <v-app>
-        <div style="position: absolute; top: 1rem; right: 1rem">
-            {{ $vuetify.breakpoint.width }}
-            {{ $vuetify.breakpoint.height }}
-        </div>
         <div class="non-authenticated-layout">
             <router-link :to="{ name: 'login' }" class="non-authenticated-layout__title green--text"
                 >Tout Doux</router-link

@@ -43,7 +43,13 @@
             <EmptyListDisplay class="empty-list-display">
                 <template #img>
                     <img
-                        src="../../../assets/project.svg"
+                        v-if="!archived"
+                        src="../../../assets/collection-empty.svg"
+                        alt="No collection"
+                        class="empty-list-display__img" />
+                    <img
+                        v-else
+                        src="../../../assets/collection-archived-empty.svg"
                         alt="No collection"
                         class="empty-list-display__img" />
                 </template>

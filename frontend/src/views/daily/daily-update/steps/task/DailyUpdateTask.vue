@@ -64,7 +64,7 @@
                             class="empty-list-display">
                             <template #img>
                                 <img
-                                    src="../../../../../assets/project.svg"
+                                    src="../../../../../assets/project-empty.svg"
                                     alt="No Project"
                                     class="empty-list-display__img" />
                             </template>
@@ -108,7 +108,7 @@
                             class="empty-list-display">
                             <template #img>
                                 <img
-                                    src="../../../../../assets/project.svg"
+                                    src="../../../../../assets/collection-empty.svg"
                                     alt="No Collection"
                                     class="empty-list-display__img" />
                             </template>
