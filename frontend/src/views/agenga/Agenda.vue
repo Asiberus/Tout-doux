@@ -196,6 +196,7 @@ export default class Agenda extends Vue {
     }
 
     retrieveEvents(): void {
+        this.events = []
         const month = moment(this.value).month() + 1 // Month count start at 0
         const year = moment(this.value).year()
         eventService.getEvents({ month, year }).then(
