@@ -8,7 +8,7 @@
             </TheHeader>
         </v-app-bar>
         <v-main v-touch="{ right: showNavbar }">
-            <v-container fluid class="pa-3 pa-sm-5 pa-lg-7 h-100">
+            <v-container fluid class="pa-3 pa-sm-5 pa-lg-6 h-100">
                 <router-view />
             </v-container>
         </v-main>
