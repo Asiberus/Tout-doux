@@ -26,7 +26,7 @@
                         :size="progressWheelSize"
                         value="14"
                         max="20"
-                        color="accent">
+                        color="green accent-2">
                     </ProgressWheel>
                 </v-sheet>
             </template>

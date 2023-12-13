@@ -95,7 +95,7 @@
                 </template>
             </template>
             <template v-else>
-                <template v-if="dailyTaskList.length > 0 && events.length > 0">
+                <template v-if="dailyTaskList.length > 0 || events.length > 0">
                     <!-- Tasks and events -->
                     <v-row class="pl-4">
                         <v-col v-if="dailyTaskList.length > 0" :cols="events.length > 0 ? 7 : 8">
