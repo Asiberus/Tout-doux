@@ -1,9 +1,10 @@
 from django.db import models
 
 from tout_doux.models.project import Project
+from tout_doux.models.user import UserRelatedModel
 
 
-class Section(models.Model):
+class Section(UserRelatedModel):
     name = models.CharField(max_length=50)
     project = models.ForeignKey(
         Project,

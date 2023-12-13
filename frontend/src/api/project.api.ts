@@ -1,6 +1,6 @@
 import { apiRoutes } from '@/api-routes'
 import Vue from 'vue'
-import { Project, ProjectPostOrPatch } from '@/models/project.model'
+import { ProjectPostOrPatch } from '@/models/project.model'
 
 const getProjectList = (params = {}) => {
     return Vue.http.get(apiRoutes.project, { params: { size: 0, ...params } })

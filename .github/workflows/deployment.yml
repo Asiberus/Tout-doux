@@ -18,6 +18,8 @@ jobs:
           SECRET_DJANGO_KEY: ${{ secrets.SECRET_DJANGO_KEY }}
           SECRET_SERVER_HOST: ${{ secrets.SECRET_SERVER_HOST }}
           SECRET_API_HOST: ${{ secrets.SECRET_API_HOST }}
+          SECRET_MAILJET_API_KEY: ${{ secrets.SECRET_MAILJET_API_KEY }}
+          SECRET_MAILJET_API_SECRET: ${{ secrets.SECRET_MAILJET_API_SECRET }}
         run: envsubst < "./.conf/production/conf.server.env" | sponge "./.conf/production/conf.server.env"
       - name: Build images
         run: docker-compose --file ./docker-compose.prod.yml --env-file ./.conf/production/conf.server.env build

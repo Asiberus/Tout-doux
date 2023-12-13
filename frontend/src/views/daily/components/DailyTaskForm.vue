@@ -11,7 +11,6 @@
                 :rules="dailyTaskForm.rules.name"
                 label="Name"
                 counter="50"
-                maxlength="50"
                 required
                 autofocus
                 class="mb-2">
@@ -30,10 +29,10 @@
         </div>
 
         <v-card-actions class="justify-end">
+            <v-btn plain small @click="close()">cancel</v-btn>
             <v-btn color="success" text small :disabled="!dailyTaskForm.valid" type="submit">
                 {{ dailyTask ? 'update' : 'create' }}
             </v-btn>
-            <v-btn plain small @click="close()">cancel</v-btn>
         </v-card-actions>
     </v-form>
 </template>
@@ -100,9 +99,15 @@ export default class DailyTaskForm extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .tag-wrapper {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+        gap: 4px;
+    }
 }
 </style>

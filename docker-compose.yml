@@ -23,6 +23,7 @@ services:
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     environment:
+      SERVER_URL: http://localhost:${FRONTEND_PORT}/
       SECRET_KEY: ${BACKEND_SECRET_KEY}
       DEBUG: ${BACKEND_DEBUG}
       ALLOWED_HOSTS: ${BACKEND_ALLOWED_HOSTS}
@@ -31,6 +32,9 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      BACKEND_USE_EMAIL_FILE_SYSTEM: ${BACKEND_USE_EMAIL_FILE_SYSTEM}
+      MAILJET_API_KEY: ${MAILJET_API_KEY}
+      MAILJET_API_SECRET: ${MAILJET_API_SECRET}
     ports:
       - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
     volumes:

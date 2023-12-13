@@ -1,237 +1,231 @@
 <template>
-    <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-            <h4 class="text-h4">
-                <template v-if="event"> Update Event </template>
-                <template v-else> New Event </template>
+    <v-card class="d-flex flex-column">
+        <div class="d-flex flex-column flex-sm-row gap-2 px-6 pt-4 pb-2">
+            <h4 class="text-h5 text-sm-h4 flex-grow-1">
+                <template v-if="event"> Update event </template>
+                <template v-else> New event </template>
 
                 <template v-if="relatedToDate">
                     for the {{ dateFormat(relatedToDate, 'DD MMMM Y') }}
                 </template>
             </h4>
-            <div v-if="event">
-                <v-hover v-slot="{ hover }">
-                    <v-btn
-                        @click="emitDeleteEvent()"
-                        :color="hover || confirmDelete ? 'error' : null">
-                        {{ confirmDelete ? 'Are you sure ?' : 'Delete Event' }}
+
+            <v-hover v-slot="{ hover }" v-if="event">
+                <v-btn
+                    @click="emitDeleteEvent()"
+                    :color="hover || confirmDelete ? 'error' : null"
+                    class="align-self-end align-self-sm-center">
+                    {{ confirmDelete ? 'Are you sure ?' : 'Delete Event' }}
+                </v-btn>
+            </v-hover>
+        </div>
+
+        <v-card-text class="flex-grow-1 d-flex flex-column">
+            <v-form
+                ref="form"
+                v-model="eventForm.valid"
+                @submit.prevent="emitSubmitEvent()"
+                class="flex-grow-1 d-flex flex-column gap-2">
+                <div class="inputs-wrapper">
+                    <v-text-field
+                        ref="name"
+                        v-model="eventForm.data.name"
+                        :rules="eventForm.rules.name"
+                        label="Name"
+                        counter="50"
+                        requried
+                        :autofocus="!event"
+                        class="flex-grow-0">
+                    </v-text-field>
+
+                    <v-textarea
+                        v-model="eventForm.data.description"
+                        :rules="eventForm.rules.description"
+                        @keyup.enter.ctrl="emitSubmitEvent()"
+                        label="Description"
+                        counter="150"
+                        rows="1"
+                        auto-grow
+                        class="flex-grow-0">
+                    </v-textarea>
+
+                    <div class="d-flex flex-column flex-sm-row column-gap-6">
+                        <div class="flex-grow-1">
+                            <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">Start</h6>
+                            <div class="d-flex gap-2">
+                                <v-menu
+                                    v-model="startDatePicker"
+                                    :close-on-content-click="false"
+                                    transition="scale-transition"
+                                    offset-y
+                                    nudge-top="30"
+                                    min-width="290">
+                                    <template #activator="{ attrs, on }">
+                                        <v-text-field
+                                            :value="formattedDate(eventForm.data.startDate)"
+                                            :rules="eventForm.rules.startDate"
+                                            required
+                                            label="Date"
+                                            prepend-icon="mdi-calendar-today"
+                                            readonly
+                                            v-bind="attrs"
+                                            v-on="on">
+                                        </v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="eventForm.data.startDate"
+                                        @change="startDatePicker = false"
+                                        no-title
+                                        scrollable
+                                        show-adjacent-months
+                                        :first-day-of-week="1">
+                                    </v-date-picker>
+                                </v-menu>
+
+                                <v-menu
+                                    ref="startDateTimeMenu"
+                                    v-model="startTimePicker"
+                                    :close-on-content-click="false"
+                                    transition="scale-transition"
+                                    offset-y
+                                    nudge-top="30"
+                                    min-width="290">
+                                    <template #activator="{ attrs, on }">
+                                        <v-text-field
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            v-model="eventForm.data.startTime"
+                                            @change="startTimePicker = false"
+                                            :disabled="eventForm.data.takesWholeDay"
+                                            :error-messages="startTimeErrorMessage"
+                                            label="Time"
+                                            clearable
+                                            readonly
+                                            class="two-row-error">
+                                        </v-text-field>
+                                    </template>
+                                    <v-time-picker
+                                        v-if="startTimePicker"
+                                        v-model="eventForm.data.startTime"
+                                        format="24hr"
+                                        :allowed-minutes="allowedMinutes"
+                                        @click:minute="
+                                            $refs.startDateTimeMenu.save(eventForm.data.startTime)
+                                        ">
+                                    </v-time-picker>
+                                </v-menu>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">End</h6>
+                            <div class="d-flex gap-2">
+                                <v-menu
+                                    v-model="endDatePicker"
+                                    :close-on-content-click="false"
+                                    transition="scale-transition"
+                                    offset-y
+                                    nudge-top="30"
+                                    min-width="290">
+                                    <template #activator="{ attrs, on }">
+                                        <v-text-field
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            @click:clear="resetEndDate()"
+                                            :value="formattedDate(eventForm.data.endDate)"
+                                            :disabled="eventForm.data.takesWholeDay"
+                                            :error-messages="dateErrorMessage"
+                                            required
+                                            label="Date"
+                                            prepend-icon="mdi-calendar"
+                                            readonly
+                                            clearable
+                                            class="two-row-error">
+                                        </v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="eventForm.data.endDate"
+                                        @change="
+                                            endDatePicker = false
+                                            endTimePicker = true
+                                        "
+                                        no-title
+                                        scrollable
+                                        show-adjacent-months
+                                        :first-day-of-week="1">
+                                    </v-date-picker>
+                                </v-menu>
+
+                                <v-menu
+                                    ref="endDateTimeMenu"
+                                    v-model="endTimePicker"
+                                    :close-on-content-click="false"
+                                    transition="scale-transition"
+                                    offset-y
+                                    nudge-top="30"
+                                    min-width="290">
+                                    <template #activator="{ attrs, on }">
+                                        <v-text-field
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            v-model="eventForm.data.endTime"
+                                            @change="endTimePicker = false"
+                                            :error="showDateError && !!eventForm.data.endTime"
+                                            :error-messages="endTimeErrorMessage"
+                                            :disabled="
+                                                !eventForm.data.endDate ||
+                                                eventForm.data.takesWholeDay
+                                            "
+                                            label="Time"
+                                            clearable
+                                            readonly
+                                            class="two-row-error">
+                                        </v-text-field>
+                                    </template>
+                                    <v-time-picker
+                                        v-if="endTimePicker"
+                                        v-model="eventForm.data.endTime"
+                                        format="24hr"
+                                        :allowed-minutes="allowedMinutes"
+                                        @click:minute="
+                                            $refs.endDateTimeMenu.save(eventForm.data.endTime)
+                                        ">
+                                    </v-time-picker>
+                                </v-menu>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-inline-block">
+                        <v-switch v-model="eventForm.data.takesWholeDay" hide-details>
+                            <template #label>
+                                Takes whole day
+                                <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
+                            </template>
+                        </v-switch>
+                    </div>
+                </div>
+
+                <div
+                    v-if="relatedToDate && relatedToDateError"
+                    class="error-text text-body-2 orange--text">
+                    <v-icon class="mr-2" color="orange">mdi-calendar-alert</v-icon>
+                    Event must be related to the
+                    {{ dateFormat(relatedToDate, 'DD MMMM Y') }}.
+                </div>
+
+                <div class="d-flex justify-end gap-2">
+                    <v-btn plain class="flex-grow-1 flex-md-grow-0" @click="emitCloseEvent()">
+                        cancel
                     </v-btn>
-                </v-hover>
-            </div>
-        </v-card-title>
-
-        <v-card-text>
-            <v-form ref="form" v-model="eventForm.valid" @submit.prevent="emitSubmitEvent()">
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            ref="name"
-                            v-model="eventForm.data.name"
-                            :rules="eventForm.rules.name"
-                            label="Name"
-                            counter="50"
-                            maxlength="50"
-                            requried
-                            :autofocus="!event">
-                        </v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-textarea
-                            v-model="eventForm.data.description"
-                            :rules="eventForm.rules.description"
-                            @keyup.enter.ctrl="emitSubmitEvent()"
-                            label="Description"
-                            counter="150"
-                            maxlength="150"
-                            rows="1"
-                            auto-grow>
-                        </v-textarea>
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col class="pb-1 pr-6">
-                        <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">Start</h6>
-                    </v-col>
-                    <v-col class="pb-1 pl-6">
-                        <h6 class="text-subtitle-2 grey--text text--lighten-2 pl-1">End</h6>
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col class="pr-0 pt-0">
-                        <v-menu
-                            v-model="startDatePicker"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto">
-                            <template #activator="{ attrs, on }">
-                                <v-text-field
-                                    :value="formattedDate(eventForm.data.startDate)"
-                                    :rules="eventForm.rules.startDate"
-                                    required
-                                    label="Date"
-                                    prepend-icon="mdi-calendar-today"
-                                    readonly
-                                    v-bind="attrs"
-                                    v-on="on">
-                                </v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="eventForm.data.startDate"
-                                @change="startDatePicker = false"
-                                no-title
-                                scrollable
-                                show-adjacent-months
-                                :first-day-of-week="1">
-                            </v-date-picker>
-                        </v-menu>
-                    </v-col>
-
-                    <v-col class="pr-6 pt-0">
-                        <v-menu
-                            ref="startDateTimeMenu"
-                            v-model="startTimePicker"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto">
-                            <template #activator="{ attrs, on }">
-                                <v-text-field
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    v-model="eventForm.data.startTime"
-                                    @change="startTimePicker = false"
-                                    :disabled="eventForm.data.takesWholeDay"
-                                    :error-messages="startTimeErrorMessage"
-                                    label="Time"
-                                    clearable
-                                    readonly
-                                    class="two-row-error">
-                                </v-text-field>
-                            </template>
-                            <v-time-picker
-                                v-if="startTimePicker"
-                                v-model="eventForm.data.startTime"
-                                format="24hr"
-                                :allowed-minutes="allowedMinutes"
-                                @click:minute="
-                                    $refs.startDateTimeMenu.save(eventForm.data.startTime)
-                                ">
-                            </v-time-picker>
-                        </v-menu>
-                    </v-col>
-
-                    <v-col class="pl-6 pr-0 pt-0">
-                        <v-menu
-                            v-model="endDatePicker"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto">
-                            <template #activator="{ attrs, on }">
-                                <v-text-field
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    @click:clear="resetEndDate()"
-                                    :value="formattedDate(eventForm.data.endDate)"
-                                    :disabled="eventForm.data.takesWholeDay"
-                                    :error-messages="dateErrorMessage"
-                                    required
-                                    label="Date"
-                                    prepend-icon="mdi-calendar"
-                                    readonly
-                                    clearable
-                                    class="two-row-error">
-                                </v-text-field>
-                            </template>
-                            <v-date-picker
-                                v-model="eventForm.data.endDate"
-                                @change="
-                                    endDatePicker = false
-                                    endTimePicker = true
-                                "
-                                no-title
-                                scrollable
-                                show-adjacent-months
-                                :first-day-of-week="1">
-                            </v-date-picker>
-                        </v-menu>
-                    </v-col>
-
-                    <v-col class="pt-0">
-                        <v-menu
-                            ref="endDateTimeMenu"
-                            v-model="endTimePicker"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto">
-                            <template #activator="{ attrs, on }">
-                                <v-text-field
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    v-model="eventForm.data.endTime"
-                                    @change="endTimePicker = false"
-                                    :error="showDateError && !!eventForm.data.endTime"
-                                    :error-messages="endTimeErrorMessage"
-                                    :disabled="
-                                        !eventForm.data.endDate || eventForm.data.takesWholeDay
-                                    "
-                                    label="Time"
-                                    clearable
-                                    readonly
-                                    class="two-row-error">
-                                </v-text-field>
-                            </template>
-                            <v-time-picker
-                                v-if="endTimePicker"
-                                v-model="eventForm.data.endTime"
-                                format="24hr"
-                                :allowed-minutes="allowedMinutes"
-                                @click:minute="$refs.endDateTimeMenu.save(eventForm.data.endTime)">
-                            </v-time-picker>
-                        </v-menu>
-                    </v-col>
-                </v-row>
-
-                <v-row>
-                    <v-col>
-                        <div class="d-inline-block">
-                            <v-switch v-model="eventForm.data.takesWholeDay">
-                                <template #label>
-                                    Takes whole day
-                                    <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
-                                </template>
-                            </v-switch>
-                        </div>
-                    </v-col>
-                </v-row>
-
-                <v-card-actions class="d-flex mt-3">
-                    <v-fade-transition>
-                        <div
-                            v-if="relatedToDate && relatedToDateError"
-                            class="d-flex align-center text-body-2 orange--text">
-                            <v-icon class="mr-2" color="orange">mdi-calendar-alert</v-icon>
-                            Event must be related to the
-                            {{ dateFormat(relatedToDate, 'DD MMMM Y') }}.
-                        </div>
-                    </v-fade-transition>
-
-                    <v-spacer></v-spacer>
                     <v-btn
                         color="success"
                         text
                         type="submit"
+                        class="flex-grow-1 flex-md-grow-0"
                         :disabled="!eventForm.valid || relatedToDateError">
                         {{ event ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
-                </v-card-actions>
+                </div>
             </v-form>
         </v-card-text>
     </v-card>
@@ -249,6 +243,7 @@ export default class EventDialog extends Vue {
     @Prop({ required: true }) isDialogOpen!: boolean
     @Prop({ required: false }) event?: EventModel
     @Prop({ required: false }) relatedToDate?: string
+    @Prop({ required: false }) startDatePlaceholder?: string
 
     confirmDelete = false
     eventForm = {
@@ -256,7 +251,7 @@ export default class EventDialog extends Vue {
         data: {
             name: '',
             description: '',
-            startDate: moment().format('YYYY-MM-DD'),
+            startDate: '',
             startTime: '',
             endDate: '',
             endTime: '',
@@ -329,7 +324,7 @@ export default class EventDialog extends Vue {
     }
 
     beforeMount(): void {
-        if (this.event) this.populateForm(this.event)
+        this.populateForm(this.event)
     }
 
     @Watch('isDialogOpen')
@@ -339,7 +334,7 @@ export default class EventDialog extends Vue {
         this.confirmDelete = false
         this.form.resetValidation()
         this.populateForm(this.event)
-        this.inputName.focus()
+        if (!this.event) this.inputName.focus()
     }
 
     @Watch('eventForm.data', { deep: true })
@@ -379,16 +374,21 @@ export default class EventDialog extends Vue {
                 endTime: event.endTime ?? '',
                 takesWholeDay: event.takesWholeDay,
             }
-        } else
+        } else {
+            const startDate = this.startDatePlaceholder
+                ? moment(this.startDatePlaceholder)
+                : moment()
+
             this.eventForm.data = {
                 name: '',
                 description: '',
-                startDate: moment().format('YYYY-MM-DD'),
+                startDate: startDate.format('YYYY-MM-DD'),
                 startTime: '',
                 endDate: '',
                 endTime: '',
                 takesWholeDay: false,
             }
+        }
     }
 
     emitSubmitEvent(): void {
@@ -445,3 +445,19 @@ export default class EventDialog extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+    .inputs-wrapper {
+        flex: 1 0 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
+.v-input--switch {
+    margin-top: 0;
+}
+</style>

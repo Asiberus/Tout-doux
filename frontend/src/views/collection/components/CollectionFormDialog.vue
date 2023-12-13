@@ -1,52 +1,62 @@
 <template>
-    <v-card>
-        <v-card-title>
-            <h4 class="text-h4">New collection</h4>
-        </v-card-title>
-        <v-card-text>
-            <v-form ref="form" v-model="collectionForm.valid" @submit.prevent="emitSubmitEvent()">
-                <v-text-field
-                    ref="name"
-                    v-model="collectionForm.data.name"
-                    :rules="collectionForm.rules.name"
-                    label="Name"
-                    counter="50"
-                    maxlength="50"
-                    required
-                    autofocus
-                    class="mb-2">
-                </v-text-field>
-
-                <v-textarea
-                    v-model="collectionForm.data.description"
-                    :rules="collectionForm.rules.description"
-                    @keyup.enter.ctrl="emitSubmitEvent()"
-                    label="Description"
-                    counter="500"
-                    maxlength="500"
-                    required
-                    rows="1"
-                    auto-grow
-                    class="mb-2">
-                </v-textarea>
-
-                <div class="item-name-wrapper mb-2">
+    <v-card class="d-flex flex-column">
+        <div class="px-6 pt-4 pb-2">
+            <h4 class="text-h5 text-sm-h4">New collection</h4>
+        </div>
+        <v-card-text class="flex-grow-1 d-flex flex-column">
+            <v-form
+                ref="form"
+                v-model="collectionForm.valid"
+                @submit.prevent="emitSubmitEvent()"
+                class="flex-grow-1 d-flex flex-column">
+                <div class="inputs-wrapper">
                     <v-text-field
-                        v-model="collectionForm.data.itemName"
-                        :rules="collectionForm.rules.itemName"
-                        label="Item name"
-                        counter="20"
-                        maxlength="20"
-                        required>
+                        ref="name"
+                        v-model="collectionForm.data.name"
+                        :rules="collectionForm.rules.name"
+                        label="Name"
+                        counter="50"
+                        required
+                        autofocus
+                        class="mb-2">
                     </v-text-field>
+
+                    <v-textarea
+                        v-model="collectionForm.data.description"
+                        :rules="collectionForm.rules.description"
+                        @keyup.enter.ctrl="emitSubmitEvent()"
+                        label="Description"
+                        counter="500"
+                        required
+                        rows="1"
+                        auto-grow
+                        class="mb-2">
+                    </v-textarea>
+
+                    <div class="item-name-wrapper mb-2">
+                        <v-text-field
+                            v-model="collectionForm.data.itemName"
+                            :rules="collectionForm.rules.itemName"
+                            label="Item name"
+                            counter="15"
+                            required>
+                        </v-text-field>
+                    </div>
                 </div>
 
-                <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn color="success" text type="submit" :disabled="!collectionForm.valid">
+                <div class="d-flex justify-end gap-2">
+                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
+                    <v-btn
+                        color="success"
+                        text
+                        type="submit"
+                        :disabled="!collectionForm.valid"
+                        class="flex-grow-1 flex-md-grow-0">
                         create
                     </v-btn>
-                    <v-btn plain class="ml-1" @click="emitCloseEvent()"> cancel </v-btn>
-                </v-card-actions>
+                </div>
             </v-form>
         </v-card-text>
     </v-card>
@@ -79,7 +89,7 @@ export default class CollectionFormDialog extends Vue {
             ],
             itemName: [
                 (value: string) => !!value || 'This field is required',
-                (value: string) => value.length <= 20 || 'Max 15 characters',
+                (value: string) => value.length <= 15 || 'Max 15 characters',
             ],
         },
     }
@@ -114,7 +124,25 @@ export default class CollectionFormDialog extends Vue {
 </script>
 
 <style scoped lang="scss">
-.item-name-wrapper {
-    width: calc(100% / 3);
+@import '~vuetify/src/styles/styles.sass';
+
+@media #{map-get($display-breakpoints, 'sm-and-down')} {
+    .inputs-wrapper {
+        flex: 1 0 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'sm-only')} {
+    .item-name-wrapper {
+        width: 50%;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .item-name-wrapper {
+        width: calc(100% / 3);
+    }
 }
 </style>

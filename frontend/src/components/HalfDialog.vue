@@ -3,7 +3,11 @@
         :value="value"
         @input="$emit('input', $event)"
         content-class="half-dialog"
-        transition="slide-x-reverse-transition">
+        :transition="
+            $vuetify.breakpoint.width < 400
+                ? 'dialog-bottom-transition'
+                : 'slide-x-reverse-transition'
+        ">
         <slot></slot>
     </v-dialog>
 </template>
@@ -23,5 +27,3 @@ export default class HalfDialog extends Vue {
     }
 }
 </script>
-
-<style scoped lang="scss"></style>

@@ -1,27 +1,38 @@
 <template>
     <div class="fill-height d-flex flex-column">
-        <h3 class="text-h3 mb-5">Agenda</h3>
-        <div class="d-flex align-center mb-2">
-            <v-btn @click="setCalendarToNow()" :disabled="isCurrentMonthSelected" class="mr-2">
+        <MainTitle icon="mdi-calendar-month" class="mb-2 mb-sm-3">Agenda</MainTitle>
+
+        <div class="d-flex align-center flex-wrap gap-1 mb-2 mb-sm-3">
+            <div class="mr-sm-1">
+                <v-btn
+                    @click="previousMonth()"
+                    icon
+                    :small="$vuetify.breakpoint.xsOnly && true"
+                    :x-small="false">
+                    <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-btn @click="nextMonth()" icon :small="$vuetify.breakpoint.xsOnly && true">
+                    <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+            </div>
+
+            <v-btn
+                @click="setCalendarToNow()"
+                :disabled="isCurrentMonthSelected"
+                :small="$vuetify.breakpoint.xsOnly"
+                class="mr-1">
                 now
             </v-btn>
-            <v-btn icon @click="previousMonth()">
-                <v-icon>mdi-chevron-left</v-icon>
-            </v-btn>
-            <v-btn icon class="mr-2" @click="nextMonth()">
-                <v-icon>mdi-chevron-right</v-icon>
-            </v-btn>
 
-            <h4 class="text-h5">{{ monthSelected }}</h4>
+            <h4 class="text-body-1 text-sm-h5 flex-grow-1">{{ monthSelected }}</h4>
 
-            <v-spacer></v-spacer>
-            <v-btn @click="openEventDialog()">
-                <v-icon left>mdi-plus</v-icon>
-                event
+            <v-btn @click="openEventDialog()" :small="$vuetify.breakpoint.xsOnly">
+                <v-icon>mdi-plus</v-icon>
+                <template v-if="$vuetify.breakpoint.smAndUp">event</template>
             </v-btn>
         </div>
 
-        <v-sheet rounded class="flex-grow-1" min-height="500px">
+        <v-sheet rounded min-height="500px" height="75svh">
             <v-calendar
                 ref="calendar"
                 v-model="value"
@@ -33,9 +44,9 @@
                 :event-margin-bottom="2"
                 :event-ripple="false"
                 color="accent"
-                @click:event="openEventTooltip($event)"
-                @click:more="openDayDialog($event)">
-                <template v-slot:day-label="{ day, present, date }">
+                class="calendar"
+                @click:day="handleClickOnDay($event)">
+                <template #day-label="{ day, present, date }">
                     <v-hover v-slot="{ hover }">
                         <div
                             class="day-label"
@@ -44,13 +55,12 @@
                                 'grey--text text--lighten-1': !hover,
                                 'white--text': hover,
                                 'text--lighten-3': present && hover,
-                            }"
-                            @click="openDayDialog({ date })">
+                            }">
                             {{ day }}
                         </div>
                     </v-hover>
                 </template>
-                <template v-slot:event="{ event }">
+                <template #event="{ event }">
                     <div class="d-flex align-center px-2">
                         <template v-if="event.project">
                             <v-avatar
@@ -87,6 +97,7 @@
                     </div>
                 </template>
             </v-calendar>
+            <!-- The Tooltip menu is removed temporally. See if we keep it or not. -->
             <v-menu
                 v-model="eventTooltip"
                 :close-on-content-click="false"
@@ -96,16 +107,22 @@
                 min-width="30rem"
                 max-width="40rem">
                 <template v-if="eventSelected">
-                    <EventTooltip :event="eventSelected" @update="openEventDialog($event)">
+                    <EventTooltip
+                        :event="eventSelected"
+                        @update="openEventDialog({ event: $event })">
                     </EventTooltip>
                 </template>
             </v-menu>
         </v-sheet>
 
-        <v-dialog v-model="eventDialog" width="60%">
+        <v-dialog
+            v-model="eventDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <EventDialog
                 :is-dialog-open="eventDialog"
                 :event="eventToUpdate"
+                :start-date-placeholder="startDatePlaceholder"
                 @create="createEvent($event)"
                 @update="updateEvent($event)"
                 @delete="deleteEvent($event)"
@@ -117,6 +134,7 @@
             v-model="eventDayDialog"
             :date="eventDayDialogDate"
             :events="eventDayDialogEvents"
+            @open-event-dialog="openEventDialog({ startDatePlaceholder: $event })"
             @update="updateEvent($event)"
             @delete="deleteEvent($event)">
         </EventDayDialog>
@@ -133,9 +151,12 @@ import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
 @Component({
-    components: { EventDialog, EventTooltip, EventDayDialog },
+    methods: { getDialogWidth },
+    components: { MainTitle, EventDialog, EventTooltip, EventDayDialog },
 })
 export default class Agenda extends Vue {
     events: EventModel[] = [] // TODO : think of using Set
@@ -145,6 +166,7 @@ export default class Agenda extends Vue {
 
     eventDialog = false
     eventToUpdate: EventModel | null = null
+    startDatePlaceholder: string | null = null
 
     eventTooltip = false
     eventTooltipKey = 0
@@ -154,6 +176,8 @@ export default class Agenda extends Vue {
     eventDayDialog = false
     eventDayDialogDate: string | null = null
     eventDayDialogEvents: EventModel[] = []
+
+    doubleClickTimer?: number = undefined
 
     get monthSelected(): string {
         return moment(this.value).format('MMMM YYYY')
@@ -172,6 +196,7 @@ export default class Agenda extends Vue {
     }
 
     retrieveEvents(): void {
+        this.events = []
         const month = moment(this.value).month() + 1 // Month count start at 0
         const year = moment(this.value).year()
         eventService.getEvents({ month, year }).then(
@@ -180,8 +205,10 @@ export default class Agenda extends Vue {
         )
     }
 
-    openEventDialog(event: EventModel | null = null): void {
-        this.eventToUpdate = event
+    openEventDialog(options: { event?: EventModel; startDatePlaceholder?: string } = {}): void {
+        const { event, startDatePlaceholder } = options
+        this.eventToUpdate = event ?? null
+        this.startDatePlaceholder = startDatePlaceholder ?? null
         this.eventDialog = true
     }
 
@@ -191,6 +218,7 @@ export default class Agenda extends Vue {
             (response: any) => {
                 this.events.push(response.body)
                 this.eventDialog = false
+                if (this.eventDayDialog) this.setDayDialogEventList()
             },
             (error: any) => console.error(error)
         )
@@ -227,16 +255,34 @@ export default class Agenda extends Vue {
         )
     }
 
+    // Tooltip removed temporally
     openEventTooltip($event: { nativeEvent: MouseEvent; event: EventModel }): void {
         const { nativeEvent, event } = $event
+
+        nativeEvent.stopImmediatePropagation()
         this.eventTooltipKey += 1 // Hack to re-render v-menu component
         this.eventSelected = event
         this.eventTooltipElement = nativeEvent.target
         if (!this.eventTooltip) this.eventTooltip = true
     }
 
-    openDayDialog($event: { date: string }): void {
+    handleClickOnDay($event: { date: string }): void {
         const { date } = $event
+        const delay = 200
+
+        if (this.doubleClickTimer) {
+            clearTimeout(this.doubleClickTimer)
+            this.doubleClickTimer = undefined
+            this.openEventDialog({ startDatePlaceholder: date })
+        } else {
+            this.doubleClickTimer = setTimeout(() => {
+                this.openDayDialog(date)
+                this.doubleClickTimer = undefined
+            }, delay)
+        }
+    }
+
+    openDayDialog(date: string): void {
         this.eventDayDialog = true
         this.eventDayDialogDate = date
         this.setDayDialogEventList()
@@ -275,14 +321,42 @@ export default class Agenda extends Vue {
 </script>
 
 <style scoped lang="scss">
-.calendar-arrow {
-    margin-left: 1px;
-    margin-right: 1px;
-}
+.calendar {
+    &::v-deep .v-calendar-weekly__day {
+        cursor: pointer;
 
-.day-label {
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+        .v-event {
+            pointer-events: none;
+        }
+
+        .v-event-more {
+            background-color: inherit;
+        }
+
+        &:hover {
+            background-color: #424242;
+        }
+
+        &.v-present {
+            background-color: #515151;
+        }
+
+        &.v-outside {
+            &:hover {
+                background-color: #303030;
+            }
+        }
+    }
+
+    .day-label {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .calendar-arrow {
+        margin-left: 1px;
+        margin-right: 1px;
+    }
 }
 </style>

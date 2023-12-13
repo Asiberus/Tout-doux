@@ -8,36 +8,29 @@
         :color="backgroundColor"
         :ripple="false"
         class="rounded-lg">
-        <v-card-text>
-            <div class="d-flex align-end">
-                <div class="d-flex flex-column">
-                    <h1 class="white--text mb-2">
-                        {{ dateFormat(dailySummary.date, 'dddd') }}
-                    </h1>
-                    <p class="daily-date">
-                        {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
-                    </p>
-                </div>
-                <v-spacer></v-spacer>
-                <div v-if="dailySummary.totalEvent > 0" class="d-flex flex-shrink-0">
-                    <span class="daily-event mr-1">
-                        {{ dailySummary.totalEvent }}
-                    </span>
+        <v-card-text class="daily-summary-card d-flex flex-row">
+            <div class="flex-grow-1">
+                <h1 class="text-h5 font-weight-medium white--text mb-0">
+                    {{ dateFormat(dailySummary.date, 'dddd') }}
+                </h1>
+                <p class="text-subtitle-2 text-md-subtitle-1 mb-0">
+                    {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
+                </p>
+            </div>
+
+            <div
+                class="d-flex flex-column align-end"
+                :class="{ 'justify-end': dailySummary.totalTask === 0 }">
+                <TaskCounter
+                    v-if="dailySummary.totalTask"
+                    :value="dailySummary.totalTaskCompleted"
+                    :max="dailySummary.totalTask"
+                    class="flex-shrink-0 mb-2">
+                </TaskCounter>
+
+                <div v-if="dailySummary.totalEvent > 0" class="flex-shrink-0 d-flex gap-1">
+                    <span class="daily-event">{{ dailySummary.totalEvent }}</span>
                     <v-icon>mdi-calendar-clock</v-icon>
-                </div>
-                <div v-if="dailySummary.totalTask" class="flex-shrink-0 ml-6">
-                    <span style="font-size: 3em" class="white--text">{{
-                        dailySummary.totalTaskCompleted
-                    }}</span>
-                    /
-                    <span
-                        style="
-                            font-size: 1.8em;
-                            transform: translateY(0.3em);
-                            display: inline-block;
-                        ">
-                        {{ dailySummary.totalTask }}
-                    </span>
                 </div>
             </div>
         </v-card-text>
@@ -46,11 +39,11 @@
 
 <script lang="ts">
 import { dateFormat } from '@/pipes'
-import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { DailySummary } from 'src/models/daily-summary.model'
+import TaskCounter from '@/components/TaskCounter.vue'
 
-@Component
+@Component({ components: { TaskCounter } })
 export default class DailySummaryCardComponent extends Vue {
     @Prop({ required: true }) dailySummary!: DailySummary
 
@@ -89,13 +82,18 @@ export default class DailySummaryCardComponent extends Vue {
 </script>
 
 <style scoped lang="scss">
-.daily-date {
-    font-size: 1rem;
-    padding-left: 0.3rem;
-}
+@import '~vuetify/src/styles/styles.sass';
 
-.daily-event {
-    font-size: 1.8em;
-    color: white;
+.daily-summary-card {
+    min-height: 96px;
+
+    .daily-event {
+        font-size: 1.5rem;
+        color: white;
+
+        @media #{map-get($display-breakpoints, 'sm-and-down')} {
+            font-size: 1.25rem;
+        }
+    }
 }
 </style>

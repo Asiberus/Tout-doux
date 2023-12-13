@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fill-height d-flex flex-column">
         <template v-if="tagList.length > 0">
             <div class="tag-wrapper">
                 <TagCard
@@ -11,14 +11,22 @@
             </div>
         </template>
         <template v-else>
-            <EmptyListDisplay :message="`You didn't configure any ${type} tag yet`" class="mt-10">
+            <EmptyListDisplay
+                :message="`You didn't configure any ${type} tag yet.`"
+                class="empty-list-display">
                 <template #img>
-                    <img src="../../../assets/settings.svg" width="330" alt="No tag" />
+                    <img
+                        src="../../../assets/settings.svg"
+                        alt="No tag"
+                        class="empty-list-display__img" />
                 </template>
             </EmptyListDisplay>
         </template>
 
-        <v-dialog v-model="tagDialog" width="60%">
+        <v-dialog
+            v-model="tagDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <TagDialog
                 :type="type"
                 :is-dialog-open="tagDialog"
@@ -29,21 +37,30 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Tag, TagForm, TagType } from '@/models/tag.model'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import TagCard from '@/views/components/tag/TagCard.vue'
 import { tagService } from '@/api'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { TagDialog, TagCard, EmptyListDisplay } })
+@Component({
+    methods: { getDialogWidth },
+    components: { TagDialog, TagCard, EmptyListDisplay },
+})
 export default class SettingsTagList extends Vue {
     @Prop({ required: true }) type!: TagType
 
     tagList: Tag[] = []
     tagDialog = false
 
-    created() {
+    created(): void {
+        this.fetchTagList()
+    }
+
+    @Watch('type')
+    private onTypeChange(): void {
         this.fetchTagList()
     }
 
@@ -95,8 +112,16 @@ export default class SettingsTagList extends Vue {
 <style scoped lang="scss">
 .tag-wrapper {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(max(calc((100% / 4) - 3 * 4px), 200px), 1fr));
+    row-gap: 8px;
     column-gap: 4px;
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>

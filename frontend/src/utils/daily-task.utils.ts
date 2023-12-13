@@ -4,11 +4,11 @@ import { DailyTaskAction } from '@/models/daily-task.model'
 export function getLiteralFormOfDailyActionEnum(action: DailyTaskAction): string {
     switch (action) {
         case DailyTaskAction.THINK:
-            return 'Réfléchir'
+            return 'Think'
         case DailyTaskAction.WORK:
-            return 'Travailler'
+            return 'Work'
         case DailyTaskAction.FINISH:
-            return 'Finir'
+            return 'Finish'
     }
 }
 

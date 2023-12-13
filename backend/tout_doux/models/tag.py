@@ -1,7 +1,9 @@
 from django.db import models
 
+from tout_doux.models.user import UserRelatedModel
 
-class Tag(models.Model):
+
+class Tag(UserRelatedModel):
     class Type(models.TextChoices):
         PROJECT = 'project'
         TASK = 'task'
@@ -34,5 +36,5 @@ class Tag(models.Model):
 
     class Meta:
         constraints = (
-            models.UniqueConstraint(fields=('name', 'type'), name='unique_name_for_type'),
+            models.UniqueConstraint(fields=('user', 'name', 'type'), name='unique_name_for_user_and_type'),
         )

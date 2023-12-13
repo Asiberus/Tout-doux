@@ -2,14 +2,18 @@
     <div>
         <v-hover v-slot="{ hover }">
             <v-card
-                @click="openEventDialog()"
+                @click="onEventCardClick()"
                 :color="cardColor"
                 :disabled="disabled"
                 :ripple="false"
                 class="rounded-lg"
                 :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }">
-                <v-card-text class="d-flex align-center">
-                    <v-icon v-if="showIcon" :class="[getTextColor('icon')]" large class="mr-4">
+                <v-card-text class="d-flex align-center pa-3 pa-sm-4">
+                    <v-icon
+                        v-if="showIcon"
+                        :class="[getTextColor('icon')]"
+                        :large="$vuetify.breakpoint.smAndUp"
+                        class="mr-2 mr-sm-3 mr-md-4">
                         mdi-calendar-clock
                     </v-icon>
 
@@ -22,9 +26,9 @@
                         </v-icon>
                     </template>
 
-                    <div class="flex-grow-1 d-flex flex-column overflow-hidden mr-4">
+                    <div class="flex-grow-1 d-flex flex-column overflow-hidden">
                         <div
-                            class="d-flex align-center grey--text font-weight-bold"
+                            class="date-text grey--text font-weight-bold"
                             :class="[getTextColor('date')]">
                             <template v-if="event.takesWholeDay && !daySelected">
                                 <span title="Date">
@@ -65,7 +69,7 @@
                         </div>
 
                         <h3
-                            class="text-truncate white--text"
+                            class="text-body-2 text-sm-body-1 font-weight-bold white--text"
                             :class="[getTextColor('name')]"
                             :title="event.name">
                             {{ event.name }}
@@ -73,23 +77,39 @@
 
                         <span
                             v-if="event.description"
-                            class="text-truncate"
-                            :class="[getTextColor('description')]"
+                            ref="description"
+                            class="text-caption text-sm-body-2"
+                            :class="[
+                                {
+                                    'text-truncate': !displayDescription,
+                                    'cursor-pointer': isDescriptionOverflowing,
+                                },
+                                getTextColor('description'),
+                            ]"
                             :title="event.description">
                             {{ event.description }}
                         </span>
                     </div>
 
                     <template v-if="project">
-                        <router-link :to="{ name: 'project-detail', params: { id: project.id } }">
-                            <ProjectAvatar :project="project" :hover="hover"></ProjectAvatar>
+                        <router-link
+                            :to="{ name: 'project-detail', params: { id: project.id } }"
+                            class="ml-2">
+                            <ProjectAvatar
+                                :project="project"
+                                :hover="hover || $vuetify.breakpoint.xsOnly"
+                                :small="$vuetify.breakpoint.xsOnly">
+                            </ProjectAvatar>
                         </router-link>
                     </template>
                 </v-card-text>
             </v-card>
         </v-hover>
 
-        <v-dialog v-model="eventDialog" width="60%">
+        <v-dialog
+            v-model="eventDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <EventDialog
                 :event="event"
                 :is-dialog-open="eventDialog"
@@ -111,8 +131,12 @@ import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { EventDialog, ProjectAvatar } })
+@Component({
+    methods: { getDialogWidth },
+    components: { EventDialog, ProjectAvatar },
+})
 export default class EventItemCard extends Vue {
     @Prop({ required: true }) event!: EventModel
     @Prop({ default: null }) project!: Project | null
@@ -127,6 +151,9 @@ export default class EventItemCard extends Vue {
     @Prop({ required: false }) relatedToDate?: string
 
     eventDialog = false
+    displayDescription = false
+    isDescriptionOverflowing = false
+    descriptionElement?: HTMLElement
 
     get cardColor(): string | null {
         if (this.color) return this.color
@@ -135,10 +162,21 @@ export default class EventItemCard extends Vue {
         return 'event'
     }
 
-    openEventDialog(): void {
-        if (this.disabled || !this.clickable) return
+    mounted(): void {
+        this.descriptionElement = this.$refs.description as HTMLElement
+        if (this.descriptionElement && this.$vuetify.breakpoint.xsOnly)
+            this.isDescriptionOverflowing =
+                this.descriptionElement.scrollWidth > this.descriptionElement.clientWidth
+    }
 
-        this.eventDialog = true
+    onEventCardClick(): void {
+        if (!this.clickable) {
+            if (!this.event.description) return
+
+            this.displayDescription = !this.displayDescription
+        } else if (!this.disabled) {
+            this.eventDialog = true
+        }
     }
 
     emitUpdateEvent(data: EventPostOrPatch): void {
@@ -178,14 +216,25 @@ export default class EventItemCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .caret::after {
     content: '';
     position: absolute;
     top: calc(50% - 10px);
-    left: -10px;
+    left: -9px;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
     border-right: 10px solid #000;
     border-right-color: inherit;
+}
+
+.date-text {
+    display: flex;
+    align-items: center;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        font-size: 0.8rem;
+    }
 }
 </style>

@@ -7,11 +7,11 @@
             class="wrapper rounded-lg">
             <v-icon>mdi-timeline</v-icon>
             <div class="content">
-                <div class="content__body">
-                    <h5 class="text-h6 white--text text-truncate" :title="commonTask.name">
-                        {{ commonTask.name }}
-                    </h5>
-                </div>
+                <h5
+                    class="content__title text-body-1 text-sm-h6 white--text"
+                    :title="commonTask.name">
+                    {{ commonTask.name }}
+                </h5>
                 <template v-if="commonTask.tags.length > 0">
                     <TagGroup :tag-list="commonTask.tags" max-tag="3"></TagGroup>
                 </template>
@@ -43,14 +43,12 @@
             @update="emitUpdateEvent($event)">
         </CommonTaskDialog>
 
-        <v-dialog v-model="deleteConfirmDialog" width="50%">
-            <ConfirmDialog @confirm="emitDeleteEvent()" @cancel="deleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trash-can</v-icon>
-                </template>
-                <p>Are you sure to delete this common task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trash-can</v-icon>
+            </template>
+            <span>Are you sure to delete this common task ?</span>
+        </ConfirmDialog>
     </div>
 </template>
 
@@ -92,12 +90,15 @@ export default class CommonTaskCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .wrapper {
     display: flex;
     align-items: center;
-    column-gap: 16px;
-    padding: 12px 8px 12px 20px;
+    column-gap: 8px;
+    padding: 12px 20px 12px 12px;
     min-height: 80px;
+    height: 100%;
 
     .content {
         flex-grow: 1;
@@ -105,6 +106,10 @@ export default class CommonTaskCard extends Vue {
         display: flex;
         flex-direction: column;
         row-gap: 4px;
+
+        &__title {
+            line-height: 1.25rem;
+        }
 
         .tag-icon {
             opacity: 0.62;
@@ -115,7 +120,22 @@ export default class CommonTaskCard extends Vue {
     .actions {
         position: absolute;
         top: 8px;
-        right: 8px;
+        right: 4px;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .wrapper {
+        padding: 12px 24px 12px 20px;
+        column-gap: 16px;
+
+        .content__title {
+            line-height: 1.5rem;
+        }
+
+        .actions {
+            right: 8px;
+        }
     }
 }
 </style>

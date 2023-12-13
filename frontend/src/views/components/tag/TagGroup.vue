@@ -1,8 +1,5 @@
 <template>
-    <div
-        ref="tagGroup"
-        class="tag-group d-flex align-center gap-1 overflow-auto"
-        :class="{ small, large }">
+    <div ref="tagGroup" class="tag-group" :class="{ small, large, 'multi-row': multiRow }">
         <v-icon
             v-if="displayedTags.length > 0"
             :small="!small && !large"
@@ -28,7 +25,12 @@
                 :close-on-content-click="false"
                 :z-index="zIndex">
                 <template #activator="{ attrs, on }">
-                    <v-chip v-bind="attrs" v-on="on" :small="!large" class="flex-shrink-0">
+                    <v-chip
+                        v-bind="attrs"
+                        v-on="on"
+                        :small="!large"
+                        class="flex-shrink-0"
+                        @click.prevent.stop>
                         <template v-if="smallMenuChip">
                             <template v-if="displayedTags.length > 0">+</template>
                             <span>{{ hiddenTags.length }}</span>
@@ -71,6 +73,7 @@ export default class TagGroup extends Vue {
     @Prop({ default: true }) iconTransparent!: boolean
     @Prop({ default: 4 }) zIndex!: number
     @Prop({ default: true }) autoShrink!: boolean
+    @Prop({ default: false }) multiRow!: boolean
 
     smallMenuChip = false
     internalMaxTag: number | null = null
@@ -115,8 +118,13 @@ export default class TagGroup extends Vue {
 .tag-group {
     display: flex;
     align-items: center;
-    column-gap: 4px;
-    overflow: auto;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    &.multi-row {
+        flex-wrap: wrap;
+    }
 
     &:not(.small):not(.large) {
         .v-chip {

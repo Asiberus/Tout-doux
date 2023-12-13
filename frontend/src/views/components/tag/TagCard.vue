@@ -1,13 +1,16 @@
 <template>
     <div>
-        <v-card @click="tagDialog = true" :color="tag.color" class="rounded-pill px-3">
-            <v-card-text class="d-flex align-center px-3 py-3">
-                <v-icon>mdi-tag</v-icon>
-                <h3 class="white--text pl-3 text-truncate">{{ tag.name }}</h3>
+        <v-card @click="tagDialog = true" :color="tag.color" class="rounded-pill">
+            <v-card-text class="d-flex align-center px-6 py-3">
+                <v-icon class="mr-2">mdi-tag</v-icon>
+                <h3 class="white--text text-truncate">{{ tag.name }}</h3>
             </v-card-text>
         </v-card>
 
-        <v-dialog v-model="tagDialog" width="60%">
+        <v-dialog
+            v-model="tagDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <TagDialog
                 :tag="tag"
                 :type="tag.type"
@@ -23,8 +26,12 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Tag, TagForm } from '@/models/tag.model'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { TagDialog } })
+@Component({
+    methods: { getDialogWidth },
+    components: { TagDialog },
+})
 export default class TagCard extends Vue {
     @Prop({ required: true }) tag!: Tag
 

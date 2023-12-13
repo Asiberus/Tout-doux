@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="d-flex flex-column h-100">
         <template v-if="commonTaskList.length">
             <div class="common-task-list">
                 <CommonTaskCard
@@ -14,12 +14,14 @@
             </div>
         </template>
         <template v-else>
-            <EmptyListDisplay :message="`You didn't create any common task yet`">
+            <EmptyListDisplay
+                message="You didn't create any common task yet."
+                class="empty-list-display">
                 <template #img>
                     <img
                         src="../../../../../../assets/no_common_task.svg"
-                        width="250"
-                        alt="No common task" />
+                        alt="No common task"
+                        class="empty-list-display__img" />
                 </template>
             </EmptyListDisplay>
         </template>
@@ -51,14 +53,28 @@ export default class DailyUpdateCommonTask extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '~vuetify/src/styles/styles.sass';
+
 .common-task-list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
+    // Max 2 column
+    grid-template-columns: repeat(auto-fit, minmax(max(300px, calc((100% - 8px) / 2)), 1fr));
     gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
 
     & > * {
         min-width: 0;
+    }
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
     }
 }
 </style>

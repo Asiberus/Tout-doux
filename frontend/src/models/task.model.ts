@@ -1,6 +1,6 @@
-import { Project, ProjectDetail } from '@/models/project.model'
+import { Project } from '@/models/project.model'
 import { Section } from '@/models/section.model'
-import { Collection, CollectionDetail } from '@/models/collection.model'
+import { Collection } from '@/models/collection.model'
 import { Tag } from '@/models/tag.model'
 
 export interface TaskPost {

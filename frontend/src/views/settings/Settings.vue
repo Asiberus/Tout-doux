@@ -1,10 +1,14 @@
 <template>
-    <div>
-        <h1 class="text-h3 mb-5">Settings</h1>
+    <div class="fill-height d-flex flex-column">
+        <MainTitle icon="mdi-cog" class="mb-2 mb-md-6">Settings</MainTitle>
 
-        <v-row>
-            <v-col cols="2">
-                <v-tabs vertical color="accent" background-color="transparent">
+        <div class="settings">
+            <div class="settings__tabs">
+                <v-tabs
+                    :vertical="$vuetify.breakpoint.mdAndUp"
+                    color="accent"
+                    show-arrows
+                    background-color="transparent">
                     <v-tab :to="{ name: 'settings-preferences' }" exact class="justify-start">
                         <v-icon left small>mdi-cog</v-icon>
                         Preferences
@@ -18,17 +22,60 @@
                         Tags
                     </v-tab>
                 </v-tabs>
-            </v-col>
-            <v-col>
+            </div>
+            <div class="settings__content">
                 <router-view />
-            </v-col>
-        </v-row>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
 
-@Component
+@Component({ components: { MainTitle } })
 export default class SettingsComponent extends Vue {}
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.settings {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &__tabs {
+        .v-tabs::v-deep {
+            .v-slide-group__prev,
+            .v-slide-group__next {
+                min-width: initial;
+                flex-basis: auto;
+            }
+        }
+
+        @media #{map-get($display-breakpoints, 'xs-only')} {
+            .v-tabs::v-deep .v-tab {
+                font-size: 0.7rem;
+                padding: 0 8px;
+            }
+        }
+    }
+
+    &__content {
+        flex-grow: 1;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'md-and-up')} {
+    .settings {
+        flex-direction: row;
+
+        &__tabs {
+            flex: 0 0 calc(100% / 6 - 12px);
+        }
+    }
+}
+</style>

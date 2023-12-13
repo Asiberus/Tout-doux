@@ -3,7 +3,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
 
-class JsonAuthentication(BaseAuthentication):
+class EmailPasswordAuthentication(BaseAuthentication):
     def authenticate(self, request):
         email = request.data.get('email')
         password = request.data.get('password')

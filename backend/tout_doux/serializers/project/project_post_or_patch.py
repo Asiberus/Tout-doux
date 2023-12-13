@@ -12,6 +12,7 @@ class ProjectPostOrPatchSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Project
@@ -20,10 +21,19 @@ class ProjectPostOrPatchSerializer(serializers.ModelSerializer):
             'description',
             'tagIds',
             'archived',
+            'user',
         )
 
     def to_representation(self, instance):
         return ProjectSerializer(instance).data
+
+    def validate_tagIds(self, tags):
+        current_user = self.context.get('request').user
+        for tag in tags:
+            if tag.user.pk is not current_user.pk:
+                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
+
+        return tags
 
     def validate(self, data):
         if not self.instance and data.get('archived'):

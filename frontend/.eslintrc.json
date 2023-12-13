@@ -51,6 +51,12 @@
                         "ignoreNumericLiteralTypes": true,
                         "ignoreReadonlyClassProperties": true
                     }
+                ],
+                "vue/valid-v-slot": [
+                    "error",
+                    {
+                        "allowModifiers": true
+                    }
                 ]
             }
         },
