@@ -1,16 +1,36 @@
 <template>
     <HalfDialog :value="value" @input="$emit('input', $event)">
-        <v-card height="100%" class="d-flex flex-column">
+        <v-card
+            v-touch="{
+                start: () => touchStartEvent(),
+                right: () => handleTouchEvent('right'),
+                down: () => handleTouchEvent('down'),
+            }"
+            height="100%"
+            class="d-flex flex-column">
             <v-toolbar class="flex-grow-0">
-                <v-toolbar-title> Events : {{ dateFormat(date, 'D MMMM YYYY') }} </v-toolbar-title>
+                <v-toolbar-title class="text-body-1 text-sm-h6 mr-2">
+                    Events : {{ dateFormat(date, 'D MMMM YYYY') }}
+                </v-toolbar-title>
+
+                <v-btn
+                    @click="$emit('open-event-dialog', date)"
+                    :small="$vuetify.breakpoint.xsOnly"
+                    :icon="$vuetify.breakpoint.xsOnly"
+                    class="new-event-btn">
+                    <v-icon>mdi-plus</v-icon>
+                    <template v-if="$vuetify.breakpoint.smAndUp">event</template>
+                </v-btn>
+
                 <v-spacer></v-spacer>
+
                 <v-btn @click="$emit('input', false)" icon>
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
             </v-toolbar>
-            <v-card-text class="overflow-auto flex-grow-1">
+            <v-card-text ref="dialogContent" class="overflow-auto flex-grow-1">
                 <template v-if="events.length > 0">
-                    <div class="pt-3">
+                    <div class="d-flex flex-column gap-3 pt-3">
                         <EventItemCard
                             v-for="event of events"
                             :key="event.id"
@@ -20,17 +40,24 @@
                             color="event"
                             :daySelected="true"
                             :change-passed-text-color="false"
+                            :margin-bottom="false"
                             @update="$emit('update', $event)"
                             @delete="$emit('delete', $event)">
                         </EventItemCard>
                     </div>
                 </template>
                 <template v-else>
-                    <EmptyListDisplay
-                        message="No event for that day."
-                        class="d-flex justify-center align-center fill-height">
+                    <EmptyListDisplay class="d-flex justify-center align-center fill-height">
                         <template #img>
-                            <img src="../../../assets/no_events.svg" width="300" alt="No events" />
+                            <img
+                                src="../../../assets/no_events.svg"
+                                alt="No events"
+                                class="empty-img" />
+                        </template>
+                        <template #message>
+                            <p class="text-body-1 text-sm-h6 white--text mb-0">
+                                No event for that day.
+                            </p>
                         </template>
                     </EmptyListDisplay>
                 </template>
@@ -53,8 +80,42 @@ export default class EventDayDialog extends Vue {
     @Prop({ required: true }) date!: string
     @Prop({ required: true }) events!: EventModel[]
 
+    isScrollingOnContent = false
+
+    get scrollableElement(): Element {
+        return this.$refs.dialogContent as Element
+    }
+
+    touchStartEvent() {
+        // We detect if the touch-down is a scroll on the content
+        this.isScrollingOnContent = this.scrollableElement.scrollTop > 0
+    }
+
+    handleTouchEvent(type: string): void {
+        if (type === 'right' && this.$vuetify.breakpoint.width >= 400) this.$emit('input', false)
+        else if (type === 'down' && this.$vuetify.breakpoint.width < 400) this.scrollDownEvent()
+    }
+
+    scrollDownEvent(): void {
+        if (!this.isScrollingOnContent) this.$emit('input', false)
+    }
+
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
     }
 }
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.empty-img {
+    width: clamp(250px, 50%, 350px);
+}
+
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .new-event-btn {
+        background-color: #353535 !important;
+    }
+}
+</style>

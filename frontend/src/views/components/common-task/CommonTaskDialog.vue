@@ -1,27 +1,34 @@
 <template>
-    <v-dialog :value="value" @input="$emit('input', $event)" width="60%">
+    <v-dialog
+        :value="value"
+        @input="$emit('input', $event)"
+        :width="getDialogWidth()"
+        :fullscreen="$vuetify.breakpoint.smAndDown">
         <template #activator="{ attrs, on }">
             <slot name="activator" :attrs="attrs" :on="on"></slot>
         </template>
-        <v-card>
-            <v-card-title>
-                <h4 class="text-h4">{{ title }}</h4>
-            </v-card-title>
-            <v-card-text>
-                <v-form ref="form" v-model="commonTaskForm.valid" @submit.prevent="emitSubmit()">
+        <v-card class="d-flex flex-column">
+            <div class="px-6 pt-4 pb-2">
+                <h4 class="text-h5 text-sm-h4">{{ title }}</h4>
+            </div>
+            <v-card-text class="flex-grow-1 d-flex flex-column">
+                <v-form
+                    ref="form"
+                    v-model="commonTaskForm.valid"
+                    @submit.prevent="emitSubmit()"
+                    class="flex-grow-1 d-flex flex-column">
                     <v-text-field
                         ref="name"
                         v-model="commonTaskForm.data.name"
                         @input="validateName"
                         label="Name"
                         counter="50"
-                        maxlength="50"
                         requried
                         :loading="inputNameLoading"
                         :rules="commonTaskForm.rules.name"
                         :error-messages="nameUniqueError"
-                        autofocus
-                        class="mb-2">
+                        :autofocus="!commonTask"
+                        class="flex-grow-0 mb-2">
                     </v-text-field>
 
                     <h6 class="text-h6 grey--text text--lighten-2">
@@ -40,16 +47,21 @@
                         </TagChip>
                     </div>
 
-                    <v-card-actions class="d-flex justify-end">
+                    <v-spacer></v-spacer>
+
+                    <div class="d-flex justify-end gap-2">
+                        <v-btn @click="closeDialog()" plain class="flex-grow-1 flex-md-grow-0">
+                            cancel
+                        </v-btn>
                         <v-btn
                             color="success"
                             text
                             type="submit"
-                            :disabled="!commonTaskForm.valid || commonTaskForm.pending">
+                            :disabled="!commonTaskForm.valid || commonTaskForm.pending"
+                            class="flex-grow-1 flex-md-grow-0">
                             {{ commonTask ? 'update' : 'create' }}
                         </v-btn>
-                        <v-btn plain class="ml-2" @click="closeDialog()">cancel</v-btn>
-                    </v-card-actions>
+                    </div>
                 </v-form>
             </v-card-text>
         </v-card>
@@ -65,15 +77,19 @@ import { IsCommonTaskNameUniqueParams } from '@/api/common-task.api'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import { Tag } from '@/models/tag.model'
 import TagChip from '@/views/components/tag/TagChip.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { TagSearch, TagChip } })
+@Component({
+    methods: { getDialogWidth },
+    components: { TagSearch, TagChip },
+})
 export default class CommonTaskDialog extends Vue {
     @Prop({ required: true }) value!: boolean
     @Prop({ required: false }) commonTask?: CommonTask
 
     nameUniqueError: string | null = null
     inputNameLoading = false
-    validationTimer?: number
+    validationTimer?: number = undefined
 
     tagList: Tag[] = []
     commonTaskForm: Form<CommonTaskForm> = {
@@ -110,8 +126,8 @@ export default class CommonTaskDialog extends Vue {
             this.$nextTick(() => {
                 this.nameUniqueError = null
                 this.form.resetValidation()
-                this.inputName.focus()
                 this.populateForm()
+                if (!this.commonTask) this.inputName.focus()
             })
         }
     }
@@ -136,7 +152,10 @@ export default class CommonTaskDialog extends Vue {
     validateName(value: string): void {
         clearTimeout(this.validationTimer)
 
-        if (value === '') return
+        if (value === '') {
+            this.nameUniqueError = null
+            return
+        }
 
         this.commonTaskForm.pending = true
         this.validationTimer = setTimeout(() => this.isNameUnique(value), 300)

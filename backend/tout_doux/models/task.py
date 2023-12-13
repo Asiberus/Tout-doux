@@ -5,9 +5,10 @@ from tout_doux.models.collection import Collection
 from tout_doux.models.project import Project
 from tout_doux.models.section import Section
 from tout_doux.models.tag import Tag
+from tout_doux.models.user import UserRelatedModel
 
 
-class Task(models.Model):
+class Task(UserRelatedModel):
     name = models.CharField(max_length=50)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,9 +1,10 @@
 <template>
     <div class="daily-update">
-        <div class="d-flex justify-space-between align-center mb-4">
-            <h2 class="text-h3">
+        <div class="d-flex flex-column flex-sm-row justify-space-between align-center gap-2 mb-2">
+            <SecondaryTitle class="text-center text-sm-start">
                 <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
-            </h2>
+            </SecondaryTitle>
+
             <v-btn
                 @click="goToDailyDetail()"
                 :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
@@ -54,8 +55,10 @@ import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import MainTitle from '@/components/MainTitle.vue'
+import SecondaryTitle from '@/components/SecondaryTitle.vue'
 
-@Component({ components: { DailyUpdateTask, DailyUpdateEvent } })
+@Component({ components: { SecondaryTitle, DailyUpdateTask, DailyUpdateEvent } })
 export default class DailyUpdate extends Vue {
     @Prop({ required: true }) readonly date!: string
     @Prop({ validator: value => value === 'task' || value === 'event' })
@@ -71,8 +74,7 @@ export default class DailyUpdate extends Vue {
     }
 
     goToDailyDetail(): void {
-        localStorage.setItem('openDailyDetailTo', this.date)
-        this.$router.push({ name: 'daily-summary' })
+        this.$router.push({ name: 'daily-summary', params: { date: this.date } })
     }
 
     onStepperChange(index: number): void {
@@ -87,9 +89,17 @@ export default class DailyUpdate extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .daily-update {
     height: 100%;
     display: flex;
     flex-direction: column;
+
+    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+        .v-stepper__step--editable:hover {
+            background: inherit;
+        }
+    }
 }
 </style>

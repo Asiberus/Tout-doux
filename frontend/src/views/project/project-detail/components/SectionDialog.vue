@@ -1,39 +1,50 @@
 <template>
-    <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-            <h4 class="text-h4">{{ section ? 'Update section' : 'New section' }}</h4>
-            <div v-if="section">
-                <v-hover v-slot="{ hover }">
-                    <v-btn
-                        @click="emitDeleteSection()"
-                        :color="hover || confirmDelete ? 'error' : null">
-                        {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
+    <v-card class="d-flex flex-column">
+        <div class="d-flex justify-end align-center flex-wrap gap-2 px-6 pt-4 pb-2">
+            <h4 class="text-h5 text-sm-h4 flex-grow-1">
+                {{ section ? 'Update section' : 'New section' }}
+            </h4>
+
+            <v-hover v-slot="{ hover }" v-if="section">
+                <v-btn
+                    @click="emitDeleteSection()"
+                    :color="hover || confirmDelete ? 'error' : null"
+                    :small="$vuetify.breakpoint.xsOnly">
+                    {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
+                </v-btn>
+            </v-hover>
+        </div>
+        <v-card-text class="flex-grow-1 d-flex flex-column">
+            <v-form
+                ref="form"
+                v-model="sectionForm.valid"
+                @submit.prevent="emitSubmitEvent()"
+                class="flex-grow-1 d-flex flex-column">
+                <v-text-field
+                    ref="name"
+                    v-model="sectionForm.data.name"
+                    label="Name"
+                    counter="50"
+                    required
+                    :rules="sectionForm.rules.name"
+                    autofocus>
+                </v-text-field>
+
+                <v-spacer></v-spacer>
+
+                <div class="d-flex justify-end gap-2">
+                    <v-btn plain @click="emitCloseEvent()" class="flex-grow-1 flex-md-grow-0">
+                        cancel
                     </v-btn>
-                </v-hover>
-            </div>
-        </v-card-title>
-        <v-card-text>
-            <v-form ref="form" v-model="sectionForm.valid" @submit.prevent="emitSubmitEvent()">
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            ref="name"
-                            v-model="sectionForm.data.name"
-                            label="Name"
-                            counter="50"
-                            maxlength="50"
-                            required
-                            :rules="sectionForm.rules.name"
-                            autofocus>
-                        </v-text-field>
-                    </v-col>
-                </v-row>
-                <v-card-actions class="d-flex justify-end mt-3">
-                    <v-btn color="success" text type="submit" :disabled="!sectionForm.valid">
+                    <v-btn
+                        color="success"
+                        text
+                        type="submit"
+                        :disabled="!sectionForm.valid"
+                        class="flex-grow-1 flex-md-grow-0">
                         {{ section ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
-                </v-card-actions>
+                </div>
             </v-form>
         </v-card-text>
     </v-card>
@@ -42,6 +53,7 @@
 <script lang="ts">
 import { SectionTask } from '@/models/section.model'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import vuetify from '@/plugins/vuetify'
 
 @Component
 export default class SectionDialog extends Vue {

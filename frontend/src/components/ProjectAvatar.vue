@@ -1,9 +1,9 @@
 <template>
     <v-avatar
         :color="project.archived ? 'projectArchived' : 'project'"
-        size="15"
+        :size="small ? 12 : 15"
         class="project-avatar"
-        :class="{ hovered: hover }"
+        :class="{ hovered: hover, small }"
         :title="project.name">
         <span :class="{ 'project-archived': project.archived }">
             {{ project.name.slice(0, 1) }}
@@ -19,6 +19,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 export default class ProjectAvatar extends Vue {
     @Prop({ required: true }) project!: Project
     @Prop({ default: false }) hover!: boolean
+    @Prop({ default: false }) small!: boolean
 }
 </script>
 
@@ -28,6 +29,10 @@ export default class ProjectAvatar extends Vue {
     top: 16px;
     right: 16px;
     transition: transform 0.1s ease-in-out;
+
+    &.small span {
+        font-size: 0.45rem;
+    }
 
     &.hovered {
         transform: scale(2);

@@ -10,6 +10,8 @@ import { authService } from '@/services'
 import { HttpOptions, HttpResponse } from 'vue-resource/types/vue_resource'
 import VueRouter from 'vue-router'
 
+Vue.store = store
+
 Vue.use(VueRouter)
 Vue.router = router
 
@@ -26,6 +28,8 @@ Vue.http.interceptors.push(() => {
     return (response: HttpResponse) => {
         if (response.status === 401) {
             authService.removeToken()
+            authService.resetStore()
+
             Vue.router.push({ name: 'login' })
         }
     }

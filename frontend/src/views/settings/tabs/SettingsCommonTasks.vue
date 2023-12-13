@@ -1,11 +1,13 @@
 <template>
-    <div>
-        <div class="text-h4 mb-4">Common task</div>
-        <div class="d-flex justify-space-between align-center mb-1">
-            <p class="text-subtitle-1 mb-0 mr-10">
-                A common task represent a task that can be done multiple times (e.g. take the dog
-                out, buy some groceries). They can be easily added in the daily update.
-            </p>
+    <div class="fill-height d-flex flex-column">
+        <TertiaryTitle>Common task</TertiaryTitle>
+
+        <div class="d-flex flex-wrap flex-md-nowrap justify-end align-center gap-2 mb-2">
+            <h3 class="flex-grow-1 text-subtitle-2 text-sm-subtitle-1 mr-md-5">
+                A common task represent a task that can be done frequently (e.g. take the dog out,
+                buy some groceries). It can easily be added in the daily update.
+            </h3>
+
             <CommonTaskDialog v-model="commonTaskDialog" @create="createCommonTask($event)">
                 <template #activator="{ attrs, on }">
                     <v-btn v-bind="attrs" v-on="on">
@@ -27,12 +29,14 @@
             </div>
         </template>
         <template v-else>
-            <EmptyListDisplay :message="`You didn't create any common task yet`" class="mt-10">
+            <EmptyListDisplay
+                message="You didn't create any common task yet."
+                class="empty-list-displays">
                 <template #img>
                     <img
                         src="../../../assets/no_common_task.svg"
-                        width="330"
-                        alt="No common task" />
+                        alt="No common task"
+                        class="empty-list-display__img" />
                 </template>
             </EmptyListDisplay>
         </template>
@@ -46,8 +50,9 @@ import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import CommonTaskCard from '@/views/components/common-task/CommonTaskCard.vue'
 import CommonTaskDialog from '@/views/components/common-task/CommonTaskDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
-@Component({ components: { CommonTaskCard, CommonTaskDialog, EmptyListDisplay } })
+@Component({ components: { TertiaryTitle, CommonTaskCard, CommonTaskDialog, EmptyListDisplay } })
 export default class SettingsCommonTasks extends Vue {
     commonTaskList: CommonTask[] = []
 
@@ -99,9 +104,28 @@ export default class SettingsCommonTasks extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .common-task-wrapper {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(296px, 1fr));
+    gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'sm-and-up')} {
+        grid-template-columns: repeat(auto-fill, minmax(max(300px, calc((100% - 12px) / 2)), 1fr));
+        gap: 12px;
+    }
+
+    & > * {
+        min-width: 0;
+    }
+}
+
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 300px);
+    }
 }
 </style>

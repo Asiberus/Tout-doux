@@ -3,9 +3,10 @@ from django.db import models
 from tout_doux.models.common_task import CommonTask
 from tout_doux.models.tag import Tag
 from tout_doux.models.task import Task
+from tout_doux.models.user import UserRelatedModel
 
 
-class DailyTask(models.Model):
+class DailyTask(UserRelatedModel):
     THINK = 'TH'
     WORK = 'WO'
     FINISH = 'FI'

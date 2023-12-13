@@ -30,6 +30,7 @@ class TaskPostSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Task
@@ -39,24 +40,45 @@ class TaskPostSerializer(serializers.ModelSerializer):
             'projectId',
             'sectionId',
             'collectionId',
+            'user',
         )
 
     def to_representation(self, instance):
         return TaskSerializer(instance).data
 
+    def validate_tagIds(self, tags):
+        current_user = self.context.get('request').user
+        for tag in tags:
+            if tag.user.pk is not current_user.pk:
+                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
+
+        return tags
+
     def validate_projectId(self, project):
+        current_user = self.context.get('request').user
+        if project.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{project.pk}\" - object does not exist.')
+
         if project.archived:
             raise serializers.ValidationError('You can\'t create a task to an archived project')
 
         return project
 
     def validate_sectionId(self, section):
+        current_user = self.context.get('request').user
+        if section.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{section.pk}\" - object does not exist.')
+
         if section.project.archived:
             raise serializers.ValidationError('You can\'t create a task to an archived project')
 
         return section
 
     def validate_collectionId(self, collection):
+        current_user = self.context.get('request').user
+        if collection.user.pk is not current_user.pk:
+            raise serializers.ValidationError(f'Invalid pk \"{collection.pk}\" - object does not exist.')
+
         if collection.archived:
             raise serializers.ValidationError('You can\'t create a task to an archived collection')
 

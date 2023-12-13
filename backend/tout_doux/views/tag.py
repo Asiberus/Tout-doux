@@ -10,7 +10,6 @@ from tout_doux.serializers.tag import TagSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = ExtendedPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -18,7 +17,7 @@ class TagViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = self.request.user.tags.all()
 
         if 'exclude_ids' in self.request.query_params:
             exclude_ids = map(lambda x: int(x), self.request.query_params.get('exclude_ids').split(','))
@@ -37,7 +36,8 @@ class TagViewSet(viewsets.ModelViewSet):
         elif tag_type not in [Tag.Type.PROJECT, Tag.Type.TASK]:
             raise ParseError('Type is not good')
 
-        if self.queryset.filter(type=tag_type, name=name).exclude(id=exclude_id).count() > 0:
+        # Todo : See if can be optimize
+        if self.get_queryset().filter(type=tag_type, name=name).exclude(id=exclude_id).count() > 0:
             data = {'unique': False}
         else:
             data = {'unique': True}

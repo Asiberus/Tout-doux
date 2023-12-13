@@ -16,5 +16,3 @@ export default class FilterChip extends Vue {
     @Prop({ required: true }) icon!: string
 }
 </script>
-
-<style scoped lang="scss"></style>

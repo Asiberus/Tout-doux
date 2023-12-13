@@ -49,7 +49,7 @@
                 </template>
 
                 <div
-                    class="flex-grow-1 font-weight-medium white--text text-truncate"
+                    class="flex-grow-1 font-weight-medium white--text"
                     :class="{ 'text-body-2': small, 'text-body-1': !small }"
                     :title="task.name">
                     {{ task.name }}
@@ -66,7 +66,10 @@
             </template>
         </v-card>
 
-        <v-dialog v-model="taskDialog" width="60%">
+        <v-dialog
+            v-model="taskDialog"
+            :width="getDialogWidth()"
+            :fullscreen="$vuetify.breakpoint.smAndDown">
             <TaskDialog
                 :task="task"
                 :is-dialog-open="taskDialog"
@@ -76,36 +79,34 @@
             </TaskDialog>
         </v-dialog>
 
-        <v-dialog v-model="uncompleteConfirmDialog" width="50%">
-            <ConfirmDialog
-                @confirm="emitToggleStateEvent()"
-                @cancel="uncompleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trophy</v-icon>
-                </template>
-                <p>Are you sure to uncomplete this task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="uncompleteConfirmDialog" @confirm="emitToggleStateEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trophy</v-icon>
+            </template>
+            <span>Are you sure to uncomplete this task ?</span>
+        </ConfirmDialog>
 
-        <v-dialog v-model="deleteConfirmDialog" width="50%">
-            <ConfirmDialog @confirm="emitDeleteEvent()" @cancel="deleteConfirmDialog = false">
-                <template #icon>
-                    <v-icon x-large>mdi-trash-can</v-icon>
-                </template>
-                <p>Are you sure to delete this task ?</p>
-            </ConfirmDialog>
-        </v-dialog>
+        <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
+            <template #icon>
+                <v-icon x-large>mdi-trash-can</v-icon>
+            </template>
+            <span>Are you sure to delete this task ?</span>
+        </ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts">
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { TaskDialog, ConfirmDialog, TagGroup } })
+@Component({
+    methods: { getDialogWidth },
+    components: { TaskDialog, ConfirmDialog, TagGroup },
+})
 export default class TaskCard extends Vue {
     @Prop({ required: true }) task!: Task
     @Prop({ default: false }) disabled!: boolean
@@ -154,9 +155,12 @@ export default class TaskCard extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .task-card {
     min-height: 72px;
-    padding: 8px;
+    height: 100%;
+    padding: 8px 20px 8px 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -168,7 +172,7 @@ export default class TaskCard extends Vue {
     &__actions {
         position: absolute;
         top: 4px;
-        right: 8px;
+        right: 4px;
 
         &__btn {
             min-width: 0 !important;
@@ -180,6 +184,16 @@ export default class TaskCard extends Vue {
         display: flex;
         align-items: center;
         column-gap: 4px;
+    }
+}
+
+@media #{map-get($display-breakpoints, 'sm-and-up')} {
+    .task-card {
+        padding: 8px 24px 8px 8px;
+
+        &__actions {
+            right: 8px;
+        }
     }
 }
 </style>

@@ -1,38 +1,76 @@
 <template>
     <div>
-        <v-row>
-            <v-col cols="9">
+        <v-btn
+            v-if="$vuetify.breakpoint.xsOnly"
+            @click="$emit('new-section')"
+            :disabled="disabled"
+            small
+            class="mb-1">
+            <v-icon left>mdi-plus</v-icon>
+            section
+        </v-btn>
+        <div class="d-flex align-center justify-ends gap-2 mb-2">
+            <h3 class="section-title text-h6">
+                {{ section.name }}
+
+                <v-dialog
+                    v-model="sectionDialog"
+                    :width="getDialogWidth()"
+                    :fullscreen="$vuetify.breakpoint.smAndDown">
+                    <template #activator="{ attrs, on }">
+                        <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            :disabled="disabled"
+                            :small="$vuetify.breakpoint.mdAndDown"
+                            icon>
+                            <v-icon small>mdi-pencil</v-icon>
+                        </v-btn>
+                    </template>
+                    <SectionDialog
+                        :section="section"
+                        :is-dialog-open="sectionDialog"
+                        @submit="updateSection"
+                        @delete="deleteSection"
+                        @close="sectionDialog = false">
+                    </SectionDialog>
+                </v-dialog>
+            </h3>
+
+            <v-btn
+                v-if="$vuetify.breakpoint.smAndUp"
+                @click="$emit('new-section')"
+                :disabled="disabled"
+                :small="$vuetify.breakpoint.mdAndDown || true"
+                class="">
+                <v-icon left>mdi-plus</v-icon>
+                section
+            </v-btn>
+        </div>
+
+        <v-row class="flex-wrap-reverse flex-sm-nowrap" :no-gutters="$vuetify.breakpoint.xsOnly">
+            <v-col :cols="$vuetify.breakpoint.smAndUp ? 9 : 12">
                 <div class="d-flex align-center mb-2">
-                    <v-dialog v-model="sectionDialog" width="60%">
-                        <template #activator="{ attrs, on }">
-                            <v-btn v-bind="attrs" v-on="on" :disabled="disabled" class="mr-1">
-                                <v-icon left>mdi-pencil</v-icon>
-                                edit section
-                            </v-btn>
-                        </template>
-                        <SectionDialog
-                            :section="section"
-                            :is-dialog-open="sectionDialog"
-                            @submit="updateSection"
-                            @delete="deleteSection"
-                            @close="sectionDialog = false">
-                        </SectionDialog>
-                    </v-dialog>
-
-                    <v-spacer></v-spacer>
-
                     <FilterChip
                         v-if="section.tasks.length > 0"
                         v-model="displayCompletedTask"
                         color="green darken-2"
-                        icon="mdi-trophy"
-                        class="mr-3">
+                        icon="mdi-trophy">
                         Completed
                     </FilterChip>
 
-                    <v-dialog v-model="taskDialog" width="60%">
+                    <v-spacer></v-spacer>
+
+                    <v-dialog
+                        v-model="taskDialog"
+                        :width="getDialogWidth()"
+                        :fullscreen="$vuetify.breakpoint.smAndDown">
                         <template #activator="{ attrs, on }">
-                            <v-btn v-bind="attrs" v-on="on" :disabled="disabled">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                :disabled="disabled"
+                                :small="$vuetify.breakpoint.smAndDown">
                                 <v-icon left>mdi-plus</v-icon>
                                 task
                             </v-btn>
@@ -63,22 +101,24 @@
                             section.tasks.length > 0 &&
                             section.tasks.length === completedTasks.length
                         ">
-                        <EmptyListDisplay message="You completed all tasks of this section !">
+                        <EmptyListDisplay
+                            message="You completed all the tasks of this section!"
+                            class="my-3">
                             <template #img>
                                 <img
                                     src="../../../../assets/all_task_completed.svg"
-                                    width="200"
-                                    alt="All tasks completed" />
+                                    alt="All tasks completed!"
+                                    class="empty-img" />
                             </template>
                         </EmptyListDisplay>
                     </template>
                     <template v-else>
-                        <EmptyListDisplay message="This section has no task yet">
+                        <EmptyListDisplay message="This section has no task yet." class="my-3">
                             <template #img>
                                 <img
-                                    src="../../../../assets/no_tasks.svg"
-                                    width="200"
-                                    alt="No tasks" />
+                                    src="../../../../assets/project-no-tasks.svg"
+                                    alt="No tasks"
+                                    class="empty-img" />
                             </template>
                         </EmptyListDisplay>
                     </template>
@@ -97,27 +137,41 @@
                         </TaskCard>
                     </template>
                     <template v-else>
-                        <EmptyListDisplay message="You didn't completed any tasks yet !">
+                        <EmptyListDisplay
+                            message="You didn't completed any tasks yet!"
+                            class="my-3">
                             <template #img>
                                 <img
-                                    src="../../../../assets/no_tasks.svg"
-                                    width="200"
-                                    alt="No tasks completed" />
+                                    src="../../../../assets/project-no-tasks.svg"
+                                    alt="No tasks completed"
+                                    class="empty-img" />
                             </template>
                         </EmptyListDisplay>
                     </template>
                 </template>
             </v-col>
-            <v-col cols="3">
+            <v-col :cols="$vuetify.breakpoint.smAndUp ? 3 : 12">
                 <v-scale-transition origin="center">
-                    <div class="d-flex align-center justify-center" v-if="section.tasks.length > 0">
-                        <ProgressWheel
-                            :mode="preferences.progressWheelMode"
-                            :value="completedTasks.length"
-                            :max="section.tasks.length"
-                            size="small"
-                            color="green accent-2">
-                        </ProgressWheel>
+                    <div
+                        v-if="section.tasks.length > 0"
+                        class="d-flex flex-column align-center justify-center">
+                        <template v-if="$vuetify.breakpoint.smAndUp">
+                            <ProgressWheel
+                                :mode="preferences.progressWheelMode"
+                                :value="completedTasks.length"
+                                :max="section.tasks.length"
+                                :size="progressWheelSize"
+                                color="green accent-2">
+                            </ProgressWheel>
+                        </template>
+                        <template v-else>
+                            <v-progress-linear
+                                color="green accent-2"
+                                :value="completedTasksPercentage"
+                                rounded>
+                            </v-progress-linear>
+                            <div>{{ completedTasks.length }} / {{ section.tasks.length }}</div>
+                        </template>
                     </div>
                 </v-scale-transition>
             </v-col>
@@ -137,8 +191,10 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Preferences } from '@/models/preferences.model'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
 @Component({
+    methods: { getDialogWidth },
     components: {
         SectionDialog,
         TaskCard,
@@ -166,6 +222,18 @@ export default class ProjectSectionItem extends Vue {
 
     get uncompletedTasks(): Task[] {
         return this.section.tasks.filter(({ completed }) => !completed)
+    }
+
+    get completedTasksPercentage(): number {
+        if (this.section.tasks.length === 0) return 0
+        return Math.round((this.completedTasks.length / this.section.tasks.length) * 100)
+    }
+
+    get progressWheelSize(): 'x-small' | 'small' | 'medium' | 'large' {
+        if (this.$vuetify.breakpoint.smAndDown) return 'x-small'
+        else if (this.$vuetify.breakpoint.mdAndDown) return 'small'
+        else if (this.$vuetify.breakpoint.lgAndDown) return 'medium'
+        else return 'large'
     }
 
     updateSection({ name }: SectionPatch): void {
@@ -201,3 +269,19 @@ export default class ProjectSectionItem extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
+.section-title {
+    line-height: 1.5rem;
+}
+
+.empty-img {
+    width: clamp(200px, 50%, 300px);
+
+    @media #{map-get($display-breakpoints, 'xl-only')} {
+        width: clamp(200px, 50%, 400px);
+    }
+}
+</style>

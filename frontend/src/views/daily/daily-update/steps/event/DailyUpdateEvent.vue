@@ -1,16 +1,19 @@
 <template>
-    <div>
-        <div class="d-flex align-center mb-4">
-            <h5 class="text-h5 mr-2">Events of the day</h5>
-            <v-chip v-if="eventList.length > 0" small>
-                {{ eventList.length }}
-            </v-chip>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="eventDialog" width="60%">
+    <div class="d-flex flex-column h-100">
+        <div class="d-flex align-center flex-wrap gap-2 mb-3">
+            <div class="flex-grow-1 d-flex align-center gap-2">
+                <h5 class="text-h5">Events of the day</h5>
+                <v-chip v-if="eventList.length > 0" small>{{ eventList.length }}</v-chip>
+            </div>
+
+            <v-dialog
+                v-model="eventDialog"
+                :width="getDialogWidth()"
+                :fullscreen="$vuetify.breakpoint.smAndDown">
                 <template #activator="{ on, attrs }">
                     <v-btn v-bind="attrs" v-on="on">
-                        <v-icon left>mdi-plus</v-icon>
-                        event
+                        <v-icon :left="$vuetify.breakpoint.smAndUp">mdi-plus</v-icon>
+                        <template v-if="$vuetify.breakpoint.smAndUp">event</template>
                     </v-btn>
                 </template>
                 <EventDialog
@@ -41,9 +44,12 @@
             </div>
         </template>
         <template v-else>
-            <EmptyListDisplay message="No event for today!" class="mt-10">
+            <EmptyListDisplay message="No event for today!" class="empty-list-display">
                 <template #img>
-                    <img src="../../../../../assets/no_events.svg" width="300" alt="No events" />
+                    <img
+                        src="../../../../../assets/no_events.svg"
+                        alt="No events"
+                        class="empty-list-display__img" />
                 </template>
             </EmptyListDisplay>
         </template>
@@ -58,8 +64,12 @@ import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
+import { getDialogWidth } from '@/utils/dialog.utils'
 
-@Component({ components: { EventItemCard, EventDialog, EmptyListDisplay } })
+@Component({
+    methods: { getDialogWidth },
+    components: { EventItemCard, EventDialog, EmptyListDisplay },
+})
 export default class DailyUpdateEvent extends Vue {
     @Prop({ required: true }) private date!: string
 
@@ -141,3 +151,13 @@ export default class DailyUpdateEvent extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.empty-list-display {
+    flex-grow: 1;
+
+    &__img {
+        width: clamp(200px, 50%, 350px);
+    }
+}
+</style>

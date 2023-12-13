@@ -1,8 +1,9 @@
 <template>
     <div v-if="preferences">
-        <h4 class="text-h4 mb-4">Preferences</h4>
+        <TertiaryTitle>Preferences</TertiaryTitle>
+
         <p class="text-subtitle-1 mb-1">
-            You can here personalize the layout or the behavior of some components.
+            You can here personalize the layout and the behavior of some components.
         </p>
 
         <h5 class="text-h6 mb-2">Progress Wheel</h5>
@@ -22,7 +23,7 @@
 
                     <ProgressWheel
                         :mode="mode"
-                        size="large"
+                        :size="progressWheelSize"
                         value="14"
                         max="20"
                         color="green accent-2">
@@ -38,13 +39,21 @@ import { Component, Vue } from 'vue-property-decorator'
 import ProgressWheel from '@/components/ProgressWheel.vue'
 import { ProgressWheelMode, Preferences } from '@/models/preferences.model'
 import { preferencesActions } from '@/store/modules/preferences.store'
+import TertiaryTitle from '@/components/TertiaryTitle.vue'
 
-@Component({ components: { ProgressWheel } })
+@Component({ components: { TertiaryTitle, ProgressWheel } })
 export default class SettingsPreferences extends Vue {
     ProgressWheelMode = ProgressWheelMode
 
     get preferences(): Preferences | undefined {
         return this.$store.state.preferences.preferences
+    }
+
+    get progressWheelSize(): 'x-small' | 'small' | 'medium' | 'large' | 'x-large' {
+        if (this.$vuetify.breakpoint.xsOnly) return 'x-small'
+        if (this.$vuetify.breakpoint.smAndDown) return 'small'
+        else if (this.$vuetify.breakpoint.width < 1600) return 'medium'
+        else return 'x-large'
     }
 
     updatePreferences(progressWheelMode: ProgressWheelMode): void {
@@ -54,12 +63,18 @@ export default class SettingsPreferences extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '~vuetify/src/styles/styles.sass';
+
 .progress-wheel-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 50%);
-    column-gap: 8px;
+    display: flex;
+    gap: 8px;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        flex-direction: column;
+    }
 
     .progress-wheel-card {
+        flex-grow: 1;
         position: relative;
         display: flex;
         justify-content: center;
@@ -68,8 +83,11 @@ export default class SettingsPreferences extends Vue {
         border: 2px solid var(--v-secondary-base);
         cursor: pointer;
 
-        &:hover {
-            background-color: var(--v-secondary-darken1);
+        @media #{map-get($display-breakpoints, 'md-and-up')} {
+            // We don't display hover for mobile
+            &:hover {
+                background-color: var(--v-secondary-darken1);
+            }
         }
 
         &.selected {

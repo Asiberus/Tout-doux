@@ -5,17 +5,18 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
-from tout_doux.models import DailyTask
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer, \
     DailySummarySerializer
-from tout_doux.utils import daterange
+from tout_doux.utils.date import daterange
 
 
 class DailyTaskViewSet(viewsets.ModelViewSet):
-    queryset = DailyTask.objects.all()
     pagination_class = ExtendedPageNumberPagination
     filterset_fields = ('date',)
+
+    def get_queryset(self):
+        return self.request.user.dailytasks.all()
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -44,6 +45,6 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             raise ParseError('Date not valid.')
 
         summary_range = [{'date': d} for d in daterange(start_date, end_date)]
-        data = DailySummarySerializer(summary_range, many=True).data
+        data = DailySummarySerializer(summary_range, many=True, context={'user': request.user}).data
 
         return Response(data)

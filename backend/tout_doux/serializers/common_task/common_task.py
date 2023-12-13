@@ -14,6 +14,7 @@ class CommonTaskSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = CommonTask
@@ -21,5 +22,15 @@ class CommonTaskSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'tags',
-            'tagIds'
+            'tagIds',
+            'user',
         )
+
+    def validate_tagIds(self, tags):
+        current_user = self.context.get('request').user
+
+        for tag in tags:
+            if tag.user.pk is not current_user.pk:
+                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
+
+        return tags

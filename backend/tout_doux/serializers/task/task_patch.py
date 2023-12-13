@@ -34,6 +34,15 @@ class TaskPatchSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
+    def validate_tagIds(self, tags):
+        current_user = self.context.get('request').user
+
+        for tag in tags:
+            if tag.user.pk is not current_user.pk:
+                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
+
+        return tags
+
     def validate(self, data):
         # This serializer is only used in a PATCH context, self.instance is always defined
         if self.instance.project and self.instance.project.archived:

@@ -10,7 +10,7 @@
                 <div>
                     <span class="value">{{ value }}</span>
                     /
-                    <span class="max"> {{ max }} </span>
+                    <span class="max">{{ max }}</span>
                 </div>
                 <div class="text-caption">{{ percentage }}%</div>
             </template>
@@ -35,7 +35,7 @@ export default class ProgressWheel extends Vue {
     @Prop({ default: 0 }) value!: number
     @Prop({ default: 100 }) max!: number
     @Prop({ default: 'white' }) color!: string
-    @Prop({ default: 'medium' }) size!: 'small' | 'medium' | 'large'
+    @Prop({ default: 'medium' }) size!: 'x-small' | 'small' | 'medium' | 'large' | 'x-large'
 
     ProgressWheelMode = ProgressWheelMode
 
@@ -45,15 +45,19 @@ export default class ProgressWheel extends Vue {
     }
 
     get computedSize(): number {
-        if (this.size === 'large') return 250
-        else if (this.size === 'medium') return 200
-        else return 180 // for size === 'small'
+        if (this.size === 'x-large') return 250
+        else if (this.size === 'large') return 200
+        else if (this.size === 'medium') return 180
+        else if (this.size === 'small') return 150
+        else return 125 // for size === 'x-small'
     }
 
     get computedWidth(): number {
-        if (this.size === 'large') return 20
-        else if (this.size === 'medium') return 18
-        else return 15 // for size === 'small'
+        if (this.size === 'x-large') return 20
+        else if (this.size === 'large') return 18
+        else if (this.size === 'medium') return 15
+        else if (this.size === 'small') return 12
+        else return 10 // for size === 'x-small'
     }
 }
 </script>
@@ -64,19 +68,31 @@ export default class ProgressWheel extends Vue {
     align-items: center;
     flex-direction: column;
 
+    &.x-small {
+        .value {
+            font-size: 1.75rem;
+        }
+    }
+
     &.small {
         .value {
-            font-size: 2.5rem;
+            font-size: 2rem;
         }
     }
 
     &.medium {
         .value {
-            font-size: 3rem;
+            font-size: 2.5rem;
         }
     }
 
     &.large {
+        .value {
+            font-size: 3rem;
+        }
+    }
+
+    &.x-large {
         .value {
             font-size: 3.5rem;
         }
@@ -84,7 +100,7 @@ export default class ProgressWheel extends Vue {
 
     .max {
         display: inline-block;
-        transform: translateY(0.3rem);
+        transform: translateY(0.1rem);
     }
 }
 </style>

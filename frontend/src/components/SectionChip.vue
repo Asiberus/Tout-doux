@@ -7,8 +7,9 @@
         :small="small"
         :title="title"
         :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
-        @click="click($event)">
-        <v-icon small left>mdi-briefcase-variant</v-icon>
+        @click="click($event)"
+        class="section-chip px-0">
+        <v-icon small class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
         <div class="name-wrapper">
             <span class="project-name text-truncate">{{ project.name }}</span>
             <span class="mx-1">•</span>
@@ -21,7 +22,7 @@
 import { Project } from 'src/models/project.model'
 import { Section } from 'src/models/section.model'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Location, Route } from 'vue-router'
+import { Location } from 'vue-router'
 
 @Component
 export default class SectionChip extends Vue {
@@ -61,14 +62,19 @@ export default class SectionChip extends Vue {
 </script>
 
 <style scoped lang="scss">
-.name-wrapper {
-    display: flex;
-    overflow: hidden;
+.section-chip {
+    min-width: 32px;
 
-    .project-name,
-    .section-name {
-        flex: 1 1 auto;
-        min-width: 1ch;
+    .name-wrapper {
+        display: flex;
+        overflow: hidden;
+        margin-right: 8px;
+
+        .project-name,
+        .section-name {
+            flex: 1 1 auto;
+            min-width: 1ch;
+        }
     }
 }
 </style>

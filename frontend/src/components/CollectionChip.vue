@@ -7,9 +7,10 @@
         :small="small"
         :title="title"
         :class="{ 'cursor-default': this.collection.archived && !this.detailLocation }"
-        @click="click($event)">
-        <v-icon small left>mdi-list-box</v-icon>
-        <div class="text-truncate">
+        @click="click($event)"
+        class="collection-chip px-0">
+        <v-icon small class="ml-2 mr-1">mdi-list-box</v-icon>
+        <div class="text-truncate mr-2">
             {{ collection.name }}
         </div>
     </v-chip>
@@ -45,3 +46,9 @@ export default class CollectionChip extends Vue {
     }
 }
 </script>
+
+<style scoped lang="scss">
+.collection-chip {
+    min-width: 32px;
+}
+</style>

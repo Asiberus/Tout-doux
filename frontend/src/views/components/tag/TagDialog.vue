@@ -1,7 +1,7 @@
 <template>
-    <v-card>
-        <div class="d-flex justify-space-between align-center pa-4">
-            <h2 class="text-capitalize">{{ title }}</h2>
+    <v-card class="d-flex flex-column">
+        <div class="d-flex justify-space-between align-center px-6 pt-4 pb-2">
+            <h4 class="text-h5 text-sm-h4 text-capitalize">{{ title }}</h4>
             <div v-if="tag">
                 <v-hover v-slot="{ hover }">
                     <v-btn
@@ -12,25 +12,27 @@
                 </v-hover>
             </div>
         </div>
-        <v-card-text>
-            <v-form ref="form" v-model="tagForm.valid" @submit.prevent="emitSubmitEvent()">
-                <div class="d-flex align-center">
-                    <div class="flex-grow-1">
-                        <v-text-field
-                            ref="name"
-                            v-model="tagForm.data.name"
-                            @input="validateName"
-                            label="Name"
-                            counter="20"
-                            maxlength="20"
-                            requried
-                            :loading="inputNameLoading"
-                            :rules="tagForm.rules.name"
-                            :error-messages="nameUniqueError"
-                            autofocus>
-                        </v-text-field>
-                    </div>
-                    <div class="ml-6 mr-3 pt-3 d-flex align-center">
+        <v-card-text class="flex-grow-1 d-flex flex-column">
+            <v-form
+                ref="form"
+                v-model="tagForm.valid"
+                @submit.prevent="emitSubmitEvent()"
+                class="flex-grow-1 d-flex flex-column">
+                <div class="d-flex flex-column flex-md-row align-stretch align-md-center">
+                    <v-text-field
+                        ref="name"
+                        v-model="tagForm.data.name"
+                        @input="validateName"
+                        label="Name"
+                        counter="20"
+                        requried
+                        :loading="inputNameLoading"
+                        :rules="tagForm.rules.name"
+                        :error-messages="nameUniqueError"
+                        :autofocus="!tag"
+                        class="flex-grow-1 mb-3 mb-md-0">
+                    </v-text-field>
+                    <div class="ml-md-6 mr-md-3 pt-md-3 d-flex align-center">
                         <div class="text-body-1">Color :</div>
                         <v-menu
                             ref="colorPickerMenu"
@@ -38,7 +40,9 @@
                             :close-on-content-click="false"
                             transition="scale-transition"
                             offset-y
-                            min-width="auto">
+                            nudge-bottom="5"
+                            min-width="0"
+                            max-width="fit-content">
                             <template #activator="{ attrs, on }">
                                 <v-chip
                                     v-bind="attrs"
@@ -61,16 +65,22 @@
                         </v-menu>
                     </div>
                 </div>
-                <v-card-actions class="d-flex justify-end mt-3">
+
+                <v-spacer></v-spacer>
+
+                <div class="d-flex justify-end gap-2">
+                    <v-btn @click="emitCloseEvent()" plain class="flex-grow-1 flex-md-grow-0">
+                        cancel
+                    </v-btn>
                     <v-btn
                         color="success"
                         text
                         type="submit"
-                        :disabled="!tagForm.valid || tagForm.pending">
+                        :disabled="!tagForm.valid || tagForm.pending"
+                        class="flex-grow-1 flex-md-grow-0">
                         {{ tag ? 'update' : 'create' }}
                     </v-btn>
-                    <v-btn plain class="ml-2" @click="emitCloseEvent()">cancel</v-btn>
-                </v-card-actions>
+                </div>
             </v-form>
         </v-card-text>
     </v-card>
@@ -81,7 +91,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Tag, TagForm } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
 import { TAG_COLOR_OPTIONS } from '@/utils/constants'
-import { isNameUnique, IsTagNameUniqueParams } from '@/api/tag.api'
+import { IsTagNameUniqueParams } from '@/api/tag.api'
 import { tagService } from '@/api'
 
 @Component
@@ -98,7 +108,7 @@ export default class TagDialog extends Vue {
 
     nameUniqueError: string | null = null
     inputNameLoading = false
-    validationTimer?: number
+    validationTimer?: number = undefined
 
     tagForm: Form<TagForm> = {
         valid: false,
@@ -139,7 +149,7 @@ export default class TagDialog extends Vue {
             this.nameUniqueError = null
             this.form.resetValidation()
             this.populateForm()
-            this.inputName.focus()
+            if (!this.tag) this.inputName.focus()
         }
     }
 
@@ -159,7 +169,10 @@ export default class TagDialog extends Vue {
     validateName(value: string): void {
         clearTimeout(this.validationTimer)
 
-        if (value === '') return
+        if (value === '') {
+            this.nameUniqueError = null
+            return
+        }
 
         this.tagForm.pending = true
         this.validationTimer = setTimeout(() => this.isNameUnique(value), 300)
@@ -218,6 +231,7 @@ export default class TagDialog extends Vue {
 .color-chip {
     min-width: 12.5rem;
     margin-left: 0.5rem;
+    flex-grow: 1;
 }
 
 .color-picker {

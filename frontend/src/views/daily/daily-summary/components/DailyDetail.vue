@@ -1,90 +1,120 @@
 <template>
-    <div class="wrapper">
-        <div class="actions-wrapper">
-            <v-btn @click="closeDialog" icon>
-                <v-icon>mdi-close</v-icon>
-            </v-btn>
-        </div>
-        <div class="content-wrapper">
-            <div class="content">
-                <h1 class="text-h2 mb-10">
-                    {{ dateFormat(date, 'dddd DD MMMM Y') }}
-                    <v-hover v-slot="{ hover }" v-if="isToday">
-                        <v-btn
-                            :to="{ name: 'daily-update', params: { date, step: 'task' } }"
-                            icon
-                            large
-                            :color="hover ? 'grey lighten-1' : 'grey darken-3'"
-                            class="ml-1"
-                            title="Edit day">
-                            <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                    </v-hover>
-                </h1>
-                <v-row class="pl-8">
-                    <v-col
-                        v-if="dailyTaskList.length > 0"
-                        :cols="events.length > 0 ? 7 : 8"
-                        class="d-flex flex-column">
-                        <h4 class="text-h4">Tasks</h4>
-                        <p class="text-subtitle-1 grey--text text--lighten-1 ml-2">
-                            {{ taskText }}
-                        </p>
-                        <div class="task-wrapper">
-                            <v-timeline dense>
-                                <v-timeline-item
-                                    v-for="dailyTask in dailyTaskList"
-                                    :key="`daily-task-${dailyTask.id}`"
-                                    fill-dot
-                                    :color="dailyTask.completed ? 'green darken-2' : null">
-                                    <template #icon>
-                                        <div
-                                            v-ripple
-                                            @click="toggleDailyTask(dailyTask)"
-                                            class="icon-wrapper">
-                                            <v-icon v-if="dailyTask.completed">mdi-check</v-icon>
-                                            <v-icon v-else>mdi-trophy</v-icon>
-                                        </div>
-                                    </template>
-                                    <DailyTaskCard
-                                        :daily-task="dailyTask"
-                                        @toggle="toggleDailyTask(dailyTask)"></DailyTaskCard>
-                                </v-timeline-item>
-                            </v-timeline>
-                        </div>
-                    </v-col>
-
-                    <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
-                        <h4 class="text-h4">Events</h4>
-                        <p class="text-subtitle-1 grey--text text--lighten-1 ml-2">
-                            {{ eventText }}
-                        </p>
-                        <div class="event-wrapper">
-                            <v-timeline dense>
-                                <v-timeline-item
-                                    v-for="event of events"
-                                    :key="`event-${event.id}`"
-                                    :color="isEventPassed(event) ? null : 'event'"
-                                    :icon="
-                                        isEventPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'
-                                    "
-                                    :icon-color="isEventPassed(event) ? 'grey' : 'white'"
-                                    fill-dot>
-                                    <EventItemCard
-                                        :event="event"
-                                        :project="event.project"
-                                        :day-selected="true"
-                                        :clickable="false"
-                                        :margin-bottom="false">
-                                    </EventItemCard>
-                                </v-timeline-item>
-                            </v-timeline>
-                        </div>
-                    </v-col>
-                </v-row>
+    <v-dialog
+        :value="dialogState"
+        @input="setDialogStateTo($event)"
+        fullscreen
+        hide-overlay
+        content-class="daily-detail-dialog"
+        transition="dialog-bottom-transition">
+        <div
+            class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-8"
+            v-touch="{
+                start: touchStartEvent,
+                left: () => switchTab('left'),
+                right: () => switchTab('right'),
+                down: scrollDownEvent,
+            }">
+            <div class="actions-wrapper">
+                <v-btn @click="setDialogStateTo(false)" icon>
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
             </div>
+
+            <div class="d-flex align-center gap-2 mb-2 mb-sm-3 mb-md-5 mb-lg-10">
+                <h1 class="text-h4 text-sm-h3 text-md-h2">
+                    {{ dateFormat(date, 'dddd DD MMMM Y') }}
+                </h1>
+                <v-hover v-slot="{ hover }" v-if="isToday">
+                    <v-btn
+                        :to="{ name: 'daily-update', params: { date, step: 'task' } }"
+                        icon
+                        :large="$vuetify.breakpoint.smAndUp"
+                        :small="$vuetify.breakpoint.xsOnly"
+                        :color="hover ? 'grey lighten-1' : 'grey darken-3'"
+                        class="ml-1"
+                        title="Edit day">
+                        <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                </v-hover>
+            </div>
+
+            <template v-if="dailyTaskList.length === 0 && events.length === 0">
+                <EmptyListDisplay
+                    message="No tasks or events are set on for that day."
+                    class="empty-list-display">
+                    <template #img>
+                        <img
+                            src="../../../../assets/empty-daily-detail.svg"
+                            alt="empty daily detail"
+                            class="empty-list-display__img" />
+                    </template>
+                </EmptyListDisplay>
+            </template>
+
+            <template v-if="$vuetify.breakpoint.mdAndDown">
+                <template v-if="dailyTaskList.length > 0 && events.length > 0">
+                    <!-- Tabs -->
+                    <v-tabs
+                        v-model="tab"
+                        background-color="transparent"
+                        color="accent"
+                        grow
+                        class="flex-grow-0">
+                        <v-tab tab-value="task">Tasks</v-tab>
+                        <v-tab tab-value="event">Events</v-tab>
+                    </v-tabs>
+
+                    <v-tabs-items v-model="tab" touchless class="transparent py-2 pa-sm-2 pa-md-4">
+                        <v-tab-item value="task">
+                            <DailyDetailTaskTimeline
+                                :daily-task-list="dailyTaskList"
+                                :date="date"
+                                @toggle-daily-task="toggleDailyTask($event)">
+                            </DailyDetailTaskTimeline>
+                        </v-tab-item>
+                        <v-tab-item value="event">
+                            <DailyDetailEventTimeline :events="events" :date="date">
+                            </DailyDetailEventTimeline>
+                        </v-tab-item>
+                    </v-tabs-items>
+                </template>
+                <template v-else-if="dailyTaskList.length > 0">
+                    <!-- Only tasks -->
+                    <div class="overflow-auto">
+                        <DailyDetailTaskTimeline
+                            :daily-task-list="dailyTaskList"
+                            :date="date"
+                            @toggle-daily-task="toggleDailyTask($event)">
+                        </DailyDetailTaskTimeline>
+                    </div>
+                </template>
+                <template v-else-if="events.length > 0">
+                    <!-- Only events -->
+                    <DailyDetailEventTimeline :events="events" :date="date">
+                    </DailyDetailEventTimeline>
+                </template>
+            </template>
+            <template v-else>
+                <template v-if="dailyTaskList.length > 0 || events.length > 0">
+                    <!-- Tasks and events -->
+                    <v-row class="pl-4">
+                        <v-col v-if="dailyTaskList.length > 0" :cols="events.length > 0 ? 7 : 8">
+                            <DailyDetailTaskTimeline
+                                :daily-task-list="dailyTaskList"
+                                :date="date"
+                                @toggle-daily-task="toggleDailyTask($event)">
+                            </DailyDetailTaskTimeline>
+                        </v-col>
+
+                        <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">
+                            <DailyDetailEventTimeline :events="events" :date="date">
+                            </DailyDetailEventTimeline>
+                        </v-col>
+                    </v-row>
+                </template>
+            </template>
         </div>
-    </div>
+    </v-dialog>
 </template>
 
 <script lang="ts">
@@ -93,60 +123,54 @@ import { eventService } from '@/api/event.api'
 import { DailyTask } from '@/models/daily-task.model'
 import { EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
-import { isPassed, sortEvents } from '@/utils/event.utils'
+import { sortEvents } from '@/utils/event.utils'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import moment from 'moment'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
+import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue'
+import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
+import { hideScroll, showScroll } from '@/utils/document.utils'
+import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 
 @Component({
-    components: { DailyTaskCard, EventItemCard },
+    components: {
+        EmptyListDisplay,
+        DailyDetailEventTimeline,
+        DailyDetailTaskTimeline,
+        DailyTaskCard,
+        EventItemCard,
+    },
 })
 export default class DailyDetail extends Vue {
-    @Prop() date!: string
+    @Prop({ default: false }) value!: boolean
+    @Prop({ required: true }) date!: string
+
+    dialogState = false
     dailyTaskList: DailyTask[] = []
     events: EventModel[] = []
 
+    tab: 'task' | 'event' = 'task'
+    isScrollingOnContent = false
+
     get numberOfDailyTaskCompleted(): number {
         return this.dailyTaskList.filter(dailyTask => dailyTask.completed).length
-    }
-
-    get numberOfDailyTaskUncompleted(): number {
-        return this.dailyTaskList.filter(dailyTask => !dailyTask.completed).length
     }
 
     get isToday(): boolean {
         return moment().isSame(this.date, 'day')
     }
 
-    get taskText(): string {
-        if (this.isToday) {
-            if (this.numberOfDailyTaskUncompleted > 0)
-                return `You have ${this.numberOfDailyTaskUncompleted} ${
-                    this.numberOfDailyTaskUncompleted > 1 ? 'tasks' : 'task'
-                } left to do today!`
-            else return 'All tasks done for today! :)'
-        } else {
-            if (this.numberOfDailyTaskCompleted === this.dailyTaskList.length)
-                return 'All tasks completed for that day! :)'
-            else if (this.numberOfDailyTaskCompleted > 0)
-                return `${this.numberOfDailyTaskCompleted} on ${this.dailyTaskList.length} tasks were completed that day`
-            else return 'No tasks completed that day :('
-        }
+    @Watch('value')
+    private onDialogOpening(value: boolean): void {
+        this.dialogState = value
+        this.tab = 'task'
+
+        if (value) hideScroll()
+        else showScroll()
     }
 
-    get eventText(): string {
-        if (this.isToday)
-            return `You have ${this.events.length} ${
-                this.events.length > 1 ? 'events' : 'event'
-            } today !`
-        else
-            return `You had ${this.events.length} ${
-                this.events.length > 1 ? 'events' : 'event'
-            } that day !`
-    }
-
-    @Watch('date', { immediate: true })
+    @Watch('date', { immediate: false })
     private onDateChanges(): void {
         this.retrieveDailyTaskList()
         this.retrieveTodayEvents()
@@ -169,6 +193,33 @@ export default class DailyDetail extends Vue {
         )
     }
 
+    touchStartEvent() {
+        // We detect if the touch-down is a scroll on the content
+        const scrollableElement = document.querySelector('.v-dialog')
+        this.isScrollingOnContent = scrollableElement.scrollTop > 0
+    }
+
+    scrollDownEvent(): void {
+        if (!this.isScrollingOnContent) this.setDialogStateTo(false)
+    }
+
+    switchTab(direction: 'right' | 'left'): void {
+        if (
+            !this.$vuetify.breakpoint.mdAndDown ||
+            this.dailyTaskList.length === 0 ||
+            this.events.length === 0
+        )
+            return
+
+        if (direction === 'right') this.tab = 'task'
+        else if (direction === 'left') this.tab = 'event'
+    }
+
+    setDialogStateTo(value: boolean): void {
+        this.dialogState = value
+        this.$emit('input', value)
+    }
+
     toggleDailyTask(dailyTask: DailyTask): void {
         dailyTaskService.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
             (response: any) => {
@@ -183,76 +234,38 @@ export default class DailyDetail extends Vue {
         this.$emit('daily-task-completed', this.date, this.numberOfDailyTaskCompleted)
     }
 
-    closeDialog(): void {
-        this.$emit('close')
-    }
-
     dateFormat(date: string, format: string): string {
         return dateFormat(date, format)
-    }
-
-    isEventPassed(event: EventModel): boolean {
-        return isPassed(event)
     }
 }
 </script>
 
 <style scoped lang="scss">
-.wrapper {
-    height: 100%;
-    background-color: #0a0a0a;
+@import '~vuetify/src/styles/styles.sass';
 
-    .actions-wrapper {
-        position: absolute;
-        top: 0;
-        right: 0;
-        padding: 1rem;
-        z-index: 1;
+.content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.actions-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    padding: 1rem;
+
+    @media #{map-get($display-breakpoints, 'xs-only')} {
+        padding: 0.5rem;
     }
+}
 
-    .content-wrapper {
-        display: flex;
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+.empty-list-display {
+    flex-grow: 1;
 
-        .content {
-            width: 90%;
-            margin-top: 3rem;
-
-            .task-wrapper,
-            .event-wrapper {
-                max-height: 70vh;
-                overflow: auto;
-            }
-
-            .v-timeline {
-                overflow: hidden;
-                padding-top: 0;
-
-                &::before {
-                    top: 30px;
-                    height: calc(100% - 60px);
-                }
-
-                .v-timeline-item:last-child {
-                    padding-bottom: 0;
-                }
-
-                .icon-wrapper {
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-            }
-        }
+    &__img {
+        width: clamp(200px, 25%, 400px);
     }
 }
 </style>
