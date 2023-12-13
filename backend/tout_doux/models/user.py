@@ -2,14 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-def get_default_user():
-    user = User.objects.all().first()
-    if user:
-        return user
-    else:
-        return None
-
-
 class User(AbstractUser):
     email = models.EmailField(unique=True, max_length=100)
     first_name = models.CharField(max_length=100, default='', blank=True)
@@ -26,7 +18,7 @@ class UserRelatedModel(models.Model):
         on_delete=models.CASCADE,
         related_name='%(class)ss',
         related_query_name='%(class)ss',
-        default=get_default_user,
+        null=True,
         editable=False,
     )
 
