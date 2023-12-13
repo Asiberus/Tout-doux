@@ -196,6 +196,8 @@ export default class DailyDetail extends Vue {
     touchStartEvent() {
         // We detect if the touch-down is a scroll on the content
         const scrollableElement = document.querySelector('.v-dialog')
+        if (!scrollableElement) return
+
         this.isScrollingOnContent = scrollableElement.scrollTop > 0
     }
 
