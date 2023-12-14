@@ -91,7 +91,7 @@ export default class DailySummaryComponent extends Vue {
 
     private calculateDaysPerPage(): number {
         const { breakpoint } = this.$vuetify
-        if (breakpoint.xsOnly) return 7
+        if (breakpoint.xsOnly) return 10
         else if (breakpoint.smAndDown) return 14
         else if (breakpoint.lgAndDown) return 21
         else return 42 // for xl only

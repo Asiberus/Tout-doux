@@ -2,6 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+def get_anonymous_user():
+    anonymous_user = User.objects.get_or_create(username="anonymous")[0]
+    return anonymous_user.id
+
+
 class User(AbstractUser):
     email = models.EmailField(unique=True, max_length=100)
     first_name = models.CharField(max_length=100, default='', blank=True)
@@ -19,6 +24,7 @@ class UserRelatedModel(models.Model):
         related_name='%(class)ss',
         related_query_name='%(class)ss',
         editable=False,
+        default=get_anonymous_user,
     )
 
     class Meta:

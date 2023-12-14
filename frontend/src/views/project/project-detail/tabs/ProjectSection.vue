@@ -25,7 +25,7 @@
                 </v-tab>
             </v-tabs>
 
-            <v-tabs-items v-model="sectionTabs" class="transparent">
+            <v-tabs-items v-model="sectionTabs" class="transparent" touchless>
                 <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
                     <ProjectSectionItem
                         :section="section"
@@ -117,7 +117,7 @@ export default class ProjectSection extends Vue {
                 projectId: this.project.id,
             })
             .then(() => {
-                this.sectionTabs = this.sections.length - 1
+                this.sectionTabs = 0
             })
     }
 

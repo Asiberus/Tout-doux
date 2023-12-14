@@ -1,7 +1,7 @@
 <template>
     <div class="flex-grow-1 d-flex flex-column">
-        <div class="d-flex flex-column flex-sm-row align-stretch column-gap-2 row-gap-1 mb-3">
-            <h3 class="text-h6 text-sm-h5 flex-grow-1">Events related to the project</h3>
+        <div class="d-flex align-center column-gap-2 row-gap-1 mb-3">
+            <h3 class="text-h6 text-sm-h5 flex-grow-1">Events</h3>
 
             <div class="d-flex justify-space-between align-center gap-2">
                 <FilterChip
