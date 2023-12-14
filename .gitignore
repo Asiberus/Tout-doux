@@ -13,6 +13,10 @@ geckodriver.log
 .env.local
 .env.*.local
 
+# generated env files
+.conf/development/conf.env
+.conf/production/conf.env
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
