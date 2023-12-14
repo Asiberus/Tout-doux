@@ -10,7 +10,7 @@ services:
         ARG_VERSION: ${VERSION}
         ARG_API_URL: http://${BACKEND_HOST}:${BACKEND_PORT}/
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_CONTAINER_PORT}
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
     volumes:
       - ./frontend:/frontend
   backend:
@@ -20,9 +20,8 @@ services:
       dockerfile: ./.conf/development/backend/Dockerfile
     command: >
       sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
-
-    #      python manage.py migrate &&
     environment:
       SERVER_URL: http://localhost:${FRONTEND_PORT}/
       SECRET_KEY: ${BACKEND_SECRET_KEY}
@@ -37,7 +36,7 @@ services:
       MAILJET_API_KEY: ${MAILJET_API_KEY}
       MAILJET_API_SECRET: ${MAILJET_API_SECRET}
     ports:
-      - ${BACKEND_PORT}:${BACKEND_CONTAINER_PORT}
+      - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
       - ./backend:/backend
     depends_on:
@@ -49,15 +48,16 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGPORT: ${DB_PORT}
     ports:
-      - ${DB_PORT}:${DB_CONTAINER_PORT}
+      - ${DB_PORT}:${DB_PORT}
     volumes:
       - td_db:/var/lib/postgresql/data
   adminer:
     container_name: ${DB_ADMINER_NAME}
     image: adminer
     ports:
-      - ${DB_ADMINER_PORT}:${DB_ADMINER_CONTAINER_PORT}
+      - ${DB_ADMINER_PORT}:8080
 volumes:
   td_db:
     name: td_db
