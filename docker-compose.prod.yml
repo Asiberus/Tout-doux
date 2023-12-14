@@ -53,7 +53,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      PGPORT: ${DATABASE_PORT}
+      PGPORT: ${DB_PORT}
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
