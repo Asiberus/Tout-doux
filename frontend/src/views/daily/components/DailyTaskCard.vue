@@ -94,6 +94,10 @@ export default class DailyTaskCard extends Vue {
     flex-direction: column;
     row-gap: 8px;
 
+    &::after {
+        left: -9px !important;
+    }
+
     &__header {
         display: flex;
         flex-wrap: wrap-reverse;

@@ -44,7 +44,28 @@
         </div>
 
         <div class="d-flex flex-column flex-sm-row column-gap-2 row-gap-1 mt-5 mt-md-10 mb-2">
-            <h3 class="text-h6 text-sm-h5 flex-grow-1">General Tasks</h3>
+            <div class="d-flex align-center flex-grow-1">
+                <h3 class="text-h6 text-sm-h5 flex-grow-1">General Tasks</h3>
+
+                <template v-if="$vuetify.breakpoint.xsOnly && project.tasks.length === 0">
+                    <v-dialog
+                        v-model="taskDialog"
+                        :width="getDialogWidth()"
+                        :fullscreen="$vuetify.breakpoint.smAndDown">
+                        <template #activator="{ on, attrs }">
+                            <v-btn v-bind="attrs" v-on="on" :disabled="project.archived">
+                                <v-icon left>mdi-plus</v-icon>
+                                task
+                            </v-btn>
+                        </template>
+                        <TaskDialog
+                            :is-dialog-open="taskDialog"
+                            @create="createTask"
+                            @close="taskDialog = false">
+                        </TaskDialog>
+                    </v-dialog>
+                </template>
+            </div>
 
             <div class="d-flex justify-space-between align-center gap-2">
                 <FilterChip
@@ -56,26 +77,32 @@
                     Completed
                 </FilterChip>
 
-                <v-dialog
-                    v-model="taskDialog"
-                    :width="getDialogWidth()"
-                    :fullscreen="$vuetify.breakpoint.smAndDown">
-                    <template #activator="{ on, attrs }">
-                        <v-btn
-                            v-bind="attrs"
-                            v-on="on"
-                            :disabled="project.archived"
-                            :block="$vuetify.breakpoint.xsOnly && project.tasks.length === 0">
-                            <v-icon left>mdi-plus</v-icon>
-                            task
-                        </v-btn>
-                    </template>
-                    <TaskDialog
-                        :is-dialog-open="taskDialog"
-                        @create="createTask"
-                        @close="taskDialog = false">
-                    </TaskDialog>
-                </v-dialog>
+                <template v-if="$vuetify.breakpoint.smAndUp || project.tasks.length > 0">
+                    <v-dialog
+                        v-model="taskDialog"
+                        :width="getDialogWidth()"
+                        :fullscreen="$vuetify.breakpoint.smAndDown">
+                        <template #activator="{ on, attrs }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                :disabled="project.archived"
+                                :block="
+                                    $vuetify.breakpoint.xsOnly &&
+                                    project.tasks.length === 0 &&
+                                    false
+                                ">
+                                <v-icon left>mdi-plus</v-icon>
+                                task
+                            </v-btn>
+                        </template>
+                        <TaskDialog
+                            :is-dialog-open="taskDialog"
+                            @create="createTask"
+                            @close="taskDialog = false">
+                        </TaskDialog>
+                    </v-dialog>
+                </template>
             </div>
         </div>
 

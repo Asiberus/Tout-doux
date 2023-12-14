@@ -1,7 +1,7 @@
 <template>
     <v-app v-touch="{ left: hideNavbar }" v-if="user">
         <v-navigation-drawer v-model="displayNavbar" app touchless>
-            <TheNavbar></TheNavbar>
+            <TheNavbar :display-navbar.sync="displayNavbar"></TheNavbar>
         </v-navigation-drawer>
         <v-app-bar app dense>
             <TheHeader :header-menu.sync="headerMenu" :display-navbar.sync="displayNavbar">
