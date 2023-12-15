@@ -57,7 +57,7 @@ export default class ProfileEmail extends Vue {
                 (value: string) => value.length <= 100 || 'Max 100 characters',
                 (value: string) =>
                     value.length === 0 ||
-                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) ||
+                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) ||
                     'Invalid e-mail address',
             ],
         },
