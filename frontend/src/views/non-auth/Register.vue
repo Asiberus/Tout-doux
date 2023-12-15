@@ -105,7 +105,7 @@ export default class Register extends Vue {
                 (value: string) => !!value || 'Email is required',
                 (value: string) => value.length <= 100 || 'Max 100 characters',
                 (value: string) =>
-                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value) || 'Invalid e-mail address',
+                    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) || 'Invalid e-mail address',
             ],
             password: [
                 (value: string) => !!value || 'Password is required',
