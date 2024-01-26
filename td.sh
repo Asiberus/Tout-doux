@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-vers="0.4.0" # Must match package.json version number
+vers="0.4.1" # Must match package.json version number
 basedir=$(dirname "${0}")
 unset backendsecretkey
 unset serverhost
