@@ -20,7 +20,7 @@ export const apiRoutes = {
     event: 'event/',
     eventById: 'event/:eventId/',
     collection: 'collection/',
-    collectionDetailed: 'collection/detailed',
+    collectionDetailed: 'collection/detailed/',
     collectionById: 'collection/:collectionId/',
     dailyTask: 'daily-task/',
     dailyTaskSummary: 'daily-task/summary/',
