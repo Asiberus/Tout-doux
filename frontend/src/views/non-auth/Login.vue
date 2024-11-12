@@ -1,112 +1,108 @@
-<template>
-    <v-form class="login" @submit.prevent="login()">
-        <v-text-field label="Email" v-model="form.data.email" autofocus hide-details>
-        </v-text-field>
-
-        <v-text-field
-            label="Password"
-            v-model="form.data.password"
-            :type="showPassword ? 'text' : 'password'"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append="showPassword = !showPassword"
-            hide-details>
-        </v-text-field>
-
-        <p
-            class="error-message text-subtitle-1 error--text text-center mb-0"
-            :class="{ active: credentialsError }">
-            Invalid credentials
-        </p>
-
-        <v-btn :disabled="!form.valid" :loading="loading" type="submit" color="success">
-            login
-        </v-btn>
-
-        <div class="login__links">
-            <router-link
-                :to="{ name: 'register' }"
-                class="text-body-1 text-link green--text text--lighten-1">
-                Create account
-            </router-link>
-            <router-link
-                :to="{
-                    name: 'password-reset-request',
-                    query: { email: form.data.email || undefined },
-                }"
-                class="text-body-1 text-link green--text text--lighten-1">
-                Forgot password ?
-            </router-link>
-        </div>
-    </v-form>
-</template>
-
-<script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
 import { Form } from '@/models/common.model'
 import { authService } from '@/services'
 import { LoginPost } from '@/models/login.model'
+import { ref, watch } from 'vue'
+import { useAppStore } from '@/store'
+import { useRoute, useRouter } from 'vue-router'
 
-@Component
-export default class Login extends Vue {
-    form: Form<LoginPost> = {
-        valid: false,
-        data: {
-            email: '',
-            password: '',
-        },
-    }
+const router = useRouter()
+const route = useRoute()
+const appStore = useAppStore()
 
-    credentialsError = false
-    showPassword = false
-    loading = false
+const form = ref<Form<LoginPost>>({
+  valid: false,
+  data: {
+    email: '',
+    password: '',
+  },
+})
 
-    @Watch('form.data', { deep: true })
-    private onFormDataChanges(data: LoginPost): void {
-        this.credentialsError = false
-        this.form.valid = !!data.email && !!data.password
-    }
+const credentialsError = ref(false)
+const showPassword = ref(false)
+const loading = ref(false)
 
-    login(): void {
-        if (!this.form.valid) return
+watch(form, ({ data }) => {
+  // TODO : test if this work
+  credentialsError.value = false
+  form.value.valid = !!data.email && !!data.password
+})
 
-        this.loading = true
-        authService
-            .login(this.form.data)
-            .then(() => {
-                this.$store.dispatch('init').then(() => {
-                    const next = this.$route.query.next
-                    // We need to catch the error here when a navigation guard block the navigation
-                    if (next && typeof next === 'string') this.$router.push(next).catch(() => {})
-                    else this.$router.push({ name: 'home' })
-                })
-            })
-            .catch(() => {
-                this.credentialsError = true
-            })
-            .finally(() => (this.loading = false))
-    }
+function login(): void {
+  if (!form.value.valid) return
+
+  loading.value = true
+  authService
+    .login(form.value.data)
+    .then(() => {
+      appStore.init().then(() => {
+        const next = route.query.next
+        // TODO : if the router is blocked by a guard, navigate to home
+        // We need to catch the error here when a navigation guard block the navigation
+        if (next && typeof next === 'string') router.push(next).catch(() => {})
+        else router.push({ name: 'home' })
+      })
+    })
+    .catch(() => (credentialsError.value = true))
+    .finally(() => (loading.value = false))
 }
 </script>
 
+<template>
+  <v-form class="login" @submit.prevent="login()">
+    <v-text-field v-model="form.data.email" label="Email" autofocus hide-details />
+
+    <v-text-field
+      v-model="form.data.password"
+      label="Password"
+      :type="showPassword ? 'text' : 'password'"
+      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+      hide-details
+      @click:append="showPassword = !showPassword" />
+
+    <p
+      class="error-message text-subtitle-1 text-error text-center mb-0"
+      :class="{ active: credentialsError }">
+      Invalid credentials
+    </p>
+
+    <v-btn :disabled="!form.valid" :loading="loading" type="submit" color="success">login</v-btn>
+
+    <div class="login__links">
+      <router-link :to="{ name: 'register' }" class="text-body-1 text-link text-green-lighten-1">
+        Create account
+      </router-link>
+      <router-link
+        :to="{
+          name: 'password-reset-request',
+          query: { email: form.data.email || undefined },
+        }"
+        class="text-body-1 text-link text-green-lighten-1">
+        Forgot password ?
+      </router-link>
+    </div>
+  </v-form>
+</template>
+
 <style scoped lang="scss">
 .login {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  row-gap: 8px;
+
+  .error-message {
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  &__links {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    row-gap: 8px;
-
-    .error-message {
-        opacity: 0;
-        transition: opacity 0.1s ease-in-out;
-
-        &.active {
-            opacity: 1;
-        }
-    }
-
-    &__links {
-        display: flex;
-        justify-content: space-between;
-    }
+    justify-content: space-between;
+  }
 }
 </style>

@@ -1,193 +1,175 @@
-<template>
-    <div class="profile-user">
-        <v-form v-model="form.valid" @submit.prevent="submit()" class="flex-grow-1">
-            <div class="profile-user__username">
-                <v-avatar
-                    v-if="$vuetify.breakpoint.smAndDown"
-                    :size="avatarSize"
-                    color="grey lighten-3"
-                    class="avatar">
-                    <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
-                </v-avatar>
-                <v-text-field
-                    label="Username"
-                    v-model="form.data.username"
-                    :rules="form.rules.username"
-                    :error-messages="usernameUniqueError"
-                    @input="validateUsername"
-                    required
-                    counter="100">
-                </v-text-field>
-            </div>
-
-            <v-text-field
-                label="First Name"
-                v-model="form.data.firstName"
-                :rules="form.rules.firstName"
-                counter="100">
-            </v-text-field>
-
-            <v-text-field
-                label="Last Name"
-                v-model="form.data.lastName"
-                :rules="form.rules.lastName"
-                counter="100">
-            </v-text-field>
-
-            <v-textarea
-                label="Bio"
-                v-model="form.data.bio"
-                :rules="form.rules.bio"
-                @keyup.enter.ctrl="submit()"
-                counter="500"
-                rows="4"
-                auto-grow
-                class="mb-5">
-            </v-textarea>
-
-            <v-btn
-                color="success"
-                type="submit"
-                :disabled="!canSubmit"
-                :block="$vuetify.breakpoint.xsOnly"
-                class="float-sm-right">
-                update
-            </v-btn>
-        </v-form>
-
-        <v-avatar
-            v-if="$vuetify.breakpoint.mdAndUp"
-            :size="avatarSize"
-            color="grey lighten-3"
-            class="avatar">
-            <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
-        </v-avatar>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import { Form } from '@/models/common.model'
-import { User, UserPatch } from '@/models/user.model'
+import { UserPatch } from '@/models/user.model'
 import { userApi } from '@/api'
-import { userActions } from '@/store/modules/user.store'
+import { useDisplay } from 'vuetify'
+import { useUserStore } from '@/store'
+import { computed, ref } from 'vue'
 
-@Component
-export default class ProfileUser extends Vue {
-    form: Form<UserPatch> = {
-        valid: false,
-        pending: false,
-        data: {
-            username: this.user.username,
-            firstName: this.user.firstName,
-            lastName: this.user.lastName,
-            bio: this.user.bio,
-        },
-        rules: {
-            username: [
-                (value: string) => !!value || 'Username is required',
-                (value: string) => value.length <= 100 || 'Max 100 characters',
-            ],
-            firstName: [(value: string) => value.length <= 100 || 'Max 100 characters'],
-            lastName: [(value: string) => value.length <= 100 || 'Max 100 characters'],
-            bio: [(value: string) => value.length <= 500 || 'Max 500 characters'],
-        },
-    }
+const display = useDisplay()
+const userStore = useUserStore()
 
-    usernameUniqueError: string | null = null
-    private usernameValidationTimer?: number = undefined
+const form = ref<Form<UserPatch>>({
+  valid: false,
+  pending: false,
+  data: {
+    username: userStore.user.username, // TODO : test if this work
+    firstName: userStore.user.firstName,
+    lastName: userStore.user.lastName,
+    bio: userStore.user.bio,
+  },
+  rules: {
+    username: [
+      (value: string): boolean | string => !!value || 'Username is required',
+      (value: string): boolean | string => value.length <= 100 || 'Max 100 characters',
+    ],
+    firstName: [(value: string): boolean | string => value.length <= 100 || 'Max 100 characters'],
+    lastName: [(value: string): boolean | string => value.length <= 100 || 'Max 100 characters'],
+    bio: [(value: string): boolean | string => value.length <= 500 || 'Max 500 characters'],
+  },
+})
 
-    get user(): User {
-        return this.$store.state.user.user
-    }
+const usernameUniqueError = ref<string | null>(null)
+let usernameValidationTimer: number | undefined = undefined
 
-    get isFormUntouched(): boolean {
-        return (
-            this.form.data.username === this.user.username &&
-            this.form.data.firstName === this.user.firstName &&
-            this.form.data.lastName === this.user.lastName &&
-            this.form.data.bio === this.user.bio
-        )
-    }
+const isFormUntouched = computed<boolean>(
+  () =>
+    form.value.data.username === userStore.user.username &&
+    form.value.data.firstName === userStore.user.firstName &&
+    form.value.data.lastName === userStore.user.lastName &&
+    form.value.data.bio === userStore.user.bio
+)
 
-    get canSubmit(): boolean {
-        return this.form.valid && !this.form.pending && !this.isFormUntouched
-    }
+const canSubmit = computed<boolean>(
+  () => form.value.valid && !form.value.pending && !isFormUntouched.value
+)
 
-    get avatarSize(): number {
-        if (this.$vuetify.breakpoint.xsOnly) return 75
-        else if (this.$vuetify.breakpoint.smOnly) return 125
-        else if (this.$vuetify.breakpoint.mdOnly) return 175
-        else if (this.$vuetify.breakpoint.width <= 1600) return 225
-        else return 250
-    }
+const avatarSize = computed<number>(() => {
+  if (display.xs) return 75
+  else if (display.sm) return 125
+  else if (display.md) return 175
+  else if (display.width <= 1600) return 225
+  else return 250
+})
 
-    validateUsername(value: string): void {
-        clearTimeout(this.usernameValidationTimer)
-        if (value === '') {
-            this.usernameUniqueError = null
-            return
-        }
+function validateUsername(value: string): void {
+  clearTimeout(usernameValidationTimer)
+  if (value === '') {
+    usernameUniqueError.value = null
+    return
+  }
 
-        this.form.pending = true
-        this.usernameValidationTimer = setTimeout(() => this.isUsernameUnique(value), 300)
-    }
+  form.value.pending = true
+  usernameValidationTimer = setTimeout(() => isUsernameUnique(value), 300)
+}
 
-    private isUsernameUnique(value: string): void {
-        userApi
-            .isUsernameUnique({ username: value, excludeId: this.user.id })
-            .then((response: any) => {
-                this.usernameUniqueError = !response.body.unique
-                    ? 'This username is already used'
-                    : null
-            })
-            .catch((error: any) => console.error(error))
-            .finally(() => (this.form.pending = false))
-    }
+function isUsernameUnique(value: string): void {
+  userApi
+    .isUsernameUnique({ username: value, excludeId: userStore.user.id })
+    .then(response => {
+      usernameUniqueError.value = !response.unique ? 'This username is already used' : null
+    })
+    .catch(error => console.error(error))
+    .finally(() => (form.value.pending = false))
+}
 
-    submit(): void {
-        if (!this.canSubmit) return
+function submit(): void {
+  if (!canSubmit.value) return
 
-        this.$store.dispatch(userActions.updateUser, this.form.data)
-    }
+  userStore.updateUser(form.value.data)
 }
 </script>
 
+<template>
+  <div class="profile-user">
+    <v-form v-model="form.valid" class="flex-grow-1" @submit.prevent="submit()">
+      <div class="profile-user__username">
+        <v-avatar v-if="display.smAndDown" :size="avatarSize" color="grey-lighten-3" class="avatar">
+          <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
+        </v-avatar>
+        <v-text-field
+          v-model="form.data.username"
+          label="Username"
+          :rules="form.rules.username"
+          :error-messages="usernameUniqueError"
+          required
+          counter="100"
+          @update:model-value="validateUsername" />
+      </div>
+
+      <v-text-field
+        v-model="form.data.firstName"
+        label="First Name"
+        :rules="form.rules.firstName"
+        counter="100" />
+
+      <v-text-field
+        v-model="form.data.lastName"
+        label="Last Name"
+        :rules="form.rules.lastName"
+        counter="100" />
+
+      <v-textarea
+        v-model="form.data.bio"
+        label="Bio"
+        :rules="form.rules.bio"
+        counter="500"
+        rows="4"
+        auto-grow
+        class="mb-5"
+        @keyup.enter.ctrl="submit()" />
+
+      <v-btn
+        color="success"
+        type="submit"
+        :disabled="!canSubmit"
+        :block="display.xs"
+        class="float-sm-right">
+        update
+      </v-btn>
+    </v-form>
+
+    <v-avatar v-if="display.mdAndUp" :size="avatarSize" color="grey-lighten-3" class="avatar">
+      <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
+    </v-avatar>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@import 'vuetify/settings';
 
 .profile-user {
+  display: flex;
+
+  &__username {
     display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
 
-    &__username {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
-
-        @media #{map-get($display-breakpoints, 'sm-and-up')} {
-            gap: 16px;
-        }
+    @media #{map-get($display-breakpoints, 'sm-and-up')} {
+      gap: 16px;
     }
+  }
 
-    .avatar img {
-        width: 66.6%;
-    }
+  .avatar img {
+    width: 66.6%;
+  }
 }
 
 @media #{map-get($display-breakpoints, 'md-and-up')} {
-    .profile-user {
-        column-gap: 24px;
-    }
+  .profile-user {
+    column-gap: 24px;
+  }
 }
 
 @media only screen and (width > 1600px) {
-    .profile-user {
-        column-gap: 48px;
+  .profile-user {
+    column-gap: 48px;
 
-        .avatar {
-            margin-right: 24px;
-        }
+    .avatar {
+      margin-right: 24px;
     }
+  }
 }
 </style>

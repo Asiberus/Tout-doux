@@ -1,62 +1,60 @@
-<template>
-    <div class="confirm-email">
-        <template v-if="state === 'valid'">
-            <img
-                src="../../assets/confirm-email-success.svg"
-                alt="confirm email success"
-                class="confirm-email__img" />
-            <p class="text-body-1 text-center mb-0">Your email has been successfully changed!</p>
-            <v-btn :to="{ name: 'login' }" outlined color="green">Go back to login</v-btn>
-        </template>
-        <template v-else-if="state === 'invalid'">
-            <img
-                src="../../assets/token-error.svg"
-                alt="confirm email error"
-                class="confirm-email__img" />
-            <p class="text-body-1 text-center mb-0">
-                The token is invalid or it may be expired. <br />
-                Please restart the process to change your email.
-            </p>
-            <v-btn :to="{ name: 'login' }" outlined color="error">Go back</v-btn>
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import { authApi } from '@/api'
 import { authService } from '@/services'
+import { onBeforeMount, ref } from 'vue'
 
-@Component
-export default class ConfirmEmail extends Vue {
-    @Prop({ default: '', required: true }) token!: string
+const props = defineProps<{
+  token: string
+}>()
+const state = ref<'valid' | 'invalid' | null>(null)
 
-    state: 'valid' | 'invalid' | null = null
-
-    created(): void {
-        authApi
-            .confirmEmail({ token: this.token })
-            .then(() => {
-                this.state = 'valid'
-                if (authService.isAuthenticated()) {
-                    authService.removeToken()
-                    authService.resetStore()
-                }
-            })
-            .catch(() => (this.state = 'invalid'))
-    }
-}
+onBeforeMount(() => {
+  authApi
+    .confirmEmail({ token: props.token })
+    .then(() => {
+      state.value = 'valid'
+      if (authService.isAuthenticated()) {
+        authService.removeToken()
+        authService.resetStore()
+      }
+    })
+    .catch(() => (state.value = 'invalid'))
+})
 </script>
+
+<template>
+  <div class="confirm-email">
+    <template v-if="state === 'valid'">
+      <img
+        src="../../assets/confirm-email-success.svg"
+        alt="confirm email success"
+        class="confirm-email__img" />
+      <p class="text-body-1 text-center mb-0">Your email has been successfully changed!</p>
+      <v-btn :to="{ name: 'login' }" variant="outlined" color="green">Go back to login</v-btn>
+    </template>
+    <template v-else-if="state === 'invalid'">
+      <img
+        src="../../assets/token-error.svg"
+        alt="confirm email error"
+        class="confirm-email__img" />
+      <p class="text-body-1 text-center mb-0">
+        The token is invalid or it may be expired. <br />
+        Please restart the process to change your email.
+      </p>
+      <v-btn :to="{ name: 'login' }" variant="outlined" color="error">Go back</v-btn>
+    </template>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .confirm-email {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    row-gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 16px;
 
-    &__img {
-        width: clamp(200px, 40vw, 300px);
-    }
+  &__img {
+    width: clamp(200px, 40vw, 300px);
+  }
 }
 </style>

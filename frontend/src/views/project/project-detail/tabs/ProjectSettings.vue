@@ -1,244 +1,229 @@
-<template>
-    <div>
-        <div class="d-flex flex-column flex-sm-row align-stretch column-gap-2 row-gap-1 mb-3">
-            <h4 class="text-h6 text-sm-h5 flex-grow-1">Settings</h4>
-
-            <div class="d-flex gap-2">
-                <ConfirmDialog @confirm="toggleProjectArchiveState()">
-                    <template #activator="{ attrs, on }">
-                        <v-btn
-                            v-bind="attrs"
-                            v-on="on"
-                            :outlined="!project.archived"
-                            :small="$vuetify.breakpoint.xsOnly"
-                            color="accent"
-                            class="flex-grow-1 flex-sm-grow-0">
-                            <v-icon small left>mdi-archive</v-icon>
-                            {{ project.archived ? 'unarchive' : 'archive' }}
-                        </v-btn>
-                    </template>
-                    <template #icon>
-                        <v-icon x-large>mdi-archive</v-icon>
-                    </template>
-                    <span>
-                        Are you sure to
-                        {{ this.project.archived ? 'unarchive' : 'archive' }} this project ?
-                    </span>
-                </ConfirmDialog>
-                <template v-if="project.archived">
-                    <ConfirmDialog @confirm="deleteProject()">
-                        <template #activator="{ attrs, on }">
-                            <v-btn
-                                v-bind="attrs"
-                                v-on="on"
-                                outlined
-                                :small="$vuetify.breakpoint.xsOnly"
-                                color="error"
-                                class="flex-grow-1 flex-sm-grow-0">
-                                <v-icon small left>mdi-trash-can</v-icon>
-                                delete
-                            </v-btn>
-                        </template>
-                        <template #icon>
-                            <v-icon x-large>mdi-trash-can</v-icon>
-                        </template>
-                        <p class="mb-1">Are you sure to delete this project ?</p>
-                        <p class="mb-0 font-italic" style="font-size: 1.1rem">
-                            All related tasks will be deleted
-                        </p>
-                    </ConfirmDialog>
-                </template>
-            </div>
-        </div>
-
-        <v-form
-            ref="form"
-            v-model="projectForm.valid"
-            @submit.prevent="updateProject()"
-            class="form-wrapper">
-            <v-text-field
-                v-model="projectForm.data.name"
-                :rules="projectForm.rules.name"
-                :disabled="project.archived"
-                label="Name"
-                counter="50"
-                required
-                class="mb-2">
-            </v-text-field>
-            <v-textarea
-                v-model="projectForm.data.description"
-                :rules="projectForm.rules.description"
-                :disabled="project.archived"
-                @keyup.enter.ctrl="updateProject()"
-                label="Description"
-                counter="500"
-                required
-                rows="2"
-                auto-grow
-                class="mb-2">
-            </v-textarea>
-
-            <h6
-                class="text-h6 grey--text"
-                :class="{
-                    'text--lighten-2': !this.project.archived,
-                    'text--darken-2': this.project.archived,
-                }">
-                <v-icon small :color="this.project.archived ? 'grey darken-2' : 'grey lighten-2'">
-                    mdi-tag
-                </v-icon>
-                Tags
-            </h6>
-            <TagSearch
-                :selected-tags.sync="tagList"
-                :disabled="project.archived"
-                type="project"
-                class="mb-3">
-            </TagSearch>
-
-            <div class="tag-wrapper" v-if="tagList.length > 0">
-                <TagChip
-                    v-for="tag of tagList"
-                    :key="tag.id"
-                    :tag="tag"
-                    :disabled="project.archived"
-                    :clearable="true"
-                    @clear="removeTag($event)">
-                </TagChip>
-            </div>
-
-            <div v-if="!project.archived" class="d-flex justify-end mb-5">
-                <v-btn
-                    color="success"
-                    type="submit"
-                    :block="$vuetify.breakpoint.xsOnly"
-                    :disabled="!projectForm.valid || isFormUntouched">
-                    update
-                </v-btn>
-            </div>
-        </v-form>
-    </div>
-</template>
-
-<script lang="ts">
-import { projectService } from '@/api/project.api'
+<script setup lang="ts">
 import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
-import { projectActions } from '@/store/modules/project.store'
-import { Component, Vue, Watch } from 'vue-property-decorator'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import { Tag } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
 import deepEqual from 'deep-equal'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { useProjectStore } from '@/store'
+import { useDisplay } from 'vuetify'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { projectApi } from '@/api'
 
-@Component({ components: { TagSearch, TagChip, ConfirmDialog } })
-export default class ProjectSettings extends Vue {
-    tagList: Tag[] = []
+const router = useRouter()
+const display = useDisplay()
+const projectStore = useProjectStore()
 
-    projectForm: Form<ProjectPostOrPatch> = {
-        valid: false,
-        data: {
-            name: this.project.name,
-            description: this.project.description,
-            tagIds: [],
-        },
-        rules: {
-            name: [
-                (value: string) => !!value || 'Project name is required',
-                (value: string) => value.length <= 50 || 'Max 50 characters',
-            ],
-            description: [
-                (value: string) => !!value || 'Project description is required',
-                (value: string) => value.length <= 500 || 'Max 500 characters',
-            ],
-        },
-    }
+const formRef = useTemplateRef('form')
 
-    get project(): ProjectDetail {
-        return this.$store.state.project.currentProject
-    }
+const tagList = ref<Tag[]>([])
 
-    get isFormUntouched(): boolean {
-        return (
-            this.projectForm.data.name === this.project.name &&
-            this.projectForm.data.description === this.project.description &&
-            deepEqual(
-                this.projectForm.data.tagIds,
-                this.project.tags.map(({ id }) => id)
-            )
-        )
-    }
+const projectForm = ref<Form<ProjectPostOrPatch>>({
+  valid: false,
+  data: {
+    name: projectStore.currentProject.name,
+    description: projectStore.currentProject.description, // TODO : test it
+    tagIds: [],
+  },
+  rules: {
+    name: [
+      (value: string): boolean | string => !!value || 'Project name is required',
+      (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
+    ],
+    description: [
+      (value: string): boolean | string => !!value || 'Project description is required',
+      (value: string): boolean | string => value.length <= 500 || 'Max 500 characters',
+    ],
+  },
+})
 
-    get form(): Vue & { resetValidation: () => void } {
-        return this.$refs.form as Vue & { resetValidation: () => void }
-    }
+const project = computed<ProjectDetail>(() => projectStore.currentProject)
+const isFormUntouched = computed<boolean>(
+  () =>
+    projectForm.value.data.name === project.value.name &&
+    projectForm.value.data.description === project.value.description &&
+    deepEqual(
+      projectForm.value.data.tagIds,
+      project.value.tags.map(({ id }) => id)
+    )
+)
 
-    @Watch('project.tags', { deep: true, immediate: true })
-    private onProjectTagsChanges(value: Tag[]): void {
-        this.tagList = value
-    }
+watch(
+  () => project.value.tags,
+  (value: Tag[]) => {
+    tagList.value = value
+  },
+  { deep: true, immediate: true } // TODO : test if we need deep
+)
 
-    @Watch('tagList', { immediate: true })
-    private onTagListChanges(value: Tag[]): void {
-        this.projectForm.data.tagIds = value.map(({ id }) => id)
-    }
+watch(
+  tagList,
+  (value: Tag[]) => {
+    projectForm.value.data.tagIds = value.map(({ id }) => id)
+  },
+  { immediate: true }
+)
 
-    removeTag(id: number): void {
-        this.tagList = this.tagList.filter(tag => tag.id !== id)
-    }
+function removeTag(id: number): void {
+  tagList.value = tagList.value.filter(tag => tag.id !== id)
+}
 
-    toggleProjectArchiveState(): void {
-        this.$store.dispatch(projectActions.updateProperties, {
-            id: this.project.id,
-            data: { archived: !this.project.archived },
-        })
-        this.resetForm()
-    }
+function toggleProjectArchiveState(): void {
+  projectStore.updateProperties({ archived: !project.value.archived })
+  resetForm()
+}
 
-    resetForm(): void {
-        this.projectForm.data = {
-            name: this.project.name,
-            description: this.project.description,
-            tagIds: [],
-        }
-        this.form.resetValidation()
-    }
+function resetForm(): void {
+  projectForm.value.data = {
+    name: project.value.name,
+    description: project.value.description,
+    tagIds: [],
+  }
+  formRef.value.resetValidation()
+}
 
-    updateProject(): void {
-        this.$store.dispatch(projectActions.updateProperties, {
-            id: this.project.id,
-            data: this.projectForm.data,
-        })
-    }
+function updateProject(): void {
+  projectStore.updateProperties(projectForm.value.data)
+}
 
-    deleteProject(): void {
-        projectService.deleteProject(this.project.id).then(
-            () => {
-                this.$router.push({ name: 'project-list' })
-            },
-            (error: any) => {
-                console.error(error)
-            }
-        )
-    }
+function deleteProject(): void {
+  projectApi.deleteProject(project.value.id).then(
+    () => router.push({ name: 'project-list' }),
+    error => console.error(error)
+  )
 }
 </script>
 
+<template>
+  <div>
+    <div class="d-flex flex-column flex-sm-row align-stretch column-gap-2 row-gap-1 mb-3">
+      <h4 class="text-h6 text-sm-h5 flex-grow-1">Settings</h4>
+
+      <div class="d-flex gap-2">
+        <ConfirmDialog @confirm="toggleProjectArchiveState()">
+          <template #activator="{ attrs, on }">
+            <v-btn
+              v-bind="attrs"
+              :variant="!project.archived ? 'outlined' : 'elevated'"
+              :size="display.xs ? 'small' : 'default'"
+              color="accent"
+              class="flex-grow-1 flex-sm-grow-0"
+              v-on="on">
+              <v-icon size="small" start>mdi-archive</v-icon>
+              {{ project.archived ? 'unarchive' : 'archive' }}
+            </v-btn>
+          </template>
+          <template #icon>
+            <v-icon size="x-large">mdi-archive</v-icon>
+          </template>
+          <span>
+            Are you sure to
+            {{ project.archived ? 'unarchive' : 'archive' }} this project ?
+          </span>
+        </ConfirmDialog>
+        <template v-if="project.archived">
+          <ConfirmDialog @confirm="deleteProject()">
+            <template #activator="{ attrs, on }">
+              <v-btn
+                v-bind="attrs"
+                variant="outlined"
+                :size="display.xs ? 'small' : 'default'"
+                color="error"
+                class="flex-grow-1 flex-sm-grow-0"
+                v-on="on">
+                <v-icon size="small" start>mdi-trash-can</v-icon>
+                delete
+              </v-btn>
+            </template>
+            <template #icon>
+              <v-icon size="x-large">mdi-trash-can</v-icon>
+            </template>
+            <p class="mb-1">Are you sure to delete this project ?</p>
+            <p class="mb-0 font-italic" style="font-size: 1.1rem">
+              All related tasks will be deleted
+            </p>
+          </ConfirmDialog>
+        </template>
+      </div>
+    </div>
+
+    <v-form
+      ref="form"
+      v-model="projectForm.valid"
+      class="form-wrapper"
+      @submit.prevent="updateProject()">
+      <v-text-field
+        v-model="projectForm.data.name"
+        :rules="projectForm.rules.name"
+        :disabled="project.archived"
+        label="Name"
+        counter="50"
+        required
+        class="mb-2" />
+      <v-textarea
+        v-model="projectForm.data.description"
+        :rules="projectForm.rules.description"
+        :disabled="project.archived"
+        label="Description"
+        counter="500"
+        required
+        rows="2"
+        auto-grow
+        class="mb-2"
+        @keyup.enter.ctrl="updateProject()" />
+
+      <h6
+        class="text-h6 text-grey"
+        :class="{
+          'text--lighten-2': !project.archived,
+          'text--darken-2': project.archived,
+        }">
+        <v-icon size="small" :color="project.archived ? 'grey darken-2' : 'grey lighten-2'">
+          mdi-tag
+        </v-icon>
+        Tags
+      </h6>
+      <TagSearch v-model="tagList" :disabled="project.archived" type="project" class="mb-3" />
+
+      <div v-if="tagList.length > 0" class="tag-wrapper">
+        <TagChip
+          v-for="tag of tagList"
+          :key="tag.id"
+          :tag
+          :disabled="project.archived"
+          :clearable="true"
+          @clear="removeTag($event)" />
+      </div>
+
+      <div v-if="!project.archived" class="d-flex justify-end mb-5">
+        <v-btn
+          color="success"
+          type="submit"
+          :block="display.xs"
+          :disabled="!projectForm.valid || isFormUntouched">
+          update
+        </v-btn>
+      </div>
+    </v-form>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@import 'vuetify/settings';
 
 @media #{map-get($display-breakpoints, 'md-and-up')} {
-    .form-wrapper {
-        width: 75%;
-    }
+  .form-wrapper {
+    width: 75%;
+  }
 }
 
 .tag-wrapper {
-    min-height: 32px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
+  min-height: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 </style>

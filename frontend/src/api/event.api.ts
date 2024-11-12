@@ -1,42 +1,35 @@
 import { apiRoutes } from '@/api-routes'
 import { EventPostOrPatch } from '@/models/event.model'
-import Vue from 'vue'
+import axiosInstance from '@/axios/axios-instance'
 
 export interface EventQueryOptions {
-    date?: string
-    month?: number
-    year?: number
+  date?: string
+  month?: number
+  year?: number
 }
 
 interface EventPostOrPatchOptions {
-    extended?: boolean
+  extended?: boolean
 }
 
-const getEvents = (params: EventQueryOptions = {}) => {
-    return Vue.http.get(apiRoutes.event, { params })
+export function getEvents(params: EventQueryOptions = {}) {
+  return axiosInstance.get(apiRoutes.event, { params })
 }
 
-const createEvent = (event: EventPostOrPatch, params: EventPostOrPatchOptions = {}) => {
-    return Vue.http.post(apiRoutes.event, event, { params })
+export function createEvent(event: EventPostOrPatch, params: EventPostOrPatchOptions = {}) {
+  return axiosInstance.post(apiRoutes.event, event, { params })
 }
 
-const updateEventById = (
-    eventId: number,
-    event: EventPostOrPatch,
-    params: EventPostOrPatchOptions = {}
-) => {
-    return Vue.http.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event, {
-        params,
-    })
+export function updateEventById(
+  eventId: number,
+  event: EventPostOrPatch,
+  params: EventPostOrPatchOptions = {}
+) {
+  return axiosInstance.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event, {
+    params,
+  })
 }
 
-const deleteEventById = (eventId: number) => {
-    return Vue.http.delete(apiRoutes.eventById.replace(':eventId', eventId.toString()))
-}
-
-export const eventService = {
-    getEvents,
-    createEvent,
-    updateEventById,
-    deleteEventById,
+export function deleteEventById(eventId: number) {
+  return axiosInstance.delete(apiRoutes.eventById.replace(':eventId', eventId.toString()))
 }

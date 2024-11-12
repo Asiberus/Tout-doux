@@ -1,22 +1,27 @@
-<template>
-    <div class="d-flex align-center justify-center justify-sm-start gap-2">
-        <v-icon
-            v-if="icon"
-            :large="$vuetify.breakpoint.smOnly"
-            :x-large="$vuetify.breakpoint.mdAndUp">
-            {{ icon }}
-        </v-icon>
-        <h1 class="text-h4 text-md-h3">
-            <slot></slot>
-        </h1>
-    </div>
-</template>
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useDisplay } from 'vuetify'
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+const display = useDisplay()
 
-@Component
-export default class MainTitle extends Vue {
-    @Prop({ required: false }) icon?: string
-}
+defineProps<{
+  icon?: string
+}>()
+
+const size = computed<'default' | 'large' | 'x-large'>(() => {
+  if (display.sm) return 'large'
+  else if (display.mdAndUp) return 'x-large'
+  else return 'default'
+})
 </script>
+
+<template>
+  <div class="d-flex align-center justify-center justify-sm-start gap-2">
+    <v-icon v-if="icon" :size>
+      {{ icon }}
+    </v-icon>
+    <h1 class="text-h4 text-md-h3">
+      <slot></slot>
+    </h1>
+  </div>
+</template>

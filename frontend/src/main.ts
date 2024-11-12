@@ -1,45 +1,28 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
+// TODO : See if we can remove registerServiceWorker dependency
 import './registerServiceWorker'
 import router from './router'
-import store from './store'
-import vuetify from './plugins/vuetify'
-import VueResource from 'vue-resource'
-import { config } from '@/config'
-import { authService } from '@/services'
-import { HttpOptions, HttpResponse } from 'vue-resource/types/vue_resource'
-import VueRouter from 'vue-router'
+import { createVuetify } from 'vuetify'
+import { createPinia } from 'pinia'
+import { vuetifyOptions } from '@/plugins/vuetify'
 
-Vue.store = store
+const app = createApp(App)
 
-Vue.use(VueRouter)
-Vue.router = router
+const pinia = createPinia()
+const vuetify = createVuetify(vuetifyOptions)
 
-// Todo : add interceptor for response body
-Vue.use(VueResource)
-Vue.http.options.root = config.API_URL ?? ''
+app.use(router)
+app.use(pinia)
+app.use(vuetify)
 
-Vue.http.interceptors.push((request: HttpOptions) => {
-    if (authService.isAuthenticated())
-        request.headers.set('Authorization', `Bearer ${authService.getToken()}`)
-})
+// Vue.config.productionTip = false
 
-Vue.http.interceptors.push(() => {
-    return (response: HttpResponse) => {
-        if (response.status === 401) {
-            authService.removeToken()
-            authService.resetStore()
+// new Vue({
+//   router,
+//   store,
+//   vuetify,
+//   render: h => h(App),
+// }).$mount('#app')
 
-            Vue.router.push({ name: 'login' })
-        }
-    }
-})
-
-Vue.config.productionTip = false
-
-new Vue({
-    router,
-    store,
-    vuetify,
-    render: h => h(App),
-}).$mount('#app')
+app.mount('#app')

@@ -1,29 +1,27 @@
-<template>
-    <v-dialog
-        :value="value"
-        @input="$emit('input', $event)"
-        content-class="half-dialog"
-        :transition="
-            $vuetify.breakpoint.width < 400
-                ? 'dialog-bottom-transition'
-                : 'slide-x-reverse-transition'
-        ">
-        <slot></slot>
-    </v-dialog>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import { hideScroll, showScroll } from '@/utils/document.utils'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { watch } from 'vue'
+import { useDisplay } from 'vuetify'
 
-@Component
-export default class HalfDialog extends Vue {
-    @Prop({ required: true }) value!: boolean
+const display = useDisplay()
 
-    @Watch('value')
-    private onValueChanges(value: boolean): void {
-        if (value) hideScroll()
-        else showScroll()
-    }
-}
+const show = defineModel<boolean>()
+
+watch(
+  () => show.value,
+  value => {
+    if (value) hideScroll()
+    else showScroll()
+  }
+)
 </script>
+
+<template>
+  <v-dialog
+    :model-value="show"
+    content-class="half-dialog"
+    :transition="display.width < 400 ? 'dialog-bottom-transition' : 'slide-x-reverse-transition'"
+    @update:model-value="show = $event">
+    <slot></slot>
+  </v-dialog>
+</template>

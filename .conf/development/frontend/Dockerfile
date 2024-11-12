@@ -19,10 +19,10 @@ RUN chown node:node /frontend && \
     rm -rf /var/cache/apk/*
 
 USER node
-COPY --chown=node:node ./frontend/package.json ./frontend/package-lock.json ./
-RUN npm install
+COPY --chown=node:node ./frontend/package.json ./frontend/yarn.lock ./
+RUN yarn install
 
 COPY --chown=node:node ./frontend .
 RUN ./setup-config.sh
 
-CMD ["npm", "run", "serve"]
+CMD ["yarn", "dev"]

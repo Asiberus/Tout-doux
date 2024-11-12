@@ -1,41 +1,34 @@
 import { apiRoutes } from '@/api-routes'
-import Vue from 'vue'
 import { CollectionPatch, CollectionPost } from '@/models/collection.model'
+import axiosInstance from '@/axios/axios-instance'
 
-const getCollectionList = (params = {}) => {
-    return Vue.http.get(apiRoutes.collection, { params: { size: 0, ...params } })
+export function getCollectionList(params = {}) {
+  return axiosInstance.get(apiRoutes.collection, { params: { size: 0, ...params } })
 }
 
-const getCollectionListDetailed = (params = {}) => {
-    return Vue.http.get(apiRoutes.collectionDetailed, { params: { size: 0, ...params } })
+export function getCollectionListDetailed(params = {}) {
+  return axiosInstance.get(apiRoutes.collectionDetailed, { params: { size: 0, ...params } })
 }
 
-const getCollectionById = (collectionId: number) => {
-    return Vue.http.get(apiRoutes.collectionById.replace(':collectionId', collectionId.toString()))
+export function getCollectionById(collectionId: number) {
+  return axiosInstance.get(
+    apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+  )
 }
 
-const createCollection = (collectionForm: CollectionPost) => {
-    return Vue.http.post(apiRoutes.collection, collectionForm)
+export function createCollection(collectionForm: CollectionPost) {
+  return axiosInstance.post(apiRoutes.collection, collectionForm)
 }
 
-const updateCollection = (collectionId: number, collectionForm: CollectionPatch) => {
-    return Vue.http.patch(
-        apiRoutes.collectionById.replace(':collectionId', collectionId.toString()),
-        collectionForm
-    )
+export function updateCollection(collectionId: number, collectionForm: CollectionPatch) {
+  return axiosInstance.patch(
+    apiRoutes.collectionById.replace(':collectionId', collectionId.toString()),
+    collectionForm
+  )
 }
 
-const deleteCollection = (collectionId: number) => {
-    return Vue.http.delete(
-        apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
-    )
-}
-
-export const collectionService = {
-    getCollectionList,
-    getCollectionListDetailed,
-    getCollectionById,
-    createCollection,
-    updateCollection,
-    deleteCollection,
+export function deleteCollection(collectionId: number) {
+  return axiosInstance.delete(
+    apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+  )
 }

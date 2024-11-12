@@ -1,11 +1,11 @@
-import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
 import { Preferences } from '@/models/preferences.model'
+import axiosInstance from '@/axios/axios-instance'
 
 export function getPreferences() {
-    return Vue.http.get(apiRoutes.preferences)
+  return axiosInstance.get(apiRoutes.preferences)
 }
 
 export function updatePreferences(data: Preferences) {
-    return Vue.http.patch(apiRoutes.preferences, data)
+  return axiosInstance.patch(apiRoutes.preferences, data)
 }

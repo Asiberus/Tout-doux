@@ -155,7 +155,7 @@ prodInstall() {
 function createConfFile() {
   # Initialization sequence, fill .env file to fit user inputs and build docker images in either dev, prod or local prod mode
   # Check if all dependencies are installed before doing anything
-  for COMMAND in "docker" "docker-compose"; do
+  for COMMAND in "docker"; do
     isInstalled "${COMMAND}"
   done
 
@@ -234,7 +234,7 @@ function editConfFile() {
 function buildApp(){
   if [ "${1}" = "dev" ]; then
     echo -e "Building Tout Doux for development environment"
-    eval "docker-compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env build"
+    eval "docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env build"
   elif [ "${1}" = "prod" ]; then
     echo -e "Building Tout Doux for production environment"
     eval "docker-compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env build"
@@ -246,7 +246,7 @@ function buildApp(){
 function startApp(){
   if [ "${1}" = "dev" ]; then
     echo -e "Starting Tout Doux in development environment"
-    eval "docker-compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env up -d"
+    eval "docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env up -d"
   elif [ "${1}" = "prod" ]; then
     echo -e "Starting Tout Doux in production environment"
     eval "docker-compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env up -d"
@@ -260,7 +260,7 @@ function startApp(){
 function quitApp(){
   if [ "${1}" = "dev" ]; then
     echo -e "Stoping Tout Doux containers in development environment"
-    eval "docker-compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env stop"
+    eval "docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env stop"
   elif [ "${1}" = "prod" ]; then
     echo -e "Stoping Tout Doux containers in production environment"
     eval "docker-compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env stop"
@@ -273,8 +273,8 @@ function resetApp(){
   message="\e[93mWARNING\e[39m This command will remove the following Tout Doux's docker components : containers"
 
   if [ "${1}" = "dev" ]; then
-    stopCommand="docker-compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env stop"
-    command="docker-compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env down"
+    stopCommand="docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env stop"
+    command="docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env down"
     shift
   elif [ "${1}" = "prod" ]; then
     stopCommand="docker-compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env stop"

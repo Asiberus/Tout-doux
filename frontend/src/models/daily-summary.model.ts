@@ -1,6 +1,6 @@
 export interface DailySummary {
-    date: string
-    totalTask: number
-    totalTaskCompleted: number
-    totalEvent: number
+  date: string
+  totalTask: number
+  totalTaskCompleted: number
+  totalEvent: number
 }

@@ -4,41 +4,41 @@ import ProjectDescription from '@/views/project/project-detail/tabs/ProjectDescr
 import ProjectEvent from '@/views/project/project-detail/tabs/ProjectEvent.vue'
 import ProjectSection from '@/views/project/project-detail/tabs/ProjectSection.vue'
 import ProjectListComponent from '@/views/project/project-list/ProjectList.vue'
-import { RouteConfig } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router'
 
-export const projectRoutes: Array<RouteConfig> = [
-    {
-        path: '/project',
-        name: 'project-list',
-        component: ProjectListComponent,
-        props: (route: any) => ({ archived: route.query.archived === 'true' }),
-    },
-    {
-        path: '/project/:id',
-        component: ProjectDetailComponent,
-        props: (route: any) => ({ projectId: parseInt(route.params.id) }),
-        children: [
-            {
-                path: '',
-                name: 'project-detail',
-                component: ProjectDescription,
-            },
-            {
-                path: 'section/:sectionId?',
-                name: 'project-detail-section',
-                component: ProjectSection,
-                props: (route: any) => ({ sectionId: parseInt(route.params.sectionId) }),
-            },
-            {
-                path: 'event',
-                name: 'project-detail-event',
-                component: ProjectEvent,
-            },
-            {
-                path: 'settings',
-                name: 'project-detail-settings',
-                component: ProjectSettings,
-            },
-        ],
-    },
+export const projectRoutes: RouteRecordRaw[] = [
+  {
+    path: '/project',
+    name: 'project-list',
+    component: ProjectListComponent,
+    props: (route: any) => ({ archived: route.query.archived === 'true' }),
+  },
+  {
+    path: '/project/:id',
+    component: ProjectDetailComponent,
+    props: (route: any) => ({ projectId: parseInt(route.params.id) }),
+    children: [
+      {
+        path: '',
+        name: 'project-detail',
+        component: ProjectDescription,
+      },
+      {
+        path: 'section/:sectionId?',
+        name: 'project-detail-section',
+        component: ProjectSection,
+        props: (route: any) => ({ sectionId: parseInt(route.params.sectionId) }),
+      },
+      {
+        path: 'event',
+        name: 'project-detail-event',
+        component: ProjectEvent,
+      },
+      {
+        path: 'settings',
+        name: 'project-detail-settings',
+        component: ProjectSettings,
+      },
+    ],
+  },
 ]

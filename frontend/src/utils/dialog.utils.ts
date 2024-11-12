@@ -1,19 +1,19 @@
-import vuetify from '@/plugins/vuetify'
+import { useDisplay } from 'vuetify'
 
 export function getDialogWidth(): string | null {
-    const { breakpoint } = vuetify.framework
+  const display = useDisplay()
 
-    // dialog is fullscreen
-    if (breakpoint.smAndDown) return null
-    else if (breakpoint.mdAndDown) return '80%'
-    else return '60%'
+  // dialog is fullscreen
+  if (display.smAndDown) return null
+  else if (display.mdAndDown) return '80%'
+  else return '60%'
 }
 
 export function getConfirmDialogWidth(): string | null {
-    const { breakpoint } = vuetify.framework
+  const display = useDisplay()
 
-    // dialog is fullscreen
-    if (breakpoint.xsOnly) return null
-    else if (breakpoint.mdAndDown) return '70%'
-    else return '50%'
+  // dialog is fullscreen
+  if (display.xs) return null
+  else if (display.mdAndDown) return '70%'
+  else return '50%'
 }

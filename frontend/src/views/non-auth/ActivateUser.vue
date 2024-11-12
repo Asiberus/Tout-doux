@@ -1,66 +1,66 @@
-<template>
-    <div class="activate-user">
-        <template v-if="state === 'tokenInvalid'">
-            <img src="../../assets/token-error.svg" alt="token error" class="activate-user__img" />
-            <p class="text-body-1 text-center mb-0">
-                The token is invalid or it may be expired. <br />
-                Click on the button bellow to resend an email.
-            </p>
-            <v-btn @click="resendEmail()" outlined color="info">Resend email</v-btn>
-        </template>
-        <template v-else-if="state === 'mailSent'">
-            <img src="../../assets/mail-sent.svg" alt="mail sent" class="activate-user__img" />
-            <p class="text-body-1 text-center mb-0">
-                An email has been sent to you ! <br />
-                Check your inbox to activate your account.
-            </p>
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import { authApi } from '@/api'
 import { authService } from '@/services'
+import { onBeforeMount, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-@Component
-export default class ActivateUser extends Vue {
-    @Prop({ default: '', required: true }) uidb64!: string
-    @Prop({ default: '', required: true }) token!: string
+const router = useRouter()
 
-    state: 'tokenInvalid' | 'mailSent' | null = null
+const props = defineProps<{
+  uidb64: string
+  token: string
+}>()
 
-    created() {
-        authApi
-            .activateUser({ uidb64: this.uidb64, token: this.token })
-            .then(() => {
-                // TODO : add alert
-                if (authService.isAuthenticated()) {
-                    authService.removeToken()
-                    authService.resetStore()
-                }
-                this.$router.push({ name: 'login' })
-            })
-            .catch(() => {
-                this.state = 'tokenInvalid'
-            })
-    }
+const state = ref<'tokenInvalid' | 'mailSent' | null>(null)
 
-    resendEmail(): void {
-        authApi.resendActivationEmail({ uidb64: this.uidb64 }).then((this.state = 'mailSent'))
-    }
+onBeforeMount(() => {
+  authApi
+    .activateUser({ uidb64: props.uidb64, token: props.token })
+    .then(() => {
+      // TODO : add alert
+      if (authService.isAuthenticated()) {
+        authService.removeToken()
+        authService.resetStore()
+      }
+      router.push({ name: 'login' })
+    })
+    .catch(() => (state.value = 'tokenInvalid'))
+})
+
+function resendEmail(): void {
+  authApi.resendActivationEmail({ uidb64: props.uidb64 }).then((state.value = 'mailSent'))
 }
 </script>
 
+<template>
+  <div class="activate-user">
+    <template v-if="state === 'tokenInvalid'">
+      <img src="../../assets/token-error.svg" alt="token error" class="activate-user__img" />
+      <p class="text-body-1 text-center mb-0">
+        The token is invalid or it may be expired. <br />
+        Click on the button bellow to resend an email.
+      </p>
+      <v-btn variant="outlined" color="info" @click="resendEmail()">Resend email</v-btn>
+    </template>
+    <template v-else-if="state === 'mailSent'">
+      <img src="../../assets/mail-sent.svg" alt="mail sent" class="activate-user__img" />
+      <p class="text-body-1 text-center mb-0">
+        An email has been sent to you ! <br />
+        Check your inbox to activate your account.
+      </p>
+    </template>
+  </div>
+</template>
+
 <style scoped lang="scss">
 .activate-user {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    row-gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 16px;
 
-    &__img {
-        width: clamp(200px, 40vw, 300px);
-    }
+  &__img {
+    width: clamp(200px, 40vw, 300px);
+  }
 }
 </style>

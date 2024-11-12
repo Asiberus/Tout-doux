@@ -1,113 +1,112 @@
-<template>
-    <v-form v-model="dailyTaskForm.valid" @submit.prevent="submit()">
-        <div class="d-flex align-center gap-2">
-            <DailyTaskActionChip
-                :action.sync="dailyTaskForm.data.action"
-                :editable="true"
-                class="mb-4">
-            </DailyTaskActionChip>
-            <v-text-field
-                v-model="dailyTaskForm.data.name"
-                :rules="dailyTaskForm.rules.name"
-                label="Name"
-                counter="50"
-                required
-                autofocus
-                class="mb-2">
-            </v-text-field>
-        </div>
-
-        <TagSearch :selected-tags.sync="tagList" type="task" class="mb-5"></TagSearch>
-        <div class="tag-wrapper mb-2">
-            <TagChip
-                v-for="tag of tagList"
-                :key="tag.id"
-                :tag="tag"
-                clearable
-                @clear="removeTag($event)">
-            </TagChip>
-        </div>
-
-        <v-card-actions class="justify-end">
-            <v-btn plain small @click="close()">cancel</v-btn>
-            <v-btn color="success" text small :disabled="!dailyTaskForm.valid" type="submit">
-                {{ dailyTask ? 'update' : 'create' }}
-            </v-btn>
-        </v-card-actions>
-    </v-form>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
 import { Tag } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
 import { DailyTask, DailyTaskPatch } from '@/models/daily-task.model'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
+import { onBeforeMount, ref, watch } from 'vue'
 
-@Component({
-    components: { DailyTaskActionChip, TagChip, TagSearch },
+const props = defineProps<{
+  dailyTask?: DailyTask
+}>()
+
+const emit = defineEmits<{
+  submit: [data: DailyTaskPatch]
+  close: []
+}>()
+
+const tagList = ref<Tag[]>([])
+const dailyTaskForm = ref<Form<DailyTaskPatch>>({
+  valid: false,
+  data: {
+    action: null,
+    name: '',
+    tagIds: [],
+  },
+  rules: {
+    name: [
+      (value: string): boolean | string => !!value || 'Name is required',
+      (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
+    ],
+  },
 })
-export default class DailyTaskForm extends Vue {
-    @Prop() dailyTask?: DailyTask
 
-    tagList: Tag[] = []
-    dailyTaskForm: Form<DailyTaskPatch> = {
-        valid: false,
-        data: {
-            action: null,
-            name: '',
-            tagIds: [],
-        },
-        rules: {
-            name: [
-                (value: string) => !!value || 'Name is required',
-                (value: string) => value.length <= 50 || 'Max 50 characters',
-            ],
-        },
+onBeforeMount(() => {
+  if (props.dailyTask) {
+    dailyTaskForm.value.data = {
+      action: props.dailyTask.action,
+      name: props.dailyTask.name,
+      tagIds: props.dailyTask.tags.map(({ id }) => id),
     }
+    tagList.value = props.dailyTask.tags
+  }
+})
 
-    beforeMount(): void {
-        if (this.dailyTask) {
-            this.dailyTaskForm.data = {
-                action: this.dailyTask.action,
-                name: this.dailyTask.name,
-                tagIds: this.dailyTask.tags.map(({ id }) => id),
-            }
-            this.tagList = this.dailyTask.tags
-        }
-    }
+watch(tagList, (value: Tag[]): void => {
+  dailyTaskForm.value.data.tagIds = value.map(({ id }) => id)
+})
 
-    @Watch('tagList')
-    private onTagListChanges(value: Tag[]): void {
-        this.dailyTaskForm.data.tagIds = value.map(({ id }) => id)
-    }
+function submit(): void {
+  emit('submit', dailyTaskForm.value.data)
+}
 
-    submit(): void {
-        this.$emit('submit', this.dailyTaskForm.data)
-    }
+function close(): void {
+  emit('close')
+}
 
-    close(): void {
-        this.$emit('close')
-    }
-
-    removeTag(id: number): void {
-        this.tagList = this.tagList.filter(tag => tag.id !== id)
-    }
+function removeTag(id: number): void {
+  tagList.value = tagList.value.filter(tag => tag.id !== id)
 }
 </script>
 
+<template>
+  <v-form v-model="dailyTaskForm.valid" @submit.prevent="submit()">
+    <div class="d-flex align-center gap-2">
+      <DailyTaskActionChip
+        v-model:action="dailyTaskForm.data.action"
+        :editable="true"
+        class="mb-4" />
+
+      <v-text-field
+        v-model="dailyTaskForm.data.name"
+        :rules="dailyTaskForm.rules.name"
+        label="Name"
+        counter="50"
+        required
+        autofocus
+        class="mb-2" />
+    </div>
+
+    <TagSearch v-model="tagList" type="task" class="mb-5" />
+    <div class="tag-wrapper mb-2">
+      <TagChip v-for="tag of tagList" :key="tag.id" :tag clearable @clear="removeTag($event)" />
+    </div>
+
+    <v-card-actions class="justify-end">
+      <v-btn variant="plain" size="small" @click="close()">cancel</v-btn>
+      <v-btn
+        color="success"
+        variant="text"
+        size="small"
+        :disabled="!dailyTaskForm.valid"
+        type="submit">
+        {{ dailyTask ? 'update' : 'create' }}
+      </v-btn>
+    </v-card-actions>
+  </v-form>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@import 'vuetify/settings';
 
 .tag-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 
-    @media #{map-get($display-breakpoints, 'sm-and-down')} {
-        gap: 4px;
-    }
+  @media #{map-get($display-breakpoints, 'sm-and-down')} {
+    gap: 4px;
+  }
 }
 </style>

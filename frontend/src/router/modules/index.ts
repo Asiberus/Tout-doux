@@ -7,11 +7,11 @@ import { projectRoutes } from './project.router'
 import { settingsRoutes } from './settings.router'
 
 export {
-    administrationRoutes,
-    collectionRoutes,
-    dailyRoutes,
-    nonAuthRoutes,
-    profileRoute,
-    projectRoutes,
-    settingsRoutes,
+  administrationRoutes,
+  collectionRoutes,
+  dailyRoutes,
+  nonAuthRoutes,
+  profileRoute,
+  projectRoutes,
+  settingsRoutes,
 }

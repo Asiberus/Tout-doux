@@ -1,42 +1,43 @@
 import { authApi } from '@/api'
 import { LoginPost } from '@/models/login.model'
-import Vue from 'vue'
+import { useAppStore } from '@/store'
 
 const TOKEN_KEY = 'td_token'
 
-export function login(data: LoginPost) {
-    return authApi.login(data).then((response: any) => {
-        const token = response.body.token
-        setToken(token)
-
-        return response
-    })
-}
-
-export function logout() {
-    return authApi
-        .logout()
-        .then(() => removeToken())
-        .then(() => resetStore())
-}
-
-export function isAuthenticated(): boolean {
-    const token = getToken()
-    return token !== null
-}
-
 export function getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY)
+  return localStorage.getItem(TOKEN_KEY)
 }
 
 export function setToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token)
+  localStorage.setItem(TOKEN_KEY, token)
 }
 
 export function removeToken(): void {
-    localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(TOKEN_KEY)
 }
 
-export async function resetStore(): Promise<any> {
-    return Vue.store.dispatch('exit')
+export function resetStore(): void {
+  const appStore = useAppStore()
+  appStore.exit()
+}
+
+export function login(data: LoginPost) {
+  return authApi.login(data).then(response => {
+    const token = response.token
+    setToken(token)
+
+    return response
+  })
+}
+
+export function logout(): Promise<void> {
+  return authApi
+    .logout()
+    .then(() => removeToken())
+    .then(() => resetStore())
+}
+
+export function isAuthenticated(): boolean {
+  const token = getToken()
+  return token !== null
 }

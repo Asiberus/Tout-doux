@@ -1,31 +1,31 @@
 import { PaginationParams } from '@/models/common.model'
-import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
 import { CommonTaskForm } from '@/models/common-task.model'
+import axiosInstance from '@/axios/axios-instance'
 
 export interface IsCommonTaskNameUniqueParams {
-    name: string
-    exclude_id?: number
+  name: string
+  exclude_id?: number
 }
 
 export function getCommonTaskList(params: PaginationParams) {
-    return Vue.http.get(apiRoutes.commonTask, { params })
+  return axiosInstance.get(apiRoutes.commonTask, { params })
 }
 
 export function isNameUnique(params: IsCommonTaskNameUniqueParams) {
-    return Vue.http.get(apiRoutes.commonTaskUnique, { params })
+  return axiosInstance.get(apiRoutes.commonTaskUnique, { params })
 }
 
 export function createCommonTask(commonTask: CommonTaskForm) {
-    return Vue.http.post(apiRoutes.commonTask, commonTask)
+  return axiosInstance.post(apiRoutes.commonTask, commonTask)
 }
 
 export function updateCommonTask(id: number, commonTask: CommonTaskForm) {
-    const url = apiRoutes.commonTaskById.replace(':id', id.toString())
-    return Vue.http.patch(url, commonTask)
+  const url = apiRoutes.commonTaskById.replace(':id', id.toString())
+  return axiosInstance.patch(url, commonTask)
 }
 
 export function deleteCommonTask(id: number) {
-    const url = apiRoutes.commonTaskById.replace(':id', id.toString())
-    return Vue.http.delete(url)
+  const url = apiRoutes.commonTaskById.replace(':id', id.toString())
+  return axiosInstance.delete(url)
 }

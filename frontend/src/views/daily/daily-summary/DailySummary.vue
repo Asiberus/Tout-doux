@@ -1,168 +1,168 @@
-<template>
-    <div>
-        <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-3 mb-md-6">
-            <MainTitle icon="mdi-trophy" class="mb-3 mb-sm-0">Daily Summary</MainTitle>
-            <v-btn
-                :to="{ name: 'daily-update', params: { date: this.today, step: 'task' } }"
-                color="accent"
-                rounded
-                outlined>
-                prepare the day
-            </v-btn>
-        </div>
-
-        <div class="daily-wrapper">
-            <DailySummaryCardComponent
-                v-for="dailySummary in dailySummaryList"
-                :key="dailySummary.date"
-                :daily-summary="dailySummary"
-                @open-daily-detail="setDateParam(dailySummary.date)">
-            </DailySummaryCardComponent>
-        </div>
-
-        <div class="mt-5 d-flex justify-center" v-if="dailySummaryList.length">
-            <v-btn @click="loadNextPage()" :loading="dailyOverviewLoading" rounded>
-                Load more days
-            </v-btn>
-        </div>
-
-        <DailyDetail
-            v-model="dailyDetailDialog"
-            :date="dateSelected"
-            @input="dailyDetailDialogInput($event)"
-            @daily-task-completed="updateDailyTaskCompleted">
-        </DailyDetail>
-    </div>
-</template>
-
-<script lang="ts">
-import { dailyTaskService } from '@/api/daily-task.api'
+<script setup lang="ts">
 import { DailySummary } from '@/models/daily-summary.model'
 import { showScroll } from '@/utils/document.utils'
 import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
 import moment from 'moment'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import MainTitle from '@/components/MainTitle.vue'
+import { onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+import { dailyTaskApi } from '@/api'
 
-@Component({ components: { MainTitle, DailySummaryCardComponent, DailyDetail } })
-export default class DailySummaryComponent extends Vue {
-    @Prop({ required: false }) date?: string
+const display = useDisplay()
+const router = useRouter()
 
-    dailySummaryList: DailySummary[] = []
-    dailyOverviewLoading = false
-    dailyDetailDialog = false
-    dateSelected = ''
-    today = moment().format('YYYY-MM-DD')
+const props = defineProps<{
+  date?: string
+}>()
 
-    daysPerPage = 21
+const dailySummaryList = ref<DailySummary[]>([])
+const dailyOverviewLoading = ref(false)
+const dailyDetailDialog = ref(false)
+const dateSelected = ref<string>('')
 
-    created(): void {
-        this.daysPerPage = this.calculateDaysPerPage()
-        const endDate = moment()
-            .subtract(this.daysPerPage - 1, 'days')
-            .format('YYYY-MM-DD')
-        this.retrieveDailySummaryList(this.today, endDate)
+const today = moment().format('YYYY-MM-DD')
+let daysPerPage = 21
+
+onBeforeMount(() => {
+  daysPerPage = calculateDaysPerPage()
+  const endDate = moment()
+    .subtract(daysPerPage - 1, 'days')
+    .format('YYYY-MM-DD')
+  retrieveDailySummaryList(today, endDate)
+})
+
+onMounted(() => {
+  if (!props.date) return
+  if (!moment(props.date).isValid()) removeDateParam()
+
+  openDailyDetailDialog(props.date)
+})
+
+onUnmounted(() => {
+  // The scroll can be deactivated if a daily-detail dialog is open.
+  // So it is reset on unmounted if the user change route directly.
+  showScroll()
+})
+
+// TODO : test if this work. Otherwise watch changes on route date param
+watch(
+  () => props.date,
+  () => {
+    if (!props.date) {
+      dailyDetailDialog.value = false
+      return
     }
 
-    mounted(): void {
-        if (!this.date) return
-        if (!moment(this.date).isValid()) this.removeDateParam()
+    if (!moment(props.date).isValid()) removeDateParam()
 
-        this.openDailyDetailDialog(this.date)
-    }
+    openDailyDetailDialog(props.date)
+  }
+)
 
-    destroyed(): void {
-        // Scroll is reset whenever the user change route.
-        showScroll()
-    }
+function calculateDaysPerPage(): number {
+  if (display.xs) return 10
+  else if (display.smAndDown) return 14
+  else if (display.lgAndDown) return 21
+  else return 42 // for xl only
+}
 
-    @Watch('$route', { deep: true })
-    private onRouterChange(): void {
-        if (!this.date) {
-            this.dailyDetailDialog = false
-            return
-        }
+function retrieveDailySummaryList(startDate: string, endDate: string): void {
+  dailyOverviewLoading.value = true
+  dailyTaskApi
+    .getDailySummary(startDate, endDate)
+    .then(response => (dailySummaryList.value = dailySummaryList.value.concat(response)))
+    .catch(error => console.error(error))
+    .finally(() => (dailyOverviewLoading.value = false))
+}
 
-        if (!moment(this.date).isValid()) this.removeDateParam()
+function loadNextPage(): void {
+  const lastDailySummary = dailySummaryList.value.at(-1)
+  if (!lastDailySummary) return
 
-        this.openDailyDetailDialog(this.date)
-    }
+  const startDate = moment(lastDailySummary.date).subtract(1, 'days').format('YYYY-MM-DD')
+  const endDate = moment(lastDailySummary.date).subtract(daysPerPage, 'days').format('YYYY-MM-DD')
 
-    private calculateDaysPerPage(): number {
-        const { breakpoint } = this.$vuetify
-        if (breakpoint.xsOnly) return 10
-        else if (breakpoint.smAndDown) return 14
-        else if (breakpoint.lgAndDown) return 21
-        else return 42 // for xl only
-    }
+  retrieveDailySummaryList(startDate, endDate)
+}
 
-    private retrieveDailySummaryList(startDate: string, endDate: string): void {
-        this.dailyOverviewLoading = true
-        dailyTaskService.getDailySummary(startDate, endDate).then(
-            (response: any) => {
-                this.dailySummaryList = this.dailySummaryList.concat(response.body)
-                this.dailyOverviewLoading = false
-            },
-            (error: any) => {
-                this.dailyOverviewLoading = false
-                console.error(error)
-            }
-        )
-    }
+function openDailyDetailDialog(date: string): void {
+  dateSelected.value = date
+  dailyDetailDialog.value = true
+}
 
-    loadNextPage(): void {
-        const lastDailySummary = this.dailySummaryList.at(-1)
-        if (!lastDailySummary) return
+function dailyDetailDialogInput(value: boolean): void {
+  if (!value) removeDateParam({ push: true })
+}
 
-        const startDate = moment(lastDailySummary.date).subtract(1, 'days').format('YYYY-MM-DD')
-        const endDate = moment(lastDailySummary.date)
-            .subtract(this.daysPerPage, 'days')
-            .format('YYYY-MM-DD')
+function updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
+  const dailyTaskSummary = dailySummaryList.value.find(d => d.date === date)
+  if (dailyTaskSummary) dailyTaskSummary.totalTaskCompleted = numberOfDailyTaskCompleted
+}
 
-        this.retrieveDailySummaryList(startDate, endDate)
-    }
+function setDateParam(date: string): void {
+  router.push({ name: 'daily-summary', params: { date } })
+}
 
-    openDailyDetailDialog(date: string): void {
-        this.dateSelected = date
-        this.dailyDetailDialog = true
-    }
-
-    dailyDetailDialogInput(value: boolean): void {
-        if (!value) this.removeDateParam({ push: true })
-    }
-
-    updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: number): void {
-        const dailyTaskSummary = this.dailySummaryList.find(d => d.date === date)
-        if (dailyTaskSummary) dailyTaskSummary.totalTaskCompleted = numberOfDailyTaskCompleted
-    }
-
-    setDateParam(date: string): void {
-        this.$router.push({ name: 'daily-summary', params: { date } })
-    }
-
-    removeDateParam(options: { push?: boolean } = {}): void {
-        const { push } = options
-        if (push) this.$router.push({ name: 'daily-summary' })
-        else this.$router.replace({ name: 'daily-summary' })
-    }
+function removeDateParam(options: { push?: boolean } = {}): void {
+  const { push } = options
+  if (push) router.push({ name: 'daily-summary' })
+  else router.replace({ name: 'daily-summary' })
 }
 </script>
 
+<template>
+  <div>
+    <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-3 mb-md-6">
+      <MainTitle icon="mdi-trophy" class="mb-3 mb-sm-0">Daily Summary</MainTitle>
+      <v-btn
+        :to="{ name: 'daily-update', params: { date: today, step: 'task' } }"
+        color="accent"
+        rounded
+        variant="outlined">
+        prepare the day
+      </v-btn>
+    </div>
+
+    <div class="daily-wrapper">
+      <DailySummaryCardComponent
+        v-for="dailySummary in dailySummaryList"
+        :key="dailySummary.date"
+        :daily-summary="dailySummary"
+        @open-daily-detail="setDateParam(dailySummary.date)">
+      </DailySummaryCardComponent>
+    </div>
+
+    <div v-if="dailySummaryList.length" class="mt-5 d-flex justify-center">
+      <v-btn :loading="dailyOverviewLoading" rounded @click="loadNextPage()">
+        Load more days
+      </v-btn>
+    </div>
+
+    <DailyDetail
+      v-model="dailyDetailDialog"
+      :date="dateSelected"
+      @update:model-value="dailyDetailDialogInput($event)"
+      @daily-task-completed="updateDailyTaskCompleted">
+    </DailyDetail>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@import 'vuetify/settings';
 
 .daily-wrapper {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 
-    @media #{map-get($display-breakpoints, 'sm-and-down')} {
-        grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
-    }
+  @media #{map-get($display-breakpoints, 'sm-and-down')} {
+    grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
+  }
 
-    & > * {
-        min-width: 0;
-    }
+  & > * {
+    min-width: 0;
+  }
 }
 </style>

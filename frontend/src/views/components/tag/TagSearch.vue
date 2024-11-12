@@ -1,85 +1,83 @@
-<template>
-    <div>
-        <v-autocomplete
-            :value="selectedTags"
-            @input="updateSelectedTags($event)"
-            :disabled="disabled"
-            :search-input.sync="search"
-            :items="tagList"
-            :loading="isLoading"
-            :menu-props="{ contentClass: 'background-elevation' }"
-            multiple
-            return-object
-            no-filter
-            hide-no-data
-            hide-details
-            dense
-            auto-select-first
-            placeholder="Search tags">
-            <template #item="{ item }">
-                <TagChip :tag="item"></TagChip>
-            </template>
-            <template #selection="{ item }">
-                <!-- Empty to remove search when a tag is selected -->
-            </template>
-        </v-autocomplete>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
 import { Tag, TagType } from '@/models/tag.model'
-import { tagService } from '@/api'
+import { tagApi } from '@/api'
 import TagChip from '@/views/components/tag/TagChip.vue'
+import { ref, watch } from 'vue'
 
-@Component({ components: { TagChip } })
-export default class TagSearch extends Vue {
-    @Prop({ required: true }) selectedTags!: Tag[]
-    @Prop({ required: true }) type!: TagType
-    @Prop({ default: false }) disabled!: boolean
+const selectedTags = defineModel<Tag[]>()
 
-    tagList: Tag[] = []
-    search: string | null = null
-    isLoading = false
+const props = defineProps<{
+  type: TagType
+  disabled?: boolean
+}>()
 
-    private searchTimer?: number = undefined
+const tagList = ref<Tag[]>([])
+const search = ref<string | null>(null)
+const isLoading = ref(false)
+let searchTimer: number | undefined = undefined
 
-    @Watch('search')
-    private onSearchChanges(value: string): void {
-        clearTimeout(this.searchTimer)
+watch(search, (value: string) => {
+  clearTimeout(searchTimer)
 
-        if (!value) {
-            this.cleanTagList()
-            return
-        }
+  if (!value) {
+    cleanTagList()
+    return
+  }
 
-        this.isLoading = true
-        this.searchTimer = setTimeout(() => this.searchTags(value), 200)
-    }
+  isLoading.value = true
+  searchTimer = setTimeout(() => searchTags(value), 200)
+})
 
-    private searchTags(value: string): void {
-        const excludedId = this.selectedTags.map(({ id }) => id).join(',')
-        tagService
-            .getTagList({
-                type: this.type,
-                search: value,
-                size: 0,
-                exclude_ids: excludedId || undefined,
-            })
-            .then((response: any) => (this.tagList = response.body.content))
-            .catch((error: any) => console.error(error))
-            .finally(() => (this.isLoading = false))
-    }
+function searchTags(value: string): void {
+  const excludedId = selectedTags.value.map(({ id }) => id).join(',')
+  tagApi
+    .getTagList({
+      type: props.type,
+      search: value,
+      size: 0,
+      exclude_ids: excludedId || undefined,
+    })
+    .then(response => (tagList.value = response.content))
+    .catch(error => console.error(error))
+    .finally(() => (isLoading.value = false))
+}
 
-    updateSelectedTags(selectedTags: Tag[]): void {
-        this.$emit('update:selectedTags', [...selectedTags])
-        this.cleanTagList()
-    }
+function updateSelectedTags(tags: Tag[]): void {
+  selectedTags.value = [...tags]
+  cleanTagList()
+}
 
-    cleanTagList(): void {
-        this.tagList = []
-        this.search = null
-        this.isLoading = false
-    }
+function cleanTagList(): void {
+  tagList.value = []
+  search.value = null
+  isLoading.value = false
 }
 </script>
+
+<template>
+  <div>
+    <v-autocomplete
+      v-model:search-input="search"
+      :model-value="selectedTags"
+      :disabled
+      :items="tagList"
+      :loading="isLoading"
+      :menu-props="{ contentClass: 'background-elevation' }"
+      multiple
+      return-object
+      no-filter
+      hide-no-data
+      hide-details
+      density="compact"
+      auto-select-first
+      placeholder="Search tags"
+      @update:model-value="updateSelectedTags($event)">
+      <template #item="{ item }">
+        <TagChip :tag="item" />
+      </template>
+      <template #selection="{ item }">
+        <!-- Empty to remove search when a tag is selected -->
+      </template>
+    </v-autocomplete>
+  </div>
+</template>

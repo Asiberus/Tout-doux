@@ -1,157 +1,149 @@
-<template>
-    <div ref="tagGroup" class="tag-group" :class="{ small, large, 'multi-row': multiRow }">
-        <v-icon
-            v-if="displayedTags.length > 0"
-            :small="!small && !large"
-            :x-small="small"
-            :class="{ transparent: iconTransparent }">
-            mdi-tag
-        </v-icon>
-
-        <template v-for="tag of displayedTags">
-            <TagChip
-                :tag="tag"
-                :key="tag.id"
-                :small="!small && !large"
-                :x-small="small"
-                class="flex-shrink-0">
-            </TagChip>
-        </template>
-        <template v-if="hiddenTags.length > 0">
-            <v-menu
-                open-on-hover
-                offset-y
-                offset-overflow
-                :close-on-content-click="false"
-                :z-index="zIndex">
-                <template #activator="{ attrs, on }">
-                    <v-chip
-                        v-bind="attrs"
-                        v-on="on"
-                        :small="!large"
-                        class="flex-shrink-0"
-                        @click.prevent.stop>
-                        <template v-if="smallMenuChip">
-                            <template v-if="displayedTags.length > 0">+</template>
-                            <span>{{ hiddenTags.length }}</span>
-                            <v-icon x-small class="ml-1">mdi-tag</v-icon>
-                        </template>
-                        <template v-else>
-                            <v-icon x-small class="mr-1">mdi-tag</v-icon>
-                            {{ hiddenTags.length }}
-                            <template v-if="displayedTags.length > 0">more</template>
-                            {{ hiddenTags.length > 1 ? 'tags' : 'tag' }}
-                        </template>
-                    </v-chip>
-                </template>
-                <div class="d-flex flex-column align-start gap-1 py-1">
-                    <template v-for="tag of hiddenTags">
-                        <TagChip
-                            :tag="tag"
-                            :key="tag.id"
-                            :small="!small && !large"
-                            :x-small="small">
-                        </TagChip>
-                    </template>
-                </div>
-            </v-menu>
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
 import { Tag } from '@/models/tag.model'
 import TagChip from '@/views/components/tag/TagChip.vue'
+import { computed, nextTick, onMounted, onUpdated, ref, useTemplateRef, watch } from 'vue'
 
-@Component({ components: { TagChip } })
-export default class TagGroup extends Vue {
-    @Prop({ required: true }) tagList!: Tag[]
-    @Prop({ default: null }) maxTag!: number | null
-    @Prop({ default: false }) small!: boolean
-    @Prop({ default: false }) large!: boolean
-    @Prop({ default: true }) iconTransparent!: boolean
-    @Prop({ default: 4 }) zIndex!: number
-    @Prop({ default: true }) autoShrink!: boolean
-    @Prop({ default: false }) multiRow!: boolean
+const props = withDefaults(
+  defineProps<{
+    tagList: Tag[]
+    maxTag?: number
+    small?: boolean
+    large?: boolean
+    iconTransparent?: boolean
+    zIndex?: number
+    autoShrink?: boolean
+    multiRow?: boolean
+  }>(),
+  { maxTag: undefined, iconTransparent: true, zIndex: 4, autoShrink: true }
+)
 
-    smallMenuChip = false
-    internalMaxTag: number | null = null
-    tagGroup!: HTMLElement
+const tagGroupRef = useTemplateRef('tagGroup')
 
-    get displayedTags(): Tag[] {
-        return this.tagList.slice(0, this.internalMaxTag ?? this.tagList.length)
-    }
+onMounted(() => {
+  // TODO : test if we still need nextTick
+  if (props.autoShrink) nextTick(() => shrinkTagGroup()) // We need to use nextTick so the tagGroup render
+})
 
-    get hiddenTags(): Tag[] {
-        return this.internalMaxTag !== null ? this.tagList.slice(this.internalMaxTag) : []
-    }
+onUpdated(() => {
+  if (props.autoShrink) shrinkTagGroup()
+})
 
-    mounted(): void {
-        this.tagGroup = this.$refs.tagGroup as HTMLElement
-        if (this.autoShrink) this.$nextTick(() => this.shrinkTagGroup()) // We need to use nextTick so the tagGroup render
-    }
+const smallMenuChip = ref(false)
+const internalMaxTag = ref<number | null>(null)
 
-    updated(): void {
-        if (this.autoShrink) this.shrinkTagGroup()
-    }
+const displayedTags = computed<Tag[]>(() =>
+  props.tagList.slice(0, internalMaxTag.value ?? props.tagList.length)
+)
+const hiddenTags = computed<Tag[]>(() =>
+  internalMaxTag.value !== null ? props.tagList.slice(internalMaxTag.value) : []
+)
+const tagIconSize = computed<'small' | 'x-small' | 'default'>(() => {
+  if (!props.small && !props.large) return 'small'
+  else if (props.small) return 'x-small'
+  else return 'default'
+})
 
-    @Watch('maxTag', { immediate: true })
-    private onMaxTagChanges(value: number | null): void {
-        this.internalMaxTag = value ?? this.tagList.length
-    }
+watch(
+  () => props.maxTag,
+  (value: number | undefined) => {
+    internalMaxTag.value = value ?? props.tagList.length
+  },
+  { immediate: true }
+)
 
-    private shrinkTagGroup(): void {
-        const isOverflowing = this.tagGroup.clientWidth < this.tagGroup.scrollWidth
-        if (!isOverflowing) return
+function shrinkTagGroup(): void {
+  const isOverflowing = tagGroupRef.value.clientWidth < tagGroupRef.value.scrollWidth
+  if (!isOverflowing) return
 
-        if (this.internalMaxTag && this.internalMaxTag > 0) {
-            this.internalMaxTag = this.internalMaxTag - 1
-        } else if (!this.smallMenuChip) {
-            this.smallMenuChip = true
-        }
-    }
+  if (internalMaxTag.value && internalMaxTag.value > 0) {
+    internalMaxTag.value = internalMaxTag.value - 1
+  } else if (!smallMenuChip.value) {
+    smallMenuChip.value = true
+  }
 }
 </script>
 
+<template>
+  <div ref="tagGroup" class="tag-group" :class="{ small, large, 'multi-row': multiRow }">
+    <v-icon
+      v-if="displayedTags.length > 0"
+      :size="tagIconSize"
+      :class="{ transparent: iconTransparent }">
+      mdi-tag
+    </v-icon>
+
+    <template v-for="tag of displayedTags" :key="tag.id">
+      <TagChip :tag :small="!small && !large" :x-small="small" class="flex-shrink-0" />
+    </template>
+    <template v-if="hiddenTags.length > 0">
+      <v-menu open-on-hover offset-y offset-overflow :close-on-content-click="false" :z-index>
+        <template #activator="{ props: menuProps }">
+          <v-chip
+            :size="!large ? 'small' : 'default'"
+            class="flex-shrink-0"
+            v-bind="menuProps"
+            @click.prevent.stop>
+            <template v-if="smallMenuChip">
+              <template v-if="displayedTags.length > 0">+</template>
+              <span>{{ hiddenTags.length }}</span>
+              <v-icon size="x-small" class="ml-1">mdi-tag</v-icon>
+            </template>
+            <template v-else>
+              <v-icon size="x-small" class="mr-1">mdi-tag</v-icon>
+              {{ hiddenTags.length }}
+              <template v-if="displayedTags.length > 0">more</template>
+              {{ hiddenTags.length > 1 ? 'tags' : 'tag' }}
+            </template>
+          </v-chip>
+        </template>
+        <div class="d-flex flex-column align-start gap-1 py-1">
+          <template v-for="tag of hiddenTags" :key="tag.id">
+            <TagChip :tag :small="!small && !large" :x-small="small" />
+          </template>
+        </div>
+      </v-menu>
+    </template>
+  </div>
+</template>
+
 <style scoped lang="scss">
 .tag-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
 
-    &.multi-row {
-        flex-wrap: wrap;
-    }
+  &.multi-row {
+    flex-wrap: wrap;
+  }
 
-    &:not(.small):not(.large) {
-        .v-chip {
-            height: 20px;
-        }
-    }
-
-    &.small {
-        .v-chip {
-            height: 18px;
-        }
-    }
-
+  &:not(.small):not(.large) {
     .v-chip {
-        cursor: inherit;
-
-        &:hover::before {
-            opacity: 0 !important;
-        }
+      height: 20px;
     }
+  }
 
-    .transparent {
-        opacity: 0.62;
+  &.small {
+    .v-chip {
+      height: 18px;
     }
+  }
+
+  .v-chip {
+    cursor: inherit;
+
+    &:hover::before {
+      opacity: 0 !important;
+    }
+  }
+
+  .transparent {
+    opacity: 0.62;
+  }
 }
 
 .v-menu__content {
-    box-shadow: none;
+  box-shadow: none;
 }
 </style>

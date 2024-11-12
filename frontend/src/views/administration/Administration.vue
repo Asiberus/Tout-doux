@@ -1,78 +1,72 @@
-<template>
-    <div>
-        <MainTitle icon="mdi-security" class="mb-2 mb-md-6">Administration</MainTitle>
-
-        <div class="administration">
-            <div class="administration__tabs">
-                <v-tabs
-                    :vertical="$vuetify.breakpoint.mdAndUp"
-                    color="accent"
-                    show-arrows
-                    background-color="transparent">
-                    <v-tab :to="{ name: 'administration-user-list' }" exact class="justify-start">
-                        <v-icon left small>mdi-account-group</v-icon>
-                        User List
-                    </v-tab>
-                    <v-tab :to="{ name: 'administration-feedback' }" exact class="justify-start">
-                        <v-icon left small>mdi-comment-quote</v-icon>
-                        Feedback
-                    </v-tab>
-                </v-tabs>
-            </div>
-            <div class="administration__content">
-                <router-view />
-            </div>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import MainTitle from '@/components/MainTitle.vue'
+import { useDisplay } from 'vuetify'
 
-@Component({
-    components: { MainTitle },
-})
-export default class Administration extends Vue {}
+const display = useDisplay()
 </script>
 
+<template>
+  <div>
+    <MainTitle icon="mdi-security" class="mb-2 mb-md-6">Administration</MainTitle>
+
+    <div class="administration">
+      <div class="administration__tabs">
+        <v-tabs
+          :direction="display.mdAndUp ? 'vertical' : undefined"
+          color="accent"
+          show-arrows
+          bg-color="transparent">
+          <v-tab :to="{ name: 'administration-user-list' }" exact class="justify-start">
+            <v-icon start size="small">mdi-account-group</v-icon>
+            User List
+          </v-tab>
+          <v-tab :to="{ name: 'administration-feedback' }" exact class="justify-start">
+            <v-icon start size="small">mdi-comment-quote</v-icon>
+            Feedback
+          </v-tab>
+        </v-tabs>
+      </div>
+      <div class="administration__content">
+        <router-view />
+      </div>
+    </div>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@import 'vuetify/settings';
 
 .administration {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
-    &__tabs {
-        .v-tabs::v-deep {
-            .v-slide-group__prev,
-            .v-slide-group__next {
-                min-width: initial;
-                flex-basis: auto;
-            }
-        }
-
-        @media #{map-get($display-breakpoints, 'xs-only')} {
-            .v-tabs::v-deep .v-tab {
-                font-size: 0.7rem;
-                padding: 0 8px;
-            }
-        }
+  &__tabs {
+    .v-tabs :deep(.v-slide-group__prev, .v-slide-group__next) {
+      min-width: initial;
+      flex-basis: auto;
     }
 
-    &__content {
-        flex-grow: 1;
+    @media #{map-get($display-breakpoints, 'xs')} {
+      .v-tabs :deep(.v-tab) {
+        font-size: 0.7rem;
+        padding: 0 8px;
+      }
     }
+  }
+
+  &__content {
+    flex-grow: 1;
+  }
 }
 
 @media #{map-get($display-breakpoints, 'md-and-up')} {
-    .administration {
-        flex-direction: row;
+  .administration {
+    flex-direction: row;
 
-        &__tabs {
-            flex: 0 0 calc(100% / 6 - 12px);
-        }
+    &__tabs {
+      flex: 0 0 calc(100% / 6 - 12px);
     }
+  }
 }
 </style>

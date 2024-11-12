@@ -1,4 +1,6 @@
 {
-    "extends": "./tsconfig.json",
-    "includes": [".eslintrc.json"]
+  "extends": "./tsconfig.json",
+  "includes": [
+    "./eslint.config.mjs"
+  ]
 }
