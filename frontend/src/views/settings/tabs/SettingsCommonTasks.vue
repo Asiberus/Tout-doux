@@ -98,14 +98,15 @@ function deleteCommonTask(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .common-task-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(296px, 1fr));
   gap: 8px;
 
-  @media #{map-get($display-breakpoints, 'sm-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
     grid-template-columns: repeat(auto-fill, minmax(max(300px, calc((100% - 12px) / 2)), 1fr));
     gap: 12px;
   }

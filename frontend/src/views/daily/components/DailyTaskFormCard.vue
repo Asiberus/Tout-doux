@@ -151,7 +151,8 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-task-form-card {
   display: flex;
@@ -200,7 +201,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .daily-task-form-card {
     padding: 16px 24px 16px 16px;
 

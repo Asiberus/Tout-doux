@@ -28,7 +28,7 @@ onBeforeMount(() => {
 })
 
 function resendEmail(): void {
-  authApi.resendActivationEmail({ uidb64: props.uidb64 }).then((state.value = 'mailSent'))
+  authApi.resendActivationEmail({ uidb64: props.uidb64 }).then(() => (state.value = 'mailSent'))
 }
 </script>
 

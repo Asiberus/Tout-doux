@@ -13,7 +13,8 @@
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .non-authenticated-layout {
   flex-grow: 1;
@@ -41,7 +42,7 @@
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .non-authenticated-layout {
     align-items: center;
     padding: 48px 48px 0;
@@ -58,7 +59,7 @@
   }
 }
 
-@media #{map-get($display-breakpoints, 'lg-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'lg-and-up')} {
   .non-authenticated-layout {
     &__title {
       font-size: 8rem;

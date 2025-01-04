@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProjectAvatar from '@/components/ProjectAvatar.vue'
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventModel, EventPostOrPatch } from '@/models/event.model'
 import { Project } from '@/models/project.model'
 import { dateFormat } from '@/pipes'
 import { isPassed } from '@/utils/event.utils'
@@ -14,7 +14,7 @@ const display = useDisplay()
 
 const props = withDefaults(
   defineProps<{
-    event: EventModel
+    event: EventModel | EventExtendedModel
     project?: Project
     color?: string
     changePassedTextColor?: boolean
@@ -204,7 +204,8 @@ function isDateEqual(date1: string, date2: string): boolean {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .caret::after {
   content: '';
@@ -221,7 +222,7 @@ function isDateEqual(date1: string, date2: string): boolean {
   display: flex;
   align-items: center;
 
-  @media #{map-get($display-breakpoints, 'xs')} {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
     font-size: 0.8rem;
   }
 }

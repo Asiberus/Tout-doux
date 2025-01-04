@@ -23,10 +23,8 @@ import { useAppStore } from '@/store'
 import { authService } from '@/services'
 import FeedbackComponent from '@/views/feedback/Feedback.vue'
 
-console.log('ENV BASE URL =>', process.env.BASE_URL)
-
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '',

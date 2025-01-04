@@ -117,7 +117,8 @@ function selectTask(task: Task): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .selected {
   position: absolute;
@@ -138,7 +139,7 @@ function selectTask(task: Task): void {
       justify-content: center;
     }
 
-    @media #{map-get($display-breakpoints, 'xs')} {
+    @media #{map.get(variables.$display-breakpoints, 'xs')} {
       .v-card__text {
         padding: 12px;
       }

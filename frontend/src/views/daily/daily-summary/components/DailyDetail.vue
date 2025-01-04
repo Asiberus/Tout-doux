@@ -225,7 +225,8 @@ function emitDailyTaskCompletedEvent(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .content {
   flex-grow: 1;
@@ -240,7 +241,7 @@ function emitDailyTaskCompletedEvent(): void {
   z-index: 1;
   padding: 1rem;
 
-  @media #{map-get($display-breakpoints, 'xs')} {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
     padding: 0.5rem;
   }
 }

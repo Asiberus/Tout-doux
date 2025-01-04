@@ -16,6 +16,7 @@ const projectStore = useProjectStore()
 const eventDialog = ref(false)
 const displayPassedEvent = ref(false)
 
+// TODO : utiliser des getters
 const comingEvents = computed<EventModel[]>(() =>
   projectStore.currentProject.events.filter(event => !isPassed(event))
 )
@@ -127,7 +128,8 @@ function deleteEvent(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .empty-list-display {
   padding-top: 20px;
@@ -136,7 +138,7 @@ function deleteEvent(id: number): void {
   &__img {
     width: clamp(200px, 50%, 300px);
 
-    @media #{map-get($display-breakpoints, 'xl')} {
+    @media #{map.get(variables.$display-breakpoints, 'xl')} {
       width: clamp(200px, 50%, 400px);
     }
   }

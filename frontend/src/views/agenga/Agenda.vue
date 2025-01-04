@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
@@ -20,22 +20,22 @@ onBeforeMount(() => {
 
 const calendar = useTemplateRef('calendar')
 
-const events = ref<EventModel[]>([]) // TODO : think of using Set
+const events = ref<EventExtendedModel[]>([]) // TODO : think of using Set
 const value = ref(moment().format('YYYY-MM-DD'))
 const weekdays = [1, 2, 3, 4, 5, 6, 0]
 
 const eventDialog = ref(false)
-const eventToUpdate = ref<EventModel | null>(null)
-const startDatePlaceholder = ref<string | null>(null)
+const eventToUpdate = ref<EventExtendedModel>()
+const startDatePlaceholder = ref<string>()
 
 const eventTooltip = ref(false)
 const eventTooltipKey = ref(0)
-const eventSelected = ref<EventModel | null>(null)
-const eventTooltipElement = ref<EventTarget | null>(null)
+const eventSelected = ref<EventExtendedModel>()
+const eventTooltipElement = ref<EventExtendedModel>()
 
 const eventDayDialog = ref(false)
 const eventDayDialogDate = ref<string | null>(null)
-const eventDayDialogEvents = ref<EventModel[]>([])
+const eventDayDialogEvents = ref<EventExtendedModel[]>([])
 
 let doubleClickTimer: number | undefined = undefined
 
@@ -58,10 +58,10 @@ function retrieveEvents(): void {
 }
 
 function openEventDialog(
-  options: { event?: EventModel; startDatePlaceholder?: string } = {}
+  options: { event?: EventExtendedModel; startDatePlaceholder?: string } = {}
 ): void {
-  eventToUpdate.value = options.event ?? null
-  startDatePlaceholder.value = options.startDatePlaceholder ?? null
+  eventToUpdate.value = options.event
+  startDatePlaceholder.value = options.startDatePlaceholder
   eventDialog.value = true
 }
 
@@ -76,7 +76,7 @@ function setDayDialogEventList(options: { sort: boolean } = { sort: true }): voi
 }
 
 function createEvent(event: EventPostOrPatch): void {
-  eventSelected.value = null
+  eventSelected.value = undefined
   eventApi.createEvent(event, { extended: true }).then(
     response => {
       events.value.push(response)
@@ -118,7 +118,7 @@ function deleteEvent(id: number): void {
 }
 
 // Tooltip removed temporally
-function openEventTooltip($event: { nativeEvent: MouseEvent; event: EventModel }): void {
+function openEventTooltip($event: { nativeEvent: MouseEvent; event: EventExtendedModel }): void {
   const { nativeEvent, event } = $event
 
   nativeEvent.stopImmediatePropagation()

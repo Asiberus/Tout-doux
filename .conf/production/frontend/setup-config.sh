@@ -2,7 +2,7 @@
 
 set -e
 
-INDEX_PATH=/frontend/public/index.html
+INDEX_PATH=/frontend/index.html
 VERSION=${VERSION}
 API_URL=${API_URL}
 

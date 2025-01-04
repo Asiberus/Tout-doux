@@ -131,8 +131,8 @@ function submit(): void {
 </template>
 
 <style scoped lang="scss">
-//@import '~vuetify/src/styles/styles.sass';
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 @keyframes animate-icon-circle {
   from {
@@ -181,11 +181,11 @@ function submit(): void {
 .password-input {
   flex-grow: 0;
 
-  @media #{map-get($display-breakpoints, 'sm')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm')} {
     width: 75%;
   }
 
-  @media #{map-get($display-breakpoints, 'md-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
     width: 50%;
   }
 }

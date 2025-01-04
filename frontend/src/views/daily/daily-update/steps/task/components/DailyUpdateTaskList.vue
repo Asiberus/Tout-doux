@@ -101,7 +101,8 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-task-wrapper {
   overflow-y: auto;
@@ -110,7 +111,7 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
   flex-direction: column;
   gap: 8px;
 
-  @media #{map-get($display-breakpoints, 'md-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
     flex: 1 0 0;
   }
 }

@@ -51,14 +51,15 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .v-tabs :deep(.v-slide-group__prev, .v-slide-group__next) {
   min-width: initial;
   flex-basis: auto;
 }
 
-@media #{map-get($display-breakpoints, 'xs')} {
+@media #{map.get(variables.$display-breakpoints, 'xs')} {
   .v-tabs :deep(.v-tab) {
     font-size: 0.7rem;
     padding: 0 8px;

@@ -239,7 +239,8 @@ function deleteTask(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .section-title {
   line-height: 1.5rem;
@@ -248,7 +249,7 @@ function deleteTask(id: number): void {
 .empty-img {
   width: clamp(200px, 50%, 300px);
 
-  @media #{map-get($display-breakpoints, 'xl')} {
+  @media #{map.get(variables.$display-breakpoints, 'xl')} {
     width: clamp(200px, 50%, 400px);
   }
 }

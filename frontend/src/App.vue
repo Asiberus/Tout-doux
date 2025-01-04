@@ -3,7 +3,8 @@
 </template>
 
 <style lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 #app {
   font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
@@ -104,17 +105,17 @@ input:-webkit-autofill:active {
     left: 10% !important;
   }
 
-  @media #{map-get($display-breakpoints, 'sm')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm')} {
     width: 80% !important;
     left: 20% !important;
   }
 
-  @media #{map-get($display-breakpoints, 'md-only')} {
+  @media #{map.get(variables.$display-breakpoints, 'md')} {
     width: 60% !important;
     left: 40% !important;
   }
 
-  @media #{map-get($display-breakpoints, 'lg-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'lg-and-up')} {
     width: 40% !important;
     left: 60% !important;
   }
@@ -216,7 +217,7 @@ input:-webkit-autofill:active {
 }
 
 // Remove hover for btn on mobile
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .v-btn,
   .v-chip,
   .v-tab {

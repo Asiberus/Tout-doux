@@ -150,14 +150,15 @@ function removeDateParam(options: { push?: boolean } = {}): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-wrapper {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 
-  @media #{map-get($display-breakpoints, 'sm-and-down')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
     grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
   }
 

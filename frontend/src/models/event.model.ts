@@ -20,5 +20,18 @@ export interface EventModel {
   endDate?: string
   endTime?: string
   takesWholeDay: boolean
-  project?: Project
+}
+
+export interface EventExtendedModel extends EventModel {
+  project: Project
+}
+
+export interface EventQueryOptions {
+  date?: string
+  month?: number
+  year?: number
+}
+
+export interface EventPostOrPatchOptions {
+  extended: boolean
 }

@@ -159,7 +159,8 @@ function emitDeleteEvent(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .task-card {
   min-height: 72px;
@@ -191,7 +192,7 @@ function emitDeleteEvent(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .task-card {
     padding: 8px 24px 8px 8px;
 

@@ -117,7 +117,8 @@ function changeRouteParam(index: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .v-tab {
   max-width: 300px;
@@ -128,7 +129,7 @@ function changeRouteParam(index: number): void {
   flex: 0 1 auto;
 }
 
-@media #{map-get($display-breakpoints, 'xs')} {
+@media #{map.get(variables.$display-breakpoints, 'xs')} {
   .v-tab {
     max-width: 150px;
     font-size: 0.7rem;
@@ -143,7 +144,7 @@ function changeRouteParam(index: number): void {
   &__img {
     width: clamp(200px, 50%, 300px);
 
-    @media #{map-get($display-breakpoints, 'xl')} {
+    @media #{map.get(variables.$display-breakpoints, 'xl')} {
       width: clamp(200px, 50%, 400px);
     }
   }

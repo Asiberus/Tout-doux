@@ -1,35 +1,44 @@
 import { apiRoutes } from '@/api-routes'
-import { EventPostOrPatch } from '@/models/event.model'
+import {
+  EventExtendedModel,
+  EventModel,
+  EventPostOrPatch,
+  EventPostOrPatchOptions,
+  EventQueryOptions,
+} from '@/models/event.model'
 import axiosInstance from '@/axios/axios-instance'
 
-export interface EventQueryOptions {
-  date?: string
-  month?: number
-  year?: number
+type EventReturn<T extends EventPostOrPatchOptions> = T['extended'] extends true
+  ? EventExtendedModel
+  : EventModel
+
+export function getEvents(params: EventQueryOptions = {}): Promise<EventExtendedModel[]> {
+  return axiosInstance
+    .get<EventExtendedModel[]>(apiRoutes.event, { params })
+    .then(response => response.data)
 }
 
-interface EventPostOrPatchOptions {
-  extended?: boolean
+export function createEvent<Params extends EventPostOrPatchOptions>(
+  event: EventPostOrPatch,
+  params: Params
+): Promise<EventReturn<Params>> {
+  return axiosInstance
+    .post<EventReturn<Params>>(apiRoutes.event, event, { params })
+    .then(response => response.data)
 }
 
-export function getEvents(params: EventQueryOptions = {}) {
-  return axiosInstance.get(apiRoutes.event, { params })
-}
-
-export function createEvent(event: EventPostOrPatch, params: EventPostOrPatchOptions = {}) {
-  return axiosInstance.post(apiRoutes.event, event, { params })
-}
-
-export function updateEventById(
+export function updateEventById<Params extends EventPostOrPatchOptions>(
   eventId: number,
   event: EventPostOrPatch,
-  params: EventPostOrPatchOptions = {}
-) {
-  return axiosInstance.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event, {
-    params,
-  })
+  params: Params
+): Promise<EventReturn<Params>> {
+  const url = apiRoutes.eventById.replace(':eventId', eventId.toString())
+  return axiosInstance
+    .patch<EventReturn<Params>>(url, event, { params })
+    .then(response => response.data)
 }
 
-export function deleteEventById(eventId: number) {
-  return axiosInstance.delete(apiRoutes.eventById.replace(':eventId', eventId.toString()))
+export function deleteEventById(eventId: number): Promise<void> {
+  const url = apiRoutes.eventById.replace(':eventId', eventId.toString())
+  return axiosInstance.delete(url).then(response => response.data)
 }

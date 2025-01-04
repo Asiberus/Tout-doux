@@ -57,13 +57,14 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .progress-wheel-wrapper {
   display: flex;
   gap: 8px;
 
-  @media #{map-get($display-breakpoints, 'xs')} {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
     flex-direction: column;
   }
 
@@ -77,7 +78,7 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
     border: 2px solid var(--v-secondary-base);
     cursor: pointer;
 
-    @media #{map-get($display-breakpoints, 'md-and-up')} {
+    @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
       // We don't display hover for mobile
       &:hover {
         background-color: var(--v-secondary-darken1);

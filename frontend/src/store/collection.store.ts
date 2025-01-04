@@ -1,4 +1,3 @@
-import { taskService } from '@/api/task.api'
 import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { sortByCompletionDate } from '@/utils/task.utils'
@@ -7,6 +6,12 @@ import { collectionApi, taskApi } from '@/api'
 
 interface CollectionStoreState {
   currentCollection?: CollectionDetail
+}
+
+interface CollectionStoreGetters
+  extends Record<string, (() => unknown) | ((state: CollectionStoreState) => unknown)> {
+  completedTasks(state: CollectionStoreState): Task[]
+  uncompletedTasks(state: CollectionStoreState): Task[]
 }
 
 interface CollectionStoreActions {
@@ -22,7 +27,7 @@ interface CollectionStoreActions {
 export const useCollectionStore = defineStore<
   'collection',
   CollectionStoreState,
-  {},
+  CollectionStoreGetters,
   CollectionStoreActions
 >('collection', {
   state: (): CollectionStoreState => ({
@@ -41,9 +46,7 @@ export const useCollectionStore = defineStore<
   actions: {
     async retrieveCollection(id: number): Promise<void> {
       await collectionApi.getCollectionById(id).then(
-        response => {
-          this.currentCollection = response
-        },
+        response => (this.currentCollection = response),
         error => {
           // TODO: redirect to collection list
           console.error(error)
@@ -61,7 +64,9 @@ export const useCollectionStore = defineStore<
 
       collectionApi.updateCollection(this.currentCollection.id, data).then(
         response => {
-          this.currentCollection = { ...this.currentCollection, response }
+          if (!this.currentCollection) return
+
+          this.currentCollection = { ...this.currentCollection, ...response }
         },
         error => console.error(error)
       )
@@ -93,7 +98,7 @@ export const useCollectionStore = defineStore<
     },
 
     async deleteTask(id: number): Promise<void> {
-      await taskService.deleteTaskById(id).then(
+      await taskApi.deleteTaskById(id).then(
         () => {
           const index = this.currentCollection.tasks.findIndex(t => t.id === id)
           if (index !== -1) this.currentCollection.tasks.splice(index, 1)
