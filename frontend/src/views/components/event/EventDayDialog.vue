@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import HalfDialog from '@/components/HalfDialog.vue'
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { ref, useTemplateRef } from 'vue'
@@ -13,7 +13,7 @@ const show = defineModel<boolean>()
 
 const { date, events } = defineProps<{
   date: string
-  events: EventModel[]
+  events: EventExtendedModel[]
 }>()
 
 defineEmits<{
@@ -28,7 +28,7 @@ const isScrollingOnContent = ref(false)
 
 function touchStartEvent(): void {
   // We detect if the touch-down is a scroll on the content
-  isScrollingOnContent.value = scrollableElement.scrollTop > 0
+  isScrollingOnContent.value = scrollableElement.value.scrollTop > 0
 }
 
 function handleTouchEvent(type: string): void {
@@ -104,13 +104,14 @@ function scrollDownEvent(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .empty-img {
   width: clamp(250px, 50%, 350px);
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .new-event-btn {
     background-color: #353535 !important;
   }

@@ -232,7 +232,8 @@ function deleteTask(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .project-description {
   display: flex;
@@ -244,7 +245,7 @@ function deleteTask(id: number): void {
     flex: 1 1 calc(75% - 20px);
     max-width: 100%;
 
-    @media #{map-get($display-breakpoints, 'xs')} {
+    @media #{map.get(variables.$display-breakpoints, 'xs')} {
       &__content {
         max-height: calc(4.6 * 1.25rem); // Equal to 4.6 row
         transition: all 0.3s ease-out;
@@ -283,7 +284,7 @@ function deleteTask(id: number): void {
   &__img {
     width: clamp(200px, 50%, 300px);
 
-    @media #{map-get($display-breakpoints, 'xl')} {
+    @media #{map.get(variables.$display-breakpoints, 'xl')} {
       width: clamp(200px, 50%, 450px);
     }
   }

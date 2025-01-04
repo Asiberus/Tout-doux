@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventModel, EventPostOrPatch } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate } from '@/utils/event.utils'
 import moment from 'moment'
 import { computed, onBeforeMount, ref, useTemplateRef, watch } from 'vue'
+import { Form } from '@/models/common.model'
 
 const { isDialogOpen, event, relatedToDate, startDatePlaceholder } = defineProps<{
   isDialogOpen: boolean
-  event?: EventModel
+  event?: EventModel | EventExtendedModel
   relatedToDate?: string
-  startDatePlaceholder?: string
+  startDatePlaceholder: string | null
 }>()
 
 const emit = defineEmits<{
@@ -26,7 +27,7 @@ const formRef = useTemplateRef('form')
 const inputNameRef = useTemplateRef('name')
 
 const confirmDelete = ref(false)
-const eventForm = ref({
+const eventForm = ref<Form<EventPostOrPatch>>({
   valid: false,
   data: {
     name: '',
@@ -79,9 +80,9 @@ watch(
     if (!value) return
 
     confirmDelete.value = false
-    formRef.resetValidation()
+    formRef.value.resetValidation()
     populateForm(event)
-    if (!event) inputNameRef.focus()
+    if (!event) inputNameRef.value.focus()
   }
 )
 
@@ -96,7 +97,7 @@ watch(
     }
     if (startDate && endDate) validateDate()
     if (relatedToDate) {
-      const tempEvent = <EventModel>{ startDate, endDate }
+      const tempEvent = <EventModel | EventExtendedModel>{ startDate, endDate }
       relatedToDateError.value = !isEventRelatedToDate(tempEvent, relatedToDate)
     }
   }
@@ -113,7 +114,7 @@ function validateDate(): void {
   endTimeError.value = data.startDate === data.endDate && !data.endTime
 }
 
-function populateForm(eventToUpdate?: EventModel): void {
+function populateForm(eventToUpdate?: EventModel | EventExtendedModel): void {
   if (eventToUpdate) {
     eventForm.value.data = {
       name: eventToUpdate.name,
@@ -207,7 +208,7 @@ function formattedDate(value: string): string {
 
       <v-hover v-if="event" v-slot="{ hover }">
         <v-btn
-          :color="hover || confirmDelete ? 'error' : null"
+          :color="hover || confirmDelete ? 'error' : undefined"
           class="align-self-end align-self-sm-center"
           @click="emitDeleteEvent()">
           {{ confirmDelete ? 'Are you sure ?' : 'Delete Event' }}
@@ -339,8 +340,10 @@ function formattedDate(value: string): string {
                     show-adjacent-months
                     :first-day-of-week="1"
                     @change="
-                      endDatePicker = false
-                      endTimePicker = true
+                      () => {
+                        endDatePicker = false
+                        endTimePicker = true
+                      }
                     ">
                   </v-date-picker>
                 </v-menu>
@@ -414,9 +417,10 @@ function formattedDate(value: string): string {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .inputs-wrapper {
     flex: 1 0 0;
     overflow-y: auto;

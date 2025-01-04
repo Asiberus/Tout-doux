@@ -98,14 +98,15 @@ function removeTag(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .tag-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 
-  @media #{map-get($display-breakpoints, 'sm-and-down')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
     gap: 4px;
   }
 }

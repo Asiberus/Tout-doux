@@ -118,18 +118,19 @@ function toggleArchivedProject(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .collection-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(max(288px, calc((100% - 2 * 12px) / 3)), 1fr));
   gap: 12px;
 
-  @media #{map-get($display-breakpoints, 'md-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
     grid-template-columns: repeat(auto-fill, minmax(max(420px, calc((100% - 2 * 12px) / 3)), 1fr));
   }
 
-  @media #{map-get($display-breakpoints, 'xl')} {
+  @media #{map.get(variables.$display-breakpoints, 'xl')} {
     grid-template-columns: repeat(auto-fill, minmax(max(500px, calc((100% - 2 * 12px) / 3)), 1fr));
   }
 

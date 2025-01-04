@@ -1,5 +1,5 @@
 import { apiRoutes } from '@/api-routes'
-import { PaginationParams } from '@/models/common.model'
+import { PaginationParams } from '@/models/pagination.model'
 import { TagForm, TagType } from '@/models/tag.model'
 import axiosInstance from '@/axios/axios-instance'
 

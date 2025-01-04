@@ -96,7 +96,8 @@ function emitDeleteEvent(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .wrapper {
   display: flex;
@@ -130,7 +131,7 @@ function emitDeleteEvent(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .wrapper {
     padding: 12px 24px 12px 20px;
     column-gap: 16px;

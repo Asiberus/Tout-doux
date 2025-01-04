@@ -46,7 +46,8 @@ const userStore = useUserStore()
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .profile {
   display: flex;
@@ -59,7 +60,7 @@ const userStore = useUserStore()
       flex-basis: auto;
     }
 
-    @media #{map-get($display-breakpoints, 'xs')} {
+    @media #{map.get(variables.$display-breakpoints, 'xs')} {
       .v-tabs :deep(.v-tab) {
         font-size: 0.7rem;
         padding: 0 8px;
@@ -72,7 +73,7 @@ const userStore = useUserStore()
   }
 }
 
-@media #{map-get($display-breakpoints, 'md-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
   .profile {
     flex-direction: row;
 

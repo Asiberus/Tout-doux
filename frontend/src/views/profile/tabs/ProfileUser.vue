@@ -136,7 +136,8 @@ function submit(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .profile-user {
   display: flex;
@@ -147,7 +148,7 @@ function submit(): void {
     gap: 12px;
     margin-bottom: 8px;
 
-    @media #{map-get($display-breakpoints, 'sm-and-up')} {
+    @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
       gap: 16px;
     }
   }
@@ -157,7 +158,7 @@ function submit(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'md-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
   .profile-user {
     column-gap: 24px;
   }

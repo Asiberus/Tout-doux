@@ -18,6 +18,10 @@ export interface ValidatePasswordBody {
   password: string
 }
 
+export interface ValidatePasswordResponse {
+  errors: string[]
+}
+
 export interface ResetPasswordRequestBody {
   email: string
 }

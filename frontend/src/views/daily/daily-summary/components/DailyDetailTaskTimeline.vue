@@ -80,7 +80,8 @@ function toggleDailyTask(dailyTask: DailyTask): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .v-timeline {
   padding-top: 0;
@@ -89,13 +90,13 @@ function toggleDailyTask(dailyTask: DailyTask): void {
   --divider-width: 96px;
   --divider-justify-content: center;
 
-  @media #{map-get($display-breakpoints, 'xs')} {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
     --bar-left: 11px;
     --divider-width: 40px;
     --divider-justify-content: flex-start;
   }
 
-  @media #{map-get($display-breakpoints, 'sm')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm')} {
     --bar-left: 18px;
     --divider-width: 55px;
     --divider-justify-content: flex-start;
@@ -108,7 +109,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
   }
 
   .v-timeline-item {
-    @media #{map-get($display-breakpoints, 'xs')} {
+    @media #{map.get(variables.$display-breakpoints, 'xs')} {
       padding-bottom: 16px;
     }
 

@@ -81,14 +81,15 @@ function onStepperChange(index: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-update {
   height: 100%;
   display: flex;
   flex-direction: column;
 
-  @media #{map-get($display-breakpoints, 'sm-and-down')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
     .v-stepper__step--editable:hover {
       background: inherit;
     }

@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import ProjectChip from '@/components/ProjectChip.vue'
-import { EventModel } from '@/models/event.model'
+import { EventExtendedModel, EventModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import moment from 'moment'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  event: EventModel
+  event: EventExtendedModel
 }>()
 
 defineEmits<{
   update: [event: EventModel]
 }>()
 
-const isEditDisabled = computed<boolean>(() =>
-  props.event.project ? props.event.project.archived : false
-)
+const isEditDisabled = computed<boolean>(() => props.event.project.archived)
 
 function isDateEqual(date1: string, date2: string): boolean {
   return moment(date1).isSame(date2, 'day')

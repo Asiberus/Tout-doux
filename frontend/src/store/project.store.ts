@@ -183,7 +183,7 @@ export const useProjectStore = defineStore<'project', ProjectStoreState, {}, Pro
       // Event
 
       async addEvent(event: EventPostOrPatch): Promise<void> {
-        await eventApi.createEvent(event).then(
+        await eventApi.createEvent(event, { extended: false }).then(
           response => {
             if (!this.currentProject) return
 
@@ -195,12 +195,12 @@ export const useProjectStore = defineStore<'project', ProjectStoreState, {}, Pro
       },
 
       async editEvent(id: number, data: EventPostOrPatch): Promise<void> {
-        await eventApi.updateEventById(id, data).then(
+        await eventApi.updateEventById(id, data, { extended: false }).then(
           response => {
             if (!this.currentProject) return
 
             const { events } = this.currentProject
-            const eventToUpdate = events.find(({ id }) => response.id === id)
+            const eventToUpdate = events.find(event => response.id === event.id)
             if (eventToUpdate) {
               Object.assign(eventToUpdate, response)
               events.sort((event1, event2) => sortEvents(event1, event2))

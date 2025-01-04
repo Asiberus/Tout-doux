@@ -125,9 +125,10 @@ function emitCloseEvent(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .inputs-wrapper {
     flex: 1 0 0;
     overflow-y: auto;
@@ -135,13 +136,13 @@ function emitCloseEvent(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm')} {
+@media #{map.get(variables.$display-breakpoints, 'sm')} {
   .item-name-wrapper {
     width: 50%;
   }
 }
 
-@media #{map-get($display-breakpoints, 'md-and-up')} {
+@media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
   .item-name-wrapper {
     width: calc(100% / 3);
   }

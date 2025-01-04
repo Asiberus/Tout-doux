@@ -73,7 +73,8 @@ function openDailyDetailDialog(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-summary-card {
   min-height: 96px;
@@ -82,7 +83,7 @@ function openDailyDetailDialog(): void {
     font-size: 1.5rem;
     color: white;
 
-    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+    @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
       font-size: 1.25rem;
     }
   }

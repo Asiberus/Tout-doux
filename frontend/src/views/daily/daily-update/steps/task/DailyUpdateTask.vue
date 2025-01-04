@@ -12,7 +12,6 @@ import { ProjectDetail } from '@/models/project.model'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
-import moment from 'moment'
 import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
 import { CommonTask } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi } from '@/api'
@@ -309,7 +308,8 @@ function resetSelectedItem(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-update-task {
   height: 100%;
@@ -326,7 +326,7 @@ function resetSelectedItem(): void {
     &__content {
       position: relative;
 
-      @media #{map-get($display-breakpoints, 'md-and-up')} {
+      @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
         flex: 1 0 0;
       }
 
@@ -369,7 +369,7 @@ function resetSelectedItem(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'md-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'md-and-down')} {
   .daily-update-task__tabs {
     .v-tab {
       min-width: initial;
@@ -378,7 +378,7 @@ function resetSelectedItem(): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .daily-update-task {
     flex-direction: column;
 

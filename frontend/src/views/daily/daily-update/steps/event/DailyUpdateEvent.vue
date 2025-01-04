@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { eventService } from '@/api/event.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventModel, EventPostOrPatch } from '@/models/event.model'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
@@ -21,7 +21,7 @@ const emit = defineEmits<{
   'daily-event-count': [count: number]
 }>()
 
-const eventList = ref<EventModel[]>([])
+const eventList = ref<EventExtendedModel[]>([])
 const eventDialog = ref(false)
 
 onBeforeMount(() => retrieveEventList())
@@ -30,7 +30,7 @@ function retrieveEventList(): void {
   eventApi
     .getEvents({ date: props.date })
     .then(response => {
-      eventList.value = response // TODO : verify if there is no pagination
+      eventList.value = response
       sortEventList()
       emit('daily-event-count', eventList.value.length)
     })

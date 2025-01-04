@@ -202,7 +202,8 @@ function deleteTask(id: number): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .collection-general {
   flex-grow: 1;
@@ -222,7 +223,7 @@ function deleteTask(id: number): void {
       &__img {
         width: clamp(200px, 50%, 300px);
 
-        @media #{map-get($display-breakpoints, 'xl')} {
+        @media #{map.get(variables.$display-breakpoints, 'xl')} {
           width: clamp(200px, 50%, 450px);
         }
       }
@@ -233,7 +234,7 @@ function deleteTask(id: number): void {
     flex: 1 1 0;
     min-width: 200px;
 
-    @media #{map-get($display-breakpoints, 'sm-and-down')} {
+    @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
       &__content {
         max-height: calc(4.6 * 1.25rem); // Equal to 4.6 row
         transition: all 0.3s ease-out;
@@ -252,7 +253,7 @@ function deleteTask(id: number): void {
   }
 }
 
-@media #{map-get($display-breakpoints, 'xs')} {
+@media #{map.get(variables.$display-breakpoints, 'xs')} {
   .collection-general {
     flex-direction: column-reverse;
 

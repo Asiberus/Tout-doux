@@ -101,10 +101,11 @@ function changeEmail(): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .profile-email {
-  @media #{map-get($display-breakpoints, 'sm-and-up')} {
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
     width: 75%;
   }
 
@@ -120,7 +121,7 @@ function changeEmail(): void {
       align-items: center;
     }
 
-    @media #{map-get($display-breakpoints, 'md-and-up')} {
+    @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
       width: 75%;
     }
 

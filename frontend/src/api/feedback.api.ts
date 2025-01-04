@@ -1,6 +1,6 @@
 import { FeedbackPost } from '@/models/feedback.model'
 import { apiRoutes } from '@/api-routes'
-import { PaginationParams } from '@/models/common.model'
+import { PaginationParams } from '@/models/pagination.model'
 import axiosInstance from '@/axios/axios-instance'
 
 export function getFeedback(params: PaginationParams = {}) {

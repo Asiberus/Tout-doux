@@ -204,7 +204,8 @@ function selectTask(task: Task): void {
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .project-card {
   min-height: 88px;
@@ -229,7 +230,7 @@ function selectTask(task: Task): void {
   flex-basis: auto;
 }
 
-@media #{map-get($display-breakpoints, 'xs')} {
+@media #{map.get(variables.$display-breakpoints, 'xs')} {
   .v-tabs :deep(.v-tab) {
     font-size: 0.7rem;
     padding: 0 8px;

@@ -5,7 +5,7 @@ import {
   UserChangePassword,
   UserPatch,
 } from '@/models/user.model'
-import { PaginationParams } from '@/models/common.model'
+import { PaginationParams } from '@/models/pagination.model'
 import axiosInstance from '@/axios/axios-instance'
 
 export interface IsUsernameUniqueParams {

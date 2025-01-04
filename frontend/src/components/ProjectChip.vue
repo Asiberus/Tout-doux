@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Project } from 'src/models/project.model'
 import { RouteLocation } from 'vue-router'
 import { computed } from 'vue'
+import { Project } from '@/models/project.model'
 
 const {
   project,

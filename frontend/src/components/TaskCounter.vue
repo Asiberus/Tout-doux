@@ -19,7 +19,9 @@ withDefaults(
 </template>
 
 <style scoped lang="scss">
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
+@use 'vuetify/lib/styles/settings/_colors';
 
 .wrapper {
   display: flex;
@@ -35,17 +37,17 @@ withDefaults(
 
 .separator {
   font-size: 1.25rem;
-  color: #{map-get($grey, 'lighten-2')};
+  color: #{map.get(colors.$grey, 'lighten-2')};
 }
 
 .max {
   font-size: 1.5rem;
   line-height: 1.5rem;
-  color: #{map-get($grey, 'lighten-2')};
+  color: #{map.get(colors.$grey, 'lighten-2')};
   transform: translateY(1px);
 }
 
-@media #{map-get($display-breakpoints, 'sm-and-down')} {
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .value {
     font-size: 1.75rem;
   }

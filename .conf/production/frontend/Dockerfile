@@ -1,4 +1,4 @@
-FROM node:14.18.1-alpine3.12 as build-stage
+FROM node:18-alpine as build-stage
 
 ARG ARG_VERSION
 ARG ARG_API_URL

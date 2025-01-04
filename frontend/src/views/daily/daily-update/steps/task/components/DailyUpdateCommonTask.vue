@@ -52,7 +52,8 @@ function isCommonTaskSelected(id: number): boolean {
 </template>
 
 <style lang="scss" scoped>
-@import 'vuetify/settings';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .common-task-list {
   display: grid;
@@ -60,7 +61,7 @@ function isCommonTaskSelected(id: number): boolean {
   grid-template-columns: repeat(auto-fit, minmax(max(300px, calc((100% - 8px) / 2)), 1fr));
   gap: 8px;
 
-  @media #{map-get($display-breakpoints, 'xs')} {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 
