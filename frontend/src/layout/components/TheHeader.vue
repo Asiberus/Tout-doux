@@ -6,10 +6,10 @@ import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 const router = useRouter()
-const display = useDisplay()
+const { mobile } = useDisplay()
 const userStore = useUserStore()
 
-const displayNavbar = defineModel<boolean>('displayNavbar')
+const navbarDisplayed = defineModel<boolean>('navbarDisplayed')
 const headerMenu = defineModel<boolean>('headerMenu')
 
 const appVersion = config.VERSION
@@ -20,63 +20,74 @@ function logout(): void {
 </script>
 
 <template>
-  <div class="flex-fill d-flex align-center">
-    <v-btn v-if="display.mobile" icon size="small" @click="displayNavbar = !displayNavbar">
-      <v-icon>mdi-menu</v-icon>
-    </v-btn>
+  <v-app-bar density="compact" class="pr-4">
+    <template v-if="mobile" #prepend>
+      <v-app-bar-nav-icon @click="navbarDisplayed = !navbarDisplayed" />
+    </template>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
-    <v-menu :model-value="headerMenu" offset-y @update:model-value="headerMenu = $event">
+    <v-menu v-if="userStore.user" v-model="headerMenu">
       <template #activator="{ props }">
         <v-btn variant="flat" class="header-menu-btn text-body-1" v-bind="props">
-          <v-avatar size="24" start class="mr-1">
-            <v-icon>mdi-account-circle</v-icon>
+          <v-avatar size="24" color="transparent" class="mr-1">
+            <v-icon icon="mdi-account-circle" />
           </v-avatar>
           {{ userStore.user.username }}
         </v-btn>
       </template>
+
       <v-list>
         <v-list-item :to="{ name: 'profile-user' }" class="header-menu-link" :ripple="false">
-          <v-icon size="small" start>mdi-account-circle</v-icon>
-          <v-list-item-title>Profile</v-list-item-title>
+          <v-list-item-title class="d-flex align-center">
+            <v-icon icon="mdi-account-circle" size="small" start />
+            Profile
+          </v-list-item-title>
         </v-list-item>
         <v-list-item
           :to="{ name: 'settings-preferences' }"
           class="header-menu-link"
           :ripple="false">
-          <v-icon size="small" start>mdi-cog</v-icon>
-          <v-list-item-title>Settings</v-list-item-title>
+          <v-list-item-title class="d-flex align-center">
+            <v-icon icon="mdi-cog" size="small" start />
+            Settings
+          </v-list-item-title>
         </v-list-item>
-        <v-list-item
-          v-if="userStore.user.isStaff"
-          :to="{ name: 'administration-user-list' }"
-          class="header-menu-link"
-          :ripple="false">
-          <v-icon size="small" start>mdi-security</v-icon>
-          <v-list-item-title>Administration</v-list-item-title>
-        </v-list-item>
+        <template v-if="userStore.user.isStaff">
+          <v-list-item
+            :to="{ name: 'administration-user-list' }"
+            class="header-menu-link"
+            :ripple="false">
+            <v-list-item-title class="d-flex align-center">
+              <v-icon icon="mdi-security" size="small" start />
+              Administration
+            </v-list-item-title>
+          </v-list-item>
+        </template>
         <v-list-item :ripple="false" @click="logout()">
-          <v-icon size="small" start>mdi-logout</v-icon>
-          <v-list-item-title>Logout</v-list-item-title>
+          <v-list-item-title class="d-flex align-center">
+            <v-icon icon="mdi-logout" size="small" start />
+            Logout
+          </v-list-item-title>
         </v-list-item>
-        <v-list-item class="justify-center" density="compact" :ripple="false">
-          <v-hover v-slot="{ hover }">
-            <router-link
-              :to="{ name: 'feedback' }"
-              class="font-italic text-body-2 text-link"
-              :class="{ 'grey--text': !hover, 'white--text': hover }">
-              Give a feedback!
-            </router-link>
-          </v-hover>
-        </v-list-item>
+        <v-hover v-slot="{ isHovering, props }">
+          <v-list-item
+            v-bind="props"
+            :to="{ name: 'feedback' }"
+            density="compact"
+            :ripple="false"
+            class="font-italic text-body-2 text-link text-center feedback-link"
+            :class="{ 'text-grey': !isHovering, 'text-white': isHovering }">
+            Give a feedback!
+          </v-list-item>
+        </v-hover>
       </v-list>
     </v-menu>
 
     <span class="version mx-2" :title="`Tout Doux version : ${appVersion}`">
       v{{ appVersion }}
     </span>
-  </div>
+  </v-app-bar>
 </template>
 
 <style scoped lang="scss">
@@ -92,13 +103,17 @@ function logout(): void {
 
 .header-menu-link {
   &.v-list-item--active {
-    &::before {
+    :deep(.v-list-item__overlay) {
       opacity: 0;
     }
 
-    &:hover::before {
-      opacity: 0.08;
+    &:hover :deep(.v-list-item__overlay) {
+      opacity: calc(var(--v-hover-opacity) * var(--v-theme-overlay-multiplier));
     }
   }
+}
+
+.feedback-link :deep(.v-list-item__overlay) {
+  opacity: 0;
 }
 </style>

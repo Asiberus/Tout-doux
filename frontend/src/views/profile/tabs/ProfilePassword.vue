@@ -108,9 +108,9 @@ function submit(): void {
         required
         autocomplete="current-password"
         :type="showCurrentPassword ? 'text' : 'password'"
-        :append-icon="showCurrentPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :append-inner-icon="showCurrentPassword ? 'mdi-eye' : 'mdi-eye-off'"
         @update:model-value="currentPasswordError = null"
-        @click:append="showCurrentPassword = !showCurrentPassword" />
+        @click:append-inner="showCurrentPassword = !showCurrentPassword" />
 
       <v-text-field
         v-model="form.data.newPassword"
@@ -122,9 +122,9 @@ function submit(): void {
         autocomplete="new-password"
         :counter="form.data.newPassword.length > 0"
         :type="showNewPassword ? 'text' : 'password'"
-        :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :append-inner-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
         @update:model-value="validatePasswordStrength"
-        @click:append="showNewPassword = !showNewPassword" />
+        @click:append-inner="showNewPassword = !showNewPassword" />
 
       <v-text-field
         v-model="form.data.confirmPassword"
@@ -135,9 +135,9 @@ function submit(): void {
         :error-messages="passwordMatchError"
         :counter="form.data.confirmPassword.length > 0"
         :type="showConfirmPassword ? 'text' : 'password'"
-        :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
         @update:model-value="validatePasswordMatch()"
-        @click:append="showConfirmPassword = !showConfirmPassword" />
+        @click:append-inner="showConfirmPassword = !showConfirmPassword" />
 
       <v-btn
         type="submit"

@@ -5,13 +5,13 @@ import { useProjectStore } from '@/store/project.store'
 import { useCollectionStore } from '@/store/collection.store'
 
 interface AppStoreActions {
-  init(): Promise
+  init(): Promise<[void, void]>
   exit(): void
 }
 
 export const useAppStore = defineStore<'app', unknown, unknown, AppStoreActions>('app', {
   actions: {
-    init(): Promise {
+    init(): Promise<[void, void]> {
       const userStore = useUserStore()
       const preferencesStore = usePreferencesStore()
 

@@ -16,21 +16,25 @@ interface TagListParams extends PaginationParams {
 }
 
 export function getTagList(params: TagListParams) {
-  return axiosInstance.get(apiRoutes.tag, { params })
+  return axiosInstance.get(apiRoutes.tag, { params }).then(response => response.data)
 }
 
 export function isNameUnique(params: IsTagNameUniqueParams) {
-  return axiosInstance.get(apiRoutes.tagUnique, { params })
+  return axiosInstance.get(apiRoutes.tagUnique, { params }).then(response => response.data)
 }
 
 export function createTag(tag: TagForm) {
-  return axiosInstance.post(apiRoutes.tag, tag)
+  return axiosInstance.post(apiRoutes.tag, tag).then(response => response.data)
 }
 
 export function updateTag(id: number, tag: TagForm) {
-  return axiosInstance.patch(apiRoutes.tagById.replace(':id', id.toString()), tag)
+  return axiosInstance
+    .patch(apiRoutes.tagById.replace(':id', id.toString()), tag)
+    .then(response => response.data)
 }
 
 export function deleteTag(id: number) {
-  return axiosInstance.delete(apiRoutes.tagById.replace(':id', id.toString()))
+  return axiosInstance
+    .delete(apiRoutes.tagById.replace(':id', id.toString()))
+    .then(response => response.data)
 }

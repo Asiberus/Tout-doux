@@ -5,34 +5,31 @@ import { useDisplay } from 'vuetify'
 import { ref } from 'vue'
 import { useUserStore } from '@/store'
 
-const display = useDisplay()
+const { mobile } = useDisplay()
 const userStore = useUserStore()
 
-const displayNavbar = ref(display.mobile)
+const navbarDisplayed = ref(!mobile.value)
 const headerMenu = ref(false)
 
 function showNavbar(): void {
-  if (!display.mobile) return
+  if (!mobile.value) return
 
-  displayNavbar.value = true
+  navbarDisplayed.value = true
   headerMenu.value = false
 }
 
 function hideNavbar(): void {
-  if (!display.mobile) return
+  if (!mobile.value) return
 
-  displayNavbar.value = false
+  navbarDisplayed.value = false
 }
 </script>
 
 <template>
   <v-app v-if="userStore.user" v-touch="{ left: hideNavbar }">
-    <v-navigation-drawer v-model="displayNavbar" app touchless>
-      <TheNavbar @display-navbar="displayNavbar = $event" />
-    </v-navigation-drawer>
-    <v-app-bar app dense>
-      <TheHeader v-model:header-menu="headerMenu" v-model:display-navbar="displayNavbar" />
-    </v-app-bar>
+    <TheNavbar v-model="navbarDisplayed" />
+    <TheHeader v-model:header-menu="headerMenu" v-model:navbar-displayed="navbarDisplayed" />
+
     <v-main v-touch="{ right: showNavbar }">
       <v-container fluid class="pa-3 pa-sm-5 pa-lg-6 h-100">
         <router-view />

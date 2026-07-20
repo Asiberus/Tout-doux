@@ -121,9 +121,9 @@ function submit(): void {
           validate-on="blur"
           :counter="form.data.password.length > 0"
           :type="showPassword ? 'text' : 'password'"
-          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           @update:model-value="validatePasswordStrength"
-          @click:append="showPassword = !showPassword">
+          @click:append-inner="showPassword = !showPassword">
         </v-text-field>
 
         <v-text-field
@@ -134,9 +134,9 @@ function submit(): void {
           :error-messages="passwordMatchError"
           :counter="form.data.confirmPassword.length > 0"
           :type="showConfirmPassword ? 'text' : 'password'"
-          :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
           @update:model-value="validatePasswordMatch()"
-          @click:append="showConfirmPassword = !showConfirmPassword">
+          @click:append-inner="showConfirmPassword = !showConfirmPassword">
         </v-text-field>
 
         <v-btn

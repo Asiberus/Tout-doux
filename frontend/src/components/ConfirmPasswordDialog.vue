@@ -109,10 +109,10 @@ function submit(): void {
             placeholder="Enter your password"
             autocomplete="current-password"
             autofocus
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             class="password-input"
             @update:model-value="passwordError = null"
-            @click:append="showPassword = !showPassword">
+            @click:append-inner="showPassword = !showPassword">
           </v-text-field>
 
           <div class="d-flex justify-center gap-2">

@@ -3,15 +3,15 @@ import { SectionPatch, SectionPost } from '@/models/section.model'
 import axiosInstance from '@/axios/axios-instance'
 
 export function createSection(section: SectionPost) {
-  return axiosInstance.post(apiRoutes.section, section)
+  return axiosInstance.post(apiRoutes.section, section).then(response => response.data)
 }
 
 export function updateSection(id: number, section: SectionPatch) {
   const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
-  return axiosInstance.patch(url, section)
+  return axiosInstance.patch(url, section).then(response => response.data)
 }
 
 export function deleteSection(id: number) {
   const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
-  return axiosInstance.delete(url)
+  return axiosInstance.delete(url).then(response => response.data)
 }

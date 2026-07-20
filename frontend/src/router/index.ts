@@ -27,21 +27,21 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '',
+      path: '/',
       component: AuthenticatedLayout,
       children: [
         {
-          path: '/',
+          path: '',
           name: 'home',
           redirect: { name: 'daily-summary' },
         },
         {
-          path: '/agenda',
+          path: 'agenda',
           name: 'agenda',
           component: Agenda,
         },
         {
-          path: '/feedback',
+          path: 'feedback',
           name: 'feedback',
           component: FeedbackComponent,
         },
@@ -54,7 +54,7 @@ const router = createRouter({
       ],
     },
     {
-      path: '',
+      path: '/',
       component: NonAuthenticatedLayout,
       children: nonAuthRoutes,
     },
@@ -63,9 +63,9 @@ const router = createRouter({
 
 // If the user is authenticated, fetch the user & preferences data
 router.beforeEach(
-  (to: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) => {
+  (_: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) => {
     const appStore = useAppStore()
-    if (from === START_LOCATION && authService.isAuthenticated()) appStore.init().then(next)
+    if (from === START_LOCATION && authService.isAuthenticated()) appStore.init().then(() => next())
     else next()
   }
 )

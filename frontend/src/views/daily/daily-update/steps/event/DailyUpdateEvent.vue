@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { eventService } from '@/api/event.api'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { EventExtendedModel, EventModel, EventPostOrPatch } from '@/models/event.model'
+import { EventExtendedModel, EventPostOrPatch } from '@/models/event.model'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 import { getDialogWidth } from '@/utils/dialog.utils'
 import { onBeforeMount, ref } from 'vue'
 import { eventApi } from '@/api'

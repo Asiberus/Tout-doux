@@ -57,8 +57,9 @@ watch(
   () => {
     retrieveDailyTaskList()
     retrieveTodayEvents()
-  },
-  { immediate: true }
+  }
+  // TODO (vue3) : see if immediate was needed
+  // { immediate: false }
 )
 
 function retrieveDailyTaskList(): void {

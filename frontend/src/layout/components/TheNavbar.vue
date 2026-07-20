@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { mobile } = useDisplay()
 
-defineEmits<{
-  displayNavbar: []
-}>()
+const navbarDisplayed = defineModel<boolean>()
 
 const menu = [
   { name: 'Dashboard', icon: 'mdi-view-dashboard' },
@@ -17,49 +15,45 @@ const menu = [
 </script>
 
 <template>
-  <v-list>
-    <v-list-item>
-      <v-list-item-title class="text-h4 text-center">Tout Doux</v-list-item-title>
-    </v-list-item>
+  <v-navigation-drawer v-model="navbarDisplayed" touchless>
+    <v-list>
+      <v-list-item class="pt-3 pb-4">
+        <v-list-item-title class="text-h4 text-center">Tout Doux</v-list-item-title>
+      </v-list-item>
 
-    <v-btn
-      v-if="display.mobile"
-      icon
-      size="small"
-      class="close-navbar"
-      @click="$emit('displayNavbar')">
-      <v-icon>mdi-arrow-left</v-icon>
-    </v-btn>
+      <v-btn
+        v-if="mobile"
+        icon="mdi-arrow-left"
+        variant="text"
+        class="close-navbar"
+        @click="navbarDisplayed = false" />
 
-    <v-divider></v-divider>
+      <v-divider />
 
-    <v-list-item
-      v-for="(item, i) in menu"
-      :key="i"
-      :to="item.link"
-      :disabled="!item.link"
-      class="py-3 py-sm-0">
-      <v-list-item-icon class="mr-2">
-        <v-icon
-          start
-          :size="display.smAndUp || true ? 'small' : 'default'"
-          :class="{ disabled: !item.link }">
-          {{ item.icon }}
-        </v-icon>
-      </v-list-item-icon>
-
-      <v-list-item-title class="text-body-1">
-        {{ item.name }}
-      </v-list-item-title>
-    </v-list-item>
-  </v-list>
+      <v-list-item
+        v-for="(item, i) in menu"
+        :key="i"
+        :to="item.link"
+        :disabled="!item.link"
+        class="py-3 py-sm-0">
+        <v-list-item-title class="text-body-1 d-flex align-center">
+          <v-icon
+            :icon="item.icon"
+            size="small"
+            class="my-4 mr-3"
+            :class="{ disabled: !item.link }" />
+          {{ item.name }}
+        </v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <style scoped lang="scss">
 .close-navbar {
   position: absolute;
-  right: 0.5rem;
-  top: 0.5rem;
+  top: 0;
+  right: 0;
 }
 
 .disabled {

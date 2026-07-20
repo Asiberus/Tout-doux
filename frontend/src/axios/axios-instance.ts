@@ -15,30 +15,15 @@ axiosInstance.interceptors.request.use(requestConfig => {
 })
 
 axiosInstance.interceptors.response.use(
-  response => response.data,
+  response => response,
   error => {
     if (error.response.status === 401) {
       authService.removeToken()
       authService.resetStore()
       router.push({ name: 'login' })
     }
+    return Promise.reject(error)
   }
 )
-
-// Vue.http.interceptors.push((request: HttpOptions) => {
-//   if (authService.isAuthenticated())
-//     request.headers.set('Authorization', `Bearer ${authService.getToken()}`)
-// })
-//
-// Vue.http.interceptors.push(() => {
-//   return (response: HttpResponse) => {
-//     if (response.status === 401) {
-//       authService.removeToken()
-//       authService.resetStore()
-//
-//       Vue.router.push({ name: 'login' })
-//     }
-//   }
-// })
 
 export default axiosInstance

@@ -27,6 +27,7 @@ let daysPerPage = 21
 
 onBeforeMount(() => {
   daysPerPage = calculateDaysPerPage()
+  console.log(daysPerPage)
   const endDate = moment()
     .subtract(daysPerPage - 1, 'days')
     .format('YYYY-MM-DD')
@@ -62,9 +63,9 @@ watch(
 )
 
 function calculateDaysPerPage(): number {
-  if (display.xs) return 10
-  else if (display.smAndDown) return 14
-  else if (display.lgAndDown) return 21
+  if (display.xs.value) return 10
+  else if (display.smAndDown.value) return 14
+  else if (display.lgAndDown.value) return 21
   else return 42 // for xl only
 }
 

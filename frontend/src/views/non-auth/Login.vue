@@ -22,11 +22,14 @@ const credentialsError = ref(false)
 const showPassword = ref(false)
 const loading = ref(false)
 
-watch(form, ({ data }) => {
-  // TODO : test if this work
-  credentialsError.value = false
-  form.value.valid = !!data.email && !!data.password
-})
+watch(
+  () => form.value,
+  ({ data }) => {
+    credentialsError.value = false
+    form.value.valid = !!data.email && !!data.password
+  },
+  { deep: true }
+)
 
 function login(): void {
   if (!form.value.valid) return
@@ -50,15 +53,21 @@ function login(): void {
 
 <template>
   <v-form class="login" @submit.prevent="login()">
-    <v-text-field v-model="form.data.email" label="Email" autofocus hide-details />
+    <v-text-field
+      v-model="form.data.email"
+      label="Email"
+      variant="underlined"
+      autofocus
+      hide-details />
 
     <v-text-field
       v-model="form.data.password"
       label="Password"
+      variant="underlined"
       :type="showPassword ? 'text' : 'password'"
-      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+      :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
       hide-details
-      @click:append="showPassword = !showPassword" />
+      @click:append-inner="showPassword = !showPassword" />
 
     <p
       class="error-message text-subtitle-1 text-error text-center mb-0"

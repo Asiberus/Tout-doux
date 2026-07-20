@@ -216,9 +216,12 @@ input:-webkit-autofill:active {
   }
 }
 
-// Remove hover for btn on mobile
+// Remove hover for btn, chip and tab on mobile
 @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
-  .v-btn,
+  .v-btn:hover .v-btn__overlay {
+    opacity: 0 !important;
+  }
+
   .v-chip,
   .v-tab {
     &:focus::before,

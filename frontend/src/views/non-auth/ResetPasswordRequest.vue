@@ -24,7 +24,7 @@ const form = ref<Form<ResetPasswordRequestBody>>({
       (value: string): boolean | string => !!value || 'Email is required',
       (value: string): boolean | string => value.length <= 100 || 'Max 100 characters',
       (value: string): boolean | string =>
-        /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) || 'Invalid e-mail address',
+        /^[\w-.]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) || 'Invalid e-mail address',
     ],
   },
 })
@@ -62,6 +62,7 @@ function submit(): void {
           v-model="form.data.email"
           placeholder="Your email"
           type="email"
+          variant="underlined"
           :rules="form.rules.email"
           validate-on="blur"
           density="compact"

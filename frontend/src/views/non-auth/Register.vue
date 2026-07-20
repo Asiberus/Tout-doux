@@ -153,6 +153,7 @@ function registerUser(): void {
           label="Username"
           :rules="form.rules.username"
           :error-messages="usernameUniqueError"
+          variant="underlined"
           required
           counter="100"
           autofocus
@@ -165,6 +166,7 @@ function registerUser(): void {
           :rules="form.rules.email"
           :error-messages="emailUniqueError"
           validate-on="blur"
+          variant="underlined"
           required
           counter="100"
           @update:model-value="validateEmail">
@@ -176,24 +178,26 @@ function registerUser(): void {
           :error-messages="passwordValidationErrors"
           max-errors="6"
           required
+          variant="underlined"
           validate-on="blur"
           :counter="form.data.password.length > 0"
           :type="showPassword ? 'text' : 'password'"
-          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           @update:model-value="validatePasswordStrength"
-          @click:append="showPassword = !showPassword">
+          @click:append-inner="showPassword = !showPassword">
         </v-text-field>
         <v-text-field
           v-model="form.data.confirmPassword"
           label="Confirm password"
           :rules="form.rules.confirmPassword"
           required
+          variant="underlined"
           :error-messages="passwordMatchError"
           :counter="form.data.confirmPassword.length > 0"
           :type="showConfirmPassword ? 'text' : 'password'"
-          :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
           @update:model-value="validatePasswordMatch()"
-          @click:append="showConfirmPassword = !showConfirmPassword">
+          @click:append-inner="showConfirmPassword = !showConfirmPassword">
         </v-text-field>
 
         <v-btn
