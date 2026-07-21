@@ -53,8 +53,9 @@ function isEmailUnique(value: string): void {
     .finally(() => (form.value.pending = false))
 }
 
-function submit(): void {
-  if (!formRef.value.validate() || !form.value.data.email) return
+async function submit(): Promise<void> {
+  const { valid } = await formRef.value.validate()
+  if (!valid || !form.value.data.email) return
 
   confirmPasswordDialog.value = true
 }

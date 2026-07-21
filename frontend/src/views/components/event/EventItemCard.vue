@@ -6,11 +6,12 @@ import { dateFormat } from '@/pipes'
 import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = withDefaults(
   defineProps<{
@@ -35,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 onMounted(() => {
-  if (descriptionElement && display.xs)
+  if (descriptionElement && xs.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollWidth > descriptionElement.value.clientWidth
 })
@@ -108,7 +109,7 @@ function isDateEqual(date1: string, date2: string): boolean {
           <v-icon
             v-if="showIcon"
             :class="[getTextColor('icon')]"
-            :size="display.smAndUp ? 'large' : 'default'"
+            :size="smAndUp ? 'large' : 'default'"
             class="mr-2 mr-sm-3 mr-md-4">
             mdi-calendar-clock
           </v-icon>
@@ -182,15 +183,14 @@ function isDateEqual(date1: string, date2: string): boolean {
 
           <template v-if="project">
             <router-link :to="{ name: 'project-detail', params: { id: project.id } }" class="ml-2">
-              <ProjectAvatar :project="project" :hover="hover || display.xs" :small="display.xs">
-              </ProjectAvatar>
+              <ProjectAvatar :project="project" :hover="hover || xs" :small="xs"> </ProjectAvatar>
             </router-link>
           </template>
         </v-card-text>
       </v-card>
     </v-hover>
 
-    <v-dialog v-model="eventDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
       <EventDialog
         :event="event"
         :is-dialog-open="eventDialog"

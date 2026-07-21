@@ -3,7 +3,7 @@ import MainTitle from '@/components/MainTitle.vue'
 import { useDisplay } from 'vuetify'
 import { useUserStore } from '@/store'
 
-const display = useDisplay()
+const { mdAndUp } = useDisplay()
 const userStore = useUserStore()
 </script>
 
@@ -15,7 +15,7 @@ const userStore = useUserStore()
       <div class="profile">
         <div class="profile__tabs">
           <v-tabs
-            :direction="display.mdAndUp ? 'vertical' : 'horizontal'"
+            :direction="mdAndUp ? 'vertical' : 'horizontal'"
             color="accent"
             show-arrows
             bg-color="transparent">

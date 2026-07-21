@@ -7,20 +7,21 @@ import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 import { usePreferencesStore, useProjectStore } from '@/store'
 import { dateFormat } from '@/pipes'
 
-const display = useDisplay()
+const { xs, smAndUp, smAndDown, mdAndDown, lgAndDown } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 const projectStore = useProjectStore()
 const preferencesStore = usePreferencesStore()
 
 const descriptionElement = useTemplateRef('description')
 
 onMounted(() => {
-  if (display.xs)
+  if (xs.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollHeight > descriptionElement.value.clientHeight
 })
@@ -45,10 +46,10 @@ const allCompletedTasks = computed<Task[]>(() =>
   allTasks.value.filter(({ completed }) => completed)
 )
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x-large'>(() => {
-  if (display.xs) return 'x-small'
-  if (display.smAndDown) return 'small'
-  else if (display.mdAndDown) return 'medium'
-  else if (display.lgAndDown) return 'large'
+  if (xs.value) return 'x-small'
+  if (smAndDown.value) return 'small'
+  else if (mdAndDown.value) return 'medium'
+  else if (lgAndDown.value) return 'large'
   else return 'x-large'
 })
 
@@ -118,8 +119,8 @@ function deleteTask(id: number): void {
       <div class="d-flex align-center flex-grow-1">
         <h3 class="text-h6 text-sm-h5 flex-grow-1">General Tasks</h3>
 
-        <template v-if="display.xs && project.tasks.length === 0">
-          <v-dialog v-model="taskDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+        <template v-if="xs && project.tasks.length === 0">
+          <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props }">
               <v-btn :disabled="project.archived" v-bind="props">
                 <v-icon start>mdi-plus</v-icon>
@@ -144,12 +145,12 @@ function deleteTask(id: number): void {
           Completed
         </FilterChip>
 
-        <template v-if="display.smAndUp || project.tasks.length > 0">
-          <v-dialog v-model="taskDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+        <template v-if="smAndUp || project.tasks.length > 0">
+          <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props }">
               <v-btn
                 :disabled="project.archived"
-                :block="display.xs && project.tasks.length === 0 && false"
+                :block="xs && project.tasks.length === 0 && false"
                 v-bind="props">
                 <v-icon start>mdi-plus</v-icon>
                 task

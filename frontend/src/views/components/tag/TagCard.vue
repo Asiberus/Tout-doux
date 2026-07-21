@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Tag, TagForm } from '@/models/tag.model'
 import TagDialog from '@/views/components/tag/TagDialog.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
-import { useDisplay } from 'vuetify'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { ref } from 'vue'
 
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 defineProps<{
   tag: Tag
@@ -38,7 +37,7 @@ function deleteTag(id: number): void {
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="tagDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="tagDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
       <TagDialog
         :tag
         :type="tag.type"

@@ -7,12 +7,13 @@ import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
 import MainTitle from '@/components/MainTitle.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onBeforeMount, ref, useTemplateRef } from 'vue'
 import { eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 onBeforeMount(() => {
   retrieveEvents()
@@ -172,17 +173,17 @@ function nextMonth(): void {
 
     <div class="d-flex align-center flex-wrap gap-1 mb-2 mb-sm-3">
       <div class="mr-sm-1">
-        <v-btn icon :size="display.xs ? 'small' : 'default'" @click="previousMonth()">
+        <v-btn icon :size="xs ? 'small' : 'default'" @click="previousMonth()">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <v-btn icon :size="display.xs ? 'small' : 'default'" @click="nextMonth()">
+        <v-btn icon :size="xs ? 'small' : 'default'" @click="nextMonth()">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
       </div>
 
       <v-btn
         :disabled="isCurrentMonthSelected"
-        :size="display.xs ? 'small' : 'default'"
+        :size="xs ? 'small' : 'default'"
         class="mr-1"
         @click="setCalendarToNow()">
         now
@@ -190,9 +191,9 @@ function nextMonth(): void {
 
       <h4 class="text-body-1 text-sm-h5 flex-grow-1">{{ monthSelected }}</h4>
 
-      <v-btn :size="display.xs ? 'small' : 'default'" @click="openEventDialog()">
+      <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
         <v-icon>mdi-plus</v-icon>
-        <template v-if="display.smAndUp">event</template>
+        <template v-if="smAndUp">event</template>
       </v-btn>
     </div>
 
@@ -277,7 +278,7 @@ function nextMonth(): void {
       </v-menu>
     </v-sheet>
 
-    <v-dialog v-model="eventDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
       <EventDialog
         :is-dialog-open="eventDialog"
         :event="eventToUpdate"

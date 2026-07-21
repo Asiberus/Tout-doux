@@ -8,19 +8,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commandes
 
+Le gestionnaire de paquets est **yarn** (présence de `yarn.lock`, version épinglée via Volta dans `package.json`). Utiliser `yarn`, pas `npm`.
+
 ```bash
-npm install          # installation des dépendances
-npm run dev          # serveur de dev Vite (port 3000, host exposé)
-npm run build        # build de production (vite build)
-npm run serve        # preview du build de production
-npm run lint         # eslint --fix sur le projet (respecte .gitignore)
-npm run format       # prettier --write sur tout le projet
+yarn install         # installation des dépendances (ou simplement `yarn`)
+yarn dev             # serveur de dev Vite (port 3000, host exposé)
+yarn build           # build de production (vite build)
+yarn serve           # preview du build de production
+yarn lint            # eslint --fix sur le projet (respecte .gitignore)
+yarn format          # prettier --write sur tout le projet
 ```
 
+- **`yarn build` ne fait aucun typecheck** (`vite build` transpile via esbuild sans vérifier les types). Il n'y a pas encore de script de type-check ; l'ajout de `vue-tsc` (`yarn type-check`) est recommandé (voir `MIGRATION-VUE3.md`).
 - Il n'y a **aucune suite de tests** configurée actuellement (pas de script `test:unit`/`test:e2e` dans `package.json`, malgré ce qu'indique le `README.md`, qui est obsolète sur ce point).
 - Un hook pre-commit Husky (`.husky/pre-commit`) lance `pretty-quick --staged` puis `lint-staged` (règles dans `.lintstagedrc` : eslint + prettier sur `*.{js,ts,tsx,scss,css,md,vue}`).
 - Les messages de commit sont vérifiés par commitlint (`commitlint.config.js`, config conventionnelle).
-- Commandes Docker (depuis ce dossier, utilisent les fichiers du mono-repo parent) : `npm run docker:build`, `npm run docker:up`, `npm run docker:prod:build`, `npm run docker:prod:up`.
+- Commandes Docker (depuis ce dossier, utilisent les fichiers du mono-repo parent) : `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
+
+## Migration Vue 3 en cours
+
+La branche `migrate-to-vue3` finalise la migration Vue 2→3 / Vuetify 2→3 / Vuex→Pinia / Vue-Router 3→4. Les tâches restantes (bugs bloquants, corrections iso-visuelles, dette) sont détaillées dans `MIGRATION-VUE3.md` à la racine du dossier.
 
 ## Stack
 

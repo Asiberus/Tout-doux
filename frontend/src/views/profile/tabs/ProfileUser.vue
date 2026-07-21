@@ -6,7 +6,7 @@ import { useDisplay } from 'vuetify'
 import { useUserStore } from '@/store'
 import { computed, ref } from 'vue'
 
-const display = useDisplay()
+const { xs, sm, md, smAndDown, mdAndUp, width } = useDisplay()
 const userStore = useUserStore()
 
 const form = ref<Form<UserPatch>>({
@@ -45,10 +45,10 @@ const canSubmit = computed<boolean>(
 )
 
 const avatarSize = computed<number>(() => {
-  if (display.xs) return 75
-  else if (display.sm) return 125
-  else if (display.md) return 175
-  else if (display.width <= 1600) return 225
+  if (xs.value) return 75
+  else if (sm.value) return 125
+  else if (md.value) return 175
+  else if (width.value <= 1600) return 225
   else return 250
 })
 
@@ -84,7 +84,7 @@ function submit(): void {
   <div class="profile-user">
     <v-form v-model="form.valid" class="flex-grow-1" @submit.prevent="submit()">
       <div class="profile-user__username">
-        <v-avatar v-if="display.smAndDown" :size="avatarSize" color="grey-lighten-3" class="avatar">
+        <v-avatar v-if="smAndDown" :size="avatarSize" color="grey-lighten-3" class="avatar">
           <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
         </v-avatar>
         <v-text-field
@@ -123,13 +123,13 @@ function submit(): void {
         color="success"
         type="submit"
         :disabled="!canSubmit"
-        :block="display.xs"
+        :block="xs"
         class="float-sm-right">
         update
       </v-btn>
     </v-form>
 
-    <v-avatar v-if="display.mdAndUp" :size="avatarSize" color="grey-lighten-3" class="avatar">
+    <v-avatar v-if="mdAndUp" :size="avatarSize" color="grey-lighten-3" class="avatar">
       <img src="../../../assets/avatar.svg" alt="avatar placeholder" />
     </v-avatar>
   </div>

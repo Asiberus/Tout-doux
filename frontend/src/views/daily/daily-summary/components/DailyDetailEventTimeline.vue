@@ -6,7 +6,7 @@ import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs } = useDisplay()
 
 const props = defineProps<{
   events: EventModel[]
@@ -35,7 +35,7 @@ const eventText = computed<string>(() => {
         :dot-color="isPassed(event) ? null : 'event'"
         :icon="isPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'"
         :icon-color="isPassed(event) ? 'grey' : 'white'"
-        :size="display.xs ? 'small' : 'default'"
+        :size="xs ? 'small' : 'default'"
         fill-dot>
         <EventItemCard
           :event

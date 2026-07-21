@@ -4,7 +4,7 @@ import { SectionTask } from '@/models/section.model'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, ref, watch } from 'vue'
 import { useProjectStore } from '@/store'
 import { useRoute, useRouter } from 'vue-router'
@@ -12,7 +12,8 @@ import { useDisplay } from 'vuetify'
 
 const router = useRouter()
 const route = useRoute()
-const display = useDisplay()
+const { dialogWidth } = useDialogWidth()
+const { smAndDown } = useDisplay()
 const projectStore = useProjectStore()
 
 const props = withDefaults(
@@ -58,7 +59,7 @@ function changeRouteParam(index: number): void {
         bg-color="transparent"
         class="mb-2 flex-grow-0"
         @update:model-value="changeRouteParam($event)">
-        <v-tab v-for="section of sections" :key="'tab-' + section.id">
+        <v-tab v-for="(section, index) of sections" :key="'tab-' + section.id" :value="index">
           <span class="text-truncate">{{ section.name }}</span>
 
           <ProgressDisk
@@ -74,15 +75,18 @@ function changeRouteParam(index: number): void {
         </v-tab>
       </v-tabs>
 
-      <v-tabs-items v-model="sectionTabs" class="bg-transparent" touchless>
-        <v-tab-item v-for="section of sections" :key="'tab-item-' + section.id">
+      <v-tabs-window v-model="sectionTabs" :touch="false" class="bg-transparent">
+        <v-tabs-window-item
+          v-for="(section, index) of sections"
+          :key="'tab-item-' + section.id"
+          :value="index">
           <ProjectSectionItem
             :section
             :disabled="projectStore.currentProject.archived"
             @new-section="sectionDialog = true">
           </ProjectSectionItem>
-        </v-tab-item>
-      </v-tabs-items>
+        </v-tabs-window-item>
+      </v-tabs-window>
     </template>
     <template v-else>
       <EmptyListDisplay class="empty-list-display">
@@ -97,7 +101,7 @@ function changeRouteParam(index: number): void {
           <div class="mb-2">This project has no section yet!</div>
           <v-btn
             v-if="!projectStore.currentProject.archived"
-            :size="display.smAndDown ? 'small' : 'default'"
+            :size="smAndDown ? 'small' : 'default'"
             @click="sectionDialog = true">
             <v-icon start size="small">mdi-plus</v-icon>
             add a section
@@ -106,7 +110,7 @@ function changeRouteParam(index: number): void {
       </EmptyListDisplay>
     </template>
 
-    <v-dialog v-model="sectionDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="sectionDialog" :width="dialogWidth" :fullscreen="smAndDown">
       <SectionDialog
         :is-dialog-open="sectionDialog"
         @submit="createSection($event)"

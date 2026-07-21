@@ -4,12 +4,13 @@ import { EventExtendedModel, EventPostOrPatch } from '@/models/event.model'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { onBeforeMount, ref } from 'vue'
 import { eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { smAndUp } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = defineProps<{
   date: string
@@ -96,11 +97,11 @@ function deleteEvent(id: number): void {
         <v-chip v-if="eventList.length > 0" size="small">{{ eventList.length }}</v-chip>
       </div>
 
-      <v-dialog v-model="eventDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+      <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps">
-            <v-icon :start="display.smAndUp">mdi-plus</v-icon>
-            <template v-if="display.smAndUp">event</template>
+            <v-icon :start="smAndUp">mdi-plus</v-icon>
+            <template v-if="smAndUp">event</template>
           </v-btn>
         </template>
         <EventDialog

@@ -21,7 +21,7 @@ import { useDisplay } from 'vuetify'
 // Todo : add btn to create project in no project svg
 // Todo : add btn to create collection in no collection svg
 
-const display = useDisplay()
+const { mdAndUp, smAndDown } = useDisplay()
 
 const props = defineProps<{
   date: string
@@ -161,30 +161,33 @@ function resetSelectedItem(): void {
       v-model="taskTab"
       bg-color="transparent"
       color="accent variant-1"
-      :direction="display.mdAndUp ? 'vertical' : 'horizontal'"
-      :grow="display.smAndDown"
+      :direction="mdAndUp ? 'vertical' : 'horizontal'"
+      :grow="smAndDown"
       show-arrows
       class="daily-update-task__tabs"
       @update:model-value="resetSelectedItem()">
-      <v-tab>
+      <v-tab :value="0">
         <v-icon>mdi-briefcase-variant</v-icon>
       </v-tab>
-      <v-tab>
+      <v-tab :value="1">
         <v-icon>mdi-list-box</v-icon>
       </v-tab>
-      <v-tab>
+      <v-tab :value="2">
         <v-icon>mdi-timeline</v-icon>
       </v-tab>
-      <v-tab disabled>
+      <v-tab :value="3" disabled>
         <v-icon>mdi-calendar-range</v-icon>
       </v-tab>
-      <v-tab disabled>
+      <v-tab :value="4" disabled>
         <v-icon>mdi-calendar-month</v-icon>
       </v-tab>
     </v-tabs>
 
-    <v-tabs-items v-model="taskTab" touchless class="daily-update-task__tabs-items bg-transparent">
-      <v-tab-item :transition="false">
+    <v-tabs-window
+      v-model="taskTab"
+      :touch="false"
+      class="daily-update-task__tabs-items bg-transparent">
+      <v-tabs-window-item :value="0" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Project</h5>
           <v-hover v-slot="{ hover }">
@@ -225,8 +228,8 @@ function resetSelectedItem(): void {
             </EmptyListDisplay>
           </template>
         </div>
-      </v-tab-item>
-      <v-tab-item :transition="false">
+      </v-tabs-window-item>
+      <v-tabs-window-item :value="1" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Collection</h5>
           <v-hover v-slot="{ hover }">
@@ -266,8 +269,8 @@ function resetSelectedItem(): void {
             </EmptyListDisplay>
           </template>
         </div>
-      </v-tab-item>
-      <v-tab-item :transition="false">
+      </v-tabs-window-item>
+      <v-tabs-window-item :value="2" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Common task</h5>
           <v-hover v-slot="{ hover }">
@@ -288,14 +291,14 @@ function resetSelectedItem(): void {
             :daily-task-list="dailyTaskList"
             @select-common-task="createDailyTask($event)" />
         </div>
-      </v-tab-item>
-      <v-tab-item :transition="false">
+      </v-tabs-window-item>
+      <v-tabs-window-item :value="3" :transition="false" :reverse-transition="false">
         <h5 class="text-h5 mb-3">Weekly task</h5>
-      </v-tab-item>
-      <v-tab-item :transition="false">
+      </v-tabs-window-item>
+      <v-tabs-window-item :value="4" :transition="false" :reverse-transition="false">
         <h5 class="text-h5 mb-3">Monthly task</h5>
-      </v-tab-item>
-    </v-tabs-items>
+      </v-tabs-window-item>
+    </v-tabs-window>
 
     <DailyUpdateTaskList
       :daily-task-list="dailyTaskList"
@@ -317,7 +320,7 @@ function resetSelectedItem(): void {
   gap: 16px;
 
   &__tabs {
-    flex: 0 0 0;
+    flex: 0 0 auto;
   }
 
   &__tabs-items {

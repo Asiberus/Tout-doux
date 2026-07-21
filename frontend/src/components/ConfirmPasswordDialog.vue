@@ -2,11 +2,10 @@
 import { Form } from '@/models/common.model'
 import { CheckPasswordBody } from '@/models/auth.model'
 import { authApi } from '@/api'
-import { getConfirmDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { confirmDialogWidth, confirmDialogFullscreen } = useDialogWidth()
 
 const show = defineModel<boolean>({ default: false })
 
@@ -73,11 +72,11 @@ function submit(): void {
 <template>
   <v-dialog
     :model-value="dialogState"
-    :width="getConfirmDialogWidth()"
-    :fullscreen="display.xs"
+    :width="confirmDialogWidth"
+    :fullscreen="confirmDialogFullscreen"
     @update:model-value="setDialogStateTo($event)">
     <template #activator="{ props }">
-      <slot name="activator" v-bind="props"></slot>
+      <slot name="activator" :props="props"></slot>
     </template>
     <v-card class="d-flex flex-column">
       <v-card-text class="flex-grow-1 d-flex flex-column px-6 py-10">

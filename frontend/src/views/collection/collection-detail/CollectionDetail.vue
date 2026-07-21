@@ -4,7 +4,7 @@ import { useDisplay } from 'vuetify'
 import { onBeforeMount, onUnmounted } from 'vue'
 import { useCollectionStore } from '@/store'
 
-const display = useDisplay()
+const { xs, smAndUp } = useDisplay()
 const collectionStore = useCollectionStore()
 
 const props = defineProps<{
@@ -18,10 +18,10 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
 <template>
   <div v-if="collectionStore.currentCollection" class="d-flex flex-column h-100">
     <div class="d-flex flex-column flex-sm-row align-center column-gap-2 row-gap-1">
-      <v-icon v-if="display.xs">mdi-list-box</v-icon>
+      <v-icon v-if="xs">mdi-list-box</v-icon>
 
       <SecondaryTitle class="text-center text-sm-start">
-        <span v-if="display.smAndUp" class="text-grey">Collection : </span>
+        <span v-if="smAndUp" class="text-grey">Collection : </span>
         {{ collectionStore.currentCollection.name }}
       </SecondaryTitle>
 

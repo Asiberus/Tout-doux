@@ -5,12 +5,13 @@ import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, ref } from 'vue'
 import { useProjectStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 const projectStore = useProjectStore()
 
 const eventDialog = ref(false)
@@ -55,12 +56,12 @@ function deleteEvent(id: number): void {
           Passed
         </FilterChip>
 
-        <v-dialog v-model="eventDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+        <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
               :disabled="projectStore.currentProject.archived"
-              :block="display.xs && projectStore.currentProject.events.length === 0">
+              :block="xs && projectStore.currentProject.events.length === 0">
               <v-icon start>mdi-plus</v-icon>
               event
             </v-btn>

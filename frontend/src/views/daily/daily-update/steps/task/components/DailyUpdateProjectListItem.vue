@@ -155,7 +155,10 @@ function selectTask(task: Task): void {
             class="section-wrapper"
             hide-slider
             show-arrows>
-            <v-tab v-for="section of taskBySection" :key="`tab-${section.id}`">
+            <v-tab
+              v-for="(section, index) of taskBySection"
+              :key="`tab-${section.id}`"
+              :value="index">
               <span class="text-truncate" :title="section.name">
                 {{ section.name }}
               </span>
@@ -178,8 +181,11 @@ function selectTask(task: Task): void {
             }">
           </v-divider>
 
-          <v-tabs-items v-model="sectionTab" touchless class="tab-item-wrapper">
-            <v-tab-item v-for="section of taskBySection" :key="`tab-item-${section.id}`">
+          <v-tabs-window v-model="sectionTab" :touch="false" class="tab-item-wrapper">
+            <v-tabs-window-item
+              v-for="(section, index) of taskBySection"
+              :key="`tab-item-${section.id}`"
+              :value="index">
               <div class="task-wrapper">
                 <TaskCard
                   v-for="task of section.tasks.filter(({ completed }) => !completed)"
@@ -195,8 +201,8 @@ function selectTask(task: Task): void {
                   @click.native="selectTask(task)">
                 </TaskCard>
               </div>
-            </v-tab-item>
-          </v-tabs-items>
+            </v-tabs-window-item>
+          </v-tabs-window>
         </template>
       </v-card-text>
     </v-card>

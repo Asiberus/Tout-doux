@@ -4,11 +4,10 @@ import TagDialog from '@/views/components/tag/TagDialog.vue'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import TagCard from '@/views/components/tag/TagCard.vue'
 import { tagApi } from '@/api'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { onBeforeMount, ref, watch } from 'vue'
-import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = defineProps<{
   type: TagType
@@ -92,7 +91,7 @@ function deleteTag(id: number): void {
       </EmptyListDisplay>
     </template>
 
-    <v-dialog v-model="tagDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="tagDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
       <TagDialog :type :is-dialog-open="tagDialog" @create="createTag" @close="tagDialog = false" />
     </v-dialog>
   </div>

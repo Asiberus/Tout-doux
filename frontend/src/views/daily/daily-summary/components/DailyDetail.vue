@@ -12,7 +12,7 @@ import { computed, ref, watch } from 'vue'
 import { dailyTaskApi, eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp, mdAndDown } = useDisplay()
 
 const show = defineModel<boolean>()
 
@@ -36,8 +36,8 @@ const numberOfDailyTaskCompleted = computed<number>(
 )
 const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
 const editBtnSize = computed<'large' | 'small' | 'default'>(() => {
-  if (display.smAndUp) return 'large'
-  else if (display.xs) return 'small'
+  if (smAndUp.value) return 'large'
+  else if (xs.value) return 'small'
   else return 'default'
 })
 
@@ -92,7 +92,7 @@ function scrollDownEvent(): void {
 }
 
 function switchTab(direction: 'right' | 'left'): void {
-  if (!display.mdAndDown || dailyTaskList.value.length === 0 || events.value.length === 0) return
+  if (!mdAndDown.value || dailyTaskList.value.length === 0 || events.value.length === 0) return
 
   if (direction === 'right') tab.value = 'task'
   else if (direction === 'left') tab.value = 'event'
@@ -170,25 +170,25 @@ function emitDailyTaskCompletedEvent(): void {
         </EmptyListDisplay>
       </template>
 
-      <template v-if="display.mdAndDown">
+      <template v-if="mdAndDown">
         <template v-if="dailyTaskList.length > 0 && events.length > 0">
           <!-- Tabs -->
           <v-tabs v-model="tab" bg-color="transparent" color="accent" grow class="flex-grow-0">
-            <v-tab tab-value="task">Tasks</v-tab>
-            <v-tab tab-value="event">Events</v-tab>
+            <v-tab value="task">Tasks</v-tab>
+            <v-tab value="event">Events</v-tab>
           </v-tabs>
 
-          <v-tabs-items v-model="tab" touchless class="bg-transparent py-2 pa-sm-2 pa-md-4">
-            <v-tab-item value="task">
+          <v-tabs-window v-model="tab" :touch="false" class="bg-transparent py-2 pa-sm-2 pa-md-4">
+            <v-tabs-window-item value="task">
               <DailyDetailTaskTimeline
                 :daily-task-list="dailyTaskList"
                 :date
                 @toggle-daily-task="toggleDailyTask($event)" />
-            </v-tab-item>
-            <v-tab-item value="event">
+            </v-tabs-window-item>
+            <v-tabs-window-item value="event">
               <DailyDetailEventTimeline :events :date />
-            </v-tab-item>
-          </v-tabs-items>
+            </v-tabs-window-item>
+          </v-tabs-window>
         </template>
         <template v-else-if="dailyTaskList.length > 0">
           <!-- Only tasks -->

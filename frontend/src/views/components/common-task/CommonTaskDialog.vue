@@ -6,11 +6,10 @@ import { IsCommonTaskNameUniqueParams } from '@/api/common-task.api'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import { Tag } from '@/models/tag.model'
 import TagChip from '@/views/components/tag/TagChip.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
-import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const show = defineModel<boolean>()
 
@@ -122,11 +121,11 @@ function closeDialog(): void {
 <template>
   <v-dialog
     :model-value="show"
-    :width="getDialogWidth()"
-    :fullscreen="display.smAndDown"
+    :width="dialogWidth"
+    :fullscreen="dialogFullscreen"
     @update:model-value="show = $event">
     <template #activator="{ props }">
-      <slot name="activator" v-bind="props"></slot>
+      <slot name="activator" :props="props"></slot>
     </template>
     <v-card class="d-flex flex-column">
       <div class="px-6 pt-4 pb-2">

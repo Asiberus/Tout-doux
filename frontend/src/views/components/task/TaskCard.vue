@@ -3,11 +3,10 @@ import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, ref } from 'vue'
-import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = withDefaults(
   defineProps<{
@@ -132,7 +131,7 @@ function emitDeleteEvent(): void {
       </template>
     </v-card>
 
-    <v-dialog v-model="taskDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+    <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
       <TaskDialog
         :task="task"
         :is-dialog-open="taskDialog"

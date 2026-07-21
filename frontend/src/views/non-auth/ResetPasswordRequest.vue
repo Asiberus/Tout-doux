@@ -31,8 +31,9 @@ const form = ref<Form<ResetPasswordRequestBody>>({
 
 const resetPasswordRequested = ref(false)
 
-function submit(): void {
-  if (!formRef.value.validate()) return
+async function submit(): Promise<void> {
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
 
   authApi
     .resetPasswordRequest(form.value.data)

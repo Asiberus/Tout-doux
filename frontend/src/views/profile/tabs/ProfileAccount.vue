@@ -29,10 +29,8 @@ function deleteAccount(): void {
     <p class="text-subtitle-1 font-italic">Please be careful, this action is not reversible.</p>
 
     <ConfirmPasswordDialog @password-confirmed="deleteAccount()">
-      <template #activator="{ attrs, on }">
-        <v-btn v-bind="attrs" color="error" :block="$vuetify.breakpoint.xs" v-on="on">
-          Delete my account
-        </v-btn>
+      <template #activator="{ props }">
+        <v-btn v-bind="props" color="error" :block="$vuetify.display.xs"> Delete my account </v-btn>
       </template>
     </ConfirmPasswordDialog>
   </div>

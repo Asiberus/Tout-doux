@@ -13,7 +13,7 @@ import { useRouter } from 'vue-router'
 import { projectApi } from '@/api'
 
 const router = useRouter()
-const display = useDisplay()
+const { xs } = useDisplay()
 const projectStore = useProjectStore()
 
 const formRef = useTemplateRef('form')
@@ -103,14 +103,13 @@ function deleteProject(): void {
 
       <div class="d-flex gap-2">
         <ConfirmDialog @confirm="toggleProjectArchiveState()">
-          <template #activator="{ attrs, on }">
+          <template #activator="{ props }">
             <v-btn
-              v-bind="attrs"
+              v-bind="props"
               :variant="!project.archived ? 'outlined' : 'elevated'"
-              :size="display.xs ? 'small' : 'default'"
+              :size="xs ? 'small' : 'default'"
               color="accent"
-              class="flex-grow-1 flex-sm-grow-0"
-              v-on="on">
+              class="flex-grow-1 flex-sm-grow-0">
               <v-icon size="small" start>mdi-archive</v-icon>
               {{ project.archived ? 'unarchive' : 'archive' }}
             </v-btn>
@@ -125,14 +124,13 @@ function deleteProject(): void {
         </ConfirmDialog>
         <template v-if="project.archived">
           <ConfirmDialog @confirm="deleteProject()">
-            <template #activator="{ attrs, on }">
+            <template #activator="{ props }">
               <v-btn
-                v-bind="attrs"
+                v-bind="props"
                 variant="outlined"
-                :size="display.xs ? 'small' : 'default'"
+                :size="xs ? 'small' : 'default'"
                 color="error"
-                class="flex-grow-1 flex-sm-grow-0"
-                v-on="on">
+                class="flex-grow-1 flex-sm-grow-0">
                 <v-icon size="small" start>mdi-trash-can</v-icon>
                 delete
               </v-btn>
@@ -201,7 +199,7 @@ function deleteProject(): void {
         <v-btn
           color="success"
           type="submit"
-          :block="display.xs"
+          :block="xs"
           :disabled="!projectForm.valid || isFormUntouched">
           update
         </v-btn>

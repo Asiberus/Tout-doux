@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { getConfirmDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { ref, watch } from 'vue'
-import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { confirmDialogWidth, confirmDialogFullscreen } = useDialogWidth()
 
 const show = defineModel<boolean>({ default: false })
 
@@ -34,11 +33,11 @@ function confirm(): void {
 <template>
   <v-dialog
     :model-value="dialogState"
-    :width="getConfirmDialogWidth()"
-    :fullscreen="display.xs"
+    :width="confirmDialogWidth"
+    :fullscreen="confirmDialogFullscreen"
     @update:model-value="setDialogStateTo($event)">
     <template #activator="{ props }">
-      <slot name="activator" v-bind="props"></slot>
+      <slot name="activator" :props="props"></slot>
     </template>
     <v-card class="d-flex flex-column">
       <v-card-text class="flex-grow-1 d-flex flex-column justify-center align-stretch px-6 py-10">

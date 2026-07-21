@@ -6,13 +6,13 @@ import { usePreferencesStore } from '@/store'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndDown, width } = useDisplay()
 const preferencesStore = usePreferencesStore()
 
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x-large'>(() => {
-  if (display.xs) return 'x-small'
-  if (display.smAndDown) return 'small'
-  else if (display.width < 1600) return 'medium'
+  if (xs.value) return 'x-small'
+  if (smAndDown.value) return 'small'
+  else if (width.value < 1600) return 'medium'
   else return 'x-large'
 })
 

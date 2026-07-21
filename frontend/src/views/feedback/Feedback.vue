@@ -6,7 +6,7 @@ import MainTitle from '@/components/MainTitle.vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp } = useDisplay()
 
 const formRef = useTemplateRef('form')
 
@@ -42,7 +42,7 @@ function submit(): void {
 
 <template>
   <div class="feedback">
-    <MainTitle :icon="display.smAndUp ? 'mdi-comment-quote' : null" class="mb-3">
+    <MainTitle :icon="smAndUp ? 'mdi-comment-quote' : null" class="mb-3">
       Give us a Feedback!
     </MainTitle>
 
@@ -74,12 +74,7 @@ function submit(): void {
       </v-textarea>
 
       <div class="d-flex justify-end mt-2">
-        <v-btn
-          type="submit"
-          :disabled="!canSubmit"
-          :block="display.xs"
-          color="success"
-          class="px-6">
+        <v-btn type="submit" :disabled="!canSubmit" :block="xs" color="success" class="px-6">
           submit
         </v-btn>
       </div>

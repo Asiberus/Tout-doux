@@ -5,7 +5,7 @@ import moment from 'moment/moment'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs } = useDisplay()
 
 const props = defineProps<{
   dailyTaskList: DailyTask[]
@@ -62,14 +62,12 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         v-for="dailyTask in dailyTaskList"
         :key="`daily-task-${dailyTask.id}`"
         fill-dot
-        :size="display.xs ? 'small' : 'default'"
+        :size="xs ? 'small' : 'default'"
         :dot-color="dailyTask.completed ? 'green darken-2' : null">
         <template #icon>
           <div v-ripple class="icon-wrapper" @click="toggleDailyTask(dailyTask)">
-            <v-icon v-if="dailyTask.completed" :size="display.xs ? 'small' : 'default'">
-              mdi-check
-            </v-icon>
-            <v-icon v-else :size="display.xs ? 'small' : 'default'">mdi-trophy</v-icon>
+            <v-icon v-if="dailyTask.completed" :size="xs ? 'small' : 'default'"> mdi-check </v-icon>
+            <v-icon v-else :size="xs ? 'small' : 'default'">mdi-trophy</v-icon>
           </div>
         </template>
         <DailyTaskCard :daily-task="dailyTask" @toggle="toggleDailyTask(dailyTask)">

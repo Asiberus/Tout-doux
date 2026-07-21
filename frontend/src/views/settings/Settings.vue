@@ -2,7 +2,7 @@
 import MainTitle from '@/components/MainTitle.vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { mdAndUp } = useDisplay()
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const display = useDisplay()
     <div class="settings">
       <div class="settings__tabs">
         <v-tabs
-          :direction="display.mdAndUp ? 'vertical' : 'horizontal'"
+          :direction="mdAndUp ? 'vertical' : 'horizontal'"
           color="accent"
           show-arrows
           bg-color="transparent">

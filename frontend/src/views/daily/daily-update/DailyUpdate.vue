@@ -3,7 +3,7 @@ import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
 import SecondaryTitle from '@/components/SecondaryTitle.vue'
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -26,10 +26,10 @@ function goToDailyDetail(): void {
   router.push({ name: 'daily-summary', params: { date: props.date } })
 }
 
-function onStepperChange(index: number): void {
+watch(dailyStepper, index => {
   const step = index === 1 ? 'task' : 'event'
   router.replace({ params: { step } })
-}
+})
 </script>
 
 <template>
@@ -49,33 +49,32 @@ function onStepperChange(index: number): void {
       </v-btn>
     </div>
 
-    <v-stepper
-      :value="dailyStepper"
-      non-linear
-      alt-labels
-      class="daily-update-stepper"
-      @change="onStepperChange($event)">
+    <v-stepper v-model="dailyStepper" non-linear alt-labels class="daily-update-stepper">
       <v-stepper-header>
         <v-divider />
-        <v-stepper-step :step="1" editable color="accent">
-          Task
-          <template v-if="dailyTaskCount > 0">({{ dailyTaskCount }})</template>
-        </v-stepper-step>
+        <v-stepper-item :value="1" editable color="accent">
+          <template #title>
+            Task
+            <template v-if="dailyTaskCount > 0">({{ dailyTaskCount }})</template>
+          </template>
+        </v-stepper-item>
         <v-divider />
-        <v-stepper-step :step="2" editable color="accent">
-          Event
-          <template v-if="dailyEventCount > 0">({{ dailyEventCount }})</template>
-        </v-stepper-step>
+        <v-stepper-item :value="2" editable color="accent">
+          <template #title>
+            Event
+            <template v-if="dailyEventCount > 0">({{ dailyEventCount }})</template>
+          </template>
+        </v-stepper-item>
         <v-divider />
       </v-stepper-header>
-      <v-stepper-items>
-        <v-stepper-content :step="1">
+      <v-stepper-window>
+        <v-stepper-window-item :value="1">
           <DailyUpdateTask :date @daily-task-count="dailyTaskCount = $event" />
-        </v-stepper-content>
-        <v-stepper-content :step="2">
+        </v-stepper-window-item>
+        <v-stepper-window-item :value="2">
           <DailyUpdateEvent :date @daily-event-count="dailyEventCount = $event" />
-        </v-stepper-content>
-      </v-stepper-items>
+        </v-stepper-window-item>
+      </v-stepper-window>
     </v-stepper>
   </div>
 </template>
@@ -90,7 +89,7 @@ function onStepperChange(index: number): void {
   flex-direction: column;
 
   @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
-    .v-stepper__step--editable:hover {
+    .v-stepper-item:hover {
       background: inherit;
     }
   }

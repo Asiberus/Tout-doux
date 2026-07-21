@@ -3,7 +3,7 @@ import { SectionTask } from '@/models/section.model'
 import { onBeforeMount, ref, useTemplateRef, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs } = useDisplay()
 
 const props = defineProps<{
   section?: SectionTask
@@ -84,7 +84,7 @@ function emitCloseEvent(): void {
       <v-hover v-if="section" v-slot="{ hover }">
         <v-btn
           :color="hover || confirmDelete ? 'error' : null"
-          :size="display.xs ? 'small' : 'default'"
+          :size="xs ? 'small' : 'default'"
           @click="emitDeleteSection()">
           {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
         </v-btn>

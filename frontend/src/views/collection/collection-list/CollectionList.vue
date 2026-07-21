@@ -5,14 +5,13 @@ import { CollectionList, CollectionPost } from '@/models/collection.model'
 import CollectionFormDialog from '@/views/collection/components/CollectionFormDialog.vue'
 import CollectionCard from '@/views/collection/components/CollectionCard.vue'
 import MainTitle from '@/components/MainTitle.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { onBeforeMount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { collectionApi } from '@/api'
-import { useDisplay } from 'vuetify'
 
 const router = useRouter()
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const { archived } = defineProps<{
   archived: boolean
@@ -61,10 +60,7 @@ function toggleArchivedProject(): void {
           Archived
         </FilterChip>
 
-        <v-dialog
-          v-model="collectionDialog"
-          :width="getDialogWidth()"
-          :fullscreen="display.smAndDown">
+        <v-dialog v-model="collectionDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props }">
             <v-btn v-bind="props">
               <v-icon start>mdi-plus</v-icon>

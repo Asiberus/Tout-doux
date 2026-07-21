@@ -7,7 +7,7 @@ import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp, width } = useDisplay()
 
 const show = defineModel<boolean>()
 
@@ -32,8 +32,8 @@ function touchStartEvent(): void {
 }
 
 function handleTouchEvent(type: string): void {
-  if (type === 'right' && display.width >= 400) show.value = false
-  else if (type === 'down' && display.width < 400) scrollDownEvent()
+  if (type === 'right' && width.value >= 400) show.value = false
+  else if (type === 'down' && width.value < 400) scrollDownEvent()
 }
 
 function scrollDownEvent(): void {
@@ -57,12 +57,12 @@ function scrollDownEvent(): void {
         </v-toolbar-title>
 
         <v-btn
-          :size="display.xs ? 'small' : 'default'"
-          :icon="display.xs"
+          :size="xs ? 'small' : 'default'"
+          :icon="xs"
           class="new-event-btn"
           @click="$emit('open-event-dialog', date)">
           <v-icon>mdi-plus</v-icon>
-          <template v-if="display.smAndUp">event</template>
+          <template v-if="smAndUp">event</template>
         </v-btn>
 
         <v-spacer></v-spacer>

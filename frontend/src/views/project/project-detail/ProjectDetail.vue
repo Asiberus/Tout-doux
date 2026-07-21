@@ -4,7 +4,7 @@ import { useDisplay } from 'vuetify'
 import { useProjectStore } from '@/store'
 import { onBeforeMount, onUnmounted } from 'vue'
 
-const display = useDisplay()
+const { xs, smAndUp } = useDisplay()
 const projectStore = useProjectStore()
 
 const props = defineProps<{
@@ -23,10 +23,10 @@ onUnmounted(() => {
 <template>
   <div v-if="projectStore.currentProject" class="d-flex flex-column h-100">
     <div class="d-flex flex-column flex-sm-row align-center column-gap-2 row-gap-1">
-      <v-icon v-if="display.xs">mdi-briefcase-variant</v-icon>
+      <v-icon v-if="xs">mdi-briefcase-variant</v-icon>
 
       <SecondaryTitle class="text-center text-sm-start">
-        <span v-if="display.smAndUp" class="text-grey">Project : </span>
+        <span v-if="smAndUp" class="text-grey">Project : </span>
         {{ projectStore.currentProject.name }}
       </SecondaryTitle>
 

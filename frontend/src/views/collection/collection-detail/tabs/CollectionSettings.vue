@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 const router = useRouter()
-const display = useDisplay()
+const { xs } = useDisplay()
 const collectionStore = useCollectionStore()
 
 const formRef = useTemplateRef('form')
@@ -82,7 +82,7 @@ function deleteCollection(): void {
             <v-btn
               v-bind="props"
               :variant="!collection.archived ? 'outlined' : 'elevated'"
-              :size="display.xs ? 'small' : 'default'"
+              :size="xs ? 'small' : 'default'"
               color="accent"
               class="flex-grow-1 flex-sm-grow-0">
               <v-icon size="small" start>mdi-archive</v-icon>
@@ -104,7 +104,7 @@ function deleteCollection(): void {
                 v-bind="props"
                 variant="outlined"
                 color="error"
-                :size="display.xs ? 'small' : 'default'"
+                :size="xs ? 'small' : 'default'"
                 class="flex-grow-1 flex-sm-grow-0">
                 <v-icon size="small" start>mdi-trash-can</v-icon>
                 delete
@@ -165,7 +165,7 @@ function deleteCollection(): void {
         <v-btn
           color="success"
           type="submit"
-          :block="display.xs"
+          :block="xs"
           :disabled="!collectionForm.valid || isFormUntouched">
           update
         </v-btn>

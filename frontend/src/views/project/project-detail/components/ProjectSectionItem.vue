@@ -7,12 +7,13 @@ import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, ref } from 'vue'
 import { usePreferencesStore, useProjectStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { xs, smAndUp, smAndDown, mdAndDown, lgAndDown } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 const projectStore = useProjectStore()
 const preferencesStore = usePreferencesStore()
 
@@ -43,9 +44,9 @@ const completedTasksPercentage = computed<number>(() => {
 })
 
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large'>(() => {
-  if (display.smAndDown) return 'x-small'
-  else if (display.mdAndDown) return 'small'
-  else if (display.lgAndDown) return 'medium'
+  if (smAndDown.value) return 'x-small'
+  else if (mdAndDown.value) return 'small'
+  else if (lgAndDown.value) return 'medium'
   else return 'large'
 })
 
@@ -81,12 +82,7 @@ function deleteTask(id: number): void {
 
 <template>
   <div>
-    <v-btn
-      v-if="display.xs"
-      :disabled="disabled"
-      size="small"
-      class="mb-1"
-      @click="$emit('new-section')">
+    <v-btn v-if="xs" :disabled="disabled" size="small" class="mb-1" @click="$emit('new-section')">
       <v-icon start>mdi-plus</v-icon>
       section
     </v-btn>
@@ -94,13 +90,9 @@ function deleteTask(id: number): void {
       <h3 class="section-title text-h6">
         {{ section.name }}
 
-        <v-dialog v-model="sectionDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+        <v-dialog v-model="sectionDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props: menuProps }">
-            <v-btn
-              v-bind="menuProps"
-              :disabled
-              :size="display.mdAndDown ? 'small' : 'default'"
-              icon>
+            <v-btn v-bind="menuProps" :disabled :size="mdAndDown ? 'small' : 'default'" icon>
               <v-icon size="small">mdi-pencil</v-icon>
             </v-btn>
           </template>
@@ -114,17 +106,17 @@ function deleteTask(id: number): void {
       </h3>
 
       <v-btn
-        v-if="display.smAndUp"
+        v-if="smAndUp"
         :disabled="disabled"
-        :size="display.mdAndDown || true ? 'small' : 'default'"
+        :size="mdAndDown || true ? 'small' : 'default'"
         @click="$emit('new-section')">
         <v-icon start>mdi-plus</v-icon>
         section
       </v-btn>
     </div>
 
-    <v-row class="flex-wrap-reverse flex-sm-nowrap" :no-gutters="display.xs">
-      <v-col :cols="display.smAndUp ? 9 : 12">
+    <v-row class="flex-wrap-reverse flex-sm-nowrap" :no-gutters="xs">
+      <v-col :cols="smAndUp ? 9 : 12">
         <div class="d-flex align-center mb-2">
           <FilterChip
             v-if="section.tasks.length > 0"
@@ -136,9 +128,9 @@ function deleteTask(id: number): void {
 
           <v-spacer />
 
-          <v-dialog v-model="taskDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+          <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props: menuProps }">
-              <v-btn v-bind="menuProps" :disabled :size="display.smAndDown ? 'small' : 'default'">
+              <v-btn v-bind="menuProps" :disabled :size="smAndDown ? 'small' : 'default'">
                 <v-icon start>mdi-plus</v-icon>
                 task
               </v-btn>
@@ -209,12 +201,12 @@ function deleteTask(id: number): void {
           </template>
         </template>
       </v-col>
-      <v-col :cols="display.smAndUp ? 3 : 12">
+      <v-col :cols="smAndUp ? 3 : 12">
         <v-scale-transition origin="center">
           <div
             v-if="section.tasks.length > 0"
             class="d-flex flex-column align-center justify-center">
-            <template v-if="display.smAndUp">
+            <template v-if="smAndUp">
               <ProgressWheel
                 :mode="preferencesStore.preferences.progressWheelMode"
                 :value="completedTasks.length"

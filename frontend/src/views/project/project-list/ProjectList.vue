@@ -5,14 +5,13 @@ import { ProjectList, ProjectPostOrPatch } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectCard from '@/views/project/components/ProjectCard.vue'
 import MainTitle from '@/components/MainTitle.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { onBeforeMount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useDisplay } from 'vuetify'
 import { projectApi } from '@/api'
 
 const router = useRouter()
-const display = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = defineProps<{
   archived: boolean // TODO : test undefiness
@@ -66,7 +65,7 @@ function toggleArchivedProject(): void {
           Archived
         </FilterChip>
 
-        <v-dialog v-model="projectDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+        <v-dialog v-model="projectDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props: menuProps }">
             <v-btn v-bind="menuProps">
               <v-icon start>mdi-plus</v-icon>

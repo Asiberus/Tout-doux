@@ -6,19 +6,20 @@ import { CollectionDetail } from '@/models/collection.model'
 import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useCollectionStore, usePreferencesStore } from '@/store'
 import { dateFormat } from '@/pipes'
 
-const display = useDisplay()
+const { xs, smAndDown, mdAndDown, lgAndDown } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const preferencesStore = usePreferencesStore()
 const collectionStore = useCollectionStore()
 
 onMounted(() => {
-  if (display.xs)
+  if (xs.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollHeight > descriptionElement.value.clientHeight
 })
@@ -33,10 +34,10 @@ const isDescriptionOverflowing = ref(false)
 
 const collection = computed<CollectionDetail>(() => collectionStore.currentCollection)
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x-large'>(() => {
-  if (display.xs) return 'x-small'
-  if (display.smAndDown) return 'small'
-  else if (display.mdAndDown) return 'medium'
-  else if (display.lgAndDown) return 'large'
+  if (xs.value) return 'x-small'
+  if (smAndDown.value) return 'small'
+  else if (mdAndDown.value) return 'medium'
+  else if (lgAndDown.value) return 'large'
   else return 'x-large'
 })
 
@@ -75,12 +76,12 @@ function deleteTask(id: number): void {
             Completed
           </FilterChip>
 
-          <v-dialog v-model="taskDialog" :width="getDialogWidth()" :fullscreen="display.smAndDown">
+          <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props }">
               <v-btn
                 :disabled="collection.archived"
-                :size="display.xs && collection.itemName.length > 10 ? 'small' : 'default'"
-                :block="display.xs && collection.tasks.length === 0"
+                :size="xs && collection.itemName.length > 10 ? 'small' : 'default'"
+                :block="xs && collection.tasks.length === 0"
                 v-bind="props">
                 <v-icon start>mdi-plus</v-icon>
                 {{ collection.itemName }}

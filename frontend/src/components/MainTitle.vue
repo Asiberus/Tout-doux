@@ -2,15 +2,15 @@
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const display = useDisplay()
+const { sm, mdAndUp } = useDisplay()
 
 defineProps<{
   icon?: string
 }>()
 
 const size = computed<'default' | 'large' | 'x-large'>(() => {
-  if (display.sm) return 'large'
-  else if (display.mdAndUp) return 'x-large'
+  if (sm.value) return 'large'
+  else if (mdAndUp.value) return 'x-large'
   else return 'default'
 })
 </script>
