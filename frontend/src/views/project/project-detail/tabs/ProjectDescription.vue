@@ -32,7 +32,7 @@ const displayCompletedTask = ref(false)
 const displayDescription = ref(false)
 const isDescriptionOverflowing = ref(false)
 
-const project = computed<ProjectDetail>(() => projectStore.currentProject)
+const project = computed<ProjectDetail>(() => projectStore.loadedProject)
 const uncompletedTasks = computed<Task[]>(() =>
   project.value.tasks.filter(({ completed }) => !completed)
 )
@@ -108,7 +108,7 @@ function deleteTask(id: number): void {
       <div class="project-description__progress-wheel">
         <ProgressWheel
           :size="progressWheelSize"
-          :mode="preferencesStore.preferences.progressWheelMode"
+          :mode="preferencesStore.loadedPreferences.progressWheelMode"
           :value="allCompletedTasks.length"
           :max="allTasks.length"
           color="green-accent-2" />

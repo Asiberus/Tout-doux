@@ -17,9 +17,9 @@ const formRef = useTemplateRef('form')
 const collectionForm = ref<Form<CollectionPatch>>({
   valid: false,
   data: {
-    name: collectionStore.currentCollection.name,
-    description: collectionStore.currentCollection.description,
-    itemName: collectionStore.currentCollection.itemName,
+    name: collectionStore.loadedCollection.name,
+    description: collectionStore.loadedCollection.description,
+    itemName: collectionStore.loadedCollection.itemName,
   },
   rules: {
     name: [
@@ -37,7 +37,7 @@ const collectionForm = ref<Form<CollectionPatch>>({
   },
 })
 
-const collection = computed<CollectionDetail>(() => collectionStore.currentCollection)
+const collection = computed<CollectionDetail>(() => collectionStore.loadedCollection)
 const isFormUntouched = computed<boolean>(
   () =>
     collectionForm.value.data.name === collection.value.name &&

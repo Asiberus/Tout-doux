@@ -1,19 +1,15 @@
 import { apiRoutes } from '@/api-routes'
-import { TaskPatch, TaskPost } from '@/models/task.model'
-import axiosInstance from '@/axios/axios-instance'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
+import { http } from '@/axios/http'
 
-export function createTask(task: TaskPost) {
-  return axiosInstance.post(apiRoutes.task, task).then(response => response.data)
+export function createTask(task: TaskPost): Promise<Task> {
+  return http.post<Task>(apiRoutes.task, task)
 }
 
-export function updateTaskById(taskId: number, task: TaskPatch) {
-  return axiosInstance
-    .patch(apiRoutes.taskById.replace(':taskId', taskId.toString()), task)
-    .then(response => response.data)
+export function updateTaskById(taskId: number, task: TaskPatch): Promise<Task> {
+  return http.patch<Task>(apiRoutes.taskById.replace(':taskId', taskId.toString()), task)
 }
 
-export function deleteTaskById(taskId: number) {
-  return axiosInstance
-    .delete(apiRoutes.taskById.replace(':taskId', taskId.toString()))
-    .then(response => response.data)
+export function deleteTaskById(taskId: number): Promise<void> {
+  return http.delete(apiRoutes.taskById.replace(':taskId', taskId.toString()))
 }

@@ -1,7 +1,8 @@
 import { apiRoutes } from '@/api-routes'
-import { PaginationParams } from '@/models/pagination.model'
-import { TagForm, TagType } from '@/models/tag.model'
-import axiosInstance from '@/axios/axios-instance'
+import { Pagination, PaginationParams } from '@/models/pagination.model'
+import { Tag, TagForm, TagType } from '@/models/tag.model'
+import { UniqueResponse } from '@/models/common.model'
+import { http } from '@/axios/http'
 
 export interface IsTagNameUniqueParams {
   type: TagType
@@ -15,26 +16,22 @@ interface TagListParams extends PaginationParams {
   exclude_ids?: string
 }
 
-export function getTagList(params: TagListParams) {
-  return axiosInstance.get(apiRoutes.tag, { params }).then(response => response.data)
+export function getTagList(params: TagListParams): Promise<Pagination<Tag[]>> {
+  return http.get<Pagination<Tag[]>>(apiRoutes.tag, { params })
 }
 
-export function isNameUnique(params: IsTagNameUniqueParams) {
-  return axiosInstance.get(apiRoutes.tagUnique, { params }).then(response => response.data)
+export function isNameUnique(params: IsTagNameUniqueParams): Promise<UniqueResponse> {
+  return http.get<UniqueResponse>(apiRoutes.tagUnique, { params })
 }
 
-export function createTag(tag: TagForm) {
-  return axiosInstance.post(apiRoutes.tag, tag).then(response => response.data)
+export function createTag(tag: TagForm): Promise<Tag> {
+  return http.post<Tag>(apiRoutes.tag, tag)
 }
 
-export function updateTag(id: number, tag: TagForm) {
-  return axiosInstance
-    .patch(apiRoutes.tagById.replace(':id', id.toString()), tag)
-    .then(response => response.data)
+export function updateTag(id: number, tag: TagForm): Promise<Tag> {
+  return http.patch<Tag>(apiRoutes.tagById.replace(':id', id.toString()), tag)
 }
 
-export function deleteTag(id: number) {
-  return axiosInstance
-    .delete(apiRoutes.tagById.replace(':id', id.toString()))
-    .then(response => response.data)
+export function deleteTag(id: number): Promise<void> {
+  return http.delete(apiRoutes.tagById.replace(':id', id.toString()))
 }

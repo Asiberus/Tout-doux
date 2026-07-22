@@ -208,7 +208,7 @@ function deleteTask(id: number): void {
             class="d-flex flex-column align-center justify-center">
             <template v-if="smAndUp">
               <ProgressWheel
-                :mode="preferencesStore.preferences.progressWheelMode"
+                :mode="preferencesStore.loadedPreferences.progressWheelMode"
                 :value="completedTasks.length"
                 :max="section.tasks.length"
                 :size="progressWheelSize"

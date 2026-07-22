@@ -27,10 +27,10 @@ onUnmounted(() => {
 
       <SecondaryTitle class="text-center text-sm-start">
         <span v-if="smAndUp" class="text-grey">Project : </span>
-        {{ projectStore.currentProject.name }}
+        {{ projectStore.loadedProject.name }}
       </SecondaryTitle>
 
-      <v-chip v-if="projectStore.currentProject.archived" color="accent" class="flex-shrink-0">
+      <v-chip v-if="projectStore.loadedProject.archived" color="accent" class="flex-shrink-0">
         <v-icon size="small" class="mr-1"> mdi-archive </v-icon>
         Archived
       </v-chip>

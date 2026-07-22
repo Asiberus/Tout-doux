@@ -19,16 +19,16 @@ const displayPassedEvent = ref(false)
 
 // TODO : utiliser des getters
 const comingEvents = computed<EventModel[]>(() =>
-  projectStore.currentProject.events.filter(event => !isPassed(event))
+  projectStore.loadedProject.events.filter(event => !isPassed(event))
 )
 
 const passedEvents = computed<EventModel[]>(() =>
-  projectStore.currentProject.events.filter(event => isPassed(event)).reverse()
+  projectStore.loadedProject.events.filter(event => isPassed(event)).reverse()
 )
 
 function createEvent(event: EventPostOrPatch): void {
   eventDialog.value = false
-  event.projectId = projectStore.currentProject.id
+  event.projectId = projectStore.loadedProject.id
   projectStore.addEvent(event)
 }
 
@@ -49,7 +49,7 @@ function deleteEvent(id: number): void {
 
       <div class="d-flex justify-space-between align-center gap-2">
         <FilterChip
-          v-if="projectStore.currentProject.events.length > 0"
+          v-if="projectStore.loadedProject.events.length > 0"
           v-model="displayPassedEvent"
           color="event"
           icon="mdi-clock-check-outline">
@@ -60,8 +60,8 @@ function deleteEvent(id: number): void {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              :disabled="projectStore.currentProject.archived"
-              :block="xs && projectStore.currentProject.events.length === 0">
+              :disabled="projectStore.loadedProject.archived"
+              :block="xs && projectStore.loadedProject.events.length === 0">
               <v-icon start>mdi-plus</v-icon>
               event
             </v-btn>
@@ -82,7 +82,7 @@ function deleteEvent(id: number): void {
             v-for="event of comingEvents"
             :key="event.id"
             :event
-            :disabled="projectStore.currentProject.archived"
+            :disabled="projectStore.loadedProject.archived"
             :show-icon="true"
             @update="updateEvent($event)"
             @delete="deleteEvent($event)">
@@ -108,7 +108,7 @@ function deleteEvent(id: number): void {
             :key="event.id"
             :event
             :show-icon="true"
-            :disabled="projectStore.currentProject.archived"
+            :disabled="projectStore.loadedProject.archived"
             @update="updateEvent($event)"
             @delete="deleteEvent($event)">
           </EventItemCard>

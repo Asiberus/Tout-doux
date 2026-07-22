@@ -72,7 +72,7 @@ function deleteUser(id: number): void {
     <v-data-table :items="userList" :headers="headerDefinition" :loading>
       <template #item.username="{ item, value }">
         {{ value }}
-        <template v-if="item.id === userStore.user.id">
+        <template v-if="item.id === userStore.loadedUser.id">
           <v-icon size="small" title="Account connected">mdi-account-circle</v-icon>
         </template>
       </template>
@@ -102,7 +102,7 @@ function deleteUser(id: number): void {
       <template #item.actions="{ item }">
         <v-menu>
           <template #activator="{ props }">
-            <v-btn v-bind="props" :disabled="item.id === userStore.user.id" variant="plain">
+            <v-btn v-bind="props" :disabled="item.id === userStore.loadedUser.id" variant="plain">
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>

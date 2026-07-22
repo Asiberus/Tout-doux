@@ -32,7 +32,7 @@ const displayCompletedTask = ref(false)
 const displayDescription = ref(false)
 const isDescriptionOverflowing = ref(false)
 
-const collection = computed<CollectionDetail>(() => collectionStore.currentCollection)
+const collection = computed<CollectionDetail>(() => collectionStore.loadedCollection)
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x-large'>(() => {
   if (xs.value) return 'x-small'
   if (smAndDown.value) return 'small'
@@ -43,7 +43,7 @@ const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x
 
 function createTask(task: TaskPost): void {
   taskDialog.value = false
-  task.collectionId = collectionStore.currentCollection.id
+  task.collectionId = collectionStore.loadedCollection.id
   collectionStore.addTask(task)
 }
 
@@ -173,7 +173,7 @@ function deleteTask(id: number): void {
       <div class="d-flex justify-center mb-2">
         <ProgressWheel
           :size="progressWheelSize"
-          :mode="preferencesStore.preferences.progressWheelMode"
+          :mode="preferencesStore.loadedPreferences.progressWheelMode"
           :value="collectionStore.completedTasks.length"
           :max="collection.tasks.length"
           color="collection lighten-2">

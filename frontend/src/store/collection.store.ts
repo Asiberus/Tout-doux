@@ -12,6 +12,7 @@ interface CollectionStoreGetters
   extends Record<string, (() => unknown) | ((state: CollectionStoreState) => unknown)> {
   completedTasks(state: CollectionStoreState): Task[]
   uncompletedTasks(state: CollectionStoreState): Task[]
+  loadedCollection(state: CollectionStoreState): CollectionDetail
 }
 
 interface CollectionStoreActions {
@@ -42,6 +43,11 @@ export const useCollectionStore = defineStore<
       if (!state.currentCollection) return []
       return state.currentCollection.tasks.filter(({ completed }) => !completed)
     },
+    loadedCollection(state): CollectionDetail {
+      if (!state.currentCollection)
+        throw new Error('currentCollection accessed before being loaded')
+      return state.currentCollection
+    },
   },
   actions: {
     async retrieveCollection(id: number): Promise<void> {
@@ -62,7 +68,7 @@ export const useCollectionStore = defineStore<
     async updateProperties(data: CollectionPatch): Promise<void> {
       if (!this.currentCollection) return
 
-      collectionApi.updateCollection(this.currentCollection.id, data).then(
+      await collectionApi.updateCollection(this.currentCollection.id, data).then(
         response => {
           if (!this.currentCollection) return
 
@@ -75,6 +81,8 @@ export const useCollectionStore = defineStore<
     async addTask(task: TaskPost): Promise<void> {
       await taskApi.createTask(task).then(
         response => {
+          if (!this.currentCollection) return
+
           this.currentCollection.tasks.unshift(response)
         },
         error => console.error(error)
@@ -84,8 +92,9 @@ export const useCollectionStore = defineStore<
     async editTask(id: number, data: TaskPatch): Promise<void> {
       await taskApi.updateTaskById(id, data).then(
         response => {
-          const task: Task = response
+          if (!this.currentCollection) return
 
+          const task: Task = response
           const taskToUpdate = this.currentCollection.tasks.find(t => t.id === task.id)
           if (taskToUpdate) Object.assign(taskToUpdate, task)
 
@@ -100,6 +109,7 @@ export const useCollectionStore = defineStore<
     async deleteTask(id: number): Promise<void> {
       await taskApi.deleteTaskById(id).then(
         () => {
+          if (!this.currentCollection) return
           const index = this.currentCollection.tasks.findIndex(t => t.id === id)
           if (index !== -1) this.currentCollection.tasks.splice(index, 1)
         },
@@ -110,6 +120,7 @@ export const useCollectionStore = defineStore<
     },
 
     sortTask(): void {
+      if (!this.currentCollection) return
       this.currentCollection.tasks = [...sortByCompletionDate(this.currentCollection.tasks)]
     },
   },

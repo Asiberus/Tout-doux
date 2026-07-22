@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
-import { LoginPost } from '@/models/login.model'
+import { LoginPost, LoginResponse } from '@/models/login.model'
 import { authApi } from '@/api'
 import { useAppStore } from '@/store/app.store'
 import { getToken } from '@/services/auth.service'
 
-interface AuthStoreGetters extends Record<string, () => any> {
+interface AuthStoreGetters extends Record<string, () => unknown> {
   isAuthenticated(): boolean
   getToken(): string | null
 }
 
 interface AuthStoreActions {
-  login(data: LoginPost)
+  login(data: LoginPost): Promise<LoginResponse>
   logout(): Promise<void>
   setToken(token: string): void
   removeToken(): void
@@ -19,7 +19,13 @@ interface AuthStoreActions {
 
 const TOKEN_KEY = 'td_token'
 
-export const useAuthStore = defineStore<'auth', {}, AuthStoreGetters, AuthStoreActions>('auth', {
+// TODO: Not used ? see if needed
+export const useAuthStore = defineStore<
+  'auth',
+  Record<string, never>,
+  AuthStoreGetters,
+  AuthStoreActions
+>('auth', {
   getters: {
     isAuthenticated(): boolean {
       const token = getToken()
@@ -31,20 +37,17 @@ export const useAuthStore = defineStore<'auth', {}, AuthStoreGetters, AuthStoreA
     },
   },
   actions: {
-    login(data: LoginPost) {
-      return authApi.login(data).then((response: any) => {
-        const token = response.token
-        this.setToken(token)
-
-        return response
-      })
+    async login(data: LoginPost) {
+      const response = await authApi.login(data)
+      const token = response.token
+      this.setToken(token)
+      return response
     },
 
-    logout(): Promise<void> {
-      return authApi
-        .logout()
-        .then(() => this.removeToken())
-        .then(() => this.resetStore())
+    async logout(): Promise<void> {
+      await authApi.logout()
+      this.removeToken()
+      return this.resetStore()
     },
 
     setToken(token: string): void {

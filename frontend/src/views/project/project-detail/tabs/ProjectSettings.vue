@@ -23,8 +23,8 @@ const tagList = ref<Tag[]>([])
 const projectForm = ref<Form<ProjectPostOrPatch>>({
   valid: false,
   data: {
-    name: projectStore.currentProject.name,
-    description: projectStore.currentProject.description, // TODO : test it
+    name: projectStore.loadedProject.name,
+    description: projectStore.loadedProject.description, // TODO : test it
     tagIds: [],
   },
   rules: {
@@ -39,7 +39,7 @@ const projectForm = ref<Form<ProjectPostOrPatch>>({
   },
 })
 
-const project = computed<ProjectDetail>(() => projectStore.currentProject)
+const project = computed<ProjectDetail>(() => projectStore.loadedProject)
 const isFormUntouched = computed<boolean>(
   () =>
     projectForm.value.data.name === project.value.name &&

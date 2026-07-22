@@ -9,7 +9,12 @@ interface AppStoreActions {
   exit(): void
 }
 
-export const useAppStore = defineStore<'app', unknown, unknown, AppStoreActions>('app', {
+export const useAppStore = defineStore<
+  'app',
+  Record<string, never>,
+  Record<string, never>,
+  AppStoreActions
+>('app', {
   actions: {
     init(): Promise<[void, void]> {
       const userStore = useUserStore()

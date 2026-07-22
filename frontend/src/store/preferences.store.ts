@@ -7,6 +7,11 @@ interface PreferencesStoreState {
   preferences?: Preferences
 }
 
+interface PreferencesStoreGetters
+  extends Record<string, (state: PreferencesStoreState) => unknown> {
+  loadedPreferences(state: PreferencesStoreState): Preferences
+}
+
 interface PreferencesStoreActions {
   getPreferences(): Promise<void>
   updatePreferences(data: Preferences): Promise<void>
@@ -16,29 +21,31 @@ interface PreferencesStoreActions {
 export const usePreferencesStore = defineStore<
   'preferences',
   PreferencesStoreState,
-  unknown,
+  PreferencesStoreGetters,
   PreferencesStoreActions
 >('preferences', {
   state: (): PreferencesStoreState => ({
     preferences: undefined,
   }),
+  getters: {
+    loadedPreferences(state): Preferences {
+      if (!state.preferences) throw new Error('preferences accessed before being loaded')
+      return state.preferences
+    },
+  },
   actions: {
     async getPreferences(): Promise<void> {
       await preferencesApi
         .getPreferences()
-        .then((response: any) => {
-          this.preferences = response
-        })
-        .catch((error: any) => console.error(error))
+        .then(response => (this.preferences = response))
+        .catch(error => console.error(error))
     },
 
     async updatePreferences(data: Preferences): Promise<void> {
       await preferencesApi
         .updatePreferences(data)
-        .then((response: any) => {
-          this.preferences = { ...this.preferences, response }
-        })
-        .catch((error: any) => console.error(error))
+        .then(response => (this.preferences = { ...this.preferences, ...response }))
+        .catch(error => console.error(error))
     },
 
     removePreferences(): void {

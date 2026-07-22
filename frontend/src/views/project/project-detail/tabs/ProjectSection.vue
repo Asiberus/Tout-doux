@@ -41,7 +41,7 @@ function createSection(data: { name: string }): void {
 
   sectionDialog.value = false
   projectStore
-    .addSection({ name: data.name, projectId: projectStore.currentProject.id })
+    .addSection({ name: data.name, projectId: projectStore.loadedProject.id })
     .then(() => (sectionTabs.value = 0))
 }
 

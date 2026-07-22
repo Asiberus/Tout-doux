@@ -33,7 +33,7 @@ function logout(): void {
           <v-avatar size="24" color="transparent" class="mr-1">
             <v-icon icon="mdi-account-circle" />
           </v-avatar>
-          {{ userStore.user.username }}
+          {{ userStore.loadedUser.username }}
         </v-btn>
       </template>
 
@@ -53,7 +53,7 @@ function logout(): void {
             Settings
           </v-list-item-title>
         </v-list-item>
-        <template v-if="userStore.user.isStaff">
+        <template v-if="userStore.loadedUser.isStaff">
           <v-list-item
             :to="{ name: 'administration-user-list' }"
             class="header-menu-link"

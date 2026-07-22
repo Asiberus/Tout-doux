@@ -13,10 +13,10 @@ const form = ref<Form<UserPatch>>({
   valid: false,
   pending: false,
   data: {
-    username: userStore.user.username, // TODO : test if this work
-    firstName: userStore.user.firstName,
-    lastName: userStore.user.lastName,
-    bio: userStore.user.bio,
+    username: userStore.loadedUser.username, // TODO : test if this work
+    firstName: userStore.loadedUser.firstName,
+    lastName: userStore.loadedUser.lastName,
+    bio: userStore.loadedUser.bio,
   },
   rules: {
     username: [
@@ -34,10 +34,10 @@ let usernameValidationTimer: ReturnType<typeof setTimeout> | undefined = undefin
 
 const isFormUntouched = computed<boolean>(
   () =>
-    form.value.data.username === userStore.user.username &&
-    form.value.data.firstName === userStore.user.firstName &&
-    form.value.data.lastName === userStore.user.lastName &&
-    form.value.data.bio === userStore.user.bio
+    form.value.data.username === userStore.loadedUser.username &&
+    form.value.data.firstName === userStore.loadedUser.firstName &&
+    form.value.data.lastName === userStore.loadedUser.lastName &&
+    form.value.data.bio === userStore.loadedUser.bio
 )
 
 const canSubmit = computed<boolean>(
@@ -65,7 +65,7 @@ function validateUsername(value: string): void {
 
 function isUsernameUnique(value: string): void {
   userApi
-    .isUsernameUnique({ username: value, excludeId: userStore.user.id })
+    .isUsernameUnique({ username: value, excludeId: userStore.loadedUser.id })
     .then(response => {
       usernameUniqueError.value = !response.unique ? 'This username is already used' : null
     })

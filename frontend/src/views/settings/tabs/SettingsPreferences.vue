@@ -35,9 +35,9 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
         <v-sheet
           v-ripple
           class="progress-wheel-card rounded-lg"
-          :class="{ selected: preferencesStore.preferences.progressWheelMode === mode }"
+          :class="{ selected: preferencesStore.loadedPreferences.progressWheelMode === mode }"
           @click="updatePreferences(mode)">
-          <template v-if="preferencesStore.preferences.progressWheelMode === mode">
+          <template v-if="preferencesStore.loadedPreferences.progressWheelMode === mode">
             <v-icon class="radio-button" color="accent">mdi-radiobox-marked</v-icon>
           </template>
           <template v-else>

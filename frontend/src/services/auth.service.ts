@@ -1,5 +1,5 @@
 import { authApi } from '@/api'
-import { LoginPost } from '@/models/login.model'
+import { LoginPost, LoginResponse } from '@/models/login.model'
 import { useAppStore } from '@/store'
 
 const TOKEN_KEY = 'td_token'
@@ -21,7 +21,7 @@ export function resetStore(): void {
   appStore.exit()
 }
 
-export function login(data: LoginPost) {
+export function login(data: LoginPost): Promise<LoginResponse> {
   return authApi.login(data).then(response => {
     const token = response.token
     setToken(token)

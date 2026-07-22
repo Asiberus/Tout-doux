@@ -29,7 +29,7 @@
 
 ### 3. 🟡 Nettoyage / dette
 - [ ] 3.1 — Hack `loginGuard`
-- [ ] 3.2 — Typer `src/api/*.api.ts`
+- [x] 3.2 — Typer `src/api/*.api.ts`
 - [ ] 3.3 — Husky v9
 - [x] 3.4 — Props booléennes verbeuses
 - [~] 3.5 — `exact` sur `v-tab` *(PRÉMISSE DU DOC FAUSSE : `exact` reste actif en Vuetify 3 → nécessaire sur les onglets dont le `:to` est un chemin parent. Retrait annulé/rétabli.)*
@@ -516,7 +516,7 @@ beforeEnter: loginGuard,
 ```
 Concerne les routes `login`, `register`, `password-reset-request`. Supprimer les commentaires « Hack for the loginGuard » (L.16, 25, 35) et « When updated to Vue Router 4 remove the loginGuard hack » (L.10).
 
-### 3.2 Typer les fichiers `src/api/*.api.ts` restants
+### 3.2 Typer les fichiers `src/api/*.api.ts` restants — ✅ FAIT
 
 La **plupart** sont déjà typés (`auth` sauf `login`, `collection`, `common-task`, `daily-task`, `event`). À compléter, via le générique d'Axios (`axiosInstance.get<T>(…)`) + type de retour `Promise<T>` :
 

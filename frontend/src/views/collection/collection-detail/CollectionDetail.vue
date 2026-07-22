@@ -22,11 +22,11 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
 
       <SecondaryTitle class="text-center text-sm-start">
         <span v-if="smAndUp" class="text-grey">Collection : </span>
-        {{ collectionStore.currentCollection.name }}
+        {{ collectionStore.loadedCollection.name }}
       </SecondaryTitle>
 
       <v-chip
-        v-if="collectionStore.currentCollection.archived"
+        v-if="collectionStore.loadedCollection.archived"
         color="accent"
         class="flex-shrink-0">
         <v-icon size="small" class="mr-1">mdi-archive</v-icon>
