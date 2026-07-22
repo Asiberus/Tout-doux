@@ -26,7 +26,7 @@ const props = withDefaults(
 const sectionDialog = ref(false)
 const sectionTabs = ref<number>(0)
 
-const sections = computed<SectionTask[]>(() => projectStore.currentProject.sections)
+const sections = computed<SectionTask[]>(() => projectStore.currentProject?.sections ?? [])
 
 watch(
   () => props.sectionId,
@@ -37,6 +37,8 @@ watch(
 )
 
 function createSection(data: { name: string }): void {
+  if (!projectStore.currentProject) return
+
   sectionDialog.value = false
   projectStore
     .addSection({ name: data.name, projectId: projectStore.currentProject.id })
@@ -44,7 +46,7 @@ function createSection(data: { name: string }): void {
 }
 
 function changeRouteParam(index: number): void {
-  router.replace({ params: { ...route.params, sectionId: `${sections[index].id}` } })
+  router.replace({ params: { ...route.params, sectionId: `${sections.value[index].id}` } })
 }
 </script>
 
@@ -82,7 +84,7 @@ function changeRouteParam(index: number): void {
           :value="index">
           <ProjectSectionItem
             :section
-            :disabled="projectStore.currentProject.archived"
+            :disabled="projectStore.currentProject?.archived"
             @new-section="sectionDialog = true">
           </ProjectSectionItem>
         </v-tabs-window-item>
@@ -100,7 +102,7 @@ function changeRouteParam(index: number): void {
         <template #message>
           <div class="mb-2">This project has no section yet!</div>
           <v-btn
-            v-if="!projectStore.currentProject.archived"
+            v-if="!projectStore.currentProject?.archived"
             :size="smAndDown ? 'small' : 'default'"
             @click="sectionDialog = true">
             <v-icon start size="small">mdi-plus</v-icon>

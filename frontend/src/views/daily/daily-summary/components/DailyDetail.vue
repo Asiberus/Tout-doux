@@ -41,16 +41,14 @@ const editBtnSize = computed<'large' | 'small' | 'default'>(() => {
   else return 'default'
 })
 
-watch(
-  () => props.value,
-  (value: boolean): void => {
-    dialogState.value = value
-    tab.value = 'task'
+watch(show, value => {
+  console.log(value)
+  dialogState.value = !!value
+  tab.value = 'task'
 
-    if (value) hideScroll()
-    else showScroll()
-  }
-)
+  if (value) hideScroll()
+  else showScroll()
+})
 
 watch(
   () => props.date,

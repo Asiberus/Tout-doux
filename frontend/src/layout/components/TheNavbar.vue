@@ -1,17 +1,32 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 
 const { mobile } = useDisplay()
+const route = useRoute()
+const router = useRouter()
 
 const navbarDisplayed = defineModel<boolean>()
 
-const menu = [
+interface MenuItem {
+  name: string
+  icon: string
+  link?: RouteLocationRaw
+}
+
+const menu: MenuItem[] = [
   { name: 'Dashboard', icon: 'mdi-view-dashboard' },
   { name: 'Daily', link: { name: 'daily-summary' }, icon: 'mdi-trophy' },
   { name: 'Projects', link: { name: 'project-list' }, icon: 'mdi-briefcase-variant' },
   { name: 'Collections', link: { name: 'collection-list' }, icon: 'mdi-list-box' },
   { name: 'Agenda', link: { name: 'agenda' }, icon: 'mdi-calendar-month' },
 ]
+
+function isItemActive(item: MenuItem): boolean {
+  if (!item.link) return false
+  const base = router.resolve(item.link).path
+  return route.path === base || route.path.startsWith(`${base}/`)
+}
 </script>
 
 <template>
@@ -34,6 +49,7 @@ const menu = [
         v-for="(item, i) in menu"
         :key="i"
         :to="item.link"
+        :active="isItemActive(item)"
         :disabled="!item.link"
         class="py-3 py-sm-0">
         <v-list-item-title class="text-body-1 d-flex align-center">

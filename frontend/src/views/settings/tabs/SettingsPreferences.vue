@@ -22,7 +22,7 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
 </script>
 
 <template>
-  <div v-if="preferences">
+  <div v-if="preferencesStore.preferences">
     <TertiaryTitle>Preferences</TertiaryTitle>
 
     <p class="text-subtitle-1 mb-1">
@@ -47,8 +47,8 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
           <ProgressWheel
             :mode
             :size="progressWheelSize"
-            value="14"
-            max="20"
+            :value="14"
+            :max="20"
             color="green-accent-2" />
         </v-sheet>
       </template>

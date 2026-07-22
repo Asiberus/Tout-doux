@@ -32,7 +32,7 @@
 - [ ] 3.2 — Typer `src/api/*.api.ts`
 - [ ] 3.3 — Husky v9
 - [x] 3.4 — Props booléennes verbeuses
-- [x] 3.5 — `exact` sur `v-tab`
+- [~] 3.5 — `exact` sur `v-tab` *(PRÉMISSE DU DOC FAUSSE : `exact` reste actif en Vuetify 3 → nécessaire sur les onglets dont le `:to` est un chemin parent. Retrait annulé/rétabli.)*
 - [x] 3.6 — `formRef` sans `.value` *(+ `inputNameRef.focus()` corrigé)*
 - [x] 3.7 — `v-list-item-icon` *(déjà migré, confirmé : aucune occurrence)*
 
@@ -569,7 +569,9 @@ Simplifier `:prop="true"` → `prop` et `:prop="false"` → à supprimer (défau
 
 > ⚠️ Ne pas toucher les `:small="true"`, `:completable="false"`, `:display-options="false"`, `:editable="false"` sur les **composants custom** (`TaskCard`, `CommonTaskCard`…) : ce sont des props internes légitimes.
 
-### 3.5 Liens `exact` sur `v-tab` (VR4) — ✅ FAIT
+### 3.5 Liens `exact` sur `v-tab` (VR4) — ⚠️ PRÉMISSE FAUSSE, RETRAIT ANNULÉ
+
+> **Correction** : contrairement à ce que dit ce point, `exact` **est toujours pris en compte par Vuetify 3** (cf. `vuetify/lib/composables/router.js` : `if (!props.exact) return isActive ; return isExactActive`). Sans `exact`, un `v-tab :to="/parent"` reste actif sur toutes les routes enfant `/parent/xxx` (match par préfixe) → onglet parent surligné en permanence + indicateur mal placé. `exact` a donc été **rétabli** sur les onglets `Profile`, `Settings`, `Administration`, `CollectionDetail` et le `Description` de `ProjectDetail`. Ne PAS retirer `exact` de ces onglets.
 
 En VR4, `exact` n'a plus d'effet (matching géré via `exact-active-class`). Retirer `exact` des `<v-tab :to="…">` et **vérifier le surlignage de l'onglet actif** après coup :
 - `src/views/settings/Settings.vue:19, 23, 27`
