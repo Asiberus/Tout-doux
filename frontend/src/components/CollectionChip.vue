@@ -47,7 +47,7 @@ function click(): void {
     :title
     class="collection-chip px-0"
     :class="{ 'cursor-default': collection.archived && !detailLocation }"
-    @click="click()">
+    @click.stop="click()">
     <v-icon size="small" class="ml-2 mr-1">mdi-list-box</v-icon>
     <div class="text-truncate mr-2">
       {{ collection.name }}

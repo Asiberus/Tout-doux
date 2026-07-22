@@ -49,7 +49,7 @@ function click(): void {
     :title
     :class="{ 'cursor-default': section.project.archived && !detailLocation }"
     class="section-chip px-0"
-    @click="click($event)">
+    @click.stop="click($event)">
     <v-icon size="small" class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
     <div class="name-wrapper">
       <span class="project-name text-truncate">{{ section.project.name }}</span>

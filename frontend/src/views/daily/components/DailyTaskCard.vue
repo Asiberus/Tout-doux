@@ -46,8 +46,7 @@ const name = computed<string>(() => {
             v-if="dailyTask.task.project"
             :project="dailyTask.task.project"
             small
-            class="daily-task-card__header__link"
-            @click.native.stop>
+            class="daily-task-card__header__link">
           </ProjectChip>
         </template>
         <template v-if="dailyTask.task.section">
@@ -55,8 +54,7 @@ const name = computed<string>(() => {
             v-if="dailyTask.task.section"
             :section="dailyTask.task.section"
             small
-            class="daily-task-card__header__link"
-            @click.native.stop>
+            class="daily-task-card__header__link">
           </SectionChip>
         </template>
         <template v-if="dailyTask.task.collection">
@@ -64,8 +62,7 @@ const name = computed<string>(() => {
             v-if="dailyTask.task.collection"
             :collection="dailyTask.task.collection"
             small
-            class="daily-task-card__header__link"
-            @click.native.stop>
+            class="daily-task-card__header__link">
           </CollectionChip>
         </template>
       </template>

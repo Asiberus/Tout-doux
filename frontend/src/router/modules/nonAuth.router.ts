@@ -1,4 +1,4 @@
-import { Route, RouteRecordRaw } from 'vue-router'
+import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import Login from '@/views/non-auth/Login.vue'
 import { loginGuard } from '@/router/guards'
 import Register from '@/views/non-auth/Register.vue'
@@ -31,7 +31,7 @@ export const nonAuthRoutes: RouteRecordRaw[] = [
     path: '/password-reset-request',
     name: 'password-reset-request',
     component: ResetPasswordRequest,
-    props: (route: Route) => ({ email: route.query.email }),
+    props: (route: RouteLocationNormalized) => ({ email: route.query.email }),
     // Hack for the loginGuard to be called
     beforeEnter: (to, from, next): void => {
       loginGuard(to, from, next)
@@ -42,18 +42,18 @@ export const nonAuthRoutes: RouteRecordRaw[] = [
     name: 'activate',
     // Activate user and then redirect to /login
     component: ActivateUser,
-    props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
+    props: (route: RouteLocationNormalized) => ({ uidb64: route.query.uidb64, token: route.query.token }),
   },
   {
     path: '/password-reset',
     name: 'password-reset',
     component: ResetPassword,
-    props: (route: Route) => ({ uidb64: route.query.uidb64, token: route.query.token }),
+    props: (route: RouteLocationNormalized) => ({ uidb64: route.query.uidb64, token: route.query.token }),
   },
   {
     path: '/confirm-email',
     name: 'confirm-email',
     component: ConfirmEmail,
-    props: (route: Route) => ({ token: route.query.token }),
+    props: (route: RouteLocationNormalized) => ({ token: route.query.token }),
   },
 ]

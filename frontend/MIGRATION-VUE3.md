@@ -4,6 +4,46 @@
 > **Public** : ce document doit permettre à une personne qui **ne connaît pas le projet** de traiter chaque tâche. Chaque point donne les fichiers, les **numéros de ligne**, et le code **avant → après**.
 > **Légende priorité** : 🔴 Bloquant (casse le fonctionnement) · 🟠 Iso-visuel (casse le style) · 🟡 Dette/nettoyage · ⚪ Optionnel.
 
+## ✅ Avancement de la migration
+
+> Suivi mis à jour au fil de l'eau. Chaque tâche réalisée est cochée ici **et** son titre de section reçoit le marqueur « — ✅ FAIT ».
+
+### 1. 🔴 Bloquants
+- [ ] §0 — Ajouter `vue-tsc` + script `type-check` *(non fait ; vérif via `yarn lint` + `yarn build`)*
+- [x] 1.1 — `useDisplay()` : refs déballés (composable `useDialogWidth`)
+- [x] 1.2 — Slot activator `{ attrs, on }` → `{ props }` *(+ correctif wrappers `:props`)*
+- [x] 1.3 — `$vuetify.breakpoint` → `$vuetify.display`
+- [x] 1.4 — `v-form.validate()` asynchrone
+- [x] 1.5 — `v-stepper` V2 → V3
+- [x] 1.6 — `v-tabs-items`/`v-tab-item` → `v-tabs-window`/`-item` *(+ correctif flex barre d'onglets)*
+- [x] 1.7 — `@click.native` → `@click` *(+ `.stop` interne aux chips)*
+- [ ] 1.8 — `EventDialog.vue` : date/time pickers
+- [ ] 1.9 — `v-calendar` (Agenda)
+- [x] 1.10 — Type `Route` (Vue Router 4)
+
+### 2. 🟠 Iso-visuel
+- [ ] 2.1 — `variant` des inputs (`underlined`)
+- [ ] 2.2 — `offset-*` / `nudge-*` supprimés
+- [ ] 2.3 — Hover mobile chips & tabs
+- [ ] 2.4 — QA des sélecteurs `:deep()`
+
+### 3. 🟡 Nettoyage / dette
+- [ ] 3.1 — Hack `loginGuard`
+- [ ] 3.2 — Typer `src/api/*.api.ts`
+- [ ] 3.3 — Husky v9
+- [ ] 3.4 — Props booléennes verbeuses
+- [ ] 3.5 — `exact` sur `v-tab`
+- [ ] 3.6 — `formRef` sans `.value`
+- [ ] 3.7 — `v-list-item-icon` *(déjà migré, à confirmer)*
+
+### 4. ⚪ Optionnel
+- [ ] §4 — Améliorations optionnelles
+
+### 5. Checklist QA finale
+- [ ] §5 — QA finale
+
+---
+
 ## 0. À lire avant de commencer
 
 - **Gestionnaire de paquets : `yarn`** (présence de `yarn.lock`, version épinglée via Volta). Toujours `yarn`, jamais `npm`.
@@ -27,7 +67,7 @@
 
 ## 1. 🔴 Bloquants — cassent le comportement
 
-### 1.1 `useDisplay()` : refs jamais déballés (`.value` manquant)
+### 1.1 `useDisplay()` : refs jamais déballés (`.value` manquant) — ✅ FAIT
 
 **Contexte technique (à comprendre une fois).** `useDisplay()` renvoie un objet dont **chaque propriété est un `Ref`** (vérifié dans `node_modules/vuetify/lib/composables/display.d.ts` : `xs: Ref<boolean>`, `smAndDown: Ref<boolean>`, …). Ce n'est **pas** un objet `reactive`. Conséquences du pattern `const display = useDisplay()` puis `display.xs` :
 - **En JS (computed / fonctions)** : `display.xs` est un objet `Ref`, donc **toujours _truthy_** → `if (display.smAndDown) return null` est **toujours vrai**.
@@ -179,7 +219,7 @@ Appliquer la règle (déstructurer + template sans `.value`). Aucune ligne de sc
 
 ---
 
-### 1.2 Slot activator Vuetify 2 (`{ attrs, on }`) — activator mort
+### 1.2 Slot activator Vuetify 2 (`{ attrs, on }`) — activator mort — ✅ FAIT
 
 En Vuetify 3, le slot activator expose `{ props }` (plus `{ attrs, on }`). `v-on="on"` reçoit `undefined` → **le clic n'ouvre plus rien**. Ces 3 fichiers utilisent des composants wrappers custom (`CommonTaskDialog`, `ConfirmDialog`, `ConfirmPasswordDialog`) qui exposent déjà `{ props }` (confirmé par les autres usages corrects, ex. `AdministrationUser.vue:104/127`).
 
@@ -209,7 +249,7 @@ En Vuetify 3, le slot activator expose `{ props }` (plus `{ attrs, on }`). `v-on
 
 ---
 
-### 1.3 `$vuetify.breakpoint` supprimé → `$vuetify.display`
+### 1.3 `$vuetify.breakpoint` supprimé → `$vuetify.display` — ✅ FAIT
 
 `$vuetify.breakpoint` n'existe plus en Vuetify 3 (renommé `$vuetify.display`).
 
@@ -218,7 +258,7 @@ En Vuetify 3, le slot activator expose `{ props }` (plus `{ attrs, on }`). `v-on
 
 ---
 
-### 1.4 `v-form.validate()` renvoie une `Promise`
+### 1.4 `v-form.validate()` renvoie une `Promise` — ✅ FAIT
 
 En Vuetify 3, `validate()` est **asynchrone** et renvoie `Promise<{ valid: boolean; errors: [] }>`. Tester la valeur de retour directement ne bloque **jamais** (une `Promise` est _truthy_). **Seuls 2 fichiers** appellent `validate()` :
 
@@ -255,7 +295,7 @@ async function submit(): Promise<void> {
 
 ---
 
-### 1.5 `v-stepper` en syntaxe V2 — `DailyUpdate.vue`
+### 1.5 `v-stepper` en syntaxe V2 — `DailyUpdate.vue` — ✅ FAIT
 
 `src/views/daily/daily-update/DailyUpdate.vue` (L.52-79) utilise l'API stepper de Vuetify 2, disparue. Réécriture complète du bloc :
 
@@ -307,7 +347,7 @@ Détails :
 
 ---
 
-### 1.6 `v-tabs-items` / `v-tab-item` supprimés → `v-tabs-window` / `v-tabs-window-item`
+### 1.6 `v-tabs-items` / `v-tab-item` supprimés → `v-tabs-window` / `v-tabs-window-item` — ✅ FAIT
 
 Règle générale : `<v-tabs-items>` → `<v-tabs-window>` ; `<v-tab-item>` → `<v-tabs-window-item>`. Le `v-tabs` **et** le `v-tabs-window` doivent partager le **même `v-model`** ; chaque `v-tab` et chaque `v-tabs-window-item` doit porter un `value` correspondant.
 
@@ -332,7 +372,7 @@ Règle générale : `<v-tabs-items>` → `<v-tabs-window>` ; `<v-tab-item>` → 
 
 ---
 
-### 1.7 `@click.native` supprimé → `@click`
+### 1.7 `@click.native` supprimé → `@click` — ✅ FAIT
 
 Le modificateur `.native` n'existe plus en Vue 3.
 
@@ -390,7 +430,7 @@ Le menu tooltip juste en dessous (L.265-277) est **déjà désactivé** (comment
 
 ---
 
-### 1.10 Type `Route` inexistant en Vue Router 4
+### 1.10 Type `Route` inexistant en Vue Router 4 — ✅ FAIT
 
 `src/router/modules/nonAuth.router.ts` importe `Route` (L.1), type **supprimé** en VR4. Non vu par `yarn build`, mais faux et signalé par `yarn type-check`.
 

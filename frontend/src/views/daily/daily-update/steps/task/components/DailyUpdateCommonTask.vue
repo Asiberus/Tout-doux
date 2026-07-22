@@ -35,7 +35,7 @@ function isCommonTaskSelected(id: number): boolean {
           :selected="isCommonTaskSelected(commonTask.id)"
           :class="{ 'cursor-pointer': !isCommonTaskSelected(commonTask.id) }"
           :editable="false"
-          @click.native="selectCommonTask(commonTask.id)" />
+          @click="selectCommonTask(commonTask.id)" />
       </div>
     </template>
     <template v-else>

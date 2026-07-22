@@ -107,7 +107,7 @@ function selectTask(task: Task): void {
               :display-options="false"
               elevation="3"
               color="grey-darken-4"
-              @click.native="selectTask(task)">
+              @click="selectTask(task)">
             </TaskCard>
           </div>
         </template>
