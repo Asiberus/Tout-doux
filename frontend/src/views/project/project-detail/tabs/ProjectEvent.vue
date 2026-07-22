@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
-import { isPassed } from '@/utils/event.utils'
+import { EventPostOrPatch } from '@/models/event.model'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useProjectStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
@@ -16,15 +15,6 @@ const projectStore = useProjectStore()
 
 const eventDialog = ref(false)
 const displayPassedEvent = ref(false)
-
-// TODO : utiliser des getters
-const comingEvents = computed<EventModel[]>(() =>
-  projectStore.loadedProject.events.filter(event => !isPassed(event))
-)
-
-const passedEvents = computed<EventModel[]>(() =>
-  projectStore.loadedProject.events.filter(event => isPassed(event)).reverse()
-)
 
 function createEvent(event: EventPostOrPatch): void {
   eventDialog.value = false
@@ -76,10 +66,10 @@ function deleteEvent(id: number): void {
     </div>
 
     <template v-if="!displayPassedEvent">
-      <template v-if="comingEvents.length > 0">
+      <template v-if="projectStore.comingEvents.length > 0">
         <div class="pl-3">
           <EventItemCard
-            v-for="event of comingEvents"
+            v-for="event of projectStore.comingEvents"
             :key="event.id"
             :event
             :disabled="projectStore.loadedProject.archived"
@@ -101,10 +91,10 @@ function deleteEvent(id: number): void {
       </template>
     </template>
     <template v-else>
-      <template v-if="passedEvents.length > 0">
+      <template v-if="projectStore.passedEvents.length > 0">
         <div class="pl-3">
           <EventItemCard
-            v-for="event of passedEvents"
+            v-for="event of projectStore.passedEvents"
             :key="event.id"
             :event
             :show-icon="true"

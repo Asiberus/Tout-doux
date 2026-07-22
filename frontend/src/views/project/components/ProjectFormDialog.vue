@@ -3,7 +3,7 @@ import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import { Tag } from '@/models/tag.model'
 import { Form } from '@/models/common.model'
-import { ProjectPostOrPatch } from '@/models/project.model'
+import { ProjectPost } from '@/models/project.model'
 import { ref, useTemplateRef, watch } from 'vue'
 
 const props = defineProps<{
@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  submit: [data: ProjectPostOrPatch]
+  submit: [data: ProjectPost]
   close: []
 }>()
 
@@ -19,7 +19,7 @@ const formRef = useTemplateRef('form')
 const inputNameRef = useTemplateRef('name')
 
 const tagList = ref<Tag[]>([])
-const projectForm = ref<Form<ProjectPostOrPatch>>({
+const projectForm = ref<Form<ProjectPost>>({
   valid: false,
   data: {
     name: '',

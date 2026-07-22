@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 onMounted(() => {
-  if (descriptionElement && xs.value)
+  if (descriptionElement.value && xs.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollWidth > descriptionElement.value.clientWidth
 })
@@ -167,7 +167,7 @@ function isDateEqual(date1: string, date2: string): boolean {
 
             <span
               v-if="event.description"
-              ref="description"
+              ref="descriptionElement"
               class="text-caption text-sm-body-2"
               :class="[
                 {

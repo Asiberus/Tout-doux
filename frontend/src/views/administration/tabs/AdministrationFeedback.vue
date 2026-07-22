@@ -52,7 +52,7 @@ function deleteFeedback(id: number): void {
   })
 }
 
-function getItemClass(item: Feedback): string {
+function getItemClass(item: Feedback): { class: string } {
   if (item.isRead) return { class: 'grey--text text--lighten-2 font-weight-light' }
   else return { class: 'white--text font-weight-bold' }
 }

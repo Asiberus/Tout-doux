@@ -19,7 +19,7 @@ const preferencesStore = usePreferencesStore()
 const collectionStore = useCollectionStore()
 
 onMounted(() => {
-  if (xs.value)
+  if (xs.value && descriptionElement.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollHeight > descriptionElement.value.clientHeight
 })

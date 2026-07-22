@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
-import { SectionTask } from '@/models/section.model'
 import ProjectSectionItem from '@/views/project/project-detail/components/ProjectSectionItem.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useProjectStore } from '@/store'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
@@ -26,12 +25,10 @@ const props = withDefaults(
 const sectionDialog = ref(false)
 const sectionTabs = ref<number>(0)
 
-const sections = computed<SectionTask[]>(() => projectStore.currentProject?.sections ?? [])
-
 watch(
   () => props.sectionId,
   (value: number) => {
-    sectionTabs.value = sections.value.findIndex(({ id }) => id === value) ?? 0
+    sectionTabs.value = projectStore.sections.findIndex(({ id }) => id === value) ?? 0
   },
   { immediate: true }
 )
@@ -46,13 +43,15 @@ function createSection(data: { name: string }): void {
 }
 
 function changeRouteParam(index: number): void {
-  router.replace({ params: { ...route.params, sectionId: `${sections.value[index].id}` } })
+  router.replace({
+    params: { ...route.params, sectionId: `${projectStore.sections[index].id}` },
+  })
 }
 </script>
 
 <template>
   <div class="flex-grow-1 d-flex flex-column">
-    <template v-if="sections.length > 0">
+    <template v-if="projectStore.sections.length > 0">
       <v-tabs
         v-model="sectionTabs"
         color="accent"
@@ -61,7 +60,10 @@ function changeRouteParam(index: number): void {
         bg-color="transparent"
         class="mb-2 flex-grow-0"
         @update:model-value="changeRouteParam($event)">
-        <v-tab v-for="(section, index) of sections" :key="'tab-' + section.id" :value="index">
+        <v-tab
+          v-for="(section, index) of projectStore.sections"
+          :key="'tab-' + section.id"
+          :value="index">
           <span class="text-truncate">{{ section.name }}</span>
 
           <ProgressDisk
@@ -79,12 +81,12 @@ function changeRouteParam(index: number): void {
 
       <v-tabs-window v-model="sectionTabs" :touch="false" class="bg-transparent">
         <v-tabs-window-item
-          v-for="(section, index) of sections"
+          v-for="(section, index) of projectStore.sections"
           :key="'tab-item-' + section.id"
           :value="index">
           <ProjectSectionItem
             :section
-            :disabled="projectStore.currentProject?.archived"
+            :disabled="projectStore.loadedProject.archived"
             @new-section="sectionDialog = true">
           </ProjectSectionItem>
         </v-tabs-window-item>
@@ -102,7 +104,7 @@ function changeRouteParam(index: number): void {
         <template #message>
           <div class="mb-2">This project has no section yet!</div>
           <v-btn
-            v-if="!projectStore.currentProject?.archived"
+            v-if="!projectStore.loadedProject.archived"
             :size="smAndDown ? 'small' : 'default'"
             @click="sectionDialog = true">
             <v-icon start size="small">mdi-plus</v-icon>

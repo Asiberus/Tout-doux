@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { ProjectList, ProjectPostOrPatch } from '@/models/project.model'
+import { ProjectList, ProjectPost } from '@/models/project.model'
 import ProjectFormDialog from '@/views/project/components/ProjectFormDialog.vue'
 import ProjectCard from '@/views/project/components/ProjectCard.vue'
 import MainTitle from '@/components/MainTitle.vue'
@@ -14,7 +14,7 @@ const router = useRouter()
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = defineProps<{
-  archived: boolean // TODO : test undefiness
+  archived: boolean
 }>()
 
 const projectList = ref<ProjectList[]>([])
@@ -38,7 +38,7 @@ function retrieveProjectList(params = {}): void {
   )
 }
 
-function createProject(projectForm: ProjectPostOrPatch): void {
+function createProject(projectForm: ProjectPost): void {
   projectDialog.value = false
   projectApi.createProject(projectForm).then(
     response => router.push({ name: 'project-detail', params: { id: response.id } }),

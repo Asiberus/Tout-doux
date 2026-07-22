@@ -1,8 +1,8 @@
-import { EventPostOrPatch } from '@/models/event.model'
-import { SectionPost } from '@/models/section.model'
+import { EventModel, EventPostOrPatch } from '@/models/event.model'
+import { SectionPost, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
-import { sortEvents } from '@/utils/event.utils'
-import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
+import { isPassed, sortEvents } from '@/utils/event.utils'
+import { ProjectDetail, ProjectPatch } from '@/models/project.model'
 import { sortByCompletionDate } from '@/utils/task.utils'
 import { defineStore } from 'pinia'
 import { eventApi, projectApi, sectionApi, taskApi } from '@/api'
@@ -13,12 +13,19 @@ interface ProjectStoreState {
 
 interface ProjectStoreGetters extends Record<string, (state: ProjectStoreState) => unknown> {
   loadedProject(state: ProjectStoreState): ProjectDetail
+  sections(state: ProjectStoreState): SectionTask[]
+  completedTasks(state: ProjectStoreState): Task[]
+  uncompletedTasks(state: ProjectStoreState): Task[]
+  allTasks(state: ProjectStoreState): Task[]
+  allCompletedTasks(state: ProjectStoreState): Task[]
+  comingEvents(state: ProjectStoreState): EventModel[]
+  passedEvents(state: ProjectStoreState): EventModel[]
 }
 
 interface ProjectStoreActions {
   retrieveProject(id: number): Promise<void>
   removeCurrentProject(): void
-  updateProperties(data: ProjectPostOrPatch): Promise<void>
+  updateProperties(data: ProjectPatch): Promise<void>
   addSection(section: SectionPost): Promise<void>
   editSection(id: number, name: string): Promise<void>
   deleteSection(id: number): Promise<void>
@@ -45,6 +52,38 @@ export const useProjectStore = defineStore<
       if (!state.currentProject) throw new Error('currentProject accessed before being loaded')
       return state.currentProject
     },
+    sections(state): SectionTask[] {
+      if (!state.currentProject) return []
+      return state.currentProject.sections
+    },
+    completedTasks(state): Task[] {
+      if (!state.currentProject) return []
+      return state.currentProject.tasks.filter(({ completed }) => completed)
+    },
+    uncompletedTasks(state): Task[] {
+      if (!state.currentProject) return []
+      return state.currentProject.tasks.filter(({ completed }) => !completed)
+    },
+    allTasks(state): Task[] {
+      if (!state.currentProject) return []
+      return state.currentProject.tasks.concat(
+        ...state.currentProject.sections.map(({ tasks }) => tasks)
+      )
+    },
+    allCompletedTasks(state): Task[] {
+      if (!state.currentProject) return []
+      return state.currentProject.tasks
+        .concat(...state.currentProject.sections.map(({ tasks }) => tasks))
+        .filter(({ completed }) => completed)
+    },
+    comingEvents(state): EventModel[] {
+      if (!state.currentProject) return []
+      return state.currentProject.events.filter(event => !isPassed(event))
+    },
+    passedEvents(state): EventModel[] {
+      if (!state.currentProject) return []
+      return state.currentProject.events.filter(event => isPassed(event)).reverse()
+    },
   },
   actions: {
     async retrieveProject(id: number): Promise<void> {
@@ -67,7 +106,7 @@ export const useProjectStore = defineStore<
       this.currentProject = undefined
     },
 
-    async updateProperties(data: ProjectPostOrPatch): Promise<void> {
+    async updateProperties(data: ProjectPatch): Promise<void> {
       if (!this.currentProject) return
 
       await projectApi.updateProject(this.currentProject.id, data).then(

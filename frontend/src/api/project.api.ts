@@ -1,5 +1,11 @@
 import { apiRoutes } from '@/api-routes'
-import { Project, ProjectDetail, ProjectList, ProjectPostOrPatch } from '@/models/project.model'
+import {
+  Project,
+  ProjectDetail,
+  ProjectList,
+  ProjectPatch,
+  ProjectPost,
+} from '@/models/project.model'
 import { Pagination } from '@/models/pagination.model'
 import { http } from '@/axios/http'
 
@@ -17,11 +23,11 @@ export function getProjectById(projectId: number): Promise<ProjectDetail> {
   return http.get<ProjectDetail>(apiRoutes.projectById.replace(':projectId', projectId.toString()))
 }
 
-export function createProject(project: ProjectPostOrPatch): Promise<Project> {
+export function createProject(project: ProjectPost): Promise<Project> {
   return http.post<Project>(apiRoutes.project, project)
 }
 
-export function updateProject(projectId: number, project: ProjectPostOrPatch): Promise<Project> {
+export function updateProject(projectId: number, project: ProjectPatch): Promise<Project> {
   return http.patch<Project>(
     apiRoutes.projectById.replace(':projectId', projectId.toString()),
     project

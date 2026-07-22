@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ProjectDetail, ProjectPostOrPatch } from '@/models/project.model'
+import { ProjectDetail, ProjectPatch } from '@/models/project.model'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import { Tag } from '@/models/tag.model'
@@ -20,7 +20,7 @@ const formRef = useTemplateRef('form')
 
 const tagList = ref<Tag[]>([])
 
-const projectForm = ref<Form<ProjectPostOrPatch>>({
+const projectForm = ref<Form<ProjectPatch>>({
   valid: false,
   data: {
     name: projectStore.loadedProject.name,

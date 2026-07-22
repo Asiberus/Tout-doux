@@ -3,10 +3,16 @@ import { Task } from '@/models/task.model'
 import { SectionTask } from '@/models/section.model'
 import { Tag } from '@/models/tag.model'
 
-export interface ProjectPostOrPatch {
+export interface ProjectPost {
   name: string
   description: string
   tagIds: number[]
+}
+
+export interface ProjectPatch {
+  name?: string
+  description?: string
+  tagIds?: number[]
   archived?: boolean
 }
 

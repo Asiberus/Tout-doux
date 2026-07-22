@@ -3,7 +3,7 @@ import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressWheel from '@/components/ProgressWheel.vue'
 import { ProjectDetail } from '@/models/project.model'
-import { Task, TaskPatch, TaskPost } from '@/models/task.model'
+import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
@@ -21,7 +21,7 @@ const preferencesStore = usePreferencesStore()
 const descriptionElement = useTemplateRef('description')
 
 onMounted(() => {
-  if (xs.value)
+  if (xs.value && descriptionElement.value)
     isDescriptionOverflowing.value =
       descriptionElement.value.scrollHeight > descriptionElement.value.clientHeight
 })
@@ -33,18 +33,6 @@ const displayDescription = ref(false)
 const isDescriptionOverflowing = ref(false)
 
 const project = computed<ProjectDetail>(() => projectStore.loadedProject)
-const uncompletedTasks = computed<Task[]>(() =>
-  project.value.tasks.filter(({ completed }) => !completed)
-)
-const completedTasks = computed<Task[]>(() =>
-  project.value.tasks.filter(({ completed }) => completed)
-)
-const allTasks = computed<Task[]>(() =>
-  project.value.tasks.concat(...project.value.sections.map(({ tasks }) => tasks))
-)
-const allCompletedTasks = computed<Task[]>(() =>
-  allTasks.value.filter(({ completed }) => completed)
-)
 const progressWheelSize = computed<'x-small' | 'small' | 'medium' | 'large' | 'x-large'>(() => {
   if (xs.value) return 'x-small'
   if (smAndDown.value) return 'small'
@@ -109,8 +97,8 @@ function deleteTask(id: number): void {
         <ProgressWheel
           :size="progressWheelSize"
           :mode="preferencesStore.loadedPreferences.progressWheelMode"
-          :value="allCompletedTasks.length"
-          :max="allTasks.length"
+          :value="projectStore.allCompletedTasks.length"
+          :max="projectStore.allTasks.length"
           color="green-accent-2" />
       </div>
     </div>
@@ -167,10 +155,10 @@ function deleteTask(id: number): void {
     </div>
 
     <template v-if="!displayCompletedTask">
-      <template v-if="uncompletedTasks.length > 0">
+      <template v-if="projectStore.uncompletedTasks.length > 0">
         <div class="task-wrapper">
           <TaskCard
-            v-for="task of uncompletedTasks"
+            v-for="task of projectStore.uncompletedTasks"
             :key="task.id"
             :task="task"
             :disabled="project.archived"
@@ -180,7 +168,9 @@ function deleteTask(id: number): void {
         </div>
       </template>
       <template
-        v-else-if="project.tasks.length > 0 && project.tasks.length === completedTasks.length">
+        v-else-if="
+          project.tasks.length > 0 && project.tasks.length === projectStore.completedTasks.length
+        ">
         <EmptyListDisplay
           message="You completed all the general tasks of this project!"
           class="empty-list-display">
@@ -204,10 +194,10 @@ function deleteTask(id: number): void {
       </template>
     </template>
     <template v-else>
-      <template v-if="completedTasks.length > 0">
+      <template v-if="projectStore.completedTasks.length > 0">
         <div class="task-wrapper">
           <TaskCard
-            v-for="task of completedTasks"
+            v-for="task of projectStore.completedTasks"
             :key="task.id"
             :task="task"
             :disabled="project.archived"
