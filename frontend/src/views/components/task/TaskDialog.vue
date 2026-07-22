@@ -49,8 +49,8 @@ watch(
   (value: boolean) => {
     if (value) {
       populateForm(props.task)
-      formRef.value.resetValidation()
-      if (!props.task) inputNameRef.value.focus()
+      formRef.value?.resetValidation()
+      if (!props.task) inputNameRef.value?.focus()
     }
   }
 )
@@ -106,7 +106,7 @@ function emitCloseEvent(): void {
           label="Name"
           counter="50"
           requried
-          :rules="taskForm.rules.name"
+          :rules="taskForm.rules?.name"
           :autofocus="!task"
           class="flex-grow-0 mb-2" />
 

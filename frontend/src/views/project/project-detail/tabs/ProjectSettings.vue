@@ -81,7 +81,7 @@ function resetForm(): void {
     description: project.value.description,
     tagIds: [],
   }
-  formRef.value.resetValidation()
+  formRef.value?.resetValidation()
 }
 
 function updateProject(): void {
@@ -154,7 +154,7 @@ function deleteProject(): void {
       @submit.prevent="updateProject()">
       <v-text-field
         v-model="projectForm.data.name"
-        :rules="projectForm.rules.name"
+        :rules="projectForm.rules?.name"
         :disabled="project.archived"
         label="Name"
         counter="50"
@@ -162,7 +162,7 @@ function deleteProject(): void {
         class="mb-2" />
       <v-textarea
         v-model="projectForm.data.description"
-        :rules="projectForm.rules.description"
+        :rules="projectForm.rules?.description"
         :disabled="project.archived"
         label="Description"
         counter="500"

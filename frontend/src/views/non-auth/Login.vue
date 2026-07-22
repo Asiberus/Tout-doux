@@ -53,11 +53,7 @@ function login(): void {
 
 <template>
   <v-form class="login" @submit.prevent="login()">
-    <v-text-field
-      v-model="form.data.email"
-      label="Email"
-      autofocus
-      hide-details />
+    <v-text-field v-model="form.data.email" label="Email" autofocus hide-details />
 
     <v-text-field
       v-model="form.data.password"

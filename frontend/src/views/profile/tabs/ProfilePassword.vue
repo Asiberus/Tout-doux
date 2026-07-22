@@ -5,7 +5,7 @@ import { authApi, userApi } from '@/api'
 import TertiaryTitle from '@/components/TertiaryTitle.vue'
 import { ref, useTemplateRef } from 'vue'
 
-const formRef = useTemplateRef('form')
+const formRef = useTemplateRef('formRef')
 
 const form = ref<Form<UserChangePassword>>({
   valid: false,
@@ -38,8 +38,8 @@ const showConfirmPassword = ref(false)
 const currentPasswordError = ref<string | null>(null)
 const newPasswordValidationErrors = ref<string[]>([])
 const passwordMatchError = ref<string | null>(null)
-let newPasswordValidationTimer: number | undefined = undefined
-let passwordMatchTimer: number | undefined = undefined
+let newPasswordValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
+let passwordMatchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 function validatePasswordStrength(value: string): void {
   validatePasswordMatch()
@@ -87,7 +87,7 @@ function submit(): void {
     .changePassword(form.value.data)
     .then(() => {
       form.value.data = { currentPassword: '', newPassword: '', confirmPassword: '' }
-      formRef.value.resetValidation()
+      formRef.value?.resetValidation()
     })
     .catch(error => {
       if (error.status === 403) currentPasswordError.value = 'Incorrect Password'
@@ -99,11 +99,11 @@ function submit(): void {
   <div>
     <TertiaryTitle>Change Password</TertiaryTitle>
 
-    <v-form ref="form" v-model="form.valid" class="password-form" @submit.prevent="submit()">
+    <v-form ref="formRef" v-model="form.valid" class="password-form" @submit.prevent="submit()">
       <v-text-field
         v-model="form.data.currentPassword"
         label="Current Password"
-        :rules="form.rules.currentPassword"
+        :rules="form.rules?.currentPassword"
         :error-messages="currentPasswordError"
         required
         autocomplete="current-password"
@@ -115,7 +115,7 @@ function submit(): void {
       <v-text-field
         v-model="form.data.newPassword"
         label="New Password"
-        :rules="form.rules.newPassword"
+        :rules="form.rules?.newPassword"
         :error-messages="newPasswordValidationErrors"
         max-errors="6"
         required
@@ -129,7 +129,7 @@ function submit(): void {
       <v-text-field
         v-model="form.data.confirmPassword"
         label="Confirm Password"
-        :rules="form.rules.confirmPassword"
+        :rules="form.rules?.confirmPassword"
         required
         autocomplete="none"
         :error-messages="passwordMatchError"

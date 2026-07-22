@@ -42,13 +42,19 @@ export const nonAuthRoutes: RouteRecordRaw[] = [
     name: 'activate',
     // Activate user and then redirect to /login
     component: ActivateUser,
-    props: (route: RouteLocationNormalized) => ({ uidb64: route.query.uidb64, token: route.query.token }),
+    props: (route: RouteLocationNormalized) => ({
+      uidb64: route.query.uidb64,
+      token: route.query.token,
+    }),
   },
   {
     path: '/password-reset',
     name: 'password-reset',
     component: ResetPassword,
-    props: (route: RouteLocationNormalized) => ({ uidb64: route.query.uidb64, token: route.query.token }),
+    props: (route: RouteLocationNormalized) => ({
+      uidb64: route.query.uidb64,
+      token: route.query.token,
+    }),
   },
   {
     path: '/confirm-email',

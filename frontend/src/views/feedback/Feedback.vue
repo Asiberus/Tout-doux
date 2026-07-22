@@ -8,7 +8,7 @@ import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp } = useDisplay()
 
-const formRef = useTemplateRef('form')
+const formRef = useTemplateRef('formRef')
 
 const form = ref<Form<FeedbackPost>>({
   valid: false,
@@ -34,7 +34,7 @@ function submit(): void {
     .createFeedback(form.value.data)
     .then(() => {
       form.value.data = { title: '', message: '' }
-      formRef.value.resetValidation()
+      formRef.value?.resetValidation()
     })
     .catch(error => console.error(error))
 }
@@ -54,10 +54,10 @@ function submit(): void {
       Thank you for the time you take on it!
     </p>
 
-    <v-form ref="form" v-model="form.valid" @submit.prevent="submit()">
+    <v-form ref="formRef" v-model="form.valid" @submit.prevent="submit()">
       <v-text-field
         v-model="form.data.title"
-        :rules="form.rules.title"
+        :rules="form.rules?.title"
         label="Title"
         variant="filled"
         counter="100">
@@ -65,7 +65,7 @@ function submit(): void {
 
       <v-textarea
         v-model="form.data.message"
-        :rules="form.rules.message"
+        :rules="form.rules?.message"
         label="Message"
         counter="2000"
         rows="10"

@@ -42,8 +42,8 @@ watch(
     if (value) {
       // We need to wait for next tick to access the form and the input name
       nextTick(() => {
-        formRef.value.resetValidation()
-        passwordInput.value.focus()
+        formRef.value?.resetValidation()
+        passwordInput.value?.focus()
       })
     }
   }
@@ -101,7 +101,7 @@ function submit(): void {
             ref="passwordInput"
             v-model="form.data.password"
             :type="showPassword ? 'text' : 'password'"
-            :rules="form.rules.password"
+            :rules="form.rules?.password"
             :error-messages="passwordError"
             required
             density="compact"

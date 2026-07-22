@@ -63,14 +63,11 @@ function removeTag(id: number): void {
 <template>
   <v-form v-model="dailyTaskForm.valid" @submit.prevent="submit()">
     <div class="d-flex align-center gap-2">
-      <DailyTaskActionChip
-        v-model:action="dailyTaskForm.data.action"
-        editable
-        class="mb-4" />
+      <DailyTaskActionChip v-model:action="dailyTaskForm.data.action" editable class="mb-4" />
 
       <v-text-field
         v-model="dailyTaskForm.data.name"
-        :rules="dailyTaskForm.rules.name"
+        :rules="dailyTaskForm.rules?.name"
         label="Name"
         counter="50"
         required

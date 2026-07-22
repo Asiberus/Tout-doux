@@ -46,10 +46,10 @@ const emailUniqueError = ref<string | null>(null)
 const passwordMatchError = ref<string | null>(null)
 const passwordValidationErrors = ref<string[]>([])
 
-let usernameValidationTimer: number | undefined = undefined
-let emailValidationTimer: number | undefined = undefined
-let passwordValidationTimer: number | undefined = undefined
-let passwordMatchTimer: number | undefined = undefined
+let usernameValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
+let emailValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
+let passwordValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
+let passwordMatchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 function validateUsername(value: string): void {
   clearTimeout(usernameValidationTimer)
@@ -151,7 +151,7 @@ function registerUser(): void {
         <v-text-field
           v-model="form.data.username"
           label="Username"
-          :rules="form.rules.username"
+          :rules="form.rules?.username"
           :error-messages="usernameUniqueError"
           required
           counter="100"
@@ -162,7 +162,7 @@ function registerUser(): void {
           v-model="form.data.email"
           label="Email"
           type="email"
-          :rules="form.rules.email"
+          :rules="form.rules?.email"
           :error-messages="emailUniqueError"
           validate-on="blur"
           required
@@ -172,7 +172,7 @@ function registerUser(): void {
         <v-text-field
           v-model="form.data.password"
           label="Password"
-          :rules="form.rules.password"
+          :rules="form.rules?.password"
           :error-messages="passwordValidationErrors"
           max-errors="6"
           required
@@ -186,7 +186,7 @@ function registerUser(): void {
         <v-text-field
           v-model="form.data.confirmPassword"
           label="Confirm password"
-          :rules="form.rules.confirmPassword"
+          :rules="form.rules?.confirmPassword"
           required
           :error-messages="passwordMatchError"
           :counter="form.data.confirmPassword.length > 0"

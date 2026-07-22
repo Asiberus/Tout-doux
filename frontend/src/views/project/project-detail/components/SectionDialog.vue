@@ -102,7 +102,7 @@ function emitCloseEvent(): void {
           label="Name"
           counter="50"
           required
-          :rules="sectionForm.rules.name"
+          :rules="sectionForm.rules?.name"
           autofocus />
 
         <v-spacer />

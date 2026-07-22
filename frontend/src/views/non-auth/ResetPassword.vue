@@ -45,8 +45,8 @@ const showConfirmPassword = ref(false)
 
 const passwordMatchError = ref<string | null>(null)
 const passwordValidationErrors = ref<string[]>([])
-let passwordValidationTimer: number | undefined = undefined
-let passwordMatchTimer: number | undefined = undefined
+let passwordValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
+let passwordMatchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 function validatePasswordStrength(value: string): void {
   this.validatePasswordMatch()
@@ -114,7 +114,7 @@ function submit(): void {
         <v-text-field
           v-model="form.data.password"
           label="Password"
-          :rules="form.rules.password"
+          :rules="form.rules?.password"
           :error-messages="passwordValidationErrors"
           max-errors="6"
           required
@@ -129,7 +129,7 @@ function submit(): void {
         <v-text-field
           v-model="form.data.confirmPassword"
           label="Confirm password"
-          :rules="form.rules.confirmPassword"
+          :rules="form.rules?.confirmPassword"
           required
           :error-messages="passwordMatchError"
           :counter="form.data.confirmPassword.length > 0"

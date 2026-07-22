@@ -29,7 +29,7 @@ const colorPicker = ref(false)
 
 const nameUniqueError = ref<string | null>(null)
 const inputNameLoading = ref(false)
-let validationTimer: number | undefined = undefined
+let validationTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 const tagForm: Form<TagForm> = ref({
   valid: false,
@@ -55,9 +55,9 @@ watch(
     if (value) {
       confirmDelete.value = false
       nameUniqueError.value = null
-      formRef.value.resetValidation()
+      formRef.value?.resetValidation()
       populateForm()
-      if (!props.tag) inputNameRef.value.focus()
+      if (!props.tag) inputNameRef.value?.focus()
     }
   }
 )
@@ -159,7 +159,7 @@ function emitCloseEvent(): void {
             counter="20"
             requried
             :loading="inputNameLoading"
-            :rules="tagForm.rules.name"
+            :rules="tagForm.rules?.name"
             :error-messages="nameUniqueError"
             :autofocus="!tag"
             class="flex-grow-1 mb-3 mb-md-0"

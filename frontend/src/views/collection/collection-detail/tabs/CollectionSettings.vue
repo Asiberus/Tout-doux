@@ -56,7 +56,7 @@ function resetForm(): void {
     description: collection.value.description,
     itemName: collection.value.itemName,
   }
-  formRef.value.resetValidation()
+  formRef.value?.resetValidation()
 }
 
 function updateCollection(): void {
@@ -129,7 +129,7 @@ function deleteCollection(): void {
       @submit.prevent="updateCollection()">
       <v-text-field
         v-model="collectionForm.data.name"
-        :rules="collectionForm.rules.name"
+        :rules="collectionForm.rules?.name"
         :disabled="collection.archived"
         label="Name"
         counter="50"
@@ -139,7 +139,7 @@ function deleteCollection(): void {
 
       <v-textarea
         v-model="collectionForm.data.description"
-        :rules="collectionForm.rules.description"
+        :rules="collectionForm.rules?.description"
         :disabled="collection.archived"
         label="Description"
         counter="500"
@@ -153,7 +153,7 @@ function deleteCollection(): void {
       <div class="item-name-wrapper mb-2">
         <v-text-field
           v-model="collectionForm.data.itemName"
-          :rules="collectionForm.rules.itemName"
+          :rules="collectionForm.rules?.itemName"
           :disabled="collection.archived"
           label="Item name"
           counter="15"

@@ -14,7 +14,7 @@ const props = defineProps<{
 const tagList = ref<Tag[]>([])
 const search = ref<string | null>(null)
 const isLoading = ref(false)
-let searchTimer: number | undefined = undefined
+let searchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 watch(search, (value: string) => {
   clearTimeout(searchTimer)

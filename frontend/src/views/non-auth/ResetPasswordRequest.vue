@@ -32,6 +32,7 @@ const form = ref<Form<ResetPasswordRequestBody>>({
 const resetPasswordRequested = ref(false)
 
 async function submit(): Promise<void> {
+  if (!formRef.value) return
   const { valid } = await formRef.value.validate()
   if (!valid) return
 
@@ -63,7 +64,7 @@ async function submit(): Promise<void> {
           v-model="form.data.email"
           placeholder="Your email"
           type="email"
-          :rules="form.rules.email"
+          :rules="form.rules?.email"
           validate-on="blur"
           density="compact"
           required

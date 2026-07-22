@@ -30,7 +30,7 @@ const form = ref<Form<UserPatch>>({
 })
 
 const usernameUniqueError = ref<string | null>(null)
-let usernameValidationTimer: number | undefined = undefined
+let usernameValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 const isFormUntouched = computed<boolean>(
   () =>
@@ -90,7 +90,7 @@ function submit(): void {
         <v-text-field
           v-model="form.data.username"
           label="Username"
-          :rules="form.rules.username"
+          :rules="form.rules?.username"
           :error-messages="usernameUniqueError"
           required
           counter="100"
@@ -100,19 +100,19 @@ function submit(): void {
       <v-text-field
         v-model="form.data.firstName"
         label="First Name"
-        :rules="form.rules.firstName"
+        :rules="form.rules?.firstName"
         counter="100" />
 
       <v-text-field
         v-model="form.data.lastName"
         label="Last Name"
-        :rules="form.rules.lastName"
+        :rules="form.rules?.lastName"
         counter="100" />
 
       <v-textarea
         v-model="form.data.bio"
         label="Bio"
-        :rules="form.rules.bio"
+        :rules="form.rules?.bio"
         counter="500"
         rows="4"
         auto-grow

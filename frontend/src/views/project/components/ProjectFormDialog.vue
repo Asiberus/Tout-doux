@@ -45,8 +45,8 @@ watch(
 
     projectForm.value.data = { name: '', description: '', tagIds: [] }
     tagList.value = []
-    formRef.value.resetValidation()
-    inputNameRef.value.focus()
+    formRef.value?.resetValidation()
+    inputNameRef.value?.focus()
   }
 )
 
@@ -85,7 +85,7 @@ function emitCloseEvent(): void {
           <v-text-field
             ref="name"
             v-model="projectForm.data.name"
-            :rules="projectForm.rules.name"
+            :rules="projectForm.rules?.name"
             label="Name"
             counter="50"
             required
@@ -93,7 +93,7 @@ function emitCloseEvent(): void {
             class="mb-2" />
           <v-textarea
             v-model="projectForm.data.description"
-            :rules="projectForm.rules.description"
+            :rules="projectForm.rules?.description"
             label="Description"
             counter="500"
             required

@@ -43,8 +43,8 @@ watch(
   (value: boolean) => {
     if (!value) return
 
-    formRef.value.resetValidation()
-    inputNameRef.value.focus()
+    formRef.value?.resetValidation()
+    inputNameRef.value?.focus()
     collectionForm.value.data = { name: '', description: '', itemName: 'task' }
   }
 )
@@ -75,7 +75,7 @@ function emitCloseEvent(): void {
           <v-text-field
             ref="name"
             v-model="collectionForm.data.name"
-            :rules="collectionForm.rules.name"
+            :rules="collectionForm.rules?.name"
             label="Name"
             counter="50"
             required
@@ -85,7 +85,7 @@ function emitCloseEvent(): void {
 
           <v-textarea
             v-model="collectionForm.data.description"
-            :rules="collectionForm.rules.description"
+            :rules="collectionForm.rules?.description"
             label="Description"
             counter="500"
             required
@@ -98,7 +98,7 @@ function emitCloseEvent(): void {
           <div class="item-name-wrapper mb-2">
             <v-text-field
               v-model="collectionForm.data.itemName"
-              :rules="collectionForm.rules.itemName"
+              :rules="collectionForm.rules?.itemName"
               label="Item name"
               counter="15"
               required>

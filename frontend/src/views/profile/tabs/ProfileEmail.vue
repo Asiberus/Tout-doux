@@ -9,7 +9,7 @@ import { useUserStore } from '@/store'
 
 const userStore = useUserStore()
 
-const formRef = useTemplateRef('form')
+const formRef = useTemplateRef('formRef')
 
 const form = ref<Form<UserChangeEmail>>({
   valid: false,
@@ -30,7 +30,7 @@ const form = ref<Form<UserChangeEmail>>({
 
 const confirmPasswordDialog = ref(false)
 const emailUniqueError = ref<string | null>(null)
-let emailValidationTimer: number | undefined = undefined
+let emailValidationTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 function validateEmail(value: string): void {
   clearTimeout(emailValidationTimer)
@@ -54,6 +54,7 @@ function isEmailUnique(value: string): void {
 }
 
 async function submit(): Promise<void> {
+  if (!formRef.value) return
   const { valid } = await formRef.value.validate()
   if (!valid || !form.value.data.email) return
 
@@ -65,7 +66,7 @@ function changeEmail(): void {
     .changeEmail(form.value.data)
     .then(() => {
       form.value.data.email = ''
-      formRef.value.resetValidation()
+      formRef.value?.resetValidation()
     })
     .catch(error => console.error(error))
 }
@@ -76,19 +77,24 @@ function changeEmail(): void {
     <TertiaryTitle>Email Management</TertiaryTitle>
 
     <p class="text-subtitle-1 mb-1">
-      Your current email address is : <span class="font-weight-bold">{{ user.email }}</span>
+      Your current email address is :
+      <span class="font-weight-bold">{{ userStore.user?.email }}</span>
     </p>
     <p class="text-subtitle-1">
       If you want to change it, fill the input bellow. An email will be sent to the new address with
       a link. <br />
       In order to complete the change, you must click on the link.
     </p>
-    <v-form ref="form" v-model="form.valid" class="profile-email__form" @submit.prevent="submit()">
+    <v-form
+      ref="formRef"
+      v-model="form.valid"
+      class="profile-email__form"
+      @submit.prevent="submit()">
       <v-text-field
         v-model="form.data.email"
         label="New Email"
         type="email"
-        :rules="form.rules.email"
+        :rules="form.rules?.email"
         :error-messages="emailUniqueError"
         validate-on="blur"
         counter="100"

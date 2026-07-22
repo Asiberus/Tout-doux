@@ -80,9 +80,9 @@ watch(
     if (!value) return
 
     confirmDelete.value = false
-    formRef.value.resetValidation()
+    formRef.value?.resetValidation()
     populateForm(event)
-    if (!event) inputNameRef.value.focus()
+    if (!event) inputNameRef.value?.focus()
   }
 )
 
@@ -226,7 +226,7 @@ function formattedDate(value: string): string {
           <v-text-field
             ref="name"
             v-model="eventForm.data.name"
-            :rules="eventForm.rules.name"
+            :rules="eventForm.rules?.name"
             label="Name"
             counter="50"
             requried
@@ -236,7 +236,7 @@ function formattedDate(value: string): string {
 
           <v-textarea
             v-model="eventForm.data.description"
-            :rules="eventForm.rules.description"
+            :rules="eventForm.rules?.description"
             label="Description"
             counter="150"
             rows="1"
@@ -258,7 +258,7 @@ function formattedDate(value: string): string {
                     <v-text-field
                       v-bind="props"
                       :model-value="formattedDate(eventForm.data.startDate)"
-                      :rules="eventForm.rules.startDate"
+                      :rules="eventForm.rules?.startDate"
                       required
                       label="Date"
                       prepend-icon="mdi-calendar-today"

@@ -27,7 +27,7 @@ const inputNameRef = useTemplateRef('name')
 
 const nameUniqueError = ref<string | null>(null)
 const inputNameLoading = ref(false)
-let validationTimer: number | undefined = undefined
+let validationTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 const tagList = ref<Tag[]>([])
 const commonTaskForm = ref<Form<CommonTaskForm>>({
@@ -146,7 +146,7 @@ function closeDialog(): void {
             counter="50"
             requried
             :loading="inputNameLoading"
-            :rules="commonTaskForm.rules.name"
+            :rules="commonTaskForm.rules?.name"
             :error-messages="nameUniqueError"
             :autofocus="!commonTask"
             class="flex-grow-0 mb-2"

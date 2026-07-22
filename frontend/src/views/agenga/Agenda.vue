@@ -38,7 +38,7 @@ const eventDayDialog = ref(false)
 const eventDayDialogDate = ref<string | null>(null)
 const eventDayDialogEvents = ref<EventExtendedModel[]>([])
 
-let doubleClickTimer: number | undefined = undefined
+let doubleClickTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 const monthSelected = computed<string>(() => {
   return moment(value).format('MMMM YYYY')
