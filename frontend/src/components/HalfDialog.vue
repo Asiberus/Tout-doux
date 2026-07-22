@@ -7,13 +7,10 @@ const { width } = useDisplay()
 
 const show = defineModel<boolean>()
 
-watch(
-  () => show.value,
-  value => {
-    if (value) hideScroll()
-    else showScroll()
-  }
-)
+watch(show, value => {
+  if (value) hideScroll()
+  else showScroll()
+})
 </script>
 
 <template>

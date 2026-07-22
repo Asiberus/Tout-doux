@@ -42,7 +42,7 @@ function scrollDownEvent(): void {
 </script>
 
 <template>
-  <HalfDialog :value="show" @input="show = $event">
+  <HalfDialog v-model="show">
     <v-card
       v-touch="{
         start: () => touchStartEvent(),

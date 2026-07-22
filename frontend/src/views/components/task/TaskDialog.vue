@@ -17,7 +17,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   update: [data: TaskPatch]
-  create: [data: TaskPatch]
+  create: [data: TaskPost]
   submit: [data: TaskPatch]
   close: []
 }>()
@@ -30,7 +30,7 @@ onBeforeMount(() => {
 })
 
 const tagList = ref<Tag[]>([])
-const taskForm = ref<Form<TaskPost | TaskPatch>>({
+const taskForm = ref<Form<TaskPost>>({
   valid: false,
   data: {
     name: '',
@@ -105,7 +105,7 @@ function emitCloseEvent(): void {
           v-model="taskForm.data.name"
           label="Name"
           counter="50"
-          requried
+          required
           :rules="taskForm.rules?.name"
           :autofocus="!task"
           class="flex-grow-0 mb-2" />

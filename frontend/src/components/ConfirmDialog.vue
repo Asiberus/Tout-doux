@@ -12,12 +12,9 @@ const emit = defineEmits<{
 
 const dialogState = ref(false)
 
-watch(
-  () => show,
-  value => {
-    dialogState.value = value
-  }
-)
+watch(show, value => {
+  dialogState.value = !!value
+})
 
 function setDialogStateTo(value: boolean): void {
   dialogState.value = value

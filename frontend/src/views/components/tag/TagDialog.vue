@@ -157,7 +157,7 @@ function emitCloseEvent(): void {
             v-model="tagForm.data.name"
             label="Name"
             counter="20"
-            requried
+            required
             :loading="inputNameLoading"
             :rules="tagForm.rules?.name"
             :error-messages="nameUniqueError"

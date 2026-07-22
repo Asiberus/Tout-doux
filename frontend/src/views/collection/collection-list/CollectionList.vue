@@ -53,10 +53,10 @@ function toggleArchivedProject(): void {
 
       <div class="d-flex align-center gap-2">
         <FilterChip
-          :value="archived"
+          :model-value="archived"
           color="accent"
           icon="mdi-archive"
-          @input="toggleArchivedProject()">
+          @update:model-value="toggleArchivedProject()">
           Archived
         </FilterChip>
 

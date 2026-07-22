@@ -115,11 +115,11 @@ export const useProjectStore = defineStore<'project', ProjectStoreState, {}, Pro
           response => {
             if (!this.currentProject) return
 
-            if (response.projectId) {
-              this.currentProject.tasks.unshift(response)
-            } else if (response.sectionId) {
-              const section = this.currentProject.sections.find(s => s.id === response.sectionId)
+            if (task.sectionId) {
+              const section = this.currentProject.sections.find(s => s.id === task.sectionId)
               if (section) section.tasks.unshift(response)
+            } else if (task.projectId) {
+              this.currentProject.tasks.unshift(response)
             }
           },
           error => console.error(error)

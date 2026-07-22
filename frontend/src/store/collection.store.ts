@@ -36,11 +36,11 @@ export const useCollectionStore = defineStore<
   getters: {
     completedTasks(state: CollectionStoreState): Task[] {
       if (!state.currentCollection) return []
-      return state.currentCollection.tasks.filter(({ completed }) => !completed)
+      return state.currentCollection.tasks.filter(({ completed }) => completed)
     },
     uncompletedTasks(state: CollectionStoreState): Task[] {
       if (!state.currentCollection) return []
-      return state.currentCollection.tasks.filter(({ completed }) => completed)
+      return state.currentCollection.tasks.filter(({ completed }) => !completed)
     },
   },
   actions: {

@@ -229,7 +229,7 @@ function formattedDate(value: string): string {
             :rules="eventForm.rules?.name"
             label="Name"
             counter="50"
-            requried
+            required
             :autofocus="!event"
             class="flex-grow-0">
           </v-text-field>

@@ -42,7 +42,6 @@ const editBtnSize = computed<'large' | 'small' | 'default'>(() => {
 })
 
 watch(show, value => {
-  console.log(value)
   dialogState.value = !!value
   tab.value = 'task'
 

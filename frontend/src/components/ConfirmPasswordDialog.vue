@@ -33,21 +33,18 @@ const passwordError = ref<string | null>('')
 const formRef = useTemplateRef('formRef')
 const passwordInput = useTemplateRef('passwordInput')
 
-watch(
-  () => show,
-  value => {
-    dialogState.value = value
-    form.value.data.password = ''
+watch(show, value => {
+  dialogState.value = !!value
+  form.value.data.password = ''
 
-    if (value) {
-      // We need to wait for next tick to access the form and the input name
-      nextTick(() => {
-        formRef.value?.resetValidation()
-        passwordInput.value?.focus()
-      })
-    }
+  if (value) {
+    // We need to wait for next tick to access the form and the input name
+    nextTick(() => {
+      formRef.value?.resetValidation()
+      passwordInput.value?.focus()
+    })
   }
-)
+})
 
 function setDialogStateTo(value: boolean): void {
   dialogState.value = value

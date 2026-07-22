@@ -144,7 +144,7 @@ function closeDialog(): void {
             v-model="commonTaskForm.data.name"
             label="Name"
             counter="50"
-            requried
+            required
             :loading="inputNameLoading"
             :rules="commonTaskForm.rules?.name"
             :error-messages="nameUniqueError"

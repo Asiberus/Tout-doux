@@ -125,7 +125,7 @@ function emitDeleteEvent(): void {
         <TagGroup
           :tag-list="task.tags"
           :small="small"
-          max-tag="3"
+          :max-tag="3"
           :class="{ 'pl-10': completable }">
         </TagGroup>
       </template>

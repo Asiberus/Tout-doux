@@ -48,7 +48,8 @@ function createTask(task: TaskPost): void {
 }
 
 function toggleTaskState(id: number, completed: boolean): void {
-  collectionStore.editTask(id, completed)
+  console.log(id, completed)
+  collectionStore.editTask(id, { completed })
 }
 
 function updateTask(id: number, data: TaskPatch): void {

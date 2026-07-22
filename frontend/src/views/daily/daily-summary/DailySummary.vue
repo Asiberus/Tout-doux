@@ -46,7 +46,6 @@ onUnmounted(() => {
   showScroll()
 })
 
-// TODO : test if this work. Otherwise watch changes on route date param
 watch(
   () => props.date,
   () => {
