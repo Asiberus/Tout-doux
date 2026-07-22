@@ -153,7 +153,6 @@ function registerUser(): void {
           label="Username"
           :rules="form.rules.username"
           :error-messages="usernameUniqueError"
-          variant="underlined"
           required
           counter="100"
           autofocus
@@ -166,7 +165,6 @@ function registerUser(): void {
           :rules="form.rules.email"
           :error-messages="emailUniqueError"
           validate-on="blur"
-          variant="underlined"
           required
           counter="100"
           @update:model-value="validateEmail">
@@ -178,7 +176,6 @@ function registerUser(): void {
           :error-messages="passwordValidationErrors"
           max-errors="6"
           required
-          variant="underlined"
           validate-on="blur"
           :counter="form.data.password.length > 0"
           :type="showPassword ? 'text' : 'password'"
@@ -191,7 +188,6 @@ function registerUser(): void {
           label="Confirm password"
           :rules="form.rules.confirmPassword"
           required
-          variant="underlined"
           :error-messages="passwordMatchError"
           :counter="form.data.confirmPassword.length > 0"
           :type="showConfirmPassword ? 'text' : 'password'"

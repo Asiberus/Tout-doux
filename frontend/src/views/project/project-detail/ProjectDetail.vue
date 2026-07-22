@@ -39,7 +39,7 @@ onUnmounted(() => {
     <v-divider class="my-2 my-sm-4" />
 
     <v-tabs bg-color="transparent" color="accent" class="flex-grow-0 mb-3" show-arrows>
-      <v-tab :to="{ name: 'project-detail' }" exact>Description</v-tab>
+      <v-tab :to="{ name: 'project-detail' }">Description</v-tab>
       <v-tab :to="{ name: 'project-detail-section' }">Section</v-tab>
       <v-tab :to="{ name: 'project-detail-event' }">Event</v-tab>
       <v-tab disabled>Historic</v-tab>

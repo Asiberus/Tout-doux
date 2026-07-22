@@ -56,14 +56,12 @@ function login(): void {
     <v-text-field
       v-model="form.data.email"
       label="Email"
-      variant="underlined"
       autofocus
       hide-details />
 
     <v-text-field
       v-model="form.data.password"
       label="Password"
-      variant="underlined"
       :type="showPassword ? 'text' : 'password'"
       :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
       hide-details

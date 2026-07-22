@@ -22,8 +22,8 @@
 - [x] 1.10 — Type `Route` (Vue Router 4)
 
 ### 2. 🟠 Iso-visuel
-- [ ] 2.1 — `variant` des inputs (`underlined`)
-- [ ] 2.2 — `offset-*` / `nudge-*` supprimés
+- [x] 2.1 — `variant` des inputs (`underlined`)
+- [x] 2.2 — `offset-*` / `nudge-*` supprimés
 - [ ] 2.3 — Hover mobile chips & tabs
 - [ ] 2.4 — QA des sélecteurs `:deep()`
 
@@ -31,10 +31,10 @@
 - [ ] 3.1 — Hack `loginGuard`
 - [ ] 3.2 — Typer `src/api/*.api.ts`
 - [ ] 3.3 — Husky v9
-- [ ] 3.4 — Props booléennes verbeuses
-- [ ] 3.5 — `exact` sur `v-tab`
-- [ ] 3.6 — `formRef` sans `.value`
-- [ ] 3.7 — `v-list-item-icon` *(déjà migré, à confirmer)*
+- [x] 3.4 — Props booléennes verbeuses
+- [x] 3.5 — `exact` sur `v-tab`
+- [x] 3.6 — `formRef` sans `.value` *(+ `inputNameRef.focus()` corrigé)*
+- [x] 3.7 — `v-list-item-icon` *(déjà migré, confirmé : aucune occurrence)*
 
 ### 4. ⚪ Optionnel
 - [ ] §4 — Améliorations optionnelles
@@ -450,7 +450,7 @@ Puis remplacer les 3 annotations `(route: Route)` par `(route: RouteLocationNorm
 
 ## 2. 🟠 Iso-visuel — pour ne rien changer au style
 
-### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`)
+### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`) — ✅ FAIT
 
 En Vuetify 2, les inputs étaient soulignés ; en V3 le défaut est `filled`. Certains inputs ont **déjà** `variant="underlined"` (ex. `Login.vue:59/66`, `Register.vue:156/169/181/194`, `ResetPasswordRequest.vue:65`), d'autres non → rendu **incohérent**.
 
@@ -469,7 +469,7 @@ Points de vigilance :
 - Les `variant` **locaux** l'emportent sur le défaut → les inputs déjà en `underlined` restent identiques, et **`Feedback.vue:62/72` (`variant="filled"`)** conserve `filled` : confirmer que c'est bien voulu (sinon retirer l'override).
 - Après ajout, **passer en revue tous les fichiers à inputs** pour vérifier le rendu : `App.vue`, `ConfirmPasswordDialog.vue`, `Register.vue`, `ResetPassword.vue`, `Login.vue`, `ResetPasswordRequest.vue`, `CollectionFormDialog.vue`, `CollectionSettings.vue`, `DailyTaskForm.vue`, `Feedback.vue`, `ProjectSettings.vue`, `SectionDialog.vue`, `ProjectFormDialog.vue`, `CommonTaskDialog.vue`, `TaskDialog.vue`, `EventDialog.vue`, `TagSearch.vue`, `ProfileEmail.vue`, `TagDialog.vue`, `ProfilePassword.vue`, `ProfileUser.vue`.
 
-### 2.2 `offset-y` / `offset-x` / `offset-overflow` / `nudge-*` supprimés
+### 2.2 `offset-y` / `offset-x` / `offset-overflow` / `nudge-*` supprimés — ✅ FAIT
 
 Sur `v-menu`, ces props n'existent plus. En V3 le menu se place par défaut sous l'activateur ; utiliser `location="…"` et `offset="<px>"` si besoin.
 
@@ -560,7 +560,7 @@ export function getProjectById(projectId: number): Promise<ProjectDetail> {
 - `.husky/commit-msg` : même nettoyage (retirer le source de `husky.sh`).
 - Après migration, le dossier `.husky/_/` est régénéré par husky v9 ; ne pas le committer manuellement.
 
-### 3.4 Props booléennes verbeuses `:x="true"` / `:x="false"` (cosmétique)
+### 3.4 Props booléennes verbeuses `:x="true"` / `:x="false"` (cosmétique) — ✅ FAIT
 
 Simplifier `:prop="true"` → `prop` et `:prop="false"` → à supprimer (défaut) **uniquement** sur des props réellement booléennes de composants où elles existent encore :
 - `src/views/daily/components/DailyTaskForm.vue:68` — `:editable="true"` → `editable`
@@ -569,7 +569,7 @@ Simplifier `:prop="true"` → `prop` et `:prop="false"` → à supprimer (défau
 
 > ⚠️ Ne pas toucher les `:small="true"`, `:completable="false"`, `:display-options="false"`, `:editable="false"` sur les **composants custom** (`TaskCard`, `CommonTaskCard`…) : ce sont des props internes légitimes.
 
-### 3.5 Liens `exact` sur `v-tab` (VR4)
+### 3.5 Liens `exact` sur `v-tab` (VR4) — ✅ FAIT
 
 En VR4, `exact` n'a plus d'effet (matching géré via `exact-active-class`). Retirer `exact` des `<v-tab :to="…">` et **vérifier le surlignage de l'onglet actif** après coup :
 - `src/views/settings/Settings.vue:19, 23, 27`
@@ -579,13 +579,13 @@ En VR4, `exact` n'a plus d'effet (matching géré via `exact-active-class`). Ret
 - `src/views/administration/Administration.vue:19, 23`
 - `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue:193, 235, 276` (`:exact="true"`)
 
-### 3.6 Bugs `formRef` sans `.value` (refs jamais résolues)
+### 3.6 Bugs `formRef` sans `.value` (refs jamais résolues) — ✅ FAIT
 
 `useTemplateRef('form')` renvoie un ref → il faut `formRef.value.…`. Deux fichiers appellent la méthode **directement sur le ref** (donc `undefined` → erreur runtime) :
 - `src/views/project/project-detail/components/SectionDialog.vue:45` — `formRef.resetValidation()` → `formRef.value?.resetValidation()`
 - `src/views/components/common-task/CommonTaskDialog.vue:54` — `formRef.resetValidation()` → `formRef.value?.resetValidation()`
 
-### 3.7 `v-list-item-icon` — déjà migré
+### 3.7 `v-list-item-icon` — déjà migré — ✅ FAIT
 
 Aucune occurrence de `v-list-item-icon` : migration vers `v-list-item` + slots `#prepend`/`#append` **déjà faite**. Rien à modifier, confirmer visuellement.
 

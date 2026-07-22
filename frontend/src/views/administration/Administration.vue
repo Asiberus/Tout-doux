@@ -16,11 +16,11 @@ const { mdAndUp } = useDisplay()
           color="accent"
           show-arrows
           bg-color="transparent">
-          <v-tab :to="{ name: 'administration-user-list' }" exact class="justify-start">
+          <v-tab :to="{ name: 'administration-user-list' }" class="justify-start">
             <v-icon start size="small">mdi-account-group</v-icon>
             User List
           </v-tab>
-          <v-tab :to="{ name: 'administration-feedback' }" exact class="justify-start">
+          <v-tab :to="{ name: 'administration-feedback' }" class="justify-start">
             <v-icon start size="small">mdi-comment-quote</v-icon>
             Feedback
           </v-tab>

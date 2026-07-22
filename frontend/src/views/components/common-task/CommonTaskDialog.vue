@@ -50,9 +50,9 @@ watch(show, (value: boolean) => {
     // We need to wait for next tick to access the form and the input name
     nextTick(() => {
       nameUniqueError.value = null
-      formRef.resetValidation()
+      formRef.value?.resetValidation()
       populateForm()
-      if (!commonTask) inputNameRef.focus()
+      if (!commonTask) inputNameRef.value?.focus()
     })
   }
 })

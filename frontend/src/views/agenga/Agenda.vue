@@ -268,7 +268,6 @@ function nextMonth(): void {
         v-model="eventTooltip"
         :close-on-content-click="false"
         :activator="eventTooltipElement"
-        offset-x
         min-width="30rem"
         max-width="40rem">
         <template v-if="eventSelected">

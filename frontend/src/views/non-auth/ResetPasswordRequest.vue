@@ -63,7 +63,6 @@ async function submit(): Promise<void> {
           v-model="form.data.email"
           placeholder="Your email"
           type="email"
-          variant="underlined"
           :rules="form.rules.email"
           validate-on="blur"
           density="compact"

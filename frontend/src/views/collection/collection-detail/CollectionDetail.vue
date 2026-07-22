@@ -37,8 +37,8 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
     <v-divider class="my-2 my-sm-4" />
 
     <v-tabs bg-color="transparent" color="accent" class="flex-grow-0 mb-3" show-arrows>
-      <v-tab :to="{ name: 'collection-detail' }" exact>General</v-tab>
-      <v-tab :to="{ name: 'collection-detail-settings' }" exact>Settings</v-tab>
+      <v-tab :to="{ name: 'collection-detail' }">General</v-tab>
+      <v-tab :to="{ name: 'collection-detail-settings' }">Settings</v-tab>
     </v-tabs>
 
     <router-view />

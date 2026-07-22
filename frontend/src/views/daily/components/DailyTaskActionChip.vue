@@ -33,7 +33,7 @@ function updateAction(value: DailyTaskAction | null): void {
 <template>
   <div>
     <template v-if="editable">
-      <v-menu offset-y offset-overflow>
+      <v-menu>
         <template #activator="{ props: menuProps }">
           <v-chip v-bind="menuProps" size="small" :color class="rounded-lg">
             <template v-if="action">

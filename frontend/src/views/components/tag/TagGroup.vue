@@ -76,7 +76,7 @@ function shrinkTagGroup(): void {
       <TagChip :tag :small="!small && !large" :x-small="small" class="flex-shrink-0" />
     </template>
     <template v-if="hiddenTags.length > 0">
-      <v-menu open-on-hover offset-y offset-overflow :close-on-content-click="false" :z-index>
+      <v-menu open-on-hover :close-on-content-click="false" :z-index>
         <template #activator="{ props: menuProps }">
           <v-chip
             :size="!large ? 'small' : 'default'"

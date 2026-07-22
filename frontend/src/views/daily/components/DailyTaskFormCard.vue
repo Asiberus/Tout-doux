@@ -53,7 +53,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
     <template v-if="!editMode && dailyTask">
       <div class="daily-task-form-card__content">
         <div class="daily-task-form-card__actions">
-          <v-menu offset-y>
+          <v-menu>
             <template #activator="{ props: menuProps }">
               <v-btn
                 v-bind="menuProps"
@@ -80,7 +80,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
         <div class="daily-task-form-card__content__header">
           <DailyTaskActionChip
             v-model:action="dailyTask.action"
-            :editable="true"
+            editable
             class="flex-shrink-0"
             @update="updateDailyTask({ action: $event })">
           </DailyTaskActionChip>

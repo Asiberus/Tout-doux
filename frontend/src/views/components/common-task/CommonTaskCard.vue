@@ -60,7 +60,7 @@ function emitDeleteEvent(): void {
         </template>
       </div>
       <div v-if="editable" class="actions">
-        <v-menu v-model="commonTaskMenu" offset-y>
+        <v-menu v-model="commonTaskMenu">
           <template #activator="{ props }">
             <v-btn variant="plain" icon size="x-small" v-bind="props">
               <v-icon size="small">mdi-dots-vertical</v-icon>

@@ -4,6 +4,14 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { en } from 'vuetify/locale'
 
 export const vuetifyOptions: VuetifyOptions = {
+  defaults: {
+    VTextField: { variant: 'underlined' },
+    VTextarea: { variant: 'underlined' },
+    VSelect: { variant: 'underlined' },
+    VAutocomplete: { variant: 'underlined' },
+    VCombobox: { variant: 'underlined' },
+    VFileInput: { variant: 'underlined' },
+  },
   theme: {
     defaultTheme: 'dark',
     themes: {

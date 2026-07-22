@@ -65,7 +65,7 @@ function removeTag(id: number): void {
     <div class="d-flex align-center gap-2">
       <DailyTaskActionChip
         v-model:action="dailyTaskForm.data.action"
-        :editable="true"
+        editable
         class="mb-4" />
 
       <v-text-field

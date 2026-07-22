@@ -100,7 +100,7 @@ function deleteUser(id: number): void {
         </template>
       </template>
       <template #item.actions="{ item }">
-        <v-menu offset-y offset-x>
+        <v-menu>
           <template #activator="{ props }">
             <v-btn v-bind="props" :disabled="item.id === userStore.user.id" variant="plain">
               <v-icon>mdi-dots-vertical</v-icon>

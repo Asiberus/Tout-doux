@@ -172,8 +172,6 @@ function emitCloseEvent(): void {
               v-model="colorPicker"
               :close-on-content-click="false"
               transition="scale-transition"
-              offset-y
-              nudge-bottom="5"
               min-width="0"
               max-width="fit-content">
               <template #activator="{ props: menuProps }">

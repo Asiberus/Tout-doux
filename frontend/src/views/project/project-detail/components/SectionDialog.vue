@@ -42,10 +42,10 @@ watch(
   (value: boolean) => {
     if (value) {
       confirmDelete.value = false
-      formRef.resetValidation()
+      formRef.value?.resetValidation()
       if (props.section) populateForm(props.section.name)
       else populateForm('')
-      inputNameRef.focus()
+      inputNameRef.value?.focus()
     }
   }
 )

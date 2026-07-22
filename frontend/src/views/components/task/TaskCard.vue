@@ -75,7 +75,7 @@ function emitDeleteEvent(): void {
       :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions, small }">
       <template v-if="displayOptions">
         <div class="task-card__actions">
-          <v-menu v-model="taskMenu" offset-y>
+          <v-menu v-model="taskMenu">
             <template #activator="{ props: menuProps }">
               <v-btn
                 v-bind="menuProps"

@@ -253,8 +253,6 @@ function formattedDate(value: string): string {
                   v-model="startDatePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
-                  offset-y
-                  nudge-top="30"
                   min-width="290">
                   <template #activator="{ props }">
                     <v-text-field
@@ -282,8 +280,6 @@ function formattedDate(value: string): string {
                   v-model="startTimePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
-                  offset-y
-                  nudge-top="30"
                   min-width="290">
                   <template #activator="{ props }">
                     <v-text-field
@@ -315,8 +311,6 @@ function formattedDate(value: string): string {
                   v-model="endDatePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
-                  offset-y
-                  nudge-top="30"
                   min-width="290">
                   <template #activator="{ props }">
                     <v-text-field
@@ -353,8 +347,6 @@ function formattedDate(value: string): string {
                   v-model="endTimePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
-                  offset-y
-                  nudge-top="30"
                   min-width="290">
                   <template #activator="{ props }">
                     <v-text-field

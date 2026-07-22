@@ -193,7 +193,6 @@ function resetSelectedItem(): void {
           <v-hover v-slot="{ hover }">
             <v-btn
               :to="{ name: 'project-list' }"
-              :exact="true"
               icon
               size="small"
               :color="hover ? 'grey' : 'grey darken-3'"
@@ -235,7 +234,6 @@ function resetSelectedItem(): void {
           <v-hover v-slot="{ hover }">
             <v-btn
               :to="{ name: 'collection-list' }"
-              :exact="true"
               icon
               size="small"
               :color="hover ? 'grey' : 'grey darken-3'"
@@ -276,7 +274,6 @@ function resetSelectedItem(): void {
           <v-hover v-slot="{ hover }">
             <v-btn
               :to="{ name: 'settings-common-tasks' }"
-              :exact="true"
               icon
               size="small"
               :color="hover ? 'grey' : 'grey darken-3'"
