@@ -31,7 +31,7 @@ const nameUniqueError = ref<string | null>(null)
 const inputNameLoading = ref(false)
 let validationTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
-const tagForm: Form<TagForm> = ref({
+const tagForm = ref<Form<TagForm>>({
   valid: false,
   pending: false,
   data: {
@@ -139,7 +139,7 @@ function emitCloseEvent(): void {
       <h4 class="text-h5 text-sm-h4 text-capitalize">{{ title }}</h4>
       <div v-if="tag">
         <v-hover v-slot="{ hover }">
-          <v-btn :color="hover || confirmDelete ? 'error' : null" @click="emitDeleteTag()">
+          <v-btn :color="hover || confirmDelete ? 'error' : undefined" @click="emitDeleteTag()">
             {{ confirmDelete ? 'Are you sure ?' : 'Delete Tag' }}
           </v-btn>
         </v-hover>

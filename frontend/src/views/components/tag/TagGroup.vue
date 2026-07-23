@@ -52,6 +52,7 @@ watch(
 )
 
 function shrinkTagGroup(): void {
+  if (!tagGroupRef.value) return
   const isOverflowing = tagGroupRef.value.clientWidth < tagGroupRef.value.scrollWidth
   if (!isOverflowing) return
 

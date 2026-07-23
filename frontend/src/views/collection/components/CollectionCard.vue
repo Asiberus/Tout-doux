@@ -16,7 +16,7 @@ const percentageOfCompletedTask = computed<number>(
   <v-card
     rounded
     :to="{ name: 'collection-detail', params: { id: collection.id } }"
-    :color="collection.archived ? 'collectionArchived' : null"
+    :color="collection.archived ? 'collectionArchived' : undefined"
     :ripple="false"
     class="rounded-lg">
     <v-progress-linear

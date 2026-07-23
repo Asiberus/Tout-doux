@@ -46,7 +46,7 @@ function emitDeleteEvent(): void {
 <template>
   <div>
     <v-card
-      :color="selected ? 'green darken-2' : null"
+      :color="selected ? 'green darken-2' : undefined"
       :disabled="selected"
       :ripple="false"
       class="wrapper rounded-lg">
@@ -56,7 +56,7 @@ function emitDeleteEvent(): void {
           {{ commonTask.name }}
         </h5>
         <template v-if="commonTask.tags.length > 0">
-          <TagGroup :tag-list="commonTask.tags" max-tag="3"></TagGroup>
+          <TagGroup :tag-list="commonTask.tags" :max-tag="3"></TagGroup>
         </template>
       </div>
       <div v-if="editable" class="actions">

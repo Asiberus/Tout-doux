@@ -105,7 +105,7 @@ function selectTask(task: Task): void {
               :small="true"
               :completable="false"
               :display-options="false"
-              elevation="3"
+              :elevation="3"
               color="grey-darken-4"
               @click="selectTask(task)">
             </TaskCard>

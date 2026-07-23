@@ -63,7 +63,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         :key="`daily-task-${dailyTask.id}`"
         fill-dot
         :size="xs ? 'small' : 'default'"
-        :dot-color="dailyTask.completed ? 'green darken-2' : null">
+        :dot-color="dailyTask.completed ? 'green darken-2' : undefined">
         <template #icon>
           <div v-ripple class="icon-wrapper" @click="toggleDailyTask(dailyTask)">
             <v-icon v-if="dailyTask.completed" :size="xs ? 'small' : 'default'"> mdi-check </v-icon>

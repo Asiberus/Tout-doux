@@ -17,10 +17,10 @@ const props = withDefaults(
     small?: boolean
     selected?: boolean
     elevation?: number
-    color: string | null
+    color?: string
     itemName?: string
   }>(),
-  { displayOptions: true, completable: true, elevation: 2, color: null, itemName: 'task' }
+  { displayOptions: true, completable: true, elevation: 2, itemName: 'task' }
 )
 
 const emit = defineEmits<{
@@ -34,7 +34,7 @@ const taskDialog = ref(false)
 const uncompleteConfirmDialog = ref(false)
 const deleteConfirmDialog = ref(false)
 
-const cardColor = computed<string | null>(() =>
+const cardColor = computed<string | undefined>(() =>
   props.task.completed || props.selected ? 'green darken-2' : props.color
 )
 
