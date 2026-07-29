@@ -1,12 +1,5 @@
 import Agenda from '@/views/agenga/Agenda.vue'
-import {
-  createRouter,
-  createWebHistory,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-  RouteLocationNormalizedLoaded,
-  START_LOCATION,
-} from 'vue-router'
+import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { authGuard } from '@/router/guards'
 import AuthenticatedLayout from '@/layout/AuthenticatedLayout.vue'
 import NonAuthenticatedLayout from '@/layout/NonAuthenticatedLayout.vue'
@@ -62,13 +55,10 @@ const router = createRouter({
 })
 
 // If the user is authenticated, fetch the user & preferences data
-router.beforeEach(
-  (_: RouteLocationNormalized, from: RouteLocationNormalizedLoaded, next: NavigationGuardNext) => {
-    const appStore = useAppStore()
-    if (from === START_LOCATION && authService.isAuthenticated()) appStore.init().then(() => next())
-    else next()
-  }
-)
+router.beforeEach(async (_, from) => {
+  const appStore = useAppStore()
+  if (from === START_LOCATION && authService.isAuthenticated()) await appStore.init()
+})
 router.beforeEach(authGuard)
 
 export default router

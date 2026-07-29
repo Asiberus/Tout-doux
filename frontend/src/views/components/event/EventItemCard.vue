@@ -97,7 +97,7 @@ function isDateEqual(date1: string, date2: string): boolean {
 
 <template>
   <div>
-    <v-hover v-slot="{ hover }">
+    <v-hover v-slot="{ isHovering }">
       <v-card
         :color="cardColor"
         :disabled
@@ -183,7 +183,7 @@ function isDateEqual(date1: string, date2: string): boolean {
 
           <template v-if="project">
             <router-link :to="{ name: 'project-detail', params: { id: project.id } }" class="ml-2">
-              <ProjectAvatar :project="project" :hover="hover || xs" :small="xs"> </ProjectAvatar>
+              <ProjectAvatar :project="project" :hover="isHovering || xs" :small="xs"> </ProjectAvatar>
             </router-link>
           </template>
         </v-card-text>

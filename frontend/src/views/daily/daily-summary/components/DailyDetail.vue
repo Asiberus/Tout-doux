@@ -141,12 +141,12 @@ function emitDailyTaskCompletedEvent(): void {
         <h1 class="text-h4 text-sm-h3 text-md-h2">
           {{ dateFormat(date, 'dddd DD MMMM Y') }}
         </h1>
-        <v-hover v-if="isToday" v-slot="{ hover }">
+        <v-hover v-if="isToday" v-slot="{ isHovering }">
           <v-btn
             :to="{ name: 'daily-update', params: { date, step: 'task' } }"
             icon
             :size="editBtnSize"
-            :color="hover ? 'grey lighten-1' : 'grey darken-3'"
+            :color="isHovering ? 'grey lighten-1' : 'grey darken-3'"
             class="ml-1"
             title="Edit day">
             <v-icon>mdi-pencil</v-icon>

@@ -1,41 +1,31 @@
 import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import Login from '@/views/non-auth/Login.vue'
-import { loginGuard } from '@/router/guards'
+import { loginGuard } from '../guards/login.guard'
 import Register from '@/views/non-auth/Register.vue'
 import ResetPasswordRequest from '@/views/non-auth/ResetPasswordRequest.vue'
 import ResetPassword from '@/views/non-auth/ResetPassword.vue'
 import ConfirmEmail from '@/views/non-auth/ConfirmEmail.vue'
 import ActivateUser from '@/views/non-auth/ActivateUser.vue'
 
-// TODO : When updated to Vue Router 4 remove the loginGuard hack
 export const nonAuthRoutes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
     component: Login,
-    // Hack for the loginGuard to be called
-    beforeEnter: (to, from, next): void => {
-      loginGuard(to, from, next)
-    },
+    beforeEnter: loginGuard,
   },
   {
     path: '/register',
     name: 'register',
     component: Register,
-    // Hack for the loginGuard to be called
-    beforeEnter: (to, from, next): void => {
-      loginGuard(to, from, next)
-    },
+    beforeEnter: loginGuard,
   },
   {
     path: '/password-reset-request',
     name: 'password-reset-request',
     component: ResetPasswordRequest,
     props: (route: RouteLocationNormalized) => ({ email: route.query.email }),
-    // Hack for the loginGuard to be called
-    beforeEnter: (to, from, next): void => {
-      loginGuard(to, from, next)
-    },
+    beforeEnter: loginGuard,
   },
   {
     path: '/activate',

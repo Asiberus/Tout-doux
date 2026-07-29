@@ -206,9 +206,9 @@ function formattedDate(value: string): string {
         </template>
       </h4>
 
-      <v-hover v-if="event" v-slot="{ hover }">
+      <v-hover v-if="event" v-slot="{ isHovering }">
         <v-btn
-          :color="hover || confirmDelete ? 'error' : undefined"
+          :color="isHovering || confirmDelete ? 'error' : undefined"
           class="align-self-end align-self-sm-center"
           @click="emitDeleteEvent()">
           {{ confirmDelete ? 'Are you sure ?' : 'Delete Event' }}

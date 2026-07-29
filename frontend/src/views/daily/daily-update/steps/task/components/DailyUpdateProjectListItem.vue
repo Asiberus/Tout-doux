@@ -123,12 +123,12 @@ function selectTask(task: Task): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
-            <v-hover v-slot="{ hover }">
+            <v-hover v-slot="{ isHovering }">
               <v-btn
                 :to="{ name: 'project-detail', params: { id: project.id } }"
                 icon
                 size="small"
-                :color="hover ? 'grey' : 'grey darken-3'"
+                :color="isHovering ? 'grey' : 'grey darken-3'"
                 class="mx-1"
                 title="Go to project">
                 <v-icon size="small">mdi-open-in-new</v-icon>

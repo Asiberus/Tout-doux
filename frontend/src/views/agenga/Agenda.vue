@@ -212,14 +212,14 @@ function nextMonth(): void {
         class="calendar"
         @click:day="handleClickOnDay($event)">
         <template #day-label="{ day, present, date }">
-          <v-hover v-slot="{ hover }">
+          <v-hover v-slot="{ isHovering }">
             <div
               class="day-label"
               :class="{
                 'accent--text': present,
-                'grey--text text--lighten-1': !hover,
-                'white--text': hover,
-                'text--lighten-3': present && hover,
+                'grey--text text--lighten-1': !isHovering,
+                'white--text': isHovering,
+                'text--lighten-3': present && isHovering,
               }">
               {{ day }}
             </div>

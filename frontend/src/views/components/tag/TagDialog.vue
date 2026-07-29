@@ -138,8 +138,8 @@ function emitCloseEvent(): void {
     <div class="d-flex justify-space-between align-center px-6 pt-4 pb-2">
       <h4 class="text-h5 text-sm-h4 text-capitalize">{{ title }}</h4>
       <div v-if="tag">
-        <v-hover v-slot="{ hover }">
-          <v-btn :color="hover || confirmDelete ? 'error' : undefined" @click="emitDeleteTag()">
+        <v-hover v-slot="{ isHovering }">
+          <v-btn :color="isHovering || confirmDelete ? 'error' : undefined" @click="emitDeleteTag()">
             {{ confirmDelete ? 'Are you sure ?' : 'Delete Tag' }}
           </v-btn>
         </v-hover>

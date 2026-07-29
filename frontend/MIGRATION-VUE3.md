@@ -27,7 +27,7 @@
 - [x] 2.2 — `offset-*` / `nudge-*` supprimés
 - [ ] 2.3 — Hover mobile chips & tabs
 - [ ] 2.4 — QA des sélecteurs `:deep()`
-- [ ] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
+- [x] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
 - [ ] 2.6 — (Vuetify 4) Typographie MD3
 - [ ] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`)
 - [ ] 2.8 — (Vuetify 4) `fill-height` / VContainer
@@ -37,7 +37,7 @@
 - [ ] 2.12 — (Vuetify 4) Grille VRow/VCol
 
 ### 3. 🟡 Nettoyage / dette
-- [ ] 3.1 — Hack `loginGuard`
+- [x] 3.1 — Hack `loginGuard`
 - [x] 3.2 — Typer `src/api/*.api.ts`
 - [ ] 3.3 — Husky v9
 - [x] 3.4 — Props booléennes verbeuses
@@ -545,7 +545,7 @@ Aucun `::v-deep`/`>>>` résiduel (déjà en `:deep()`). **Pas de changement de c
 
 ---
 
-### 2.5 Slot `v-hover` : `{ hover }` → `{ isHovering }` (Vuetify 3 — manqué)
+### 2.5 Slot `v-hover` : `{ hover }` → `{ isHovering }` (Vuetify 3 — manqué) — ✅ FAIT
 
 En Vuetify 3, le slot par défaut de `<v-hover>` expose **`{ isHovering }`** (et non `{ hover }`). Comme `hover` n'existe pas, le binding vaut `undefined` → l'effet de survol (couleur d'icône/bouton) **ne s'applique jamais**, et `vue-tsc` remonte `Property 'hover' does not exist`.
 
@@ -628,7 +628,7 @@ Refonte (marges négatives → CSS `gap`, certaines classes/comportements change
 
 ## 3. 🟡 Nettoyage / dette technique
 
-### 3.1 Hack `loginGuard` (`nonAuth.router.ts`)
+### 3.1 Hack `loginGuard` (`nonAuth.router.ts`) — ✅ FAIT
 
 Trois routes enveloppent inutilement le guard. En VR4, `beforeEnter` accepte directement la fonction.
 ```ts

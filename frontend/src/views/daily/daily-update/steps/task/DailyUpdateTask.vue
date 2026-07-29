@@ -190,12 +190,12 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="0" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Project</h5>
-          <v-hover v-slot="{ hover }">
+          <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'project-list' }"
               icon
               size="small"
-              :color="hover ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to project list">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>
@@ -231,12 +231,12 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="1" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Collection</h5>
-          <v-hover v-slot="{ hover }">
+          <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'collection-list' }"
               icon
               size="small"
-              :color="hover ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to collection">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>
@@ -271,12 +271,12 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="2" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-h5 mr-2">Common task</h5>
-          <v-hover v-slot="{ hover }">
+          <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'settings-common-tasks' }"
               icon
               size="small"
-              :color="hover ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to common task">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>

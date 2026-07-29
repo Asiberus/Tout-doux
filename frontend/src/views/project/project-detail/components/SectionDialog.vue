@@ -81,9 +81,9 @@ function emitCloseEvent(): void {
         {{ section ? 'Update section' : 'New section' }}
       </h4>
 
-      <v-hover v-if="section" v-slot="{ hover }">
+      <v-hover v-if="section" v-slot="{ isHovering }">
         <v-btn
-          :color="hover || confirmDelete ? 'error' : null"
+          :color="isHovering || confirmDelete ? 'error' : null"
           :size="xs ? 'small' : 'default'"
           @click="emitDeleteSection()">
           {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
