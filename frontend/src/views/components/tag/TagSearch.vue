@@ -4,7 +4,7 @@ import { tagApi } from '@/api'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import { ref, watch } from 'vue'
 
-const selectedTags = defineModel<Tag[]>()
+const selectedTags = defineModel<Tag[]>({ required: true })
 
 const props = defineProps<{
   type: TagType
@@ -12,11 +12,11 @@ const props = defineProps<{
 }>()
 
 const tagList = ref<Tag[]>([])
-const search = ref<string | null>(null)
+const search = ref<string>()
 const isLoading = ref(false)
 let searchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
-watch(search, (value: string) => {
+watch(search, (value: string | undefined) => {
   clearTimeout(searchTimer)
 
   if (!value) {
@@ -49,7 +49,7 @@ function updateSelectedTags(tags: Tag[]): void {
 
 function cleanTagList(): void {
   tagList.value = []
-  search.value = null
+  search.value = undefined
   isLoading.value = false
 }
 </script>
@@ -57,10 +57,12 @@ function cleanTagList(): void {
 <template>
   <div>
     <v-autocomplete
-      v-model:search-input="search"
+      v-model:search="search"
       :model-value="selectedTags"
       :disabled
       :items="tagList"
+      item-title="name"
+      item-value="id"
       :loading="isLoading"
       :menu-props="{ contentClass: 'background-elevation' }"
       multiple
@@ -72,10 +74,12 @@ function cleanTagList(): void {
       auto-select-first
       placeholder="Search tags"
       @update:model-value="updateSelectedTags($event)">
-      <template #item="{ item }">
-        <TagChip :tag="item" />
+      <template #item="{ props: itemProps, item }">
+        <v-list-item v-bind="itemProps" :title="undefined">
+          <TagChip :tag="item.raw" />
+        </v-list-item>
       </template>
-      <template #selection="{ item }">
+      <template #selection>
         <!-- Empty to remove search when a tag is selected -->
       </template>
     </v-autocomplete>

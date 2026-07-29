@@ -20,7 +20,7 @@
 - [ ] 1.8 — `EventDialog.vue` : date/time pickers
 - [ ] 1.9 — `v-calendar` (Agenda)
 - [x] 1.10 — Type `Route` (Vue Router 4)
-- [ ] 1.11 — VAutocomplete : slot `item` → `internalItem` (Vuetify 4)
+- [x] 1.11 — VAutocomplete : slot `item` → `internalItem` (Vuetify 4)
 
 ### 2. 🟠 Iso-visuel
 - [x] 2.1 — `variant` des inputs (`underlined`)
@@ -467,7 +467,7 @@ Puis remplacer les 3 annotations `(route: Route)` par `(route: RouteLocationNorm
 
 ---
 
-### 1.11 `VSelect`/`VAutocomplete`/`VCombobox` : slot `item` → `internalItem` (Vuetify 4)
+### 1.11 `VSelect`/`VAutocomplete`/`VCombobox` : slot `item` → `internalItem` (Vuetify 4) — ✅ FAIT
 
 En Vuetify 4, la prop de slot **`item`** des slots `#item` / `#selection` est renommée **`internalItem`** (l'objet interne Vuetify `{ raw, title, value }`). Seul usage du projet : un `v-autocomplete`.
 
