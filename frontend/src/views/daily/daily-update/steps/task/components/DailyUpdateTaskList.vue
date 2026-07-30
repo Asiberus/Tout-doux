@@ -51,7 +51,7 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
 <template>
   <div class="d-flex flex-column">
     <div class="d-flex align-center mb-3">
-      <h2 class="text-h5 mr-2">Tasks of the day</h2>
+      <h2 class="text-headline-small mr-2">Tasks of the day</h2>
       <v-chip v-if="dailyTaskList.length > 0" size="small">
         {{ dailyTaskList.length }}
       </v-chip>

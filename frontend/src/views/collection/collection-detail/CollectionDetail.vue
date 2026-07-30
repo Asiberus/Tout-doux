@@ -25,10 +25,7 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
         {{ collectionStore.loadedCollection.name }}
       </SecondaryTitle>
 
-      <v-chip
-        v-if="collectionStore.loadedCollection.archived"
-        color="accent"
-        class="flex-shrink-0">
+      <v-chip v-if="collectionStore.loadedCollection.archived" color="accent" class="flex-shrink-0">
         <v-icon size="small" class="mr-1">mdi-archive</v-icon>
         Archived
       </v-chip>

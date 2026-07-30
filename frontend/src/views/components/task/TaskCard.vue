@@ -115,7 +115,7 @@ function emitDeleteEvent(): void {
 
         <div
           class="flex-grow-1 font-weight-medium text-white"
-          :class="{ 'text-body-2': small, 'text-body-1': !small }"
+          :class="{ 'text-body-medium': small, 'text-body-large': !small }"
           :title="task.name">
           {{ task.name }}
         </div>

@@ -209,7 +209,7 @@ function formattedDate(value: string | null | undefined): string {
 <template>
   <v-card class="d-flex flex-column">
     <div class="d-flex flex-column flex-sm-row gap-2 px-6 pt-4 pb-2">
-      <h4 class="text-h5 text-sm-h4 flex-grow-1">
+      <h4 class="text-headline-small text-sm-headline-large flex-grow-1">
         <template v-if="event">Update event</template>
         <template v-else>New event</template>
 
@@ -259,7 +259,7 @@ function formattedDate(value: string | null | undefined): string {
 
           <div class="d-flex flex-column flex-sm-row column-gap-6 date-time-section">
             <div class="flex-grow-1">
-              <h6 class="text-subtitle-2 text-grey-lighten-2 pl-1">Start</h6>
+              <h6 class="text-title-small text-grey-lighten-2 pl-1">Start</h6>
               <div class="d-flex gap-2 date-time-row">
                 <v-menu
                   v-model="startDatePicker"
@@ -321,7 +321,7 @@ function formattedDate(value: string | null | undefined): string {
               </div>
             </div>
             <div class="flex-grow-1">
-              <h6 class="text-subtitle-2 text-grey-lighten-2 pl-1">End</h6>
+              <h6 class="text-title-small text-grey-lighten-2 pl-1">End</h6>
               <div class="d-flex gap-2 date-time-row">
                 <v-menu
                   v-model="endDatePicker"
@@ -396,7 +396,9 @@ function formattedDate(value: string | null | undefined): string {
           </div>
         </div>
 
-        <div v-if="relatedToDate && relatedToDateError" class="error-text text-body-2 text-orange">
+        <div
+          v-if="relatedToDate && relatedToDateError"
+          class="error-text text-body-medium text-orange">
           <v-icon class="mr-2" color="orange">mdi-calendar-alert</v-icon>
           Event must be related to the
           {{ dateFormat(relatedToDate, 'DD MMMM Y') }}.

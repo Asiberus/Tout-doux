@@ -77,7 +77,7 @@ function emitCloseEvent(): void {
 <template>
   <v-card class="d-flex flex-column">
     <div class="d-flex justify-end align-center flex-wrap gap-2 px-6 pt-4 pb-2">
-      <h4 class="text-h5 text-sm-h4 flex-grow-1">
+      <h4 class="text-headline-small text-sm-headline-large flex-grow-1">
         {{ section ? 'Update section' : 'New section' }}
       </h4>
 

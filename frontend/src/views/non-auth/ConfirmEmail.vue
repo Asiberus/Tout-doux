@@ -29,7 +29,7 @@ onBeforeMount(() => {
         src="../../assets/confirm-email-success.svg"
         alt="confirm email success"
         class="confirm-email__img" />
-      <p class="text-body-1 text-center mb-0">Your email has been successfully changed!</p>
+      <p class="text-body-large text-center mb-0">Your email has been successfully changed!</p>
       <v-btn :to="{ name: 'login' }" variant="outlined" color="green">Go back to login</v-btn>
     </template>
     <template v-else-if="state === 'invalid'">
@@ -37,7 +37,7 @@ onBeforeMount(() => {
         src="../../assets/token-error.svg"
         alt="confirm email error"
         class="confirm-email__img" />
-      <p class="text-body-1 text-center mb-0">
+      <p class="text-body-large text-center mb-0">
         The token is invalid or it may be expired. <br />
         Please restart the process to change your email.
       </p>

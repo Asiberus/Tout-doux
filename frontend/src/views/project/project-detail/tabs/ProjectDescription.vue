@@ -64,12 +64,12 @@ function deleteTask(id: number): void {
   <div class="flex-grow-1 d-flex flex-column">
     <div class="project-description">
       <div class="project-description__description">
-        <h3 class="text-h6 text-sm-h5 mb-1 mb-lg-2">Description</h3>
+        <h3 class="text-title-large text-sm-headline-small mb-1 mb-lg-2">Description</h3>
         <v-card class="rounded-lg mb-3">
           <v-card-text>
             <div
               ref="description"
-              class="project-description__description__content text-body-2"
+              class="project-description__description__content text-body-medium"
               :class="{
                 'display-description': displayDescription,
                 'cursor-pointer': isDescriptionOverflowing,
@@ -105,7 +105,7 @@ function deleteTask(id: number): void {
 
     <div class="d-flex flex-column flex-sm-row column-gap-2 row-gap-1 mt-5 mt-md-10 mb-2">
       <div class="d-flex align-center flex-grow-1">
-        <h3 class="text-h6 text-sm-h5 flex-grow-1">General Tasks</h3>
+        <h3 class="text-title-large text-sm-headline-small flex-grow-1">General Tasks</h3>
 
         <template v-if="xs && project.tasks.length === 0">
           <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">

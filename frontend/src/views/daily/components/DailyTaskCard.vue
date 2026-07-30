@@ -40,7 +40,7 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green darken-2' :
           class="daily-task-card__header__action">
         </DailyTaskActionChip>
 
-        <h4 class="flex-grow-1 text-body-2 text-sm-body-1 font-weight-medium">
+        <h4 class="flex-grow-1 text-body-medium text-sm-body-large font-weight-medium">
           {{ name }}
         </h4>
       </div>

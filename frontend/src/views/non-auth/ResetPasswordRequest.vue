@@ -56,7 +56,7 @@ async function submit(): Promise<void> {
         v-model="form.valid"
         class="password-reset-requested__form"
         @submit.prevent="submit()">
-        <p class="align-self-start text-body-1 font-weight-bold mb-2">
+        <p class="align-self-start text-body-large font-weight-bold mb-2">
           Enter your email to reset your password.
         </p>
 
@@ -73,18 +73,18 @@ async function submit(): Promise<void> {
         <v-btn type="submit" color="green" block class="my-2">Reset Password</v-btn>
         <router-link
           :to="{ name: 'login' }"
-          class="text-body-1 text-link text-green-lighten-1 float-right">
+          class="text-body-large text-link text-green-lighten-1 float-right">
           Go back to login
         </router-link>
       </v-form>
     </template>
     <template v-else>
       <img src="../../assets/mail-sent.svg" alt="mail sent" class="password-reset-requested__img" />
-      <p class="text-body-1 text-center mb-0">
+      <p class="text-body-large text-center mb-0">
         An email has been sent to you ! <br />
         Check your inbox to reset your password.
       </p>
-      <router-link :to="{ name: 'login' }" class="text-body-1 text-link text-green-lighten-1">
+      <router-link :to="{ name: 'login' }" class="text-body-large text-link text-green-lighten-1">
         Go back to login
       </router-link>
     </template>

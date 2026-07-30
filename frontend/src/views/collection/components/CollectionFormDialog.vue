@@ -63,7 +63,7 @@ function emitCloseEvent(): void {
 <template>
   <v-card class="d-flex flex-column">
     <div class="px-6 pt-4 pb-2">
-      <h4 class="text-h5 text-sm-h4">New collection</h4>
+      <h4 class="text-headline-small text-sm-headline-large">New collection</h4>
     </div>
     <v-card-text class="flex-grow-1 d-flex flex-column">
       <v-form

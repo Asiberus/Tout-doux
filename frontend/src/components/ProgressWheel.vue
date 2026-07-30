@@ -52,14 +52,14 @@ const computedWidth = computed<number>(() => {
           /
           <span class="max">{{ max }}</span>
         </div>
-        <div class="text-caption">{{ percentage }}%</div>
+        <div class="text-body-small">{{ percentage }}%</div>
       </template>
       <template v-if="mode === ProgressWheelMode.Percent">
         <div>
           <span class="value">{{ percentage }}</span>
           <span> %</span>
         </div>
-        <div class="text-caption">{{ value }} / {{ max }}</div>
+        <div class="text-body-small">{{ value }} / {{ max }}</div>
       </template>
     </div>
   </v-progress-circular>

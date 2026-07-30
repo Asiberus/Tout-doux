@@ -87,7 +87,7 @@ function deleteTask(id: number): void {
       section
     </v-btn>
     <div class="d-flex align-center justify-ends gap-2 mb-2">
-      <h3 class="section-title text-h6">
+      <h3 class="section-title text-title-large">
         {{ section.name }}
 
         <v-dialog v-model="sectionDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">

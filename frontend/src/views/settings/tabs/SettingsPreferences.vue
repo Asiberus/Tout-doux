@@ -25,11 +25,11 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
   <div v-if="preferencesStore.preferences">
     <TertiaryTitle>Preferences</TertiaryTitle>
 
-    <p class="text-subtitle-1 mb-1">
+    <p class="text-body-large mb-1">
       You can here personalize the layout and the behavior of some components.
     </p>
 
-    <h5 class="text-h6 mb-2">Progress Wheel</h5>
+    <h5 class="text-title-large mb-2">Progress Wheel</h5>
     <div class="progress-wheel-wrapper">
       <template v-for="mode of [ProgressWheelMode.Number, ProgressWheelMode.Percent]">
         <v-sheet

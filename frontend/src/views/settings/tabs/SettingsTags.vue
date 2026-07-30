@@ -17,7 +17,7 @@ function openTagDialog(): void {
 <template>
   <div class="fill-height d-flex flex-column">
     <TertiaryTitle>Tags</TertiaryTitle>
-    <p class="text-subtitle-2 text-sm-subtitle-1 mb-1">
+    <p class="text-title-small text-sm-body-large mb-1">
       Tags are useful to group or filter items. Two types of tag are available : project tag and
       task tag (used for Task, Common Task and Daily Task).
     </p>
@@ -29,7 +29,7 @@ function openTagDialog(): void {
           :key="type"
           :value="type"
           :ripple="false"
-          class="text-overline outlined px-3 px-sm-6 py-3">
+          class="text-label-medium text-uppercase outlined px-3 px-sm-6 py-3">
           {{ type }}
         </v-chip>
       </v-chip-group>

@@ -138,7 +138,7 @@ function emitDailyTaskCompletedEvent(): void {
       </div>
 
       <div class="d-flex align-center gap-2 mb-2 mb-sm-3 mb-md-5 mb-lg-10">
-        <h1 class="text-h4 text-sm-h3 text-md-h2">
+        <h1 class="text-headline-large text-sm-display-medium text-md-display-large">
           {{ dateFormat(date, 'dddd DD MMMM Y') }}
         </h1>
         <v-hover v-if="isToday" v-slot="{ isHovering }">

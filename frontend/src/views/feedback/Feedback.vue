@@ -46,7 +46,7 @@ function submit(): void {
       Give us a Feedback!
     </MainTitle>
 
-    <p class="text-body-1">
+    <p class="text-body-large">
       If you encounter a bug, think about a new amazing functionality or just want to say how you
       use the app, fill the form below!<br />
       Try to be as complete as possible. Every detail will help us to integrate your feedback and

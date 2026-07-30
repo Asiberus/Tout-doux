@@ -136,10 +136,12 @@ function emitCloseEvent(): void {
 <template>
   <v-card class="d-flex flex-column">
     <div class="d-flex justify-space-between align-center px-6 pt-4 pb-2">
-      <h4 class="text-h5 text-sm-h4 text-capitalize">{{ title }}</h4>
+      <h4 class="text-headline-small text-sm-headline-large text-capitalize">{{ title }}</h4>
       <div v-if="tag">
         <v-hover v-slot="{ isHovering }">
-          <v-btn :color="isHovering || confirmDelete ? 'error' : undefined" @click="emitDeleteTag()">
+          <v-btn
+            :color="isHovering || confirmDelete ? 'error' : undefined"
+            @click="emitDeleteTag()">
             {{ confirmDelete ? 'Are you sure ?' : 'Delete Tag' }}
           </v-btn>
         </v-hover>
@@ -166,7 +168,7 @@ function emitCloseEvent(): void {
             @update:model-value="validateName">
           </v-text-field>
           <div class="ml-md-6 mr-md-3 pt-md-3 d-flex align-center">
-            <div class="text-body-1">Color :</div>
+            <div class="text-body-large">Color :</div>
             <v-menu
               ref="colorPickerMenu"
               v-model="colorPicker"

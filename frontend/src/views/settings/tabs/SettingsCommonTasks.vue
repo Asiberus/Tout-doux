@@ -57,7 +57,7 @@ function deleteCommonTask(id: number): void {
     <TertiaryTitle>Common task</TertiaryTitle>
 
     <div class="d-flex flex-wrap flex-md-nowrap justify-end align-center gap-2 mb-2">
-      <h3 class="flex-grow-1 text-subtitle-2 text-sm-subtitle-1 mr-md-5">
+      <h3 class="flex-grow-1 text-title-small text-sm-body-large mr-md-5">
         A common task represent a task that can be done frequently (e.g. take the dog out, buy some
         groceries). It can easily be added in the daily update.
       </h3>

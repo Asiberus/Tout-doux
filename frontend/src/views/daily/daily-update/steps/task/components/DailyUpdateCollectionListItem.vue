@@ -62,7 +62,7 @@ function selectTask(task: Task): void {
       <v-card-text>
         <div class="d-flex align-center">
           <h3
-            class="text-body-h1 text-sm-h6 text-white"
+            class="text-body-h1 text-sm-title-large text-white"
             :class="{ 'text-truncate': !selected }"
             :title="collection.name">
             {{ collection.name }}
@@ -90,7 +90,12 @@ function selectTask(task: Task): void {
               </v-btn>
             </v-hover>
             <v-spacer />
-            <v-btn color="red" icon variant="text" density="comfortable" @click.stop="unselectCollection">
+            <v-btn
+              color="red"
+              icon
+              variant="text"
+              density="comfortable"
+              @click.stop="unselectCollection">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </template>

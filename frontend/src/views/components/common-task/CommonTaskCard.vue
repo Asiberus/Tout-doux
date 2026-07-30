@@ -52,7 +52,9 @@ function emitDeleteEvent(): void {
       class="wrapper rounded-lg">
       <v-icon>mdi-timeline</v-icon>
       <div class="content">
-        <h5 class="content__title text-body-1 text-sm-h6 text-white" :title="commonTask.name">
+        <h5
+          class="content__title text-body-large text-sm-title-large text-white"
+          :title="commonTask.name">
           {{ commonTask.name }}
         </h5>
         <template v-if="commonTask.tags.length > 0">

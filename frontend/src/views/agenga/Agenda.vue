@@ -199,7 +199,7 @@ function nextMonth(): void {
         now
       </v-btn>
 
-      <h4 class="text-body-1 text-sm-h5 flex-grow-1">{{ monthSelected }}</h4>
+      <h4 class="text-body-large text-sm-headline-small flex-grow-1">{{ monthSelected }}</h4>
 
       <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
         <v-icon>mdi-plus</v-icon>

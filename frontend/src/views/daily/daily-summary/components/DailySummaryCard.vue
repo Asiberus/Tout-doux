@@ -46,10 +46,10 @@ function openDailyDetailDialog(): void {
     ">
     <v-card-text class="daily-summary-card d-flex flex-row">
       <div class="flex-grow-1">
-        <h1 class="text-h5 font-weight-medium text-white mb-0">
+        <h1 class="text-headline-small font-weight-medium text-white mb-0">
           {{ dateFormat(dailySummary.date, 'dddd') }}
         </h1>
-        <p class="text-subtitle-2 text-md-subtitle-1 mb-0">
+        <p class="text-title-small text-md-body-large mb-0">
           {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
         </p>
       </div>

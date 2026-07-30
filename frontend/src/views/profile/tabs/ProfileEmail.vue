@@ -76,11 +76,11 @@ function changeEmail(): void {
   <div class="profile-email">
     <TertiaryTitle>Email Management</TertiaryTitle>
 
-    <p class="text-subtitle-1 mb-1">
+    <p class="text-body-large mb-1">
       Your current email address is :
       <span class="font-weight-bold">{{ userStore.user?.email }}</span>
     </p>
-    <p class="text-subtitle-1">
+    <p class="text-body-large">
       If you want to change it, fill the input bellow. An email will be sent to the new address with
       a link. <br />
       In order to complete the change, you must click on the link.

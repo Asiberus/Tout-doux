@@ -27,12 +27,12 @@ const percentageOfCompletedTask = computed<number>(
     <v-card-text class="d-flex justify-space-between align-center gap-1 pa-3 pa-sm-4">
       <div class="flex-shrink-1 overflow-hidden">
         <h5
-          class="text-h6 text-sm-h5 text-white font-weight-bold text-truncate"
+          class="text-title-large text-sm-headline-small text-white font-weight-bold text-truncate"
           :title="collection.name">
           {{ collection.name }}
         </h5>
         <p
-          class="text-subtitle-2 text-sm-subtitle-1 text-truncate mb-0"
+          class="text-title-small text-sm-body-large text-truncate mb-0"
           :title="collection.description">
           {{ collection.description }}
         </p>

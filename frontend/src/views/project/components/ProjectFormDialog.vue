@@ -72,7 +72,7 @@ function emitCloseEvent(): void {
 <template>
   <v-card class="d-flex flex-column">
     <div class="px-6 pt-4 pb-2">
-      <h4 class="text-h5 text-sm-h4">New project</h4>
+      <h4 class="text-headline-small text-sm-headline-large">New project</h4>
     </div>
 
     <v-card-text class="flex-grow-1 d-flex flex-column">
@@ -102,7 +102,7 @@ function emitCloseEvent(): void {
             class="mb-2"
             @keyup.enter.ctrl="emitSubmitEvent()" />
 
-          <h6 class="text-h6 text-grey-lighten-2">
+          <h6 class="text-title-large text-grey-lighten-2">
             <v-icon size="small">mdi-tag</v-icon>
             Tags
           </h6>

@@ -168,7 +168,7 @@ function isDateEqual(date1: string, date2: string): boolean {
             </div>
 
             <h3
-              class="text-body-2 text-sm-body-1 font-weight-bold text-white"
+              class="text-body-medium text-sm-body-large font-weight-bold text-white"
               :class="[getTextColor('name')]"
               :title="event.name">
               {{ event.name }}
@@ -177,7 +177,7 @@ function isDateEqual(date1: string, date2: string): boolean {
             <span
               v-if="event.description"
               ref="descriptionElement"
-              class="text-caption text-sm-body-2"
+              class="text-body-small text-sm-body-medium"
               :class="[
                 {
                   'text-truncate': !displayDescription,

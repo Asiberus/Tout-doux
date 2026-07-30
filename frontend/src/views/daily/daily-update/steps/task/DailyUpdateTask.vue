@@ -189,7 +189,7 @@ function resetSelectedItem(): void {
       class="daily-update-task__tabs-items bg-transparent">
       <v-tabs-window-item :value="0" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-h5 mr-2">Project</h5>
+          <h5 class="text-headline-small mr-2">Project</h5>
           <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'project-list' }"
@@ -232,7 +232,7 @@ function resetSelectedItem(): void {
       </v-tabs-window-item>
       <v-tabs-window-item :value="1" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-h5 mr-2">Collection</h5>
+          <h5 class="text-headline-small mr-2">Collection</h5>
           <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'collection-list' }"
@@ -274,7 +274,7 @@ function resetSelectedItem(): void {
       </v-tabs-window-item>
       <v-tabs-window-item :value="2" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-h5 mr-2">Common task</h5>
+          <h5 class="text-headline-small mr-2">Common task</h5>
           <v-hover v-slot="{ isHovering }">
             <v-btn
               :to="{ name: 'settings-common-tasks' }"
@@ -296,10 +296,10 @@ function resetSelectedItem(): void {
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item :value="3" :transition="false" :reverse-transition="false">
-        <h5 class="text-h5 mb-3">Weekly task</h5>
+        <h5 class="text-headline-small mb-3">Weekly task</h5>
       </v-tabs-window-item>
       <v-tabs-window-item :value="4" :transition="false" :reverse-transition="false">
-        <h5 class="text-h5 mb-3">Monthly task</h5>
+        <h5 class="text-headline-small mb-3">Monthly task</h5>
       </v-tabs-window-item>
     </v-tabs-window>
 

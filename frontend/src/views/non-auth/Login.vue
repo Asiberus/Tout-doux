@@ -64,7 +64,7 @@ function login(): void {
       @click:append-inner="showPassword = !showPassword" />
 
     <p
-      class="error-message text-subtitle-1 text-error text-center mb-0"
+      class="error-message text-body-large text-error text-center mb-0"
       :class="{ active: credentialsError }">
       Invalid credentials
     </p>
@@ -72,7 +72,9 @@ function login(): void {
     <v-btn :disabled="!form.valid" :loading="loading" type="submit" color="success">login</v-btn>
 
     <div class="login__links">
-      <router-link :to="{ name: 'register' }" class="text-body-1 text-link text-green-lighten-1">
+      <router-link
+        :to="{ name: 'register' }"
+        class="text-body-large text-link text-green-lighten-1">
         Create account
       </router-link>
       <router-link
@@ -80,7 +82,7 @@ function login(): void {
           name: 'password-reset-request',
           query: { email: form.data.email || undefined },
         }"
-        class="text-body-1 text-link text-green-lighten-1">
+        class="text-body-large text-link text-green-lighten-1">
         Forgot password ?
       </router-link>
     </div>

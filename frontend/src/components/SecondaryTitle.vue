@@ -1,5 +1,5 @@
 <template>
-  <h2 class="text-h5 text-sm-h4 text-lg-h3">
+  <h2 class="text-headline-small text-sm-headline-large text-lg-display-medium">
     <slot></slot>
   </h2>
 </template>

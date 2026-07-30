@@ -33,7 +33,7 @@ function isItemActive(item: MenuItem): boolean {
   <v-navigation-drawer v-model="navbarDisplayed" touchless>
     <v-list>
       <v-list-item class="pt-3 pb-4">
-        <v-list-item-title class="text-h4 text-center">Tout Doux</v-list-item-title>
+        <v-list-item-title class="text-headline-large text-center">Tout Doux</v-list-item-title>
       </v-list-item>
 
       <v-btn
@@ -53,7 +53,7 @@ function isItemActive(item: MenuItem): boolean {
         :active="isItemActive(item)"
         :disabled="!item.link"
         class="py-3 py-sm-0">
-        <v-list-item-title class="text-body-1 d-flex align-center">
+        <v-list-item-title class="text-body-large d-flex align-center">
           <v-icon
             :icon="item.icon"
             size="small"

@@ -53,7 +53,7 @@ function scrollDownEvent(): void {
       height="100%"
       class="d-flex flex-column">
       <v-toolbar class="flex-grow-0">
-        <div class="text-body-1 text-sm-h6 mr-2 ml-4">
+        <div class="text-body-large text-sm-title-large mr-2 ml-4">
           Events : {{ dateFormat(date, 'D MMMM YYYY') }}
         </div>
 
@@ -97,7 +97,9 @@ function scrollDownEvent(): void {
               <img src="../../../assets/no_events.svg" alt="No events" class="empty-img" />
             </template>
             <template #message>
-              <p class="text-body-1 text-sm-h6 text-white mb-0">No event for that day.</p>
+              <p class="text-body-large text-sm-title-large text-white mb-0">
+                No event for that day.
+              </p>
             </template>
           </EmptyListDisplay>
         </template>

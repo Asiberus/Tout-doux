@@ -20,7 +20,7 @@ const size = computed<'default' | 'large' | 'x-large'>(() => {
     <v-icon v-if="icon" :size>
       {{ icon }}
     </v-icon>
-    <h1 class="text-h4 text-md-h3">
+    <h1 class="text-headline-large text-md-display-medium">
       <slot></slot>
     </h1>
   </div>

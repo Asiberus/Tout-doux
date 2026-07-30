@@ -90,7 +90,7 @@ function submit(): void {
             </span>
           </div>
 
-          <h1 class="text-h6 text-center">
+          <h1 class="text-title-large text-center">
             You must confirm your password to validate this action.
           </h1>
 

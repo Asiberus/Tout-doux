@@ -36,7 +36,7 @@ function resendEmail(): void {
   <div class="activate-user">
     <template v-if="state === 'tokenInvalid'">
       <img src="../../assets/token-error.svg" alt="token error" class="activate-user__img" />
-      <p class="text-body-1 text-center mb-0">
+      <p class="text-body-large text-center mb-0">
         The token is invalid or it may be expired. <br />
         Click on the button bellow to resend an email.
       </p>
@@ -44,7 +44,7 @@ function resendEmail(): void {
     </template>
     <template v-else-if="state === 'mailSent'">
       <img src="../../assets/mail-sent.svg" alt="mail sent" class="activate-user__img" />
-      <p class="text-body-1 text-center mb-0">
+      <p class="text-body-large text-center mb-0">
         An email has been sent to you ! <br />
         Check your inbox to activate your account.
       </p>

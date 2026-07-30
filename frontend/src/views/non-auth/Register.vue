@@ -207,15 +207,15 @@ function registerUser(): void {
         </v-btn>
         <router-link
           :to="{ name: 'login' }"
-          class="text-body-1 text-link text-green-lighten-1 float-right">
+          class="text-body-large text-link text-green-lighten-1 float-right">
           Go back to login
         </router-link>
       </v-form>
     </template>
     <template v-else>
       <img src="../../assets/mail-sent.svg" alt="mail sent" class="register__success-img" />
-      <h6 class="text-h6 mb-0">Account successfully created!</h6>
-      <p class="text-body-1 text-center mb-0">
+      <h6 class="text-title-large mb-0">Account successfully created!</h6>
+      <p class="text-body-large text-center mb-0">
         The last step to the activation of your account is to
         <span class="font-weight-bold">confirm your email</span>! <br />
         We have sent you a message with a link. Click on it and your account will be ready to use!

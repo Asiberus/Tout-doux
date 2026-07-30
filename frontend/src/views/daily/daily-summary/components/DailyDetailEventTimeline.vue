@@ -23,8 +23,8 @@ const eventText = computed<string>(() => {
 
 <template>
   <div>
-    <h4 class="text-h5 text-lg-h4">Events</h4>
-    <p class="text-subtitle-1 text-grey-lighten-1">
+    <h4 class="text-headline-small text-lg-headline-large">Events</h4>
+    <p class="text-body-large text-grey-lighten-1">
       {{ eventText }}
     </p>
 

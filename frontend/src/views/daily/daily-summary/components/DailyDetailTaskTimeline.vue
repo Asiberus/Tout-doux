@@ -45,7 +45,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
 
 <template>
   <div>
-    <h4 class="text-h5 text-lg-h4">
+    <h4 class="text-headline-small text-lg-headline-large">
       Tasks
       <v-chip size="small" color="grey-darken-3">
         {{ numberOfDailyTaskCompleted }}
@@ -53,7 +53,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         {{ dailyTaskList.length }}
       </v-chip>
     </h4>
-    <p class="text-subtitle-1 text-grey-lighten-1">
+    <p class="text-body-large text-grey-lighten-1">
       {{ taskText }}
     </p>
 

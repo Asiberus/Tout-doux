@@ -29,7 +29,7 @@ function logout(): void {
 
     <v-menu v-if="userStore.user" v-model="headerMenu">
       <template #activator="{ props }">
-        <v-btn variant="flat" class="header-menu-btn text-body-1" v-bind="props">
+        <v-btn variant="flat" class="header-menu-btn text-body-large" v-bind="props">
           <v-avatar size="24" color="transparent" class="mr-1">
             <v-icon icon="mdi-account-circle" />
           </v-avatar>
@@ -76,7 +76,7 @@ function logout(): void {
             :to="{ name: 'feedback' }"
             density="compact"
             :ripple="false"
-            class="font-italic text-body-2 text-link text-center feedback-link"
+            class="font-italic text-body-medium text-link text-center feedback-link"
             :class="{ 'text-grey': !isHovering, 'text-white': isHovering }">
             Give a feedback!
           </v-list-item>

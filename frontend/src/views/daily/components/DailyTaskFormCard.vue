@@ -85,7 +85,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
             @update="updateDailyTask({ action: $event })">
           </DailyTaskActionChip>
 
-          <h4 class="text-body-2 text-sm-body-1 font-weight-medium" :title="name">
+          <h4 class="text-body-medium text-sm-body-large font-weight-medium" :title="name">
             {{ name }}
           </h4>
         </div>

@@ -74,7 +74,7 @@ function deleteCollection(): void {
 <template>
   <div>
     <div class="d-flex flex-column flex-sm-row align-stretch column-gap-2 row-gap-1 mb-3">
-      <h4 class="text-h6 text-sm-h5 flex-grow-1">Settings</h4>
+      <h4 class="text-title-large text-sm-headline-small flex-grow-1">Settings</h4>
 
       <div class="d-flex gap-2">
         <ConfirmDialog @confirm="toggleCollectionArchiveState()">

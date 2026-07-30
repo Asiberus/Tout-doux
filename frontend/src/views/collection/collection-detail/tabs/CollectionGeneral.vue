@@ -65,7 +65,9 @@ function deleteTask(id: number): void {
   <div class="collection-general">
     <div class="collection-general__tasks">
       <div class="d-flex flex-column flex-sm-row flex-wrap column-gap-2 row-gap-1 mb-2">
-        <h5 class="text-h6 text-sm-h5 flex-grow-1">List of {{ collection.itemName }}</h5>
+        <h5 class="text-title-large text-sm-headline-small flex-grow-1">
+          List of {{ collection.itemName }}
+        </h5>
 
         <div class="d-flex justify-space-between align-center gap-2">
           <FilterChip
@@ -179,12 +181,12 @@ function deleteTask(id: number): void {
           color="collection lighten-2">
         </ProgressWheel>
       </div>
-      <h5 class="text-h6 text-sm-h5 mb-1 mb-lg-2">Description</h5>
+      <h5 class="text-title-large text-sm-headline-small mb-1 mb-lg-2">Description</h5>
       <v-card class="rounded-lg">
         <v-card-text>
           <div
             ref="description"
-            class="collection-general__description__content text-body-2"
+            class="collection-general__description__content text-body-medium"
             :class="{
               'display-description': displayDescription,
               'cursor-pointer': isDescriptionOverflowing,

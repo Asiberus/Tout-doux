@@ -101,7 +101,7 @@ function selectTask(task: Task): void {
         <div class="d-flex align-center">
           <div class="min-width-0">
             <h3
-              class="text-body-h1 text-sm-h6 text-white"
+              class="text-body-h1 text-sm-title-large text-white"
               :class="{ 'text-truncate': !selected }"
               :title="project.name">
               {{ project.name }}
@@ -139,7 +139,12 @@ function selectTask(task: Task): void {
 
             <v-spacer />
 
-            <v-btn color="red" icon variant="text" density="comfortable" @click.stop="unselectProject()">
+            <v-btn
+              color="red"
+              icon
+              variant="text"
+              density="comfortable"
+              @click.stop="unselectProject()">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </template>

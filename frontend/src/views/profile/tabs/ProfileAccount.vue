@@ -22,11 +22,11 @@ function deleteAccount(): void {
   <div class="profile-account">
     <TertiaryTitle>Delete your account</TertiaryTitle>
 
-    <p class="text-subtitle-1 mb-1">
+    <p class="text-body-large mb-1">
       You can delete your account by clicking on the button bellow. This action will delete all your
       <span class="font-weight-bold">projects, collections, tasks and events</span>.
     </p>
-    <p class="text-subtitle-1 font-italic">Please be careful, this action is not reversible.</p>
+    <p class="text-body-large font-italic">Please be careful, this action is not reversible.</p>
 
     <ConfirmPasswordDialog @password-confirmed="deleteAccount()">
       <template #activator="{ props }">

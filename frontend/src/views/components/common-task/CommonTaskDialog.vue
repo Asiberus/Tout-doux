@@ -129,7 +129,7 @@ function closeDialog(): void {
     </template>
     <v-card class="d-flex flex-column">
       <div class="px-6 pt-4 pb-2">
-        <h4 class="text-h5 text-sm-h4">
+        <h4 class="text-headline-small text-sm-headline-large">
           {{ commonTask ? 'Update Common Task' : 'New Common Task' }}
         </h4>
       </div>
@@ -153,7 +153,7 @@ function closeDialog(): void {
             @update:model-value="validateName">
           </v-text-field>
 
-          <h6 class="text-h6 text-grey-lighten-2">
+          <h6 class="text-title-large text-grey-lighten-2">
             <v-icon size="small">mdi-tag</v-icon>
             Tags
           </h6>

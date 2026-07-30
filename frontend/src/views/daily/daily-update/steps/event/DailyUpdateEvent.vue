@@ -93,7 +93,7 @@ function deleteEvent(id: number): void {
   <div class="d-flex flex-column h-100">
     <div class="d-flex align-center flex-wrap gap-2 mb-3">
       <div class="flex-grow-1 d-flex align-center gap-2">
-        <h5 class="text-h5">Events of the day</h5>
+        <h5 class="text-headline-small">Events of the day</h5>
         <v-chip v-if="eventList.length > 0" size="small">{{ eventList.length }}</v-chip>
       </div>
 

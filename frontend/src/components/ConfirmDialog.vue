@@ -44,7 +44,7 @@ function confirm(): void {
           </span>
         </div>
 
-        <div class="dialog-message text-h6 text-md-h5 text-white">
+        <div class="dialog-message text-title-large text-md-headline-small text-white">
           <slot></slot>
         </div>
 
