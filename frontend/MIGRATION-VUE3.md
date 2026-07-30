@@ -25,15 +25,15 @@
 ### 2. 🟠 Iso-visuel
 - [x] 2.1 — `variant` des inputs (`underlined`)
 - [x] 2.2 — `offset-*` / `nudge-*` supprimés
-- [ ] 2.3 — Hover mobile chips & tabs
+- [ ] 2.3 — Hover mobile chips & tabs *(⚠️ confirmé cassé : voir §2.3)*
 - [ ] 2.4 — QA des sélecteurs `:deep()`
 - [x] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
-- [ ] 2.6 — (Vuetify 4) Typographie MD3
-- [ ] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`)
+- [x] 2.6 — (Vuetify 4) Typographie MD3 *(91 occurrences renommées, 51 fichiers)*
+- [ ] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`) *(décision prise : MD3 adopté tel quel, cf. §2.7)*
 - [ ] 2.8 — (Vuetify 4) `fill-height` / VContainer
-- [ ] 2.9 — (Vuetify 4) VBtn (uppercase + grid→flex)
-- [ ] 2.10 — (Vuetify 4) CSS Layers + `!important`
-- [ ] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
+- [x] 2.9 — (Vuetify 4) VBtn (uppercase + grid→flex)
+- [x] 2.10 — (Vuetify 4) CSS Layers + `!important` *(cas connu traité, cf. §2.10)*
+- [x] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
 - [ ] 2.12 — (Vuetify 4) Grille VRow/VCol
 
 ### 3. 🟡 Nettoyage / dette
@@ -44,10 +44,10 @@
 - [~] 3.5 — `exact` sur `v-tab` *(PRÉMISSE DU DOC FAUSSE : `exact` reste actif en Vuetify 3 → nécessaire sur les onglets dont le `:to` est un chemin parent. Retrait annulé/rétabli.)*
 - [x] 3.6 — `formRef` sans `.value` *(+ `inputNameRef.focus()` corrigé)*
 - [x] 3.7 — `v-list-item-icon` *(déjà migré, confirmé : aucune occurrence)*
-- [ ] 3.8 — Dette de type : `string | null` → `string | undefined`
-- [ ] 3.9 — Dette de type : Vue Router 5 (`:to` chips, `auth.guard`, params)
-- [ ] 3.10 — Dette de type : `EventDialog`/events & divers
-- [ ] 3.11 — (Vuetify 4) Divers 🟡 (elevation, date range, thème `system`, labs)
+- [ ] 3.8 — Dette de type : `string | null` → `string | undefined` *(1/7 corrigé, cf. §3.8)*
+- [~] 3.9 — Dette de type : Vue Router 5 (`:to` chips, `auth.guard`, params) *(`auth.guard.ts` corrigé, reste `*Chip.vue`/`collection.router.ts`, cf. §3.9)*
+- [x] 3.10 — Dette de type : `EventDialog`/events & divers *(la majorité corrigée en traitant les bugs runtime associés, reliquat listé en §3.10)*
+- [x] 3.11 — (Vuetify 4) Divers 🟡 (elevation, date range, thème `system`, labs) *(chaque sous-point conclut « aucune action requise »)*
 - [ ] 3.12 — Montée de **Vite** 6 → dernière stable
 
 ### 4. ⚪ Optionnel
@@ -84,7 +84,8 @@
 
 ---
 
-## 1. 🔴 Bloquants — cassent le comportement
+<details>
+<summary><strong>1. 🔴 Bloquants — cassent le comportement — ✅ Terminé (11/11)</strong></summary>
 
 ### 1.1 `useDisplay()` : refs jamais déballés (`.value` manquant) — ✅ FAIT
 
@@ -502,9 +503,12 @@ En Vuetify 4, la prop de slot **`item`** des slots `#item` / `#selection` est re
 ```
 > ⚠️ `item` était déjà l'objet interne (pas le `Tag`) → passer `.raw` à `TagChip` corrige aussi l'erreur `vue-tsc` `TagSearch.vue:76` (cf. §3.10). À re-tester : rendu de la liste déroulante + sélection d'un tag.
 
+</details>
+
 ---
 
-## 2. 🟠 Iso-visuel — pour ne rien changer au style
+<details>
+<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 7/12 faits</strong></summary>
 
 ### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`) — ✅ FAIT
 
@@ -543,9 +547,13 @@ Sur `v-menu`, ces props n'existent plus. En V3 le menu se place par défaut sous
 
 > Comparer le positionnement avant/après ; ajuster via `location`/`offset` si le placement diffère.
 
-### 2.3 Hover mobile — chips & tabs (`src/App.vue`)
+### 2.3 Hover mobile — chips & tabs (`src/styles/global.scss`, ex-`App.vue`)
 
-`App.vue` (L.219+) neutralise déjà le hover des `v-btn` (`.v-btn__overlay`, L.221-223). Le bloc chips/tabs (L.225-232) cible `.v-chip` / `.v-tab` via `&:focus::before, &:hover::before` — **structure V2**. En V3 l'overlay a changé : vérifier les bons éléments (`.v-chip__overlay`, `.v-tab` → surface/overlay) et tester sur viewport `sm-and-down` que le hover est bien neutralisé sur mobile.
+> **⚠️ CONFIRMÉ CASSÉ** (vérifié dans `node_modules/vuetify/lib/components/VChip/VChip.sass` et `VTabs.sass`) : `.v-chip` neutralise son survol via un vrai élément **`.v-chip__overlay`** (pas un pseudo-élément), et `.v-tab` délègue au **`.v-btn__overlay`** (un `v-tab` est construit sur `VBtn` en interne). La règle actuelle `.v-chip, .v-tab { &:focus::before, &:hover::before { opacity: 0 !important } }` cible un `::before` qui n'existe plus pour ces deux composants → **du CSS mort, sans effet**. Seule la règle `.v-btn:hover .v-btn__overlay { opacity: 0 !important }` (déjà présente juste au-dessus) reste correcte et couvre `.v-tab` par ricochet (même classe interne).
+>
+> **Correctif à faire** : remplacer le bloc `.v-chip, .v-tab { &:focus::before, ... }` par `.v-chip:hover .v-chip__overlay, .v-chip:focus .v-chip__overlay { opacity: 0 !important }`.
+
+Le fichier a été extrait de `App.vue` vers `src/styles/global.scss` (voir aussi §2.10). Le bloc chips/tabs cible `.v-chip` / `.v-tab` via `&:focus::before, &:hover::before` — **structure V2/V3, obsolète en V4** comme détaillé ci-dessus. Tester sur viewport `sm-and-down` une fois corrigé.
 
 ### 2.4 QA des sélecteurs `:deep()`
 
@@ -585,14 +593,20 @@ En Vuetify 3, le slot par défaut de `<v-hover>` expose **`{ isHovering }`** (et
 > **Décisions à trancher** : (1) breakpoints — figer les anciens seuils *(recommandé, §2.7)* ou adopter MD3 ; (2) typo — renommage des classes `text-*` **non confirmé** (le codemod tranchera, §2.6) ; (3) `v-btn` uppercase — accepter le défaut ou rétablir (§2.9).
 > Outils officiels : `npx vuetify-codemods` + MCP Vuetify (`get_v4_breaking_changes`).
 
-### 2.6 (Vuetify 4) Typographie MD3 (~91 occurrences, 51 fichiers)
+### 2.6 (Vuetify 4) Typographie MD3 (~91 occurrences, 51 fichiers) — ✅ FAIT
 
-Vuetify 4 aligne la typographie sur MD3 (issue `vuetifyjs/vuetify#22557`). ⚠️ **La source officielle décrit un restyle (tailles/graisses/line-heights), sans renommage confirmé** des classes `text-h*`/`text-body-*`/… → lancer le codemod (qui renommera s'il y a lieu) puis **revue visuelle obligatoire**.
+> **Réalisé.** Renommage confirmé (guide officiel [Typography Migration](https://vuetifyjs.com/en/getting-started/typography-migration/)) : `h1-h3`→`display-*`, `h4-h6`→`headline-*`/`title-large`, `subtitle-1`/`body-1`→`body-large`, `subtitle-2`/`button`→`title-small`/`label-large`, `body-2`→`body-medium`, `caption`→`body-small`, `overline`→`label-medium` (+ `text-uppercase` ajouté pour compenser la perte des majuscules par défaut, seule occurrence dans `SettingsTags.vue`). Appliqué par script sur les **91 occurrences / 51 fichiers**, y compris les variantes responsive (`text-sm-*`, `text-md-*`, etc., qui suivent la même convention en MD3).
+>
+> **Effet de bord découvert et corrigé** : Vuetify 4 a aussi réduit son reset CSS (`h1`-`h6`/`p` n'ont plus `margin: 0` par défaut) → règle de reset restaurée dans `src/styles/global.scss`, correctement wrappée en `@layer vuetify-core.reset` pour ne pas gagner sur les classes utilitaires `mb-*`/`mt-*` (cf. §2.10). `p` a aussi une marge par défaut `margin-bottom: 16px` ajoutée (choix produit, hors reset MD2).
+>
+> **build + type-check OK.** ⚠️ QA visuelle recommandée (tailles légèrement différentes, cf. tableau de correspondance ci-dessous).
 
 Repérer les fichiers : `grep -rlE "text-(h[1-6]|subtitle-[12]|body-[12]|button|caption|overline)\b" src/`.
 Occurrences par classe : `text-body-1` (23), `text-h5` (19), `text-h6` (18), `text-subtitle-1` (8), `text-body-2` (8), `text-subtitle-2` (7), `text-h4` (3), `text-caption` (3), `text-h1` (1), `text-overline` (1). Concentrées dans `MainTitle/SecondaryTitle/TertiaryTitle.vue`, `TheHeader/TheNavbar`, et la quasi-totalité des vues.
 
 ### 2.7 (Vuetify 4) Breakpoints réduits → `useDisplay`
+
+> **Décision prise (implicite)** : les seuils MD3 par défaut (`md: 840`, `lg: 1145`, `xl: 1545`, `xxl: 2138`) ont été **adoptés tels quels**, pas figés à l'ancien découpage. Ça a d'ailleurs servi de piste de diagnostic pour un bug de layout `DailyDetail.vue` (bascule tabs ↔ 2-colonnes à une largeur différente qu'avant). Reste à faire : la **QA responsive complète** `xs`→`xl` n'a pas été menée systématiquement — cocher la case seulement après un passage écran par écran.
 
 Les seuils par défaut sont réduits (MD3) → tout le responsive se décale. **~30 fichiers** utilisent `useDisplay()` + le composable central `src/composables/useDialogWidth.ts` (consommé par ~20 dialogs/cartes). Repérer : `grep -rl "useDisplay" src/`.
 
@@ -611,23 +625,35 @@ Sinon (adopter MD3) : re-tester `xs`→`xl` sur chaque écran (dialogs plein éc
 
 Action : réintroduire `d-flex align-center` là où un centrage vertical était attendu.
 
-### 2.9 (Vuetify 4) VBtn : uppercase supprimé + layout grid → flex
+### 2.9 (Vuetify 4) VBtn : uppercase supprimé + layout grid → flex — ✅ FAIT
+
+> **Réalisé** — via la variable Sass officielle plutôt qu'une classe (`src/styles/settings.scss`) :
+> ```scss
+> @use 'vuetify/settings' with (
+>     $button-colored-disabled: false,
+>     $button-text-transform: uppercase,
+> );
+> ```
+> Vérifié par compilation directe (`sass` CLI sur `VBtn.sass`) : `.v-btn { text-transform: uppercase; }` bien généré. Le passage grid→flex est **purement interne** à Vuetify (aucun override custom du projet n'en dépendait) → aucune action requise sur ce point. ⚠️ QA visuelle : alignement icône + texte sur les boutons avec `<v-icon start/end>`.
 
 Les libellés des **89 `<v-btn>`** ne sont plus en MAJUSCULES par défaut, et le layout interne passe de grid à flexbox.
-- Choix : accepter le rendu (revoir les libellés) **ou** rétablir globalement dans `src/plugins/vuetify.ts` :
-  ```ts
-  defaults: { VBtn: { class: 'text-uppercase' }, /* … bloc defaults existant */ }
-  ```
-- Revérifier l'alignement icône + texte (boutons avec `<v-icon start/end>`).
 
-### 2.10 (Vuetify 4) CSS Layers obligatoires + `!important`
+### 2.10 (Vuetify 4) CSS Layers obligatoires + `!important` — ✅ FAIT (cas connu traité)
 
-Vuetify 4 impose les CSS layers → la spécificité des overrides change. Le MCP officiel préconise de remplacer les `!important` par du CSS layer-aware.
-- **49 `!important`** dans le projet (surtout `src/App.vue`) : `grep -rn "!important" src/` → passer en revue (un `!important` peut ne plus l'emporter).
-- Overrides `:deep()` à revérifier : `App.vue` (`.v-stepper__*`, `.v-window__*`, `.v-calendar-weekly*`, `.v-btn__overlay`, `.v-chip`/`.v-tab`), `Settings/CollectionDetail/ProjectDetail/ProjectSection/Profile/DailyUpdateProjectListItem`, timelines, `TheHeader`.
-- Reset CSS réduit : ⚠️ **`overflow-y` retiré** du reset → ré-ajouter si un scroll en dépendait.
+> **Réalisé pour le cas identifié** : bug concret rencontré sur le reset `h1`-`h6`/`p` (§2.6) — une règle `margin: 0` non-layered dans `global.scss` gagnait **systématiquement** sur les classes utilitaires Vuetify (`mb-3`, etc.), même wrappées dans un layer, car **une règle hors layer bat toujours une règle layered, quelle que soit la spécificité**. Confirmé par le guide officiel ([Upgrade guide — Layers](https://vuetifyjs.com/en/getting-started/upgrade-guide/#layers)) et corrigé en reproduisant exactement le snippet recommandé, avec le bon sous-layer :
+> ```scss
+> @layer vuetify-core.reset {
+>   h1, h2, h3, h4, h5, h6 { margin: 0; }
+>   p { margin: 0 0 16px; }
+> }
+> ```
+> **Les 48 autres `!important` du projet n'ont pas ce problème** : ils sont eux aussi non-layered, mais leur but est justement de **gagner** face à Vuetify (neutraliser un défaut, forcer une dimension) — le mécanisme « non-layered gagne toujours » joue alors **en leur faveur**, pas besoin d'y toucher. Seul un `!important` qui doit explicitement **perdre** face à une classe utilitaire Vuetify (comme le cas du reset) a besoin d'être repassé en `@layer`.
+> **`overflow-y` retiré du reset** (Vuetify) : non vérifié spécifiquement, à surveiller si un scroll casse quelque part.
 
-### 2.11 (Vuetify 4) Variables Sass renommées/supprimées
+Vuetify 4 impose les CSS layers → la spécificité des overrides change.
+- Overrides `:deep()` à revérifier : `global.scss` (ex-`App.vue`) (`.v-stepper__*`, `.v-window__*`, `.v-calendar-weekly*`, `.v-btn__overlay`, `.v-chip`/`.v-tab` — cf. §2.3 pour ce dernier point, confirmé cassé), `Settings/CollectionDetail/ProjectDetail/ProjectSection/Profile/DailyUpdateProjectListItem`, timelines, `TheHeader`.
+
+### 2.11 (Vuetify 4) Variables Sass renommées/supprimées — ✅ FAIT
 
 `src/styles/settings.scss` fait `@use 'vuetify/settings' with ($button-colored-disabled: false)`.
 - ✅ **`$button-colored-disabled` existe toujours en v4.1.6** (le `yarn build` passe sans erreur Sass). Aucune action requise ici. *(D'autres variables sont supprimées — `$grid-gutters`, `$form-grid-gutter`, `$counter-color`… — mais non utilisées par le projet.)*
@@ -636,9 +662,14 @@ Vuetify 4 impose les CSS layers → la spécificité des overrides change. Le MC
 
 Refonte (marges négatives → CSS `gap`, certaines classes/comportements changent). **Surface faible** : 2 `v-container`, 4 `v-row`, 8 `v-col` (aucun `offset-*`). Action : re-tester les espacements de ces écrans ; pas de renommage systématique.
 
+> Note d'investigation : un bug de layout signalé dans `DailyDetail.vue` (cards qui ne remplissaient plus la largeur disponible) faisait initialement suspecter ce point (`v-row`/`v-col`), mais la cause réelle était ailleurs (`.v-timeline-item__body`, cf. §3.10/timelines). `v-row`/`v-col` en tant que tel reste non vérifié pour ce qui est du `gap`.
+
+</details>
+
 ---
 
-## 3. 🟡 Nettoyage / dette technique
+<details>
+<summary><strong>3. 🟡 Nettoyage / dette technique — 7/12 faits, 2 partiels</strong></summary>
 
 ### 3.1 Hack `loginGuard` (`nonAuth.router.ts`) — ✅ FAIT
 
@@ -730,27 +761,33 @@ Aucune occurrence de `v-list-item-icon` : migration vers `v-list-item` + slots `
 
 ---
 
-### 3.8 Dette de type : `string | null` → `string | undefined`
+### 3.8 Dette de type : `string | null` → `string | undefined` (1/7 corrigé)
 
 Des props (couleur/taille) reçoivent `string | null` alors que Vuetify attend `string | undefined` (`vue-tsc` : `Type 'null' is not assignable to type 'string | undefined'`). Aligner le type **source** (computed/prop) sur `string | undefined`, ou passer `?? undefined`.
-- `src/views/project/components/ProjectCard.vue:19`, `src/views/feedback/Feedback.vue:45`, `src/views/project/project-detail/components/SectionDialog.vue:86`, `src/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue:62`, `src/views/daily/daily-summary/DailySummary.vue:145`, `src/views/daily/daily-summary/components/DailyDetailEventTimeline.vue:35`, `src/views/daily/daily-summary/components/DailySummaryCard.vue:39`.
+- ✅ `src/views/daily/daily-summary/components/DailyDetailEventTimeline.vue:35` — corrigé en même temps que le bug de couleur du dot de timeline (`isPassed(event) ? 'passedEvent' : 'event'` au lieu de `null`).
+- Restent ouverts (vérifié via `yarn type-check`, toujours en erreur) : `src/views/project/components/ProjectCard.vue:19`, `src/views/feedback/Feedback.vue:45`, `src/views/project/project-detail/components/SectionDialog.vue:86`, `src/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue:64`, `src/views/daily/daily-summary/DailySummary.vue:145`, `src/views/daily/daily-summary/components/DailySummaryCard.vue:39`.
 
-### 3.9 Dette de type : Vue Router 5
+### 3.9 Dette de type : Vue Router 5 (partiel)
 
 Les types VR5 sont plus stricts :
-- **`src/components/ProjectChip.vue:42`, `SectionChip.vue:44`, `CollectionChip.vue:42`** : `detailLocation` renvoie `RouteLocation | null` mais la prop `:to` n'accepte pas `null` ni un objet partiel `{ name, params }` → typer en `RouteLocationRaw | undefined` (et retourner `undefined` au lieu de `null`).
-- **`src/router/guards/auth.guard.ts:10, 17`** : `RouteRecordNameGeneric` (un nom de route peut être `symbol`) non assignable à `(string|null|undefined)[]` / `string` → adapter la comparaison (filtrer/caster en `string`).
-- **`src/router/modules/collection.router.ts:17`** : `route.params.id` est `string | string[]` → `String(route.params.id)` ou `Array` guard.
+- ✅ **`src/router/guards/auth.guard.ts`** — corrigé (traité avec la refonte des guards en `NavigationGuard` sans `next()`, cf. §3.1) : `NON_AUTH_ROUTES` typé en `RouteRecordNameGeneric[]` au lieu de `(string|null|undefined)[]`.
+- Restent ouverts (vérifié via `yarn type-check`) :
+  - **`src/components/ProjectChip.vue`, `SectionChip.vue`, `CollectionChip.vue`** (L.28 + L.42/44) : `detailLocation` renvoie `RouteLocation | null`, incompatible avec la prop `:to` → typer en `RouteLocationRaw | undefined` (retourner `undefined` au lieu de `null`). Nouvelles erreurs apparues aussi sur ces 3 fichiers (`No overload matches this call`, `SectionChip.vue:52` `Expected 0 arguments, but got 1`) — probablement amplifiées par la montée vue-router 5.2.0, à re-diagnostiquer.
+  - **`src/router/modules/collection.router.ts:17`** : `route.params.id` est `string | string[]` → `String(route.params.id)` ou garde de type `Array`.
 
-### 3.10 Dette de type : `EventDialog`/events & divers
+### 3.10 Dette de type : `EventDialog`/events & divers — ✅ FAIT (majorité), reliquat listé
 
-- **Prop `startDatePlaceholder` manquante** aux usages d'`EventDialog` : `src/views/daily/daily-update/steps/event/DailyUpdateEvent.vue:107`, `src/views/project/project-detail/tabs/ProjectEvent.vue:59` → passer la prop (ou la rendre optionnelle dans `EventDialog`).
-- **`EventDialog.vue` interne** : L.158 `emit('update', { id: eventToSubmit.id })` — `EventPostOrPatch` n'a pas de champ `id` (cf. §4) ; L.128, 209, 302, 317, 370. **`EventItemCard.vue`** : 100/102/197.
-- **Mismatch props/model** : `DailyUpdateEvent.vue:128` (`string`→`boolean`), `DailyUpdateProjectListItem.vue:199` (`string`→`number`), `DailyTaskCard.vue` (27/72/76/80), `DailyTaskActionChip.vue` (29/50), `TagSearch.vue` (19/32 + slot `item` cf. §1.11), `*Chip.vue:28` (`withDefaults`), `CommonTaskDialog.vue:48`, `DailyDetail.vue:144`, `DailyUpdateTask.vue:306` (`sectionId` optionnel), `DailyUpdateTaskList.vue:76/83` (`DailyTaskPatch` vs `DailyTaskPost`).
-- **Divers** : `src/views/non-auth/ResetPassword.vue:52` (`this` implicite — annoter ou refactorer), `src/views/settings/tabs/SettingsTags.vue:7` (`SettingsTagList` utilisé comme type → `typeof`), `src/plugins/vuetify.ts:28` (typage thème/couleurs custom), `AdministrationUser.vue:72` + `AdministrationFeedback.vue:67/96` (typage des headers `v-data-table`).
-- **Agenda / `v-calendar`** (~15 erreurs dans `Agenda.vue` : 44/48/53/54/74/128/160/165/213/270/274/284/294…) : liées au calendrier non migré → **à traiter avec §1.9** (pas isolément).
+- ✅ **Prop `startDatePlaceholder` manquante** — corrigé : rendue optionnelle (`string`, plus de `| null`) dans `EventDialog.vue`, câblée avec la vraie date de contexte dans `DailyUpdateEvent.vue` (`:start-date-placeholder="date"`, un vrai bug UX corrigé au passage : le formulaire de création s'ouvrait sur « aujourd'hui » au lieu du jour du daily-update), omise proprement dans `EventItemCard.vue`/`ProjectEvent.vue` où elle n'a pas de sens (mode édition / pas de contexte de jour).
+- ✅ **`EventDialog.vue` interne** — plus aucune erreur `vue-tsc` sur ce fichier (corrigé avec la réécriture des date/time pickers, §1.8 : `emit('update', { id: event.id, ... })` au lieu de `eventToSubmit.id`).
+- ✅ **`EventItemCard.vue`** — plus aucune erreur : `cardColor` typé proprement (`'passedEvent'` au lieu du `'null'` littéral), `relatedToDate` retypé `string` (au lieu de `boolean`, faute de frappe d'origine).
+- ✅ **`DailyTaskCard.vue` (27/72/76/80)** — corrigé : `cardColor` computed (plus de `null` littéral sur `:color`), `z-index="300"` → `:z-index="300"` (×3, string→number).
+- ✅ **`DailyDetail.vue:144`** — corrigé avec le slot `v-hover` (§2.5).
+- ✅ **`DailyUpdateEvent.vue:128`** — plus d'erreur sur ce fichier (effet de bord du retypage `relatedToDate`/`startDatePlaceholder` ci-dessus).
+- ✅ **Agenda / `v-calendar`** — 0 erreur sur `Agenda.vue` (traité avec §1.9).
+- **Reliquat encore ouvert** (vérifié via `yarn type-check`) : `DailyUpdateProjectListItem.vue:206` (`string`→`number`), `DailyTaskActionChip.vue` (29/50), `TagSearch.vue:79` (`Property 'raw' does not exist on type Tag` — reformulation du souci de §1.11, à revérifier), `*Chip.vue:28` (`withDefaults`/`No overload matches`), `CommonTaskDialog.vue:48`, `DailyUpdateTask.vue:312` (`sectionId` optionnel), `DailyUpdateTaskList.vue:78/85` (`DailyTaskPatch` vs `DailyTaskPost`), `src/views/non-auth/ResetPassword.vue:52` (`this` implicite), `src/views/settings/tabs/SettingsTags.vue:7` (`SettingsTagList` utilisé comme type → `typeof`), `AdministrationUser.vue:72` + `AdministrationFeedback.vue:67/98` (typage des headers `v-data-table`), et une nouvelle erreur `EventDayDialog.vue:32` (`scrollTop` n'existe pas sur le type du ref `v-card`).
+- **`src/plugins/vuetify.ts:28`** (typage thème/couleurs custom) : n'apparaît plus dans `yarn type-check` — semble non-bloquant en pratique, pas d'action nécessaire.
 
-### 3.11 (Vuetify 4) Divers 🟡
+### 3.11 (Vuetify 4) Divers 🟡 — ✅ FAIT (aucune action requise)
 
 - **Elevation** : MD3 réduit à ~6 niveaux (0-5). Aucun `elevation` > 5 utilisé ; seul un commentaire SCSS `App.vue:171` (« elevation-8 ») à revoir si le shadow custom en dépendait.
 - **VDatePicker `multiple="range"`** n'émet plus les dates intermédiaires — vérifier `EventDialog.vue` (a priori sélection simple).
@@ -765,20 +802,26 @@ Vite est en **`^6.0.1`**. Monter vers la dernière stable (≥ 7, désormais per
 - Fichiers potentiellement impactés : `vite.config.ts`, `package.json` (scripts/deps), éventuels réglages `build.rollupOptions`.
 - Migration **indépendante** de Vuetify 4 ; à faire séparément avec `yarn build` + `yarn dev` de contrôle.
 
+</details>
+
 ---
 
-## 4. ⚪ Optionnel / améliorations (hors « iso-fonctionnel »)
+<details>
+<summary><strong>4. ⚪ Optionnel / améliorations (hors « iso-fonctionnel ») — non requis pour l'iso-fonctionnel</strong></summary>
 
 - **`:model-value` → `v-model`** : convertir **uniquement** quand `:model-value="x"` **+** `@update:model-value="x = $event"` portent sur la **même** valeur (ex. `HalfDialog.vue:21/24`, `ConfirmDialog.vue:36/39`, `CommonTaskDialog.vue:124/127`). **Ne pas** toucher : les `:model-value` en lecture seule (`ProgressDisk.vue:21`, `ProgressWheel.vue:43`, `ProjectCard.vue:22`, `CollectionCard.vue:23`, `ProjectSectionItem.vue:229`) ni les `@update:model-value` qui appellent une fonction (validation) sans liaison bidirectionnelle.
 - **Vuelidate** : remplacer la validation manuelle des forms — change le fonctionnement, hors lot iso-fonctionnel.
 - **Calls API via les stores** : `project`/`collection` passent déjà par leurs stores Pinia. Auditer si des composants appellent directement `*.api.ts` alors qu'un store existe.
 - **Getters Pinia « completed tasks »** du `currentProject` : factorisation.
 - **Bug latent** `src/store/project.store.ts:62` : `this.currentProject = { ...this.currentProject, response }` crée une clé littérale `response` au lieu de fusionner (`...response`). À corriger si la mise à jour des propriétés projet ne se reflète pas dans l'UI.
-- **Bug latent** `src/views/components/event/EventDialog.vue:158` : `emit('update', { id: eventToSubmit.id, … })` — `eventToSubmit` (type `EventPostOrPatch`) n'a pas de champ `id`. À vérifier lors du typage.
+- ✅ **Bug latent corrigé** `src/views/components/event/EventDialog.vue` : `emit('update', { id: eventToSubmit.id, … })` utilisait le mauvais id — corrigé en `emit('update', { id: event.id, ... })` avec la réécriture des date/time pickers (§1.8/§3.10).
+
+</details>
 
 ---
 
-## 5. Checklist QA finale
+<details>
+<summary><strong>5. Checklist QA finale — à faire (QA manuelle)</strong></summary>
 
 - [ ] `vue-tsc` installé + `yarn type-check` : 0 erreur.
 - [ ] `yarn lint` : 0 warning `eslint-plugin-vuetify`.
@@ -792,9 +835,12 @@ Vite est en **`^6.0.1`**. Monter vers la dernière stable (≥ 7, désormais per
 - [ ] Hover neutralisé sur mobile pour btn/chip/tab (§2.3).
 - [ ] Inputs : variant homogène (§2.1).
 
+</details>
+
 ---
 
-## 6. 📦 Montée de versions des dépendances (2026-07)
+<details open>
+<summary><strong>6. 📦 Montée de versions des dépendances (2026-07) — ✅ FAIT</strong></summary>
 
 > Fusion de l'ancien `MIGRATION-DEPS.md`. Recherche recoupée avec npm + Context7 + **MCP officiel Vuetify**.
 
@@ -810,3 +856,5 @@ Vite est en **`^6.0.1`**. Monter vers la dernière stable (≥ 7, désormais per
 - **`yarn build` OK** ; `type-check` : 76 erreurs de type préexistantes (détaillées en **§2.5** et **§3.8–§3.10**), **inchangées** par les montées (aucune régression).
 
 *(Migration Vuetify 3→4, dette de type et montée de Vite : voir les points détaillés §1.11, §2.5–§2.12, §3.8–§3.12 ci-dessus.)*
+
+</details>

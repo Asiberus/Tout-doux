@@ -57,7 +57,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
       {{ taskText }}
     </p>
 
-    <v-timeline density="compact">
+    <v-timeline density="compact" truncate-line="both">
       <v-timeline-item
         v-for="dailyTask in dailyTaskList"
         :key="`daily-task-${dailyTask.id}`"
@@ -97,12 +97,6 @@ function toggleDailyTask(dailyTask: DailyTask): void {
     --bar-left: 18px;
     --divider-width: 55px;
     --divider-justify-content: flex-start;
-  }
-
-  &::before {
-    top: 36px;
-    left: var(--bar-left) !important;
-    height: calc(100% - 60px);
   }
 
   .v-timeline-item {

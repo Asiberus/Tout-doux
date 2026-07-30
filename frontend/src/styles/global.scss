@@ -13,14 +13,19 @@ body {
   background: #121212; // Background color of vuetify dark theme
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  margin: 0;
+@layer vuetify-core.reset {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0 0 16px;
+  }
 }
 
 .h-100 {

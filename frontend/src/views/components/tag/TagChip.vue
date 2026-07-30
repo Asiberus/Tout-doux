@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Tag } from '@/models/tag.model'
-import { onMounted } from 'vue'
 
-const props = defineProps<{
+defineProps<{
   tag: Tag
   small?: boolean
   xSmall?: boolean
@@ -18,7 +17,6 @@ defineEmits<{
 <template>
   <v-chip
     :color="tag.color"
-    variant="flat"
     :size="small || xSmall ? 'small' : 'default'"
     :closable="clearable && !disabled"
     :disabled

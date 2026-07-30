@@ -28,7 +28,7 @@ const eventText = computed<string>(() => {
       {{ eventText }}
     </p>
 
-    <v-timeline density="compact">
+    <v-timeline density="compact" truncate-line="both">
       <v-timeline-item
         v-for="event of events"
         :key="`event-${event.id}`"
@@ -71,12 +71,6 @@ const eventText = computed<string>(() => {
     --bar-left: 18px;
     --divider-width: 55px;
     --divider-justify-content: flex-start;
-  }
-
-  &::before {
-    top: 36px;
-    left: var(--bar-left) !important;
-    height: calc(100% - 60px);
   }
 
   .v-timeline-item {
