@@ -75,18 +75,18 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
     justify-content: center;
     padding: 24px 0;
     background-color: transparent;
-    border: 2px solid var(--v-secondary-base);
+    border: 2px solid rgb(var(--v-theme-secondary));
     cursor: pointer;
 
     @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
       // We don't display hover for mobile
       &:hover {
-        background-color: var(--v-secondary-darken1);
+        background-color: rgb(var(--v-theme-secondary-darken-1));
       }
     }
 
     &.selected {
-      border-color: var(--v-accent-base);
+      border-color: rgb(var(--v-theme-accent));
     }
 
     .radio-button {

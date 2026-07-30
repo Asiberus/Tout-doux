@@ -10,10 +10,6 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-onMounted(() => {
-  console.log(props.tag)
-})
-
 defineEmits<{
   clear: [id: number]
 }>()

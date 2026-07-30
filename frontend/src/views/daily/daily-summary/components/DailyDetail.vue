@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DailyTask } from '@/models/daily-task.model'
-import { EventModel } from '@/models/event.model'
+import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
 import moment from 'moment'
@@ -26,7 +26,7 @@ const emit = defineEmits<{
 
 const dialogState = ref(false)
 const dailyTaskList = ref<DailyTask[]>([])
-const events = ref<EventModel[]>([])
+const events = ref<EventExtendedModel[]>([])
 
 const tab = ref<'task' | 'event'>('task')
 const isScrollingOnContent = ref(false)
@@ -69,7 +69,7 @@ function retrieveDailyTaskList(): void {
 function retrieveTodayEvents(): void {
   eventApi.getEvents({ date: props.date }).then(
     response =>
-      (events.value = response.sort((a: EventModel, b: EventModel) =>
+      (events.value = response.sort((a: EventExtendedModel, b: EventExtendedModel) =>
         sortEvents(a, b, { handlePassedEvent: true })
       )),
     error => console.error(error)
@@ -132,7 +132,7 @@ function emitDailyTaskCompletedEvent(): void {
       }"
       class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-8">
       <div class="actions-wrapper">
-        <v-btn icon @click="setDialogStateTo(false)">
+        <v-btn icon variant="text" density="comfortable" @click="setDialogStateTo(false)">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>
@@ -145,6 +145,8 @@ function emitDailyTaskCompletedEvent(): void {
           <v-btn
             :to="{ name: 'daily-update', params: { date, step: 'task' } }"
             icon
+            variant="text"
+            density="comfortable"
             :size="editBtnSize"
             :color="isHovering ? 'grey lighten-1' : 'grey darken-3'"
             class="ml-1"

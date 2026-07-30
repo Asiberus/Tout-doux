@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Project } from '@/models/project.model'
 
-const { hover = false, small = false } = defineProps<{
-  project: Project
-  hover?: boolean
-  small?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    project: Project
+    hover?: boolean
+    small?: boolean
+  }>(),
+  { hover: false, small: false }
+)
 </script>
 
 <template>
@@ -13,7 +16,7 @@ const { hover = false, small = false } = defineProps<{
     :color="project.archived ? 'projectArchived' : 'project'"
     :size="small ? 12 : 15"
     class="project-avatar"
-    :class="{ hovered: hover, small }"
+    :class="{ hovered: hover, small: small }"
     :title="project.name">
     <span :class="{ 'project-archived': project.archived }">
       {{ project.name.slice(0, 1) }}
@@ -47,10 +50,10 @@ const { hover = false, small = false } = defineProps<{
     font-weight: 0;
     transform: scale(0.5);
     transition: all 0.2s ease-in-out;
-    color: var(--v-antiProject-base);
+    color: rgb(var(--v-theme-antiProject));
 
     &.project-archived {
-      color: var(--v-antiProjectArchived-base);
+      color: rgb(var(--v-theme-antiProjectArchived));
     }
   }
 

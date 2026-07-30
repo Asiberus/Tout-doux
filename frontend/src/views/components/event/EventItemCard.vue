@@ -25,9 +25,10 @@ const props = withDefaults(
     showIcon?: boolean
     caret?: boolean
     marginBottom?: boolean
-    relatedToDate?: boolean
+    relatedToDate?: string
+    hoverBackground?: boolean
   }>(),
-  { changePassedTextColor: true, project: null, color: null }
+  { changePassedTextColor: true, project: undefined, color: undefined, hoverBackground: true }
 )
 
 const emit = defineEmits<{
@@ -47,9 +48,9 @@ const eventDialog = ref(false)
 const displayDescription = ref(false)
 const isDescriptionOverflowing = ref(false)
 
-const cardColor = computed<string | null>(() => {
+const cardColor = computed(() => {
   if (props.color) return props.color
-  if (isPassed(props.event)) return 'null' // TODO : 'null' or null ?
+  if (isPassed(props.event)) return 'passedEvent'
 
   return 'event'
 })
@@ -97,13 +98,19 @@ function isDateEqual(date1: string, date2: string): boolean {
 
 <template>
   <div>
-    <v-hover v-slot="{ isHovering }">
+    <v-hover v-slot="{ isHovering, props: hoverProps }">
       <v-card
+        v-bind="hoverProps"
         :color="cardColor"
         :disabled
         :ripple="false"
         class="rounded-lg"
-        :class="{ 'cursor-default': !clickable, 'mb-3': marginBottom, caret }"
+        :class="{
+          'cursor-default': !clickable,
+          'mb-3': marginBottom,
+          caret,
+          'no-hover-bg': !hoverBackground,
+        }"
         @click="onEventCardClick()">
         <v-card-text class="d-flex align-center pa-3 pa-sm-4">
           <v-icon
@@ -121,7 +128,9 @@ function isDateEqual(date1: string, date2: string): boolean {
           </template>
 
           <div class="flex-grow-1 d-flex flex-column overflow-hidden">
-            <div class="date-text text-grey font-weight-bold" :class="[getTextColor('date')]">
+            <div
+              class="date-text text-grey-lighten-3 font-weight-bold"
+              :class="[getTextColor('date')]">
               <template v-if="event.takesWholeDay && !daySelected">
                 <span title="Date">
                   {{ dateFormat(event.startDate, 'DD/MM/YY') }}
@@ -183,7 +192,8 @@ function isDateEqual(date1: string, date2: string): boolean {
 
           <template v-if="project">
             <router-link :to="{ name: 'project-detail', params: { id: project.id } }" class="ml-2">
-              <ProjectAvatar :project="project" :hover="isHovering || xs" :small="xs"> </ProjectAvatar>
+              <ProjectAvatar :project="project" :hover="isHovering || xs" :small="xs">
+              </ProjectAvatar>
             </router-link>
           </template>
         </v-card-text>
@@ -207,15 +217,23 @@ function isDateEqual(date1: string, date2: string): boolean {
 @use 'sass:map';
 @use 'vuetify/lib/styles/settings/_variables';
 
+.v-card.caret {
+  overflow: visible;
+}
+
 .caret::after {
   content: '';
   position: absolute;
-  top: calc(50% - 10px);
-  left: -9px;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #000;
-  border-right-color: inherit;
+  top: 50%;
+  left: -5px;
+  width: 14px;
+  height: 14px;
+  background-color: inherit;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.no-hover-bg :deep(.v-card__overlay) {
+  opacity: 0 !important;
 }
 
 .date-text {

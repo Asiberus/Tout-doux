@@ -27,6 +27,7 @@ const scrollableElement = useTemplateRef('dialogContent')
 const isScrollingOnContent = ref(false)
 
 function touchStartEvent(): void {
+  if (!scrollableElement.value) return
   // We detect if the touch-down is a scroll on the content
   isScrollingOnContent.value = scrollableElement.value.scrollTop > 0
 }
@@ -52,9 +53,9 @@ function scrollDownEvent(): void {
       height="100%"
       class="d-flex flex-column">
       <v-toolbar class="flex-grow-0">
-        <v-toolbar-title class="text-body-1 text-sm-h6 mr-2">
+        <div class="text-body-1 text-sm-h6 mr-2 ml-4">
           Events : {{ dateFormat(date, 'D MMMM YYYY') }}
-        </v-toolbar-title>
+        </div>
 
         <v-btn
           :size="xs ? 'small' : 'default'"
@@ -65,9 +66,9 @@ function scrollDownEvent(): void {
           <template v-if="smAndUp">event</template>
         </v-btn>
 
-        <v-spacer></v-spacer>
+        <v-spacer />
 
-        <v-btn icon @click="show = false">
+        <v-btn icon variant="text" density="comfortable" @click="show = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
@@ -76,10 +77,12 @@ function scrollDownEvent(): void {
           <div class="d-flex flex-column gap-3 pt-3">
             <EventItemCard
               v-for="event of events"
+              :key="event.id"
               :event
               :project="event.project"
               :clickable="event.project ? !event.project.archived : true"
               color="event"
+              caret
               :day-selected="true"
               :change-passed-text-color="false"
               :margin-bottom="false"

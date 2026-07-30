@@ -32,7 +32,7 @@ const startDatePlaceholder = ref<string>()
 const eventTooltip = ref(false)
 const eventTooltipKey = ref(0)
 const eventSelected = ref<EventExtendedModel>()
-const eventTooltipElement = ref<EventExtendedModel>()
+const eventTooltipElement = ref<Element>()
 
 const eventDayDialog = ref(false)
 const eventDayDialogDate = ref<string | null>(null)
@@ -41,17 +41,17 @@ const eventDayDialogEvents = ref<EventExtendedModel[]>([])
 let doubleClickTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 const monthSelected = computed<string>(() => {
-  return moment(value).format('MMMM YYYY')
+  return moment(value.value).format('MMMM YYYY')
 })
 
 const isCurrentMonthSelected = computed<boolean>(() => {
-  return moment(value).isSame(moment(), 'month')
+  return moment(value.value).isSame(moment(), 'month')
 })
 
 function retrieveEvents(): void {
   events.value = []
-  const month = moment(value).month() + 1 // Month count start at 0
-  const year = moment(value).year()
+  const month = moment(value.value).month() + 1 // Month count start at 0
+  const year = moment(value.value).year()
   eventApi.getEvents({ month, year }).then(
     response => (events.value = response),
     error => console.error(error)
@@ -71,7 +71,7 @@ function setDayDialogEventList(options: { sort: boolean } = { sort: true }): voi
   if (!eventDayDialogDate.value) return
 
   eventDayDialogEvents.value = events.value.filter(
-    event => isEventRelatedToDate(event, <string>eventDayDialogDate) // We have tested that date is not null before
+    event => isEventRelatedToDate(event, <string>eventDayDialogDate.value) // We have tested that date is not null before
   )
   if (options.sort) eventDayDialogEvents.value.sort((event1, event2) => sortEvents(event1, event2))
 }
@@ -125,7 +125,7 @@ function openEventTooltip($event: { nativeEvent: MouseEvent; event: EventExtende
   nativeEvent.stopImmediatePropagation()
   eventTooltipKey.value += 1 // Hack to re-render v-menu component
   eventSelected.value = event
-  eventTooltipElement.value = nativeEvent.target
+  eventTooltipElement.value = (nativeEvent.target as Element | null) ?? undefined
   if (!eventTooltip.value) eventTooltip.value = true
 }
 
@@ -135,8 +135,8 @@ function openDayDialog(date: string): void {
   setDayDialogEventList()
 }
 
-function handleClickOnDay($event: { date: string }): void {
-  const { date } = $event
+function handleClickOnDay(_nativeEvent: Event, day: { date: string }): void {
+  const { date } = day
   const delay = 200
 
   if (doubleClickTimer) {
@@ -157,12 +157,12 @@ function setCalendarToNow(): void {
 }
 
 function previousMonth(): void {
-  calendar.value.prev()
+  calendar.value?.prev()
   retrieveEvents()
 }
 
 function nextMonth(): void {
-  calendar.value.next()
+  calendar.value?.next()
   retrieveEvents()
 }
 </script>
@@ -173,10 +173,20 @@ function nextMonth(): void {
 
     <div class="d-flex align-center flex-wrap gap-1 mb-2 mb-sm-3">
       <div class="mr-sm-1">
-        <v-btn icon :size="xs ? 'small' : 'default'" @click="previousMonth()">
+        <v-btn
+          icon
+          variant="text"
+          density="comfortable"
+          :size="xs ? 'small' : 'default'"
+          @click="previousMonth()">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <v-btn icon :size="xs ? 'small' : 'default'" @click="nextMonth()">
+        <v-btn
+          icon
+          variant="text"
+          density="comfortable"
+          :size="xs ? 'small' : 'default'"
+          @click="nextMonth()">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
       </div>
@@ -210,16 +220,14 @@ function nextMonth(): void {
         :event-ripple="false"
         color="accent"
         class="calendar"
-        @click:day="handleClickOnDay($event)">
-        <template #day-label="{ day, present, date }">
+        @click:day="handleClickOnDay">
+        <template #day-label="{ day, present }">
           <v-hover v-slot="{ isHovering }">
             <div
               class="day-label"
               :class="{
-                'accent--text': present,
-                'grey--text text--lighten-1': !isHovering,
-                'white--text': isHovering,
-                'text--lighten-3': present && isHovering,
+                'day-label--present': present,
+                'day-label--hovering': isHovering,
               }">
               {{ day }}
             </div>
@@ -271,7 +279,9 @@ function nextMonth(): void {
         min-width="30rem"
         max-width="40rem">
         <template v-if="eventSelected">
-          <EventTooltip :event="eventSelected" @update="openEventDialog({ event: $event })">
+          <EventTooltip
+            :event="eventSelected"
+            @update="openEventDialog({ event: $event as EventExtendedModel })">
           </EventTooltip>
         </template>
       </v-menu>
@@ -291,7 +301,7 @@ function nextMonth(): void {
 
     <EventDayDialog
       v-model="eventDayDialog"
-      :date="eventDayDialogDate"
+      :date="eventDayDialogDate ?? ''"
       :events="eventDayDialogEvents"
       @open-event-dialog="openEventDialog({ startDatePlaceholder: $event })"
       @update="updateEvent($event)"
@@ -301,7 +311,19 @@ function nextMonth(): void {
 </template>
 
 <style scoped lang="scss">
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/colors';
+
 .calendar {
+  :deep(.v-calendar-weekly__head-weekday) {
+    // même fond que les jours hors-mois (les cases en dessous)
+    background-color: rgb(var(--v-theme-surface));
+
+    &.v-outside {
+      background-color: rgb(var(--v-theme-background));
+    }
+  }
+
   :deep(.v-calendar-weekly__day) {
     cursor: pointer;
 
@@ -314,16 +336,22 @@ function nextMonth(): void {
     }
 
     &:hover {
-      background-color: #424242;
+      background-color: map.get(colors.$grey, 'darken-3');
     }
 
     &.v-present {
-      background-color: #515151;
+      background-color: map.get(colors.$grey, 'darken-3');
+
+      &:hover {
+        background-color: map.get(colors.$grey, 'darken-2');
+      }
     }
 
     &.v-outside {
+      background-color: rgb(var(--v-theme-background));
+
       &:hover {
-        background-color: #303030;
+        background-color: map.get(colors.$grey, 'darken-4');
       }
     }
   }
@@ -332,6 +360,20 @@ function nextMonth(): void {
     width: 100%;
     height: 100%;
     cursor: pointer;
+    color: map.get(colors.$grey, 'lighten-1'); // #bdbdbd (défaut)
+
+    &--hovering {
+      color: rgb(var(--v-theme-on-surface)); // blanc
+    }
+
+    &--present {
+      color: rgb(var(--v-theme-accent)); // bleu accent
+    }
+
+    &--present.day-label--hovering {
+      color: rgb(var(--v-theme-accent));
+      filter: brightness(1.3); // accent éclairci (ex-`text--lighten-3`)
+    }
   }
 
   .calendar-arrow {

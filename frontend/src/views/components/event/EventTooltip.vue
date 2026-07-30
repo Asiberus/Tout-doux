@@ -25,7 +25,7 @@ function isDateEqual(date1: string, date2: string): boolean {
     <v-toolbar color="event">
       <v-toolbar-title :title="event.name"> {{ event.name }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-if="!isEditDisabled" icon @click="$emit('update', event)">
+      <v-btn v-if="!isEditDisabled" icon variant="text" density="comfortable" @click="$emit('update', event)">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
     </v-toolbar>

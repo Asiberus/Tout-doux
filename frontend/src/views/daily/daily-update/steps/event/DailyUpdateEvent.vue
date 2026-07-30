@@ -107,6 +107,7 @@ function deleteEvent(id: number): void {
         <EventDialog
           :is-dialog-open="eventDialog"
           :related-to-date="date"
+          :start-date-placeholder="date"
           @submit="createEvent"
           @close="eventDialog = false">
         </EventDialog>

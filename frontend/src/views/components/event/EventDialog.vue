@@ -10,7 +10,7 @@ const { isDialogOpen, event, relatedToDate, startDatePlaceholder } = defineProps
   isDialogOpen: boolean
   event?: EventModel | EventExtendedModel
   relatedToDate?: string
-  startDatePlaceholder: string | null
+  startDatePlaceholder?: string
 }>()
 
 const emit = defineEmits<{
@@ -100,7 +100,8 @@ watch(
       const tempEvent = <EventModel | EventExtendedModel>{ startDate, endDate }
       relatedToDateError.value = !isEventRelatedToDate(tempEvent, relatedToDate)
     }
-  }
+  },
+  { deep: true }
 )
 
 function validateDate(): void {
@@ -155,7 +156,7 @@ function emitSubmitEvent(): void {
   }
 
   emit('submit', eventToSubmit)
-  if (event) emit('update', { id: eventToSubmit.id, data: eventToSubmit })
+  if (event) emit('update', { id: event.id, data: eventToSubmit })
   else emit('create', eventToSubmit)
 }
 
@@ -189,7 +190,18 @@ function allowedMinutes(value: number): boolean {
   return value % 5 === 0
 }
 
-function formattedDate(value: string): string {
+function onStartDateSelected(value: unknown): void {
+  eventForm.value.data.startDate = value ? moment(value as Date).format('YYYY-MM-DD') : ''
+  startDatePicker.value = false
+}
+
+function onEndDateSelected(value: unknown): void {
+  eventForm.value.data.endDate = value ? moment(value as Date).format('YYYY-MM-DD') : ''
+  endDatePicker.value = false
+  endTimePicker.value = true
+}
+
+function formattedDate(value: string | null | undefined): string {
   return value ? moment(value).format('D MMM. Y') : ''
 }
 </script>
@@ -245,10 +257,10 @@ function formattedDate(value: string): string {
             @keyup.enter.ctrl="emitSubmitEvent()">
           </v-textarea>
 
-          <div class="d-flex flex-column flex-sm-row column-gap-6">
+          <div class="d-flex flex-column flex-sm-row column-gap-6 date-time-section">
             <div class="flex-grow-1">
               <h6 class="text-subtitle-2 text-grey-lighten-2 pl-1">Start</h6>
-              <div class="d-flex gap-2">
+              <div class="d-flex gap-2 date-time-row">
                 <v-menu
                   v-model="startDatePicker"
                   :close-on-content-click="false"
@@ -262,21 +274,25 @@ function formattedDate(value: string): string {
                       required
                       label="Date"
                       prepend-icon="mdi-calendar-today"
+                      class="two-row-error"
                       readonly>
                     </v-text-field>
                   </template>
                   <v-date-picker
-                    v-model="eventForm.data.startDate"
-                    no-title
-                    scrollable
+                    :model-value="
+                      eventForm.data.startDate
+                        ? moment(eventForm.data.startDate).toDate()
+                        : undefined
+                    "
                     show-adjacent-months
+                    hide-title
+                    hide-header
                     :first-day-of-week="1"
-                    @change="startDatePicker = false">
+                    @update:model-value="onStartDateSelected">
                   </v-date-picker>
                 </v-menu>
 
                 <v-menu
-                  ref="startDateTimeMenu"
                   v-model="startTimePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
@@ -290,23 +306,23 @@ function formattedDate(value: string): string {
                       clearable
                       readonly
                       class="two-row-error"
-                      v-bind="props"
-                      @change="startTimePicker = false">
+                      v-bind="props">
                     </v-text-field>
                   </template>
                   <v-time-picker
                     v-if="startTimePicker"
                     v-model="eventForm.data.startTime"
                     format="24hr"
+                    hide-header
                     :allowed-minutes="allowedMinutes"
-                    @click:minute="$refs.startDateTimeMenu.save(eventForm.data.startTime)">
+                    @update:minute="startTimePicker = false">
                   </v-time-picker>
                 </v-menu>
               </div>
             </div>
             <div class="flex-grow-1">
               <h6 class="text-subtitle-2 text-grey-lighten-2 pl-1">End</h6>
-              <div class="d-flex gap-2">
+              <div class="d-flex gap-2 date-time-row">
                 <v-menu
                   v-model="endDatePicker"
                   :close-on-content-click="false"
@@ -328,22 +344,18 @@ function formattedDate(value: string): string {
                     </v-text-field>
                   </template>
                   <v-date-picker
-                    v-model="eventForm.data.endDate"
-                    no-title
-                    scrollable
+                    :model-value="
+                      eventForm.data.endDate ? moment(eventForm.data.endDate).toDate() : undefined
+                    "
                     show-adjacent-months
+                    hide-title
+                    hide-header
                     :first-day-of-week="1"
-                    @change="
-                      () => {
-                        endDatePicker = false
-                        endTimePicker = true
-                      }
-                    ">
+                    @update:model-value="onEndDateSelected">
                   </v-date-picker>
                 </v-menu>
 
                 <v-menu
-                  ref="endDateTimeMenu"
                   v-model="endTimePicker"
                   :close-on-content-click="false"
                   transition="scale-transition"
@@ -358,16 +370,16 @@ function formattedDate(value: string): string {
                       clearable
                       readonly
                       class="two-row-error"
-                      v-bind="props"
-                      @change="endTimePicker = false">
+                      v-bind="props">
                     </v-text-field>
                   </template>
                   <v-time-picker
                     v-if="endTimePicker"
                     v-model="eventForm.data.endTime"
                     format="24hr"
+                    hide-header
                     :allowed-minutes="allowedMinutes"
-                    @click:minute="$refs.endDateTimeMenu.save(eventForm.data.endTime)">
+                    @update:minute="endTimePicker = false">
                   </v-time-picker>
                 </v-menu>
               </div>
@@ -417,6 +429,28 @@ function formattedDate(value: string): string {
     flex: 1 0 0;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+}
+
+.date-time-row :deep(.v-input) {
+  flex: 1 1 0;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.date-time-row :deep(.v-field) {
+  pointer-events: auto;
+}
+
+.date-time-row :deep(.v-input__prepend) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
+  .date-time-section > div {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
 

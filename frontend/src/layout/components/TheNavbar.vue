@@ -40,6 +40,7 @@ function isItemActive(item: MenuItem): boolean {
         v-if="mobile"
         icon="mdi-arrow-left"
         variant="text"
+        density="comfortable"
         class="close-navbar"
         @click="navbarDisplayed = false" />
 

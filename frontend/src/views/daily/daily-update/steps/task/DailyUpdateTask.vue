@@ -194,6 +194,8 @@ function resetSelectedItem(): void {
             <v-btn
               :to="{ name: 'project-list' }"
               icon
+              variant="text"
+              density="comfortable"
               size="small"
               :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to project list">
@@ -235,6 +237,8 @@ function resetSelectedItem(): void {
             <v-btn
               :to="{ name: 'collection-list' }"
               icon
+              variant="text"
+              density="comfortable"
               size="small"
               :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to collection">
@@ -275,6 +279,8 @@ function resetSelectedItem(): void {
             <v-btn
               :to="{ name: 'settings-common-tasks' }"
               icon
+              variant="text"
+              density="comfortable"
               size="small"
               :color="isHovering ? 'grey' : 'grey darken-3'"
               title="Go to common task">

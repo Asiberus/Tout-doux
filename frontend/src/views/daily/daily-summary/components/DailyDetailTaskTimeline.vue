@@ -63,15 +63,14 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         :key="`daily-task-${dailyTask.id}`"
         fill-dot
         :size="xs ? 'small' : 'default'"
-        :dot-color="dailyTask.completed ? 'green darken-2' : undefined">
+        :dot-color="dailyTask.completed ? 'green darken-2' : 'surface'">
         <template #icon>
           <div v-ripple class="icon-wrapper" @click="toggleDailyTask(dailyTask)">
             <v-icon v-if="dailyTask.completed" :size="xs ? 'small' : 'default'"> mdi-check </v-icon>
             <v-icon v-else :size="xs ? 'small' : 'default'">mdi-trophy</v-icon>
           </div>
         </template>
-        <DailyTaskCard :daily-task="dailyTask" @toggle="toggleDailyTask(dailyTask)">
-        </DailyTaskCard>
+        <DailyTaskCard :daily-task="dailyTask" caret @toggle="toggleDailyTask(dailyTask)" />
       </v-timeline-item>
     </v-timeline>
   </div>
@@ -116,6 +115,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
     }
 
     & :deep(.v-timeline-item__body) {
+      width: 100%;
       max-width: calc(100% - var(--divider-width));
     }
 

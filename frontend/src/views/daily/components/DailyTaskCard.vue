@@ -9,6 +9,7 @@ import { computed } from 'vue'
 
 const props = defineProps<{
   dailyTask: DailyTask
+  caret?: boolean
 }>()
 
 defineEmits<{
@@ -20,12 +21,16 @@ const name = computed<string>(() => {
   else if (props.dailyTask.commonTask) return props.dailyTask.commonTask.name
   else return props.dailyTask.name as string // We know name is defined
 })
+
+const cardColor = computed(() => (props.dailyTask.completed ? 'green darken-2' : 'surface'))
 </script>
 
 <template>
   <v-card
-    :color="dailyTask.completed ? 'green darken-2' : null"
+    :color="cardColor"
     class="daily-task-card rounded-lg pa-3 pa-sm-4"
+    :ripple="false"
+    :class="{ caret }"
     @click="$emit('toggle')">
     <div class="daily-task-card__header">
       <div class="flex-grow-1 d-flex align-center gap-2">
@@ -69,15 +74,15 @@ const name = computed<string>(() => {
     </div>
 
     <template v-if="dailyTask.task && dailyTask.task.tags.length > 0">
-      <TagGroup :tag-list="dailyTask.task.tags" z-index="300" />
+      <TagGroup :tag-list="dailyTask.task.tags" :z-index="300" />
     </template>
 
     <template v-if="dailyTask.commonTask && dailyTask.commonTask.tags.length > 0">
-      <TagGroup :tag-list="dailyTask.commonTask.tags" z-index="300" />
+      <TagGroup :tag-list="dailyTask.commonTask.tags" :z-index="300" />
     </template>
 
     <template v-if="dailyTask.tags.length > 0">
-      <TagGroup :tag-list="dailyTask.tags" z-index="300" />
+      <TagGroup :tag-list="dailyTask.tags" :z-index="300" />
     </template>
   </v-card>
 </template>
@@ -87,10 +92,6 @@ const name = computed<string>(() => {
   display: flex;
   flex-direction: column;
   row-gap: 8px;
-
-  &::after {
-    left: -9px !important;
-  }
 
   &__header {
     display: flex;
@@ -108,5 +109,20 @@ const name = computed<string>(() => {
       max-width: 12rem;
     }
   }
+}
+
+.v-card.caret {
+  overflow: visible;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  width: 14px;
+  height: 14px;
+  background-color: inherit;
+  transform: translateY(-50%) rotate(45deg);
 }
 </style>

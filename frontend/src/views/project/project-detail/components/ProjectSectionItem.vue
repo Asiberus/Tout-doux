@@ -92,7 +92,13 @@ function deleteTask(id: number): void {
 
         <v-dialog v-model="sectionDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props: menuProps }">
-            <v-btn v-bind="menuProps" :disabled :size="mdAndDown ? 'small' : 'default'" icon>
+            <v-btn
+              v-bind="menuProps"
+              :disabled
+              :size="mdAndDown ? 'small' : 'default'"
+              icon
+              variant="text"
+              density="comfortable">
               <v-icon size="small">mdi-pencil</v-icon>
             </v-btn>
           </template>

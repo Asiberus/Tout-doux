@@ -11,6 +11,7 @@ export const vuetifyOptions: VuetifyOptions = {
     VAutocomplete: { variant: 'underlined' },
     VCombobox: { variant: 'underlined' },
     VFileInput: { variant: 'underlined' },
+    VSwitch: { color: 'primary' },
   },
   theme: {
     defaultTheme: 'dark',
@@ -25,7 +26,6 @@ export const vuetifyOptions: VuetifyOptions = {
           success: '#4CAF50',
           warning: '#FFC107',
         },
-        error: '#FF5252',
       },
       dark: {
         colors: {

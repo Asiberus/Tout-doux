@@ -102,12 +102,12 @@ function emitDeleteEvent(): void {
       <div class="task-card__content" :class="{ 'mb-1': small }">
         <template v-if="completable">
           <template v-if="task.completed">
-            <v-btn icon @click="openUncompleteDialog()">
+            <v-btn icon variant="text" density="comfortable" @click="openUncompleteDialog()">
               <v-icon>mdi-checkbox-marked-outline</v-icon>
             </v-btn>
           </template>
           <template v-else>
-            <v-btn icon @click="emitToggleStateEvent()">
+            <v-btn icon variant="text" density="comfortable" @click="emitToggleStateEvent()">
               <v-icon>mdi-checkbox-blank-outline</v-icon>
             </v-btn>
           </template>

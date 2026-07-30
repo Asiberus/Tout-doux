@@ -127,6 +127,8 @@ function selectTask(task: Task): void {
               <v-btn
                 :to="{ name: 'project-detail', params: { id: project.id } }"
                 icon
+                variant="text"
+                density="comfortable"
                 size="small"
                 :color="isHovering ? 'grey' : 'grey darken-3'"
                 class="mx-1"
@@ -137,7 +139,7 @@ function selectTask(task: Task): void {
 
             <v-spacer />
 
-            <v-btn color="red" icon @click.stop="unselectProject()">
+            <v-btn color="red" icon variant="text" density="comfortable" @click.stop="unselectProject()">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EventModel } from '@/models/event.model'
+import { EventExtendedModel } from '@/models/event.model'
 import moment from 'moment/moment'
 import { isPassed } from '@/utils/event.utils'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
@@ -9,7 +9,7 @@ import { useDisplay } from 'vuetify'
 const { xs } = useDisplay()
 
 const props = defineProps<{
-  events: EventModel[]
+  events: EventExtendedModel[]
   date: string
 }>()
 
@@ -32,7 +32,7 @@ const eventText = computed<string>(() => {
       <v-timeline-item
         v-for="event of events"
         :key="`event-${event.id}`"
-        :dot-color="isPassed(event) ? null : 'event'"
+        :dot-color="isPassed(event) ? 'passedEvent' : 'event'"
         :icon="isPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'"
         :icon-color="isPassed(event) ? 'grey' : 'white'"
         :size="xs ? 'small' : 'default'"
@@ -42,6 +42,8 @@ const eventText = computed<string>(() => {
           :project="event.project"
           :day-selected="true"
           :clickable="false"
+          caret
+          :hover-background="false"
           :margin-bottom="false" />
       </v-timeline-item>
     </v-timeline>
@@ -87,6 +89,7 @@ const eventText = computed<string>(() => {
     }
 
     & :deep(.v-timeline-item__body) {
+      width: 100%;
       max-width: calc(100% - var(--divider-width));
     }
 

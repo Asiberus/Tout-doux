@@ -75,13 +75,15 @@ function getItemClass(item: Feedback): { class: string } {
           <v-btn
             v-show="item.isRead"
             icon
+            variant="text"
+            density="comfortable"
             title="Mark as unread"
             @click="setFeedbackAsUnread(item.id)">
             <v-icon>mdi-email-mark-as-unread</v-icon>
           </v-btn>
           <ConfirmDialog @confirm="deleteFeedback(item.id)">
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon title="Delete">
+              <v-btn v-bind="props" icon variant="text" density="comfortable" title="Delete">
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
             </template>

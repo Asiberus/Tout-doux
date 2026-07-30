@@ -17,8 +17,8 @@
 - [x] 1.5 — `v-stepper` V2 → V3
 - [x] 1.6 — `v-tabs-items`/`v-tab-item` → `v-tabs-window`/`-item` *(+ correctif flex barre d'onglets)*
 - [x] 1.7 — `@click.native` → `@click` *(+ `.stop` interne aux chips)*
-- [ ] 1.8 — `EventDialog.vue` : date/time pickers
-- [ ] 1.9 — `v-calendar` (Agenda)
+- [x] 1.8 — `EventDialog.vue` : date/time pickers (Vuetify 4)
+- [x] 1.9 — `v-calendar` (Agenda) *(API classique restaurée en Vuetify 4 → pas de rewrite, juste correctifs de types)*
 - [x] 1.10 — Type `Route` (Vue Router 4)
 - [x] 1.11 — VAutocomplete : slot `item` → `internalItem` (Vuetify 4)
 
@@ -404,7 +404,10 @@ Le modificateur `.native` n'existe plus en Vue 3.
 
 ---
 
-### 1.8 `EventDialog.vue` — date/time pickers cassés
+### 1.8 `EventDialog.vue` — date/time pickers cassés — ✅ FAIT
+
+> **Réalisé en Vuetify 4** (`VDatePicker`/`VTimePicker` en core, auto-importés) : `no-title`/`scrollable`/`@change` retirés des `v-date-picker` ; `v-model` (Date) géré via `:model-value="moment(str).toDate()"` + handlers `onStartDateSelected`/`onEndDateSelected` (conversion Date↔string `YYYY-MM-DD`) ; `.save()` du menu remplacé par `@click:minute="…Picker = false"` ; `ref="startDateTimeMenu"`/`ref="endDateTimeMenu"` et `@change` des champs readonly supprimés ; corrigé aussi les 4 erreurs de type (`emit('update', { id: event.id })`, `formattedDate(string | null)`, `$refs.save`). **build + type-check OK.** ⚠️ QA runtime à faire : sélection date/heure début & fin, « takes whole day », effacement date de fin, messages d'erreur.
+
 
 `src/views/components/event/EventDialog.vue` cumule plusieurs API V2 disparues dans les 4 blocs `<v-menu>` (Start date, Start time, End date, End time).
 
@@ -429,7 +432,16 @@ Le modificateur `.native` n'existe plus en Vue 3.
 
 ---
 
-### 1.9 `v-calendar` (Agenda) — retiré du core, API entièrement changée
+### 1.9 `v-calendar` (Agenda) — retiré du core, API entièrement changée — ✅ FAIT
+
+> **⚠️ PRÉMISSE FAUSSE (corrigée en Vuetify 4).** Vuetify **4** a **restauré le `VCalendar` classique en core** (celui de Vuetify 2) : `:events`, `event-color`, `event-start/end`, `event-margin-bottom`, `event-ripple`, `@click:day`, slots `#day-label`/`#event`, méthodes d'instance `prev()`/`next()` **existent tous**. Donc **aucune réécriture** — le `v-calendar` de l'Agenda est resté tel quel. §1.9 s'est réduit à corriger les erreurs de type (build/type-check) :
+> - **Vrais bugs runtime** : `moment(value)` → `moment(value.value)` (ref non déballé, ×4 : mois affiché + fetch events) ; `<string>eventDayDialogDate` → `.value`.
+> - **Nav mois** : `calendar.value?.prev()/next()` (garde de nullité).
+> - **`@click:day`** : émet `[Event, day]` en v4 → `handleClickOnDay(_nativeEvent, day)` (utilise `day.date`).
+> - **Types** : `eventTooltipElement` re-typé `ref<Element>()` (+ `nativeEvent.target as Element`), `:start-date-placeholder="… ?? null"`, `:date="… ?? ''"`, cast `$event as EventExtendedModel` du tooltip (désactivé).
+>
+> **build + type-check OK (0 erreur Agenda).** ⚠️ QA runtime : affichage du calendrier + events, navigation mois (now/précédent/suivant), clic sur un jour → `EventDayDialog`.
+
 
 `src/views/agenga/Agenda.vue` utilise `<v-calendar>` (L.200-263) avec l'API **Vuetify 2**, qui **n'existe pas** dans le `v-calendar` **labs** de Vuetify 3.
 
