@@ -1,75 +1,105 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidage pour Claude Code sur le dossier `frontend/`.
 
-## Contexte du projet
+Ce fichier ne contient **que** ce qui doit être immédiatement disponible pour produire du code
+correct. Tout le reste est dans **[`docs/`](docs/)** — et **la doc est la source de vérité**, pas
+ce fichier.
 
-`frontend` est le client web de **Tout-Doux**, une application de gestion de tâches/projets avec planification quotidienne (« daily »). Ce dossier fait partie d'un mono-repo plus large (`../backend`, `../docker-compose.yml`, `../td.sh`) mais s'utilise et se développe de façon autonome depuis ce répertoire.
+## Contexte
+
+`frontend` est le client web de **Tout-Doux** (organisation personnelle : projets, collections,
+planification journalière). SPA **Vue 3** (Composition API, `<script setup>`) + **Vue Router 5**
++ **Pinia 4** + **Vuetify 4** + TypeScript + Vite. Monorepo : `../backend` (Django),
+`../docker-compose.yml`.
+
+Une migration Vue 2 → 3 → Vuetify 4 est **en cours** :
+[docs/workflows/vuetify-4-migration.md](docs/workflows/vuetify-4-migration.md).
 
 ## Commandes
 
-Le gestionnaire de paquets est **yarn** (présence de `yarn.lock`, version épinglée via Volta dans `package.json`). Utiliser `yarn`, pas `npm`.
+**Yarn, jamais npm** (`yarn.lock`, versions épinglées via Volta : Node 22.23.1 / Yarn 1.22.19).
 
 ```bash
-yarn install         # installation des dépendances (ou simplement `yarn`)
-yarn dev             # serveur de dev Vite (port 3000, host exposé)
-yarn build           # build de production (vite build)
-yarn serve           # preview du build de production
-yarn lint            # eslint --fix sur le projet (respecte .gitignore)
-yarn format          # prettier --write sur tout le projet
+yarn                 # installer
+yarn dev             # serveur Vite, port 3000
+yarn build           # build prod — NE VÉRIFIE AUCUN TYPE
+yarn type-check      # vue-tsc --noEmit  (28 erreurs préexistantes)
+yarn lint            # eslint --fix
+yarn format          # prettier --write
 ```
 
-- **`yarn build` ne fait aucun typecheck** (`vite build` transpile via esbuild sans vérifier les types). Il n'y a pas encore de script de type-check ; l'ajout de `vue-tsc` (`yarn type-check`) est recommandé (voir `MIGRATION-VUE3.md`).
-- Il n'y a **aucune suite de tests** configurée actuellement (pas de script `test:unit`/`test:e2e` dans `package.json`, malgré ce qu'indique le `README.md`, qui est obsolète sur ce point).
-- Un hook pre-commit Husky (`.husky/pre-commit`) lance `pretty-quick --staged` puis `lint-staged` (règles dans `.lintstagedrc` : eslint + prettier sur `*.{js,ts,tsx,scss,css,md,vue}`).
-- Les messages de commit sont vérifiés par commitlint (`commitlint.config.js`, config conventionnelle).
-- Commandes Docker (depuis ce dossier, utilisent les fichiers du mono-repo parent) : `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
+Docker : `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
 
-## Migration Vue 3 en cours
+**Aucun test n'existe** (pas de script `test`). Le seul garde-fou automatique est le hook
+`pre-commit` (eslint sans `--fix` + prettier) et `commit-msg` (commitlint conventionnel).
+Détail : [docs/workflows/verification.md](docs/workflows/verification.md).
 
-La branche `migrate-to-vue3` finalise la migration Vue 2→3 / Vuetify 2→3 / Vuex→Pinia / Vue-Router 3→4. Les tâches restantes (bugs bloquants, corrections iso-visuelles, dette) sont détaillées dans `MIGRATION-VUE3.md` à la racine du dossier.
+## Règles à respecter en écrivant du code
 
-## Stack
+**Imports** — alias `@` → `src/`. Toujours passer par les barrels `@/api`, `@/store`,
+`@/services`, jamais par le fichier. Un composant n'importe **jamais** `@/axios` : il passe par
+`@/api`. `src/models/` ne dépend de rien. ⚠️ **Aucune de ces règles n'est vérifiée par un
+linter** — voir [docs/architecture/overview.md](docs/architecture/overview.md).
 
-Vue 3 (Composition API) + Vue Router 4 + Pinia + Vuetify 3 + TypeScript + Vite. Alias d'import `@` → `src/`.
+**Convention SFC** — `<script setup lang="ts">` en haut, puis `<template>`, puis
+`<style scoped lang="scss">`.
 
-## Architecture
+**Commits** — en-tête conventionnel (`feat(front):`, `fix(front):`, `chore(front):`), puis un
+sujet par ligne en texte brut, sans tiret ni puce.
 
-### Configuration runtime (pas de `.env` Vite classique)
+**Pièges à connaître avant d'écrire :**
 
-La config n'est **pas** injectée via `import.meta.env` mais lue depuis des balises `<meta>` de `index.html` (`API_URL`, `VERSION`) au moyen de `src/config/config.loader.ts` (`getConfigValue`), exposée ensuite via `src/config/index.ts`. Pour changer l'URL de l'API ou la version affichée, il faut modifier `index.html` (ou son équivalent généré côté Docker/`.conf/`), pas un fichier `.env`.
+| Sujet | Piège | Où |
+|---|---|---|
+| Responsive | `useDisplay()` renvoie des **refs** : `xs.value` en script, `xs` en template. `display.xs` est **toujours truthy** | [docs/patterns/responsive.md](docs/patterns/responsive.md) |
+| Styles | Vuetify 4 impose les **CSS layers** : hors layer bat dans un layer. `:deep()` ne cible pas la racine du composant | [docs/patterns/styling.md](docs/patterns/styling.md) |
+| Typographie | Les classes `text-h1`…`text-h6`, `text-body-1|2`, `text-caption` **n'existent plus** (MD3) | [docs/patterns/styling.md](docs/patterns/styling.md) |
+| Dialogs | Slot activator = `{ props }` + `v-bind="props"`, sinon le clic n'ouvre rien. Largeur via `useDialogWidth()` | [docs/patterns/dialogs.md](docs/patterns/dialogs.md) |
+| Formulaires | `v-form.validate()` est **asynchrone** ; `useTemplateRef` renvoie un ref (`.value`) | [docs/patterns/forms.md](docs/patterns/forms.md) |
+| Store ou API ? | Store uniquement pour `currentProject`/`currentCollection` + `user`/`preferences` ; sinon appel direct à `@/api` | [docs/architecture/state.md](docs/architecture/state.md) |
+| Config | Lue depuis des balises `<meta>` de `index.html`, **pas** `import.meta.env` | [docs/adr/0001-config-via-meta-tags.md](docs/adr/0001-config-via-meta-tags.md) |
+| Domaine daily | Task ≠ CommonTask ≠ DailyTask ; règles métier appliquées **par l'UI seulement** | [docs/domain/daily-rules.md](docs/domain/daily-rules.md) |
+| Route publique | À ajouter à `nonAuthRoutes`, sinon elle est silencieusement protégée | [docs/architecture/routing.md](docs/architecture/routing.md) |
 
-### Couche API et Axios
+## Documentation
 
-- `src/api-routes.ts` centralise tous les chemins d'API (avec placeholders type `:taskId` remplacés via `.replace()`).
-- `src/api/*.api.ts` (un fichier par domaine : `task`, `project`, `section`, `collection`, `daily-task`, `event`, `tag`, `common-task`, `preferences`, `user`, `feedback`, `auth`) exposent des fonctions fines qui appellent `axiosInstance` et retournent `response.data`. Réexportés en namespaces via `src/api/index.ts` (ex. `taskApi.createTask(...)`).
-- `src/axios/axios-instance.ts` : instance unique, injecte le Bearer token via un intercepteur de requête (`authService.isAuthenticated()`), et sur une réponse `401` supprime le token, réinitialise les stores (`authService.resetStore()`) et redirige vers `login`. Toute nouvelle route API doit passer par cette instance pour bénéficier de ce comportement.
+| Besoin | Fichier |
+|---|---|
+| Organisation du code, sens des imports | [docs/architecture/overview.md](docs/architecture/overview.md) |
+| Couche API, pagination, erreurs | [docs/architecture/api-layer.md](docs/architecture/api-layer.md) |
+| Stores Pinia | [docs/architecture/state.md](docs/architecture/state.md) |
+| Routes, guards, boot | [docs/architecture/routing.md](docs/architecture/routing.md) |
+| Composants, thème, tokens | [docs/architecture/ui-layer.md](docs/architecture/ui-layer.md) |
+| Recettes (endpoint, dialog, form, responsive, style) | [docs/patterns/](docs/patterns/) |
+| Vocabulaire métier | [docs/domain/glossary.md](docs/domain/glossary.md) |
+| Pourquoi un choix a été fait | [docs/adr/](docs/adr/) |
+| **Ce qui est cassé / risqué — ne pas imiter** | [docs/quality/](docs/quality/) |
 
-### Store (Pinia)
+⚠️ `docs/quality/` décrit ce qui est **cassé ou fragile**. Ne jamais y prendre un exemple comme
+modèle : les modèles sont dans `docs/patterns/`.
 
-- Un store par domaine (`user`, `preferences`, `project`, `collection`, `auth`) réexporté via `src/store/index.ts`.
-- `app.store.ts` est un store d'orchestration : `init()` déclenche en parallèle `userStore.getUser()` et `preferencesStore.getPreferences()` (appelé dans le guard global du routeur au premier chargement si l'utilisateur est authentifié) ; `exit()` réinitialise user/preferences/project/collection (appelé notamment lors du logout via `authService.resetStore()`).
+## Mettre à jour la doc — dans le MÊME changement
 
-### Routeur
+Quand une modification change quelque chose que `docs/` décrit, **mettre à jour le fichier
+concerné dans le même commit**. Correspondances :
 
-- `src/router/index.ts` définit deux arborescences parallèles montées sur `/` : `AuthenticatedLayout` (routes protégées, assemblées depuis `src/router/modules/*.router.ts` : `project`, `collection`, `daily`, `settings`, `profile`, `administration`) et `NonAuthenticatedLayout` (`nonAuthRoutes` : login, register, reset password…).
-- Guards dans `src/router/guards/` : `authGuard` (global, redirige vers `login` si non authentifié et route non listée dans `nonAuthRoutes`), `admin.guard`, `login.guard`, `daily-update.guard` (garde spécifique appliquée sur la route `daily-update`).
-- Le premier `beforeEach` déclenche `appStore.init()` uniquement à la navigation initiale (`from === START_LOCATION`) si un token existe déjà.
+| Si tu modifies… | Mets à jour |
+|---|---|
+| une route, un guard, `main.ts` | [docs/architecture/routing.md](docs/architecture/routing.md) (la table des routes est **maintenue à la main**) |
+| un store, `app.store.ts` | [docs/architecture/state.md](docs/architecture/state.md) |
+| `axios/`, `api-routes.ts`, une convention d'API | [docs/architecture/api-layer.md](docs/architecture/api-layer.md) + [docs/patterns/adding-an-endpoint.md](docs/patterns/adding-an-endpoint.md) |
+| une couleur de thème, un `defaults` Vuetify, `global.scss` | [docs/architecture/ui-layer.md](docs/architecture/ui-layer.md) (table des tokens **maintenue à la main**) + [docs/patterns/styling.md](docs/patterns/styling.md) |
+| un modèle métier, une énumération, une règle métier | [docs/domain/glossary.md](docs/domain/glossary.md), [daily-rules.md](docs/domain/daily-rules.md) ou [events.md](docs/domain/events.md) |
+| un composant partagé, un layout | [docs/architecture/ui-layer.md](docs/architecture/ui-layer.md) |
+| un script `package.json`, un hook, la CI | [docs/workflows/development.md](docs/workflows/development.md) + [verification.md](docs/workflows/verification.md) |
+| **tu corriges un item de `quality/`** | **Supprimer** sa ligne et sa section — ne pas la marquer « fait » |
+| tu découvres une faiblesse ou une règle non outillée | L'inscrire dans [docs/quality/](docs/quality/) (backlog si on agit, risques surveillés sinon) |
+| une décision structurante | Nouvel ADR dans [docs/adr/](docs/adr/) |
 
-### Authentification
+Le format attendu de chaque type de fichier (squelette markdown, convention de nommage,
+déclencheur précis) est dans **[docs/README.md](docs/README.md)** — le lire avant de créer un
+fichier de doc.
 
-`src/services/auth.service.ts` gère le token (`localStorage`, clé `td_token`) et orchestre login/logout en s'appuyant sur `authApi` et `appStore.exit()`. C'est la source de vérité pour `isAuthenticated()`, utilisée à la fois par les guards et par l'intercepteur Axios.
-
-### Domaine métier (`src/views/`)
-
-Organisation par feature, chacune avec ses sous-dossiers `components/` locaux :
-- `project/` : liste, détail (avec `tabs/`) et formulaires de projets.
-- `collection/` : équivalent pour les « collections ».
-- `daily/` : le cœur applicatif — `daily-summary` (vue du jour), `daily-update` (assistant multi-étapes `steps/` pour ajouter tâches/événements, protégé par `daily-update.guard`), composants partagés (`DailyTaskCard`, `DailyTaskForm`…).
-- `agenga/` (Agenda), `feedback/`, `profile/`, `settings/`, `administration/` : features secondaires.
-
-Les modèles TypeScript associés (`src/models/*.model.ts`) suivent la même découpe par domaine et distinguent souvent les variantes `Post`/`Patch` des payloads API (ex. `TaskPost`, `TaskPatch` dans `task.model.ts`).
-
-### Vuetify
-
-Thème et icônes configurés dans `src/plugins/vuetify.ts` (thèmes `light`/`dark` avec couleurs métier custom comme `taskCompleted`, `projectArchived`, `event`…) et styles Sass compilés via `src/styles/settings.scss` (référencé dans `vite.config.ts`).
+Pour vérifier qu'un changement n'a rien laissé dérivé : commande `/sync-docs`
+(`.claude/commands/sync-docs.md`).

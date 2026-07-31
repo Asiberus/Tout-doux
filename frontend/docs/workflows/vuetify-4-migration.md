@@ -1,4 +1,13 @@
-# Migration Vue 2 → Vue 3 — Tâches restantes
+# Migration Vue 2 → Vue 3 → Vuetify 4 — Tâches restantes
+
+> ⚠️ **Document temporaire.** Il suit un chantier en cours sur la branche `migrate-to-vue3` et
+> **doit être supprimé** quand la migration atterrit — `git log` sera alors le registre de ce qui
+> a été fait. Ce qui doit lui survivre a déjà été extrait :
+> - les règles pérennes → [../patterns/](../patterns/) (notamment
+>   [responsive.md](../patterns/responsive.md) et [styling.md](../patterns/styling.md)) ;
+> - la dette encore ouverte → [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+>
+> Ne pas y ajouter de règle de référence : elle serait perdue à la suppression.
 
 > **But** : terminer la migration (Vue 2→3, Vuetify 2→3, Vuex→Pinia, Vue-Router 3→4) sans **aucune** différence de fonctionnement ni de style entre avant et après.
 > **Public** : ce document doit permettre à une personne qui **ne connaît pas le projet** de traiter chaque tâche. Chaque point donne les fichiers, les **numéros de ligne**, et le code **avant → après**.
@@ -21,6 +30,7 @@
 - [x] 1.9 — `v-calendar` (Agenda) *(API classique restaurée en Vuetify 4 → pas de rewrite, juste correctifs de types)*
 - [x] 1.10 — Type `Route` (Vue Router 4)
 - [x] 1.11 — VAutocomplete : slot `item` → `internalItem` (Vuetify 4)
+- [ ] 1.12 — `ProfileAccount.vue` : `useRouter()` hors du scope `setup` → navigation morte
 
 ### 2. 🟠 Iso-visuel
 - [x] 2.1 — `variant` des inputs (`underlined`)
@@ -35,6 +45,8 @@
 - [x] 2.10 — (Vuetify 4) CSS Layers + `!important` *(cas connu traité, cf. §2.10)*
 - [x] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
 - [ ] 2.12 — (Vuetify 4) Grille VRow/VCol
+- [ ] 2.13 — (Vuetify 4) Blocs CSS morts dans `global.scss` (2 correctifs visuels inactifs)
+- [ ] 2.14 — (Vuetify 4) Modificateurs de nuance `lighten-*`/`darken-*` silencieusement perdus
 
 ### 3. 🟡 Nettoyage / dette
 - [x] 3.1 — Hack `loginGuard`
@@ -49,6 +61,10 @@
 - [x] 3.10 — Dette de type : `EventDialog`/events & divers *(la majorité corrigée en traitant les bugs runtime associés, reliquat listé en §3.10)*
 - [x] 3.11 — (Vuetify 4) Divers 🟡 (elevation, date range, thème `system`, labs) *(chaque sous-point conclut « aucune action requise »)*
 - [ ] 3.12 — Montée de **Vite** 6 → dernière stable
+- [ ] 3.13 — Amener `yarn type-check` à **0 erreur** (28 aujourd'hui, inventaire complet)
+- [ ] 3.14 — Supprimer le service worker non fonctionnel
+- [ ] 3.15 — Renommer `src/views/agenga/` → `src/views/agenda/`
+- [ ] 3.16 — Remplacer le fork local `eslint-plugin-vuetify` par le paquet npm
 
 ### 4. ⚪ Optionnel
 - [ ] §4 — Améliorations optionnelles
@@ -503,6 +519,56 @@ En Vuetify 4, la prop de slot **`item`** des slots `#item` / `#selection` est re
 ```
 > ⚠️ `item` était déjà l'objet interne (pas le `Tag`) → passer `.raw` à `TagChip` corrige aussi l'erreur `vue-tsc` `TagSearch.vue:76` (cf. §3.10). À re-tester : rendu de la liste déroulante + sélection d'un tag.
 
+---
+
+### 1.12 `ProfileAccount.vue` — `useRouter()` appelé hors du scope `setup`
+
+Un composable Vue (`useRouter`, `useRoute`, `useDisplay`…) doit être appelé **pendant l'exécution de `setup()`**, car il résout sa valeur via le contexte d'injection du composant courant. Appelé plus tard, dans un gestionnaire d'événement, ce contexte n'existe plus.
+
+Ici `useRouter()` est appelé **à l'intérieur** de `deleteAccount()` (`src/views/profile/tabs/ProfileAccount.vue:9`) : la redirection finale échoue, alors que le compte a déjà été supprimé, le token effacé et les stores réinitialisés. L'utilisateur reste sur une page morte, non authentifié, sans indication.
+
+```ts
+// AVANT (L.8-18)
+function deleteAccount(): void {
+  const router = useRouter()          // ❌ hors du scope setup
+  userApi
+    .deleteAccount()
+    .then(() => {
+      authService.removeToken()
+      authService.resetStore()
+      router.push({ name: 'login' })  // ne s'exécute pas correctement
+    })
+    .catch(error => console.error(error))
+}
+
+// APRÈS
+const router = useRouter()            // ✅ au niveau du <script setup>
+
+function deleteAccount(): void {
+  userApi
+    .deleteAccount()
+    .then(() => {
+      authService.removeToken()
+      authService.resetStore()
+      router.push({ name: 'login' })
+    })
+    .catch(error => console.error(error))
+}
+```
+
+**Fichier à modifier :**
+| Fichier | Ligne | Action |
+|---|---|---|
+| `src/views/profile/tabs/ProfileAccount.vue` | 8-9 | Remonter `const router = useRouter()` avant `function deleteAccount()` |
+
+**Vérifier qu'il n'y a pas d'autres occurrences du même défaut :**
+```bash
+# tout appel de composable à l'intérieur d'une fonction est suspect
+grep -rn "  const .* = use\(Router\|Route\|Display\|TemplateRef\)()" src --include='*.vue'
+```
+
+⚠️ QA : supprimer un compte de test → doit rediriger vers `/login`. Ce point n'a **pas** été vérifié à l'exécution (il faut détruire un compte) ; le diagnostic repose sur la règle d'usage des composables Vue. Si le test montre que la redirection fonctionnait déjà, refermer ce point sans modification.
+
 </details>
 
 ---
@@ -664,6 +730,132 @@ Refonte (marges négatives → CSS `gap`, certaines classes/comportements change
 
 > Note d'investigation : un bug de layout signalé dans `DailyDetail.vue` (cards qui ne remplissaient plus la largeur disponible) faisait initialement suspecter ce point (`v-row`/`v-col`), mais la cause réelle était ailleurs (`.v-timeline-item__body`, cf. §3.10/timelines). `v-row`/`v-col` en tant que tel reste non vérifié pour ce qui est du `gap`.
 
+---
+
+### 2.13 (Vuetify 4) Blocs CSS morts dans `global.scss` — 2 correctifs visuels inactifs
+
+Ces sélecteurs ciblent des classes internes qui **n'existent plus dans Vuetify 4**. Les règles ne matchent donc rien, **sans aucune erreur ni avertissement** — deux correctifs visuels sont silencieusement désactivés depuis la montée de version.
+
+Vérification faite pour chaque classe (`grep -rl "<classe>" node_modules/vuetify/lib/`) :
+
+| Sélecteur | Ligne | Existe en V4 ? | Conséquence réelle |
+|---|---|---|---|
+| `.v-application--wrap` | 176-178 | ❌ (classe **Vuetify 2**) | `min-height: 100svh` inactif → **la hauteur ne compense plus la barre de navigation des navigateurs mobiles** |
+| `.v-stepper__header` | 203 | ❌ | `box-shadow: none` + `margin-bottom` inactifs |
+| `.v-stepper__items` | 208 | ❌ | `flex-grow: 1` inactif |
+| `.v-stepper__content` | 212 | ❌ | `height: 100%` + `padding: 0` inactifs |
+| `.v-stepper__wrapper` | 217 | ❌ | `height: 100%` inactif |
+| `.v-window__container` | 218 | ✅ | conservé |
+| `.v-window-item` | 222 | ✅ | conservé |
+| `.v-chip` / `.v-tab` + `::before` | 235-240 | ❌ (pseudo-élément → **élément** `__overlay`) | **le survol n'est plus neutralisé sur mobile** — c'est le §2.3, déjà tracé |
+
+**Marche à suivre :**
+
+1. **Hauteur mobile** — remplacer le sélecteur V2 par le conteneur racine réel de Vuetify 4 :
+   ```scss
+   /* AVANT (L.176-178) */
+   .v-application--wrap {
+     min-height: 100svh !important;
+   }
+
+   /* APRÈS — vérifier dans l'inspecteur quel élément porte la hauteur */
+   .v-application {
+     min-height: 100svh !important;
+   }
+   ```
+   ⚠️ **À valider dans l'inspecteur** : je n'ai pas confirmé que `.v-application` est le bon
+   porteur en V4 — vérifier sur mobile réel (ou émulation avec barre d'URL) avant de conclure.
+
+2. **Stepper** — le bloc `.daily-update-stepper` (L.195-227) a été écrit pour l'ancien stepper. Depuis §1.5, le composant utilise `v-stepper-window` / `v-stepper-window-item`. **Supprimer les 4 sélecteurs `.v-stepper__*` morts** et vérifier visuellement le wizard daily : s'il s'affiche correctement sans eux, le bloc est simplement à réduire aux deux sélecteurs encore valides.
+
+3. **Survol chips/tabs** — traité par **§2.3** (même correctif). Ne pas le faire deux fois.
+
+**Fichier à modifier :**
+| Fichier | Lignes | Action |
+|---|---|---|
+| `src/styles/global.scss` | 176-178 | Remplacer `.v-application--wrap` par le sélecteur V4 valide |
+| `src/styles/global.scss` | 195-227 | Supprimer les 4 sélecteurs `.v-stepper__*` ; garder `.v-window__container` et `.v-window-item` |
+| `src/styles/global.scss` | 229-242 | Voir §2.3 |
+
+**Méthode de vérification d'un sélecteur avant de l'écrire :**
+```bash
+grep -rl "v-nom-de-classe" node_modules/vuetify/lib/ | head -1   # vide = classe inexistante
+```
+
+⚠️ QA : hauteur de page sur mobile (barre d'URL visible/masquée) ; wizard daily (`/daily/<aujourd'hui>/update/task`) ; survol des chips et onglets sur viewport `sm-and-down`.
+
+---
+
+### 2.14 (Vuetify 4) Modificateurs de nuance `lighten-*` / `darken-*` silencieusement perdus
+
+En Vuetify 2, `color="grey darken-3"` fonctionnait parce que `.darken-3` existait comme **classe autonome**. En Vuetify 4, les nuances sont **fusionnées dans le nom de la classe** (`.bg-grey-darken-3`), et les classes autonomes ont disparu.
+
+Vérifié dans `node_modules/vuetify/lib/styles/colors.css` :
+
+| Classe | V4 |
+|---|---|
+| `.darken-3`, `.lighten-2`, `.variant-1` | ❌ **absentes** |
+| `.bg-grey-darken-3`, `.text-grey-darken-3` | ✅ présentes |
+
+**Mécanique de la régression** — `computeColor()` (`node_modules/vuetify/lib/composables/color.js`) ne reconnaît pas `'grey darken-3'` comme une couleur CSS, donc il produit `class="bg-grey darken-3"` → **deux** classes : `bg-grey` s'applique, `darken-3` ne correspond à rien. **Résultat : la couleur de base s'affiche, la nuance est perdue** — sans erreur.
+
+Trois formes distinctes à traiter, avec des conséquences différentes :
+
+**a. Prop `color` avec nuance** — s'affiche, mais dans la mauvaise nuance :
+```html
+<!-- AVANT -->
+:color="isHovering ? 'grey' : 'grey darken-3'"
+<!-- APRÈS -->
+:color="isHovering ? 'grey' : 'grey-darken-3'"
+```
+
+| Fichier | Lignes |
+|---|---|
+| `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue` | 200, 243, 285 |
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue` | 86 |
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue` | 133 |
+| `src/views/daily/components/DailyTaskCard.vue` | 25 (`'green darken-2'`) |
+| `src/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue` | 66 (`'green darken-2'`) |
+| `src/views/daily/daily-summary/components/DailyDetail.vue` | 151 (`'grey lighten-1'` / `'grey darken-3'`) |
+| `src/components/FilterChip.vue` | 10 (`'grey darken-4'`) |
+| `src/views/daily/daily-summary/components/DailySummaryCard.vue` | 17 (rampe `'green darken-4'`…) |
+| `src/utils/daily-task.utils.ts` | 20, 22, 24 (`'teal lighten-3'`, `'purple lighten-3'`, `'red lighten-3'`) |
+
+**b. Nuance appliquée à un token de thème** — cas particulier : un token custom **n'a pas** de nuances générées (aucune option `variations` dans `src/plugins/vuetify.ts`). `bg-collection` s'applique, la nuance est ignorée. Choisir : soit retirer la nuance, soit déclarer une vraie couleur de thème dédiée.
+
+| Fichier | Ligne | Valeur |
+|---|---|---|
+| `src/views/collection/components/CollectionCard.vue` | 24 | `color="collection lighten-2"` |
+| `src/views/collection/collection-detail/tabs/CollectionGeneral.vue` | 181 | `color="collection lighten-2"` |
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue` | 59 | `color="collection lighten-2"` |
+| `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue` | 163 | `color="accent variant-1"` — `variant-1` n'existe dans **aucune** version, à supprimer |
+
+**c. Classes de texte V2 (`--text` / `text--`)** — celles-ci ne s'affichent **pas du tout** :
+```
+'grey--text text--lighten-3'  →  'text-grey-lighten-3'
+'white--text'                 →  'text-white'
+```
+
+| Fichier | Lignes |
+|---|---|
+| `src/utils/daily-task.utils.ts` | 33, 35, 37 |
+| `src/views/components/event/EventItemCard.vue` | 80, 81, 82, 87 |
+| `src/views/daily/components/DailyTaskActionChip.vue` | 53 |
+| `src/views/administration/tabs/AdministrationFeedback.vue` | 56, 57 |
+
+**Détection exhaustive :**
+```bash
+# a + b : nuance dans une prop color (espace entre le nom et le modificateur)
+grep -rnE "color=\"[a-zA-Z-]+ (lighten|darken|accent|variant)-[0-9]" src --include='*.vue'
+grep -rnE "'[a-zA-Z-]+ (lighten|darken|accent|variant)-[0-9]'" src --include='*.vue' --include='*.ts'
+# c : classes de texte V2
+grep -rn -- "--text\|text--" src --include='*.vue' --include='*.ts'
+```
+
+> À traiter avec les **tokens de thème morts** relevés au passage : `taskCompleted` (`#497549`) et `taskInCreation` (`#181b1f`) sont déclarés dans `src/plugins/vuetify.ts` et utilisés **nulle part** ; et `error` n'est déclaré que dans le thème `light`, donc le thème `dark` (le seul atteignable) utilise le rouge par défaut de Vuetify.
+
+⚠️ QA : écrans daily (wizard + résumé + timelines), cartes de collection, chips d'action, table de feedback en administration.
+
 </details>
 
 ---
@@ -801,6 +993,253 @@ Vite est en **`^6.0.1`**. Monter vers la dernière stable (≥ 7, désormais per
 - ⚠️ **Vérifier la version cible exacte et ses breaking changes au moment de le faire** (Rolldown, options de build, plugins). Confirmer la compat de `@vitejs/plugin-vue` (^5) et `vite-plugin-vuetify` avec la Vite cible.
 - Fichiers potentiellement impactés : `vite.config.ts`, `package.json` (scripts/deps), éventuels réglages `build.rollupOptions`.
 - Migration **indépendante** de Vuetify 4 ; à faire séparément avec `yarn build` + `yarn dev` de contrôle.
+
+---
+
+### 3.13 Amener `yarn type-check` à 0 erreur — inventaire complet des 28 erreurs
+
+Cet inventaire **remplace** les listes partielles de §3.8, §3.9 et §3.10, qui datent d'un relevé antérieur. Relevé de référence : `yarn type-check` sur la branche `migrate-to-vue3`.
+
+**Pourquoi le faire** : tant que le compteur n'est pas à 0, `type-check` ne peut pas devenir bloquant (hook ou CI) et **rien ne protège contre les régressions de typage**. Le critère de travail intermédiaire est donc *« mon changement n'ajoute pas d'erreur »* :
+
+```bash
+yarn type-check 2>&1 | grep -c "error TS"   # 28 aujourd'hui
+```
+
+#### Groupe A — Chips d'entité : `:to` et `withDefaults` (7 erreurs)
+
+Les trois chips partagent le même code copié-collé. `detailLocation` renvoie `RouteLocation | null`, incompatible avec la prop `:to`.
+
+```ts
+// AVANT
+const detailLocation = computed<RouteLocation | null>(() => { … return null })
+// APRÈS
+const detailLocation = computed<RouteLocationRaw | undefined>(() => { … return undefined })
+```
+
+| Fichier | Lignes | Erreur |
+|---|---|---|
+| `src/components/CollectionChip.vue` | 28, 42 | `No overload matches this call` + `RouteLocationGeneric \| null` non assignable à `:to` |
+| `src/components/ProjectChip.vue` | 28, 42 | idem |
+| `src/components/SectionChip.vue` | 28, 44, 52 | idem + `Expected 0 arguments, but got 1` (L.52) |
+
+Note : `SectionChip.vue:2` importe aussi `from 'src/models/section.model'` au lieu de `@/models/…` — à corriger au passage.
+
+#### Groupe B — `string | null` → `string | undefined` (5 erreurs)
+
+Vuetify attend `string | undefined` sur `color`/`size`. Aligner le type **source** (le `computed` ou la prop), ou passer `?? undefined` au point d'usage. Pattern déjà appliqué avec succès en §1.8 et sur `DailyDetailEventTimeline.vue`.
+
+| Fichier | Ligne |
+|---|---|
+| `src/views/daily/daily-summary/components/DailySummaryCard.vue` | 39 |
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue` | 64 |
+| `src/views/feedback/Feedback.vue` | 45 |
+| `src/views/project/components/ProjectCard.vue` | 19 |
+| `src/views/project/project-detail/components/SectionDialog.vue` | 86 |
+
+#### Groupe C — En-têtes de `v-data-table` (3 erreurs)
+
+La forme des en-têtes a changé : `{ text, value }` (V2) → `{ title, key }` (V3+). `AdministrationUser` utilise encore `text`, et le slot `#item.x` n'expose plus `headers`.
+
+| Fichier | Ligne | Correctif |
+|---|---|---|
+| `src/views/administration/tabs/AdministrationUser.vue` | 72 | `text:` → `title:`, `value:` → `key:` ; typer en `readonly DataTableHeader[]` |
+| `src/views/administration/tabs/AdministrationFeedback.vue` | 67 | `value:` → `key:` ; typer de même |
+| `src/views/administration/tabs/AdministrationFeedback.vue` | 98 | `headers` absent du slot `ItemSlot` → retirer sa déstructuration |
+
+#### Groupe D — `DailyTaskActionChip` (2 erreurs)
+
+Bug réel doublé d'une erreur de type : `emit('update', action)` envoie **le ref**, pas sa valeur (cf. commentaire `// We send both event to meet all possibilities`, L.29). Le consommateur construit le corps du PATCH avec (`DailyTaskFormCard.vue:85`), donc un objet `Ref` partait dans la requête.
+
+```ts
+// AVANT (L.29)
+emit('update', action)
+// APRÈS
+emit('update', action.value)
+```
+
+| Fichier | Lignes |
+|---|---|
+| `src/views/daily/components/DailyTaskActionChip.vue` | 29 (`ModelRef` non assignable), 50 (`DailyTaskAction \| null` non assignable à `PropertyKey`) |
+
+#### Groupe E — `DailyTaskPatch` vs `DailyTaskPost` (2 erreurs)
+
+`DailyTaskPatch.action` accepte `null`, `DailyTaskPost.action` non ; `Patch` a `completed` que `Post` n'a pas. La chaîne d'émission mélange les deux (`DailyTaskForm` émet un `Patch`, `DailyUpdateTaskList` déclare `Post`).
+
+| Fichier | Lignes | Correctif |
+|---|---|---|
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue` | 78, 85 | Aligner les types d'`emits` : `create: [DailyTaskPost]` mais `update: [{ id, data: DailyTaskPatch }]` |
+
+#### Groupe F — Divers (9 erreurs)
+
+| Fichier | Ligne | Erreur | Correctif |
+|---|---|---|---|
+| `src/router/modules/collection.router.ts` | 17 | `string \| string[]` → `parseInt` | `String(route.params.id)` (cf. §3.9) |
+| `src/views/components/common-task/CommonTaskDialog.vue` | 48 | `No overload matches this call` | inspecter le `withDefaults` |
+| `src/views/components/event/EventDayDialog.vue` | 32 | `scrollTop` absent du type du ref `v-card` | `(scrollableElement.value?.$el as HTMLElement).scrollTop` |
+| `src/views/components/tag/TagSearch.vue` | 79 | `Property 'raw' does not exist on type Tag` | le slot `#item` de Vuetify 4 expose `item` = valeur brute **et** `internalItem` = objet interne ; utiliser `internalItem.raw` (cf. §1.11) |
+| `src/views/daily/daily-summary/DailySummary.vue` | 145 | `boolean \| undefined` → `boolean` | valeur par défaut ou `?? false` |
+| `src/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue` | 206 | `string` → `number` | binder la valeur (`:prop="300"` au lieu de `prop="300"`) |
+| `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue` | 312 | `sectionId?: number` vs requis | rendre `sectionId` optionnel dans la signature de `select` (cf. §3.10) |
+| `src/views/non-auth/ResetPassword.vue` | 52 | `this` implicite `any` | remplacer la fonction par une arrow, ou annoter `this` |
+| `src/views/settings/tabs/SettingsTags.vue` | 7 | valeur utilisée comme type | `typeof SettingsTagList` |
+
+**Ordre conseillé** : A (7 erreurs, un seul pattern sur 3 fichiers jumeaux) → B (5, mécanique) → C (3) → D/E (4, corrigent aussi de vrais bugs runtime) → F (9, cas par cas).
+
+⚠️ Après chaque groupe : `yarn type-check` (le compteur doit baisser, jamais monter) **et** test manuel de l'écran — plusieurs de ces correctifs touchent des props réellement utilisées.
+
+---
+
+### 3.14 Supprimer le service worker non fonctionnel
+
+`src/registerServiceWorker.ts` est un reliquat de **Vue CLI** : il utilise `process.env.NODE_ENV` et `process.env.BASE_URL`, conventions webpack que Vite ne fournit pas.
+
+Comportement réel, vérifié :
+
+| Environnement | Ce qui se passe |
+|---|---|
+| `yarn dev` | Vite remplace `process.env.NODE_ENV` → la condition devient `if (false)`, code inerte |
+| `yarn build` | Vite remplace `process.env` par un **objet vide** → `register('undefined/service-worker.js')` → **404 à chaque chargement** |
+
+Vérifié dans le bundle : `dist/assets/index-*.js` contient `` CV(`${DV.BASE_URL}service-worker.js`) `` avec `DV = {}`.
+
+De plus **aucun `service-worker.js` n'est généré** (absent de `public/` et de `dist/`) et il n'y a **aucun manifeste PWA** : il n'y a donc rien à enregistrer, même en corrigeant la variable.
+
+**Marche à suivre :**
+
+```bash
+rm src/registerServiceWorker.ts
+yarn remove register-service-worker
+```
+
+Puis retirer l'import et son TODO dans `src/main.ts` :
+
+```ts
+// AVANT (L.3-4)
+// TODO : See if we can remove registerServiceWorker dependency
+import './registerServiceWorker'
+// APRÈS — les deux lignes supprimées
+```
+
+**Fichiers à modifier :**
+| Fichier | Action |
+|---|---|
+| `src/registerServiceWorker.ts` | **supprimer** |
+| `src/main.ts` | supprimer L.3 (TODO) et L.4 (import) |
+| `package.json` | retirer `register-service-worker` des `dependencies` |
+| `src/main.ts` | *(au passage)* supprimer le bootstrap Vue 2 commenté, L.19-26 |
+
+> Si un PWA est souhaité un jour, passer par un plugin Vite dédié (`vite-plugin-pwa`), qui génère le service worker **et** le manifeste — ce n'est pas une remise en service de ce fichier.
+
+⚠️ QA : `yarn build` puis `yarn serve` → la console ne doit plus contenir de 404 sur `service-worker.js`. Vérifier aussi qu'aucun service worker déjà enregistré ne subsiste dans le navigateur (DevTools → Application → Service Workers → Unregister).
+
+---
+
+### 3.15 Renommer `src/views/agenga/` → `src/views/agenda/`
+
+Faute de frappe dans le nom du dossier. Tout le reste écrit correctement « agenda » : le fichier (`Agenda.vue`), le chemin de route (`/agenda`), le nom de route (`agenda`), le libellé du menu et le titre de page. Introduite par le commit `2fcb59b`.
+
+**Un seul import à corriger** (vérifié : `grep -rn "agenga" src/`) :
+
+```ts
+// AVANT — src/router/index.ts:1
+import Agenda from '@/views/agenga/Agenda.vue'
+// APRÈS
+import Agenda from '@/views/agenda/Agenda.vue'
+```
+
+**Marche à suivre :**
+```bash
+git mv src/views/agenga src/views/agenda
+# puis corriger l'unique import
+grep -rn "agenga" src/          # doit ne rien renvoyer
+```
+
+**Fichiers à modifier :**
+| Fichier | Action |
+|---|---|
+| `src/views/agenga/` → `src/views/agenda/` | `git mv` (préserve l'historique) |
+| `src/router/index.ts` | ligne 1 : corriger le chemin d'import |
+
+> ⚠️ Sur macOS (système de fichiers insensible à la casse) le `git mv` fonctionne ici car les deux noms diffèrent par plus que la casse — pas de précaution particulière.
+
+⚠️ QA : `yarn dev` puis naviguer sur `/agenda` ; `yarn build` doit passer.
+
+---
+
+### 3.16 Remplacer le fork local `eslint-plugin-vuetify` par le paquet npm
+
+Le dossier `frontend/eslint-plugin-vuetify/` (84 fichiers, 1 Mo) est un **fork vendored en version 2.4.0**, chargé explicitement par `eslint.config.mjs:11`. Le TODO en tête du fichier dit d'attendre le support d'ESLint 9 en amont.
+
+**Cette condition est remplie** : le paquet npm `eslint-plugin-vuetify@2.7.2` est **déjà installé** (`devDependencies`) et fournit des configs flat. Deux bénéfices concrets, vérifiés :
+
+1. **Le fork produit un faux positif.** Il signale `'first-day-of-week' has been removed` sur `EventDialog.vue:290` et `:353` — or cette prop **existe bien en Vuetify 4** (déclarée avec son `type` et son `default` dans `node_modules/vuetify/lib/components/VDatePicker/VDatePicker.d.ts:327-335`). La version npm ne la signale pas. Ces 2 erreurs de lint disparaîtront.
+2. **La version npm apporte 4 règles spécifiques Vuetify 4** absentes du fork, directement utiles aux points restants :
+
+   | Règle (config `flat/recommended-v4`) | Utile pour |
+   |---|---|
+   | `vuetify/no-deprecated-typography` | §2.6 (classes typographiques MD3) |
+   | `vuetify/no-legacy-grid-props` | §2.12 (grille VRow/VCol) |
+   | `vuetify/no-deprecated-snackbar` | §3.11 |
+   | `vuetify/no-elevation-overflow` | §3.11 |
+
+   Les 8 règles de `base` sont **identiques** entre le fork et la version npm (mêmes noms, vérifié).
+
+**⚠️ Ce n'est pas un remplacement direct.** Deux pièges rencontrés en testant :
+
+- `eslint-plugin-vuetify/lib/configs/flat/base.js` **redéclare le plugin `vue`**, ce qui entre en conflit avec `pluginVue.configs['flat/recommended']` déjà présent → `ConfigError: Key "plugins": Cannot redefine plugin "vue"`.
+- Le fork restreint sa portée par `files: ['*.vue', '**/*.vue']` ; l'omettre change les fichiers analysés.
+
+**Marche à suivre :**
+
+1. Remplacer l'import et construire le bloc à la main, en reprenant la forme du fork sans sa redéclaration de `vue` :
+
+   ```ts
+   // AVANT — eslint.config.mjs:9-11
+   // TODO : when eslint-plugin-vuetify support eslint v9, remove this subfolder and install the package from
+   // https://github.com/vuetifyjs/eslint-plugin-vuetify/issues/93
+   import pluginVuetify from './eslint-plugin-vuetify/src/configs/flat/base.js'
+
+   // APRÈS
+   import vuetify from 'eslint-plugin-vuetify'
+   import vuetifyBase from 'eslint-plugin-vuetify/lib/configs/base.js'
+
+   const pluginVuetify = {
+     files: ['*.vue', '**/*.vue'],
+     plugins: { vuetify },
+     rules: { ...vuetifyBase.rules },
+   }
+   ```
+
+2. **Vérifier que les règles se déclenchent encore** — c'est l'étape critique, un mauvais montage désactive le plugin **en silence**. Test de non-régression sur une occurrence connue :
+
+   ```bash
+   # doit signaler les slots/props dépréciés du projet — si la sortie est vide, le plugin est inactif
+   npx eslint src/views/daily/daily-update/steps/task/DailyUpdateTask.vue
+   npx eslint src --ext .vue 2>&1 | grep -c "vuetify/"
+   ```
+
+   > Lors de mes essais, une variante du montage a fait tomber ce compteur à 0 **sans erreur** : ne pas conclure au succès sur la seule absence d'erreur ESLint.
+
+3. Une fois le compteur non nul confirmé, **ajouter les règles V4** :
+   ```ts
+   import vuetifyV4 from 'eslint-plugin-vuetify/lib/configs/recommended-v4.js'
+   // puis fusionner vuetifyV4.rules dans le bloc de règles
+   ```
+   ⚠️ Ces 4 règles vont **remonter de nouvelles erreurs** (typographie, grille) : les traiter avec §2.6 et §2.12, pas dans ce point.
+
+4. Supprimer le fork et nettoyer les exclusions devenues inutiles.
+
+**Fichiers à modifier :**
+| Fichier | Action |
+|---|---|
+| `eslint.config.mjs` | L.9-11 : remplacer l'import du fork (+ supprimer le TODO) ; L.55-57 : supprimer l'entrée `ignores: ['eslint-plugin-vuetify/']` |
+| `eslint-plugin-vuetify/` | **supprimer le dossier** (`git rm -r`) |
+| `tsconfig.json` | retirer `"eslint-plugin-vuetify"` de `exclude` |
+| `.prettierignore` | retirer l'entrée du fork si présente |
+| `package.json` | rien à faire — `eslint-plugin-vuetify@^2.7.2` est déjà en `devDependencies` |
+
+⚠️ QA : `yarn lint` doit tourner sans `ConfigError`, remonter au moins les mêmes catégories de règles `vuetify/*` qu'avant, et **ne plus** signaler `first-day-of-week`.
 
 </details>
 
