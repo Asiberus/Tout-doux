@@ -83,7 +83,7 @@ function deleteTask(id: number): void {
 <template>
   <div>
     <v-btn v-if="xs" :disabled="disabled" size="small" class="mb-1" @click="$emit('new-section')">
-      <v-icon start>mdi-plus</v-icon>
+      <v-icon icon="mdi-plus" start />
       section
     </v-btn>
     <div class="d-flex align-center justify-ends gap-2 mb-2">
@@ -99,7 +99,7 @@ function deleteTask(id: number): void {
               icon
               variant="text"
               density="comfortable">
-              <v-icon size="small">mdi-pencil</v-icon>
+              <v-icon icon="mdi-pencil" size="small" />
             </v-btn>
           </template>
           <SectionDialog
@@ -116,7 +116,7 @@ function deleteTask(id: number): void {
         :disabled="disabled"
         :size="mdAndDown || true ? 'small' : 'default'"
         @click="$emit('new-section')">
-        <v-icon start>mdi-plus</v-icon>
+        <v-icon icon="mdi-plus" start />
         section
       </v-btn>
     </div>
@@ -127,7 +127,7 @@ function deleteTask(id: number): void {
           <FilterChip
             v-if="section.tasks.length > 0"
             v-model="displayCompletedTask"
-            color="green-darken-2"
+            color="green"
             icon="mdi-trophy">
             Completed
           </FilterChip>
@@ -137,7 +137,7 @@ function deleteTask(id: number): void {
           <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props: menuProps }">
               <v-btn v-bind="menuProps" :disabled :size="smAndDown ? 'small' : 'default'">
-                <v-icon start>mdi-plus</v-icon>
+                <v-icon icon="mdi-plus" start />
                 task
               </v-btn>
             </template>

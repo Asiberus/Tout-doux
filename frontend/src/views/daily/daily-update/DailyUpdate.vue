@@ -45,7 +45,7 @@ watch(dailyStepper, index => {
         rounded
         @click="goToDailyDetail()">
         Start the day
-        <v-icon end>mdi-arrow-right</v-icon>
+        <v-icon icon="mdi-arrow-right" end />
       </v-btn>
     </div>
 

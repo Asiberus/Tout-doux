@@ -45,10 +45,11 @@ function click(): void {
     :ripple
     :size="small ? 'small' : 'default'"
     :title
+    variant="flat"
     class="collection-chip px-0"
     :class="{ 'cursor-default': collection.archived && !detailLocation }"
     @click.stop="click()">
-    <v-icon size="small" class="ml-2 mr-1">mdi-list-box</v-icon>
+    <v-icon icon="mdi-list-box" size="small" class="ml-2 mr-1" />
     <div class="text-truncate mr-2">
       {{ collection.name }}
     </div>

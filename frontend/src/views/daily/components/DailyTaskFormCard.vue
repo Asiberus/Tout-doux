@@ -61,17 +61,21 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
                 variant="plain"
                 color="white"
                 class="daily-task-form-card__actions__btn">
-                <v-icon size="small">mdi-dots-vertical</v-icon>
+                <v-icon icon="mdi-dots-vertical" size="small" />
               </v-btn>
             </template>
             <v-list density="compact">
               <v-list-item v-if="!dailyTask.task && !dailyTask.commonTask" @click="showEditMode()">
-                <v-icon size="small" start color="accent">mdi-pencil</v-icon>
-                <v-list-item-title>Edit</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-pencil" size="small" start color="accent" />
+                  Edit
+                </v-list-item-title>
               </v-list-item>
               <v-list-item @click="deleteDailyTask()">
-                <v-icon size="small" start color="error">mdi-trash-can</v-icon>
-                <v-list-item-title>Delete</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-trash-can" size="small" start color="error" />
+                  Delete
+                </v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>

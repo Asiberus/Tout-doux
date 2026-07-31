@@ -50,7 +50,7 @@ function emitDeleteEvent(): void {
       :disabled="selected"
       :ripple="false"
       class="wrapper rounded-lg">
-      <v-icon>mdi-timeline</v-icon>
+      <v-icon icon="mdi-timeline" />
       <div class="content">
         <h5
           class="content__title text-body-large text-sm-title-large text-white"
@@ -65,17 +65,21 @@ function emitDeleteEvent(): void {
         <v-menu v-model="commonTaskMenu">
           <template #activator="{ props }">
             <v-btn variant="text" icon density="comfortable" size="x-small" v-bind="props">
-              <v-icon size="small">mdi-dots-vertical</v-icon>
+              <v-icon icon="mdi-dots-vertical" size="small" />
             </v-btn>
           </template>
           <v-list density="compact">
             <v-list-item @click="openEditDialog()">
-              <v-icon size="small" start>mdi-pencil</v-icon>
-              <v-list-item-title>Edit</v-list-item-title>
+              <v-list-item-title class="d-flex align-center">
+                <v-icon icon="mdi-pencil" size="small" start />
+                Edit
+              </v-list-item-title>
             </v-list-item>
             <v-list-item @click="openDeleteDialog()">
-              <v-icon size="small" start>mdi-trash-can</v-icon>
-              <v-list-item-title>Delete</v-list-item-title>
+              <v-list-item-title class="d-flex align-center">
+                <v-icon icon="mdi-trash-can" size="small" start />
+                Delete
+              </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -90,7 +94,7 @@ function emitDeleteEvent(): void {
 
     <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
       <template #icon>
-        <v-icon size="x-large">mdi-trash-can</v-icon>
+        <v-icon icon="mdi-trash-can" size="x-large" />
       </template>
       <span>Are you sure to delete this common task ?</span>
     </ConfirmDialog>

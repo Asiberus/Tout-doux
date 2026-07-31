@@ -31,20 +31,20 @@ function isDateEqual(date1: string, date2: string): boolean {
         variant="text"
         density="comfortable"
         @click="$emit('update', event)">
-        <v-icon>mdi-pencil</v-icon>
+        <v-icon icon="mdi-pencil" />
       </v-btn>
     </v-toolbar>
     <v-card-text>
       <div class="d-flex align-center mb-2 text-white">
         <template v-if="!event.takesWholeDay">
           <div class="flex-shrink-0 d-flex align-center">
-            <v-icon class="mr-2">mdi-calendar-clock</v-icon>
+            <v-icon icon="mdi-calendar-clock" class="mr-2" />
             <span>
               {{ dateFormat(event.startDate, 'D MMMM Y') }}
               <template v-if="event.startTime">{{ event.startTime }}</template>
             </span>
             <template v-if="event.endDate">
-              <v-icon size="small" class="mx-1">mdi-arrow-right</v-icon>
+              <v-icon icon="mdi-arrow-right" size="small" class="mx-1" />
               <span>
                 <template v-if="!isDateEqual(event.startDate, event.endDate)">
                   {{ dateFormat(event.endDate, 'D MMMM Y') }}
@@ -55,7 +55,7 @@ function isDateEqual(date1: string, date2: string): boolean {
           </div>
         </template>
         <template v-else>
-          <v-icon title="Takes whole day" class="mr-2">mdi-white-balance-sunny</v-icon>
+          <v-icon icon="mdi-white-balance-sunny" title="Takes whole day" class="mr-2" />
           <span>{{ dateFormat(event.startDate, 'D MMMM Y') }}</span>
         </template>
 

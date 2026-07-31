@@ -31,17 +31,17 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
 
     <h5 class="text-title-large mb-2">Progress Wheel</h5>
     <div class="progress-wheel-wrapper">
-      <template v-for="mode of [ProgressWheelMode.Number, ProgressWheelMode.Percent]">
+      <template v-for="mode of [ProgressWheelMode.Number, ProgressWheelMode.Percent]" :key="mode">
         <v-sheet
           v-ripple
           class="progress-wheel-card rounded-lg"
           :class="{ selected: preferencesStore.loadedPreferences.progressWheelMode === mode }"
           @click="updatePreferences(mode)">
           <template v-if="preferencesStore.loadedPreferences.progressWheelMode === mode">
-            <v-icon class="radio-button" color="accent">mdi-radiobox-marked</v-icon>
+            <v-icon icon="mdi-radiobox-marked" class="radio-button" color="accent" />
           </template>
           <template v-else>
-            <v-icon class="radio-button">mdi-radiobox-blank</v-icon>
+            <v-icon icon="mdi-radiobox-blank" class="radio-button" />
           </template>
 
           <ProgressWheel
@@ -59,6 +59,7 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
 <style scoped lang="scss">
 @use 'sass:map';
 @use 'vuetify/lib/styles/settings/_variables';
+@use 'vuetify/lib/styles/settings/colors';
 
 .progress-wheel-wrapper {
   display: flex;
@@ -81,7 +82,7 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
     @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
       // We don't display hover for mobile
       &:hover {
-        background-color: rgb(var(--v-theme-secondary-darken-1));
+        background-color: map.get(colors.$grey, 'darken-4');
       }
     }
 

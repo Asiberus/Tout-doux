@@ -68,7 +68,7 @@ function toggleArchivedProject(): void {
         <v-dialog v-model="projectDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props: menuProps }">
             <v-btn v-bind="menuProps">
-              <v-icon start>mdi-plus</v-icon>
+              <v-icon icon="mdi-plus" start />
               project
             </v-btn>
           </template>
@@ -103,7 +103,7 @@ function toggleArchivedProject(): void {
           <div v-if="!archived" class="d-flex flex-column align-center gap-2">
             <span>You don't have any project yet!</span>
             <v-btn @click="projectDialog = true">
-              <v-icon start>mdi-plus</v-icon>
+              <v-icon icon="mdi-plus" start />
               project
             </v-btn>
           </div>

@@ -17,15 +17,15 @@ const { mdAndUp } = useDisplay()
           show-arrows
           bg-color="transparent">
           <v-tab :to="{ name: 'settings-preferences' }" exact class="justify-start">
-            <v-icon start size="small">mdi-cog</v-icon>
+            <v-icon icon="mdi-cog" start size="small" />
             Preferences
           </v-tab>
           <v-tab :to="{ name: 'settings-common-tasks' }" exact class="justify-start">
-            <v-icon start size="small">mdi-timeline</v-icon>
+            <v-icon icon="mdi-timeline" start size="small" />
             Common Tasks
           </v-tab>
           <v-tab :to="{ name: 'settings-tags' }" exact class="justify-start">
-            <v-icon start size="small">mdi-tag</v-icon>
+            <v-icon icon="mdi-tag" start size="small" />
             Tags
           </v-tab>
         </v-tabs>

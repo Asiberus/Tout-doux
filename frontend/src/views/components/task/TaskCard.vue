@@ -82,17 +82,21 @@ function emitDeleteEvent(): void {
                 size="x-small"
                 variant="plain"
                 class="task-card__actions__btn">
-                <v-icon size="small">mdi-dots-vertical</v-icon>
+                <v-icon icon="mdi-dots-vertical" size="small" />
               </v-btn>
             </template>
             <v-list density="compact">
               <v-list-item @click="openEditDialog()">
-                <v-icon size="small" start>mdi-pencil</v-icon>
-                <v-list-item-title>Edit</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-pencil" size="small" start />
+                  Edit
+                </v-list-item-title>
               </v-list-item>
               <v-list-item @click="openDeleteDialog()">
-                <v-icon size="small" start>mdi-trash-can</v-icon>
-                <v-list-item-title>Delete</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-trash-can" size="small" start />
+                  Delete
+                </v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -103,12 +107,12 @@ function emitDeleteEvent(): void {
         <template v-if="completable">
           <template v-if="task.completed">
             <v-btn icon variant="text" density="comfortable" @click="openUncompleteDialog()">
-              <v-icon>mdi-checkbox-marked-outline</v-icon>
+              <v-icon icon="mdi-checkbox-marked-outline" />
             </v-btn>
           </template>
           <template v-else>
             <v-btn icon variant="text" density="comfortable" @click="emitToggleStateEvent()">
-              <v-icon>mdi-checkbox-blank-outline</v-icon>
+              <v-icon icon="mdi-checkbox-blank-outline" />
             </v-btn>
           </template>
         </template>
@@ -143,14 +147,14 @@ function emitDeleteEvent(): void {
 
     <ConfirmDialog v-model="uncompleteConfirmDialog" @confirm="emitToggleStateEvent()">
       <template #icon>
-        <v-icon size="x-large">mdi-trophy</v-icon>
+        <v-icon icon="mdi-trophy" size="x-large" />
       </template>
       <span>Are you sure to uncomplete this task ?</span>
     </ConfirmDialog>
 
     <ConfirmDialog v-model="deleteConfirmDialog" @confirm="emitDeleteEvent()">
       <template #icon>
-        <v-icon size="x-large">mdi-trash-can</v-icon>
+        <v-icon icon="mdi-trash-can" size="x-large" />
       </template>
       <span>Are you sure to delete this task ?</span>
     </ConfirmDialog>

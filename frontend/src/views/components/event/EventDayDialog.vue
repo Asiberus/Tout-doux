@@ -62,14 +62,14 @@ function scrollDownEvent(): void {
           :icon="xs"
           class="new-event-btn"
           @click="$emit('open-event-dialog', date)">
-          <v-icon>mdi-plus</v-icon>
+          <v-icon icon="mdi-plus" />
           <template v-if="smAndUp">event</template>
         </v-btn>
 
         <v-spacer />
 
         <v-btn icon variant="text" density="comfortable" @click="show = false">
-          <v-icon>mdi-close</v-icon>
+          <v-icon icon="mdi-close" />
         </v-btn>
       </v-toolbar>
       <v-card-text ref="dialogContent" class="overflow-auto flex-grow-1">

@@ -12,7 +12,6 @@ export const vuetifyOptions: VuetifyOptions = {
     VCombobox: { variant: 'underlined' },
     VFileInput: { variant: 'underlined' },
     VSwitch: { color: 'primary' },
-    VChip: { variant: 'flat' },
   },
   theme: {
     defaultTheme: 'dark',

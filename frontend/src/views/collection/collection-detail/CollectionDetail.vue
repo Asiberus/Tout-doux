@@ -18,7 +18,7 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
 <template>
   <div v-if="collectionStore.currentCollection" class="d-flex flex-column h-100">
     <div class="d-flex flex-column flex-sm-row align-center column-gap-2 row-gap-1">
-      <v-icon v-if="xs">mdi-list-box</v-icon>
+      <v-icon v-if="xs" icon="mdi-list-box" />
 
       <SecondaryTitle class="text-center text-sm-start">
         <span v-if="smAndUp" class="text-grey">Collection : </span>
@@ -26,7 +26,7 @@ onUnmounted(() => collectionStore.removeCurrentCollection())
       </SecondaryTitle>
 
       <v-chip v-if="collectionStore.loadedCollection.archived" color="accent" class="flex-shrink-0">
-        <v-icon size="small" class="mr-1">mdi-archive</v-icon>
+        <v-icon icon="mdi-archive" size="small" class="mr-1" />
         Archived
       </v-chip>
     </div>

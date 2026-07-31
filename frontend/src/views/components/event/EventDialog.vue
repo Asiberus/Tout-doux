@@ -390,7 +390,7 @@ function formattedDate(value: string | null | undefined): string {
             <v-switch v-model="eventForm.data.takesWholeDay" hide-details>
               <template #label>
                 Takes whole day
-                <v-icon class="ml-2">mdi-white-balance-sunny</v-icon>
+                <v-icon icon="mdi-white-balance-sunny" class="ml-2" />
               </template>
             </v-switch>
           </div>
@@ -399,7 +399,7 @@ function formattedDate(value: string | null | undefined): string {
         <div
           v-if="relatedToDate && relatedToDateError"
           class="error-text text-body-medium text-orange">
-          <v-icon class="mr-2" color="orange">mdi-calendar-alert</v-icon>
+          <v-icon icon="mdi-calendar-alert" class="mr-2" color="orange" />
           Event must be related to the
           {{ dateFormat(relatedToDate, 'DD MMMM Y') }}.
         </div>

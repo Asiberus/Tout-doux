@@ -68,10 +68,9 @@ function shrinkTagGroup(): void {
   <div ref="tagGroup" class="tag-group" :class="{ small, large, 'multi-row': multiRow }">
     <v-icon
       v-if="displayedTags.length > 0"
+      icon="mdi-tag"
       :size="tagIconSize"
-      :class="{ transparent: iconTransparent }">
-      mdi-tag
-    </v-icon>
+      :class="{ transparent: iconTransparent }" />
 
     <template v-for="tag of displayedTags" :key="tag.id">
       <TagChip :tag :small="!small && !large" :x-small="small" class="flex-shrink-0" />
@@ -83,14 +82,15 @@ function shrinkTagGroup(): void {
             :size="!large ? 'small' : 'default'"
             class="flex-shrink-0"
             v-bind="menuProps"
+            variant="flat"
             @click.prevent.stop>
             <template v-if="smallMenuChip">
               <template v-if="displayedTags.length > 0">+</template>
               <span>{{ hiddenTags.length }}</span>
-              <v-icon size="x-small" class="ml-1">mdi-tag</v-icon>
+              <v-icon icon="mdi-tag" size="x-small" class="ml-1" />
             </template>
             <template v-else>
-              <v-icon size="x-small" class="mr-1">mdi-tag</v-icon>
+              <v-icon icon="mdi-tag" size="x-small" class="mr-1" />
               {{ hiddenTags.length }}
               <template v-if="displayedTags.length > 0">more</template>
               {{ hiddenTags.length > 1 ? 'tags' : 'tag' }}

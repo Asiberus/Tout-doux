@@ -17,9 +17,7 @@ const size = computed<'default' | 'large' | 'x-large'>(() => {
 
 <template>
   <div class="d-flex align-center justify-center justify-sm-start gap-2">
-    <v-icon v-if="icon" :size>
-      {{ icon }}
-    </v-icon>
+    <v-icon v-if="icon" :icon="icon" :size />
     <h1 class="text-headline-large text-md-display-medium">
       <slot></slot>
     </h1>

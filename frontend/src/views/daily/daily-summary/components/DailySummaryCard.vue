@@ -65,7 +65,7 @@ function openDailyDetailDialog(): void {
 
         <div v-if="dailySummary.totalEvent > 0" class="flex-shrink-0 d-flex gap-1">
           <span class="daily-event">{{ dailySummary.totalEvent }}</span>
-          <v-icon>mdi-calendar-clock</v-icon>
+          <v-icon icon="mdi-calendar-clock" />
         </div>
       </div>
     </v-card-text>

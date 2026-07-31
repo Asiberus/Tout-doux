@@ -86,7 +86,7 @@ function selectTask(task: Task): void {
                 :color="isHovering ? 'grey' : 'grey-darken-3'"
                 class="ml-1"
                 title="Go to collection">
-                <v-icon size="small">mdi-open-in-new</v-icon>
+                <v-icon icon="mdi-open-in-new" size="small" />
               </v-btn>
             </v-hover>
             <v-spacer />
@@ -96,7 +96,7 @@ function selectTask(task: Task): void {
               variant="text"
               density="comfortable"
               @click.stop="unselectCollection">
-              <v-icon>mdi-close</v-icon>
+              <v-icon icon="mdi-close" />
             </v-btn>
           </template>
         </div>

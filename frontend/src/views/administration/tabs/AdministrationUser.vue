@@ -73,7 +73,7 @@ function deleteUser(id: number): void {
       <template #item.username="{ item, value }">
         {{ value }}
         <template v-if="item.id === userStore.loadedUser.id">
-          <v-icon size="small" title="Account connected">mdi-account-circle</v-icon>
+          <v-icon icon="mdi-account-circle" size="small" title="Account connected" />
         </template>
       </template>
       <template #item.firstName="{ value }">{{ value ? value : '-' }}</template>
@@ -88,46 +88,54 @@ function deleteUser(id: number): void {
       </template>
       <template #item.isActive="{ value }">
         <template v-if="value">
-          <v-icon color="success">mdi-check-circle</v-icon>
+          <v-icon icon="mdi-check-circle" color="success" />
         </template>
         <template v-else>
-          <v-icon color="error">mdi-close-circle</v-icon>
+          <v-icon icon="mdi-close-circle" color="error" />
         </template>
       </template>
       <template #item.isStaff="{ value }">
         <template v-if="value">
-          <v-icon color="info">mdi-security</v-icon>
+          <v-icon icon="mdi-security" color="info" />
         </template>
       </template>
       <template #item.actions="{ item }">
         <v-menu>
           <template #activator="{ props }">
             <v-btn v-bind="props" :disabled="item.id === userStore.loadedUser.id" variant="plain">
-              <v-icon>mdi-dots-vertical</v-icon>
+              <v-icon icon="mdi-dots-vertical" />
             </v-btn>
           </template>
           <v-list density="compact">
             <v-list-item @click="resendActivationEmail(item.id)">
-              <v-icon size="small" start>mdi-email-sync</v-icon>
-              <v-list-item-title>Resend activation email</v-list-item-title>
+              <v-list-item-title class="d-flex align-center">
+                <v-icon icon="mdi-email-sync" size="small" start />
+                Resend activation email
+              </v-list-item-title>
             </v-list-item>
             <template v-if="item.isActive">
               <v-list-item @click="changeUserAccountState(item.id, false)">
-                <v-icon size="small" start>mdi-account-remove</v-icon>
-                <v-list-item-title>Deactivate user</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-account-remove" size="small" start />
+                  Deactivate user
+                </v-list-item-title>
               </v-list-item>
             </template>
             <template v-else>
               <v-list-item @click="changeUserAccountState(item.id, true)">
-                <v-icon size="small" start>mdi-account-check</v-icon>
-                <v-list-item-title>Activate user</v-list-item-title>
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-account-check" size="small" start />
+                  Activate user
+                </v-list-item-title>
               </v-list-item>
             </template>
             <ConfirmPasswordDialog @password-confirmed="deleteUser(item.id)">
               <template #activator="{ props }">
                 <v-list-item v-bind="props">
-                  <v-icon size="small" start>mdi-trash-can</v-icon>
-                  <v-list-item-title>Delete user</v-list-item-title>
+                  <v-list-item-title class="d-flex align-center">
+                    <v-icon icon="mdi-trash-can" size="small" start />
+                    Delete user
+                  </v-list-item-title>
                 </v-list-item>
               </template>
             </ConfirmPasswordDialog>

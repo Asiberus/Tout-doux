@@ -8,7 +8,7 @@ import {
 } from '@/utils/daily-task.utils'
 import { computed } from 'vue'
 
-const action = defineModel<DailyTaskAction | null>('action')
+const action = defineModel<DailyTaskAction | null>('action', { required: true })
 
 defineProps<{
   editable?: boolean
@@ -21,12 +21,11 @@ const emit = defineEmits<{
 const text = computed<string>(() =>
   action.value ? getLiteralFormOfDailyActionEnum(action.value) : ''
 )
-const color = computed<string>(() => (action.value ? getActionChipColor(action.value) : ''))
-const textColor = computed<string>(() => (action.value ? getActionChipTextColor(action.value) : ''))
+const color = computed<string>(() => getActionChipColor(action.value))
+const textColor = computed<string>(() => getActionChipTextColor(action.value))
 
 function updateAction(value: DailyTaskAction | null): void {
-  action.value = value
-  emit('update', action) // We send both event to meet all possibilities
+  emit('update', value)
 }
 </script>
 
@@ -35,12 +34,12 @@ function updateAction(value: DailyTaskAction | null): void {
     <template v-if="editable">
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-chip v-bind="menuProps" size="small" :color class="rounded-lg">
+          <v-chip v-bind="menuProps" size="small" :color variant="flat" class="rounded-lg">
             <template v-if="action">
               <span class="font-weight-bold" :class="textColor">{{ text }}</span>
             </template>
             <template v-else>
-              <v-icon size="small">mdi-bullseye-arrow</v-icon>
+              <v-icon icon="mdi-bullseye-arrow" size="small" />
             </template>
           </v-chip>
         </template>
@@ -58,7 +57,7 @@ function updateAction(value: DailyTaskAction | null): void {
       </v-menu>
     </template>
     <template v-else>
-      <v-chip :color="color" size="small" class="rounded-lg">
+      <v-chip :color="color" size="small" variant="flat" class="rounded-lg">
         <span class="font-weight-bold" :class="textColor">{{ text }}</span>
       </v-chip>
     </template>

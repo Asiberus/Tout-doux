@@ -47,7 +47,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
   <div>
     <h4 class="text-headline-small text-lg-headline-large">
       Tasks
-      <v-chip size="small" color="grey-darken-3">
+      <v-chip size="small">
         {{ numberOfDailyTaskCompleted }}
         /
         {{ dailyTaskList.length }}
@@ -66,8 +66,8 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         :dot-color="dailyTask.completed ? 'green-darken-2' : 'surface'">
         <template #icon>
           <div v-ripple class="icon-wrapper" @click="toggleDailyTask(dailyTask)">
-            <v-icon v-if="dailyTask.completed" :size="xs ? 'small' : 'default'"> mdi-check </v-icon>
-            <v-icon v-else :size="xs ? 'small' : 'default'">mdi-trophy</v-icon>
+            <v-icon v-if="dailyTask.completed" icon="mdi-check" :size="xs ? 'small' : 'default'" />
+            <v-icon v-else icon="mdi-trophy" :size="xs ? 'small' : 'default'" />
           </div>
         </template>
         <DailyTaskCard :daily-task="dailyTask" caret @toggle="toggleDailyTask(dailyTask)" />

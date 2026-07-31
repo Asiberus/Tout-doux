@@ -107,7 +107,7 @@ function changeRouteParam(index: number): void {
             v-if="!projectStore.loadedProject.archived"
             :size="smAndDown ? 'small' : 'default'"
             @click="sectionDialog = true">
-            <v-icon start size="small">mdi-plus</v-icon>
+            <v-icon icon="mdi-plus" start size="small" />
             add a section
           </v-btn>
         </template>

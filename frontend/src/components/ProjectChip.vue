@@ -45,10 +45,11 @@ function click(): void {
     :ripple
     :size="small ? 'small' : 'default'"
     :title
+    variant="flat"
     class="project-chip px-0"
     :class="{ 'cursor-default': project.archived && !detailLocation }"
     @click.stop="click()">
-    <v-icon size="small" class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
+    <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
     <div class="text-truncate mr-2">
       {{ project.name }}
     </div>

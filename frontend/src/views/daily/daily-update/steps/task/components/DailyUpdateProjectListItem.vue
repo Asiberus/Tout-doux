@@ -133,7 +133,7 @@ function selectTask(task: Task): void {
                 :color="isHovering ? 'grey' : 'grey-darken-3'"
                 class="mx-1"
                 title="Go to project">
-                <v-icon size="small">mdi-open-in-new</v-icon>
+                <v-icon icon="mdi-open-in-new" size="small" />
               </v-btn>
             </v-hover>
 
@@ -145,7 +145,7 @@ function selectTask(task: Task): void {
               variant="text"
               density="comfortable"
               @click.stop="unselectProject()">
-              <v-icon>mdi-close</v-icon>
+              <v-icon icon="mdi-close" />
             </v-btn>
           </template>
         </div>

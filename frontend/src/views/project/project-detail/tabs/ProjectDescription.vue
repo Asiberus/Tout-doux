@@ -78,7 +78,7 @@ function deleteTask(id: number): void {
               {{ project.description }}
             </div>
             <div class="d-flex justify-end align-center mt-1" title="Created on">
-              <v-icon size="small">mdi-clock</v-icon>
+              <v-icon icon="mdi-clock" size="small" />
               <span class="font-italic ml-1">{{ dateFormat(project.createdOn, 'D MMMM Y') }}</span>
             </div>
           </v-card-text>
@@ -111,7 +111,7 @@ function deleteTask(id: number): void {
           <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
             <template #activator="{ props }">
               <v-btn :disabled="project.archived" v-bind="props">
-                <v-icon start>mdi-plus</v-icon>
+                <v-icon icon="mdi-plus" start />
                 task
               </v-btn>
             </template>
@@ -127,7 +127,7 @@ function deleteTask(id: number): void {
         <FilterChip
           v-if="project.tasks.length > 0"
           v-model="displayCompletedTask"
-          color="green-darken-2"
+          color="green"
           icon="mdi-trophy"
           class="flex-shrink-0">
           Completed
@@ -140,7 +140,7 @@ function deleteTask(id: number): void {
                 :disabled="project.archived"
                 :block="xs && project.tasks.length === 0 && false"
                 v-bind="props">
-                <v-icon start>mdi-plus</v-icon>
+                <v-icon icon="mdi-plus" start />
                 task
               </v-btn>
             </template>

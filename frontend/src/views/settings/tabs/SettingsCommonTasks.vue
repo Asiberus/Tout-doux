@@ -65,7 +65,7 @@ function deleteCommonTask(id: number): void {
       <CommonTaskDialog v-model="commonTaskDialog" @create="createCommonTask($event)">
         <template #activator="{ props }">
           <v-btn v-bind="props">
-            <v-icon start>mdi-plus</v-icon>
+            <v-icon icon="mdi-plus" start />
             common task
           </v-btn>
         </template>

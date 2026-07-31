@@ -179,7 +179,7 @@ function nextMonth(): void {
           density="comfortable"
           :size="xs ? 'small' : 'default'"
           @click="previousMonth()">
-          <v-icon>mdi-chevron-left</v-icon>
+          <v-icon icon="mdi-chevron-left" />
         </v-btn>
         <v-btn
           icon
@@ -187,7 +187,7 @@ function nextMonth(): void {
           density="comfortable"
           :size="xs ? 'small' : 'default'"
           @click="nextMonth()">
-          <v-icon>mdi-chevron-right</v-icon>
+          <v-icon icon="mdi-chevron-right" />
         </v-btn>
       </div>
 
@@ -202,7 +202,7 @@ function nextMonth(): void {
       <h4 class="text-body-large text-sm-headline-small flex-grow-1">{{ monthSelected }}</h4>
 
       <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
-        <v-icon>mdi-plus</v-icon>
+        <v-icon icon="mdi-plus" />
         <template v-if="smAndUp">event</template>
       </v-btn>
     </div>
@@ -244,19 +244,19 @@ function nextMonth(): void {
             </template>
 
             <template v-if="event.takesWholeDay">
-              <v-icon size="x-small">mdi-white-balance-sunny</v-icon>
+              <v-icon icon="mdi-white-balance-sunny" size="x-small" />
             </template>
             <template v-else>
               <template v-if="event.startDate === event.endDate">
                 <span class="font-weight-bold">{{ event.startTime }}</span>
-                <v-icon size="x-small" class="calendar-arrow">mdi-arrow-right</v-icon>
+                <v-icon icon="mdi-arrow-right" size="x-small" class="calendar-arrow" />
                 <span class="font-weight-bold">{{ event.endTime }}</span>
               </template>
               <template v-else-if="event.endDate">
                 <span class="font-weight-bold">
                   {{ dateFormat(event.startDate, 'DD/MM') }}
                 </span>
-                <v-icon size="x-small" class="calendar-arrow">mdi-arrow-right</v-icon>
+                <v-icon icon="mdi-arrow-right" size="x-small" class="calendar-arrow" />
                 <span class="font-weight-bold">
                   {{ dateFormat(event.endDate, 'DD/MM') }}
                 </span>

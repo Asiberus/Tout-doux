@@ -47,10 +47,11 @@ function click(): void {
     :ripple
     :size="small ? 'small' : 'default'"
     :title
+    variant="flat"
     :class="{ 'cursor-default': section.project.archived && !detailLocation }"
     class="section-chip px-0"
     @click.stop="click($event)">
-    <v-icon size="small" class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
+    <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
     <div class="name-wrapper">
       <span class="project-name text-truncate">{{ section.project.name }}</span>
       <span class="mx-1">•</span>

@@ -167,19 +167,19 @@ function resetSelectedItem(): void {
       class="daily-update-task__tabs"
       @update:model-value="resetSelectedItem()">
       <v-tab :value="0">
-        <v-icon>mdi-briefcase-variant</v-icon>
+        <v-icon icon="mdi-briefcase-variant" />
       </v-tab>
       <v-tab :value="1">
-        <v-icon>mdi-list-box</v-icon>
+        <v-icon icon="mdi-list-box" />
       </v-tab>
       <v-tab :value="2">
-        <v-icon>mdi-timeline</v-icon>
+        <v-icon icon="mdi-timeline" />
       </v-tab>
       <v-tab :value="3" disabled>
-        <v-icon>mdi-calendar-range</v-icon>
+        <v-icon icon="mdi-calendar-range" />
       </v-tab>
       <v-tab :value="4" disabled>
-        <v-icon>mdi-calendar-month</v-icon>
+        <v-icon icon="mdi-calendar-month" />
       </v-tab>
     </v-tabs>
 
@@ -199,7 +199,7 @@ function resetSelectedItem(): void {
               size="small"
               :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to project list">
-              <v-icon size="small">mdi-open-in-new</v-icon>
+              <v-icon icon="mdi-open-in-new" size="small" />
             </v-btn>
           </v-hover>
         </div>
@@ -242,7 +242,7 @@ function resetSelectedItem(): void {
               size="small"
               :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to collection">
-              <v-icon size="small">mdi-open-in-new</v-icon>
+              <v-icon icon="mdi-open-in-new" size="small" />
             </v-btn>
           </v-hover>
         </div>
@@ -284,7 +284,7 @@ function resetSelectedItem(): void {
               size="small"
               :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to common task">
-              <v-icon size="small">mdi-open-in-new</v-icon>
+              <v-icon icon="mdi-open-in-new" size="small" />
             </v-btn>
           </v-hover>
         </div>

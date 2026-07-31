@@ -133,7 +133,7 @@ function emitDailyTaskCompletedEvent(): void {
       class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-8">
       <div class="actions-wrapper">
         <v-btn icon variant="text" density="comfortable" @click="setDialogStateTo(false)">
-          <v-icon>mdi-close</v-icon>
+          <v-icon icon="mdi-close" />
         </v-btn>
       </div>
 
@@ -151,7 +151,7 @@ function emitDailyTaskCompletedEvent(): void {
             :color="isHovering ? 'grey-lighten-1' : 'grey-darken-3'"
             class="ml-1"
             title="Edit day">
-            <v-icon>mdi-pencil</v-icon>
+            <v-icon icon="mdi-pencil" />
           </v-btn>
         </v-hover>
       </div>

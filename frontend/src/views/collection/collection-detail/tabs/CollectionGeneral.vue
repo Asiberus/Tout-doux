@@ -73,7 +73,7 @@ function deleteTask(id: number): void {
           <FilterChip
             v-if="collection.tasks.length > 0"
             v-model="displayCompletedTask"
-            color="green-darken-2"
+            color="green"
             icon="mdi-trophy"
             class="flex-shrink-0">
             Completed
@@ -86,7 +86,7 @@ function deleteTask(id: number): void {
                 :size="xs && collection.itemName.length > 10 ? 'small' : 'default'"
                 :block="xs && collection.tasks.length === 0"
                 v-bind="props">
-                <v-icon start>mdi-plus</v-icon>
+                <v-icon icon="mdi-plus" start />
                 {{ collection.itemName }}
               </v-btn>
             </template>
@@ -196,7 +196,7 @@ function deleteTask(id: number): void {
           </div>
 
           <div class="d-flex justify-end align-center mt-1" title="Created on">
-            <v-icon size="small">mdi-clock</v-icon>
+            <v-icon icon="mdi-clock" size="small" />
             <span class="font-italic ml-1">{{ dateFormat(collection.createdOn, 'D MMMM Y') }}</span>
           </div>
         </v-card-text>

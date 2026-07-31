@@ -63,7 +63,7 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
         size="small"
         :color="createDailyTaskDisplayed ? 'accent' : null"
         @click="createDailyTaskDisplayed = !createDailyTaskDisplayed">
-        <v-icon>mdi-plus</v-icon>
+        <v-icon icon="mdi-plus" />
       </v-btn>
     </div>
 

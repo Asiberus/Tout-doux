@@ -85,12 +85,12 @@ function deleteCollection(): void {
               :size="xs ? 'small' : 'default'"
               color="accent"
               class="flex-grow-1 flex-sm-grow-0">
-              <v-icon size="small" start>mdi-archive</v-icon>
+              <v-icon icon="mdi-archive" size="small" start />
               {{ collection.archived ? 'unarchive' : 'archive' }}
             </v-btn>
           </template>
           <template #icon>
-            <v-icon size="x-large">mdi-archive</v-icon>
+            <v-icon icon="mdi-archive" size="x-large" />
           </template>
           <span>
             Are you sure to
@@ -106,12 +106,12 @@ function deleteCollection(): void {
                 color="error"
                 :size="xs ? 'small' : 'default'"
                 class="flex-grow-1 flex-sm-grow-0">
-                <v-icon size="small" start>mdi-trash-can</v-icon>
+                <v-icon icon="mdi-trash-can" size="small" start />
                 delete
               </v-btn>
             </template>
             <template #icon>
-              <v-icon size="x-large">mdi-trash-can</v-icon>
+              <v-icon icon="mdi-trash-can" size="x-large" />
             </template>
             <p class="mb-1">Are you sure to delete this collection ?</p>
             <p class="mb-0 font-italic" style="font-size: 1.1rem">

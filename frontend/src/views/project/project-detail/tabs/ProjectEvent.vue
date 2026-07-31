@@ -52,7 +52,7 @@ function deleteEvent(id: number): void {
               v-bind="props"
               :disabled="projectStore.loadedProject.archived"
               :block="xs && projectStore.loadedProject.events.length === 0">
-              <v-icon start>mdi-plus</v-icon>
+              <v-icon icon="mdi-plus" start />
               event
             </v-btn>
           </template>

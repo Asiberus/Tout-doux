@@ -85,7 +85,7 @@ function submit(): void {
           <div class="icon-wrapper">
             <span class="icon-content">
               <slot name="icon">
-                <v-icon size="x-large">mdi-lock</v-icon>
+                <v-icon icon="mdi-lock" size="x-large" />
               </slot>
             </span>
           </div>

@@ -115,16 +115,17 @@ function isDateEqual(date1: string, date2: string): boolean {
         <v-card-text class="d-flex align-center pa-3 pa-sm-4">
           <v-icon
             v-if="showIcon"
+            icon="mdi-calendar-clock"
             :class="[getTextColor('icon')]"
             :size="smAndUp ? 'large' : 'default'"
-            class="mr-2 mr-sm-3 mr-md-4">
-            mdi-calendar-clock
-          </v-icon>
+            class="mr-2 mr-sm-3 mr-md-4" />
 
           <template v-if="event.takesWholeDay">
-            <v-icon title="Takes whole day" class="mr-2" :class="[getTextColor('icon')]">
-              mdi-white-balance-sunny
-            </v-icon>
+            <v-icon
+              icon="mdi-white-balance-sunny"
+              title="Takes whole day"
+              class="mr-2"
+              :class="[getTextColor('icon')]" />
           </template>
 
           <div class="flex-grow-1 d-flex flex-column overflow-hidden">
@@ -152,9 +153,11 @@ function isDateEqual(date1: string, date2: string): boolean {
                 </span>
 
                 <template v-if="event.endDate">
-                  <v-icon :class="[getTextColor('date')]" size="small" class="mx-1">
-                    mdi-arrow-right
-                  </v-icon>
+                  <v-icon
+                    icon="mdi-arrow-right"
+                    :class="[getTextColor('date')]"
+                    size="small"
+                    class="mx-1" />
                   <span title="End date">
                     <template v-if="!isDateEqual(event.startDate, event.endDate)">
                       {{ dateFormat(event.endDate, 'DD/MM/YY') }}

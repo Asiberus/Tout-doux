@@ -100,7 +100,7 @@ function deleteEvent(id: number): void {
       <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps">
-            <v-icon :start="smAndUp">mdi-plus</v-icon>
+            <v-icon icon="mdi-plus" :start="smAndUp" />
             <template v-if="smAndUp">event</template>
           </v-btn>
         </template>

@@ -113,7 +113,7 @@ function emitCloseEvent(): void {
           class="flex-grow-0 mb-2" />
 
         <h6 class="text-title-large text-grey-lighten-2">
-          <v-icon size="small">mdi-tag</v-icon>
+          <v-icon icon="mdi-tag" size="small" />
           Tags
         </h6>
         <TagSearch v-model="tagList" type="task" class="mb-5" />

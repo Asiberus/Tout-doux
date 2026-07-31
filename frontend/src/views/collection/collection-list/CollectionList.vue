@@ -63,7 +63,7 @@ function toggleArchivedProject(): void {
         <v-dialog v-model="collectionDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
           <template #activator="{ props }">
             <v-btn v-bind="props">
-              <v-icon start>mdi-plus</v-icon>
+              <v-icon icon="mdi-plus" start />
               collection
             </v-btn>
           </template>
@@ -102,7 +102,7 @@ function toggleArchivedProject(): void {
           <div v-if="!archived" class="d-flex flex-column align-center gap-2">
             <span>You don't have any collection yet!</span>
             <v-btn @click="collectionDialog = true">
-              <v-icon start>mdi-plus</v-icon>
+              <v-icon icon="mdi-plus" start />
               collection
             </v-btn>
           </div>

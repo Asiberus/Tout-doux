@@ -177,7 +177,11 @@ function emitCloseEvent(): void {
               min-width="0"
               max-width="fit-content">
               <template #activator="{ props: menuProps }">
-                <v-chip :color="tagForm.data.color" class="color-chip" v-bind="menuProps" />
+                <v-chip
+                  :color="tagForm.data.color"
+                  class="color-chip"
+                  variant="flat"
+                  v-bind="menuProps" />
               </template>
               <div class="color-picker">
                 <div

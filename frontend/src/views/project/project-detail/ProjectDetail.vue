@@ -23,7 +23,7 @@ onUnmounted(() => {
 <template>
   <div v-if="projectStore.currentProject" class="d-flex flex-column h-100">
     <div class="d-flex flex-column flex-sm-row align-center column-gap-2 row-gap-1">
-      <v-icon v-if="xs">mdi-briefcase-variant</v-icon>
+      <v-icon v-if="xs" icon="mdi-briefcase-variant" />
 
       <SecondaryTitle class="text-center text-sm-start">
         <span v-if="smAndUp" class="text-grey">Project : </span>
@@ -31,7 +31,7 @@ onUnmounted(() => {
       </SecondaryTitle>
 
       <v-chip v-if="projectStore.loadedProject.archived" color="accent" class="flex-shrink-0">
-        <v-icon size="small" class="mr-1"> mdi-archive </v-icon>
+        <v-icon icon="mdi-archive" size="small" class="mr-1" />
         Archived
       </v-chip>
     </div>

@@ -29,13 +29,13 @@ function openTagDialog(): void {
           :key="type"
           :value="type"
           :ripple="false"
-          class="text-label-medium text-uppercase outlined px-3 px-sm-6 py-3">
+          class="text-label-medium outlined px-2 px-sm-6 py-3">
           {{ type }}
         </v-chip>
       </v-chip-group>
 
       <v-btn @click="openTagDialog()">
-        <v-icon start>mdi-plus</v-icon>
+        <v-icon icon="mdi-plus" start />
         tag
       </v-btn>
     </div>
