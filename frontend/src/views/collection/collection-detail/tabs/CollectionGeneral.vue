@@ -178,7 +178,7 @@ function deleteTask(id: number): void {
           :mode="preferencesStore.loadedPreferences.progressWheelMode"
           :value="collectionStore.completedTasks.length"
           :max="collection.tasks.length"
-          color="collection lighten-2">
+          color="collection">
         </ProgressWheel>
       </div>
       <h5 class="text-title-large text-sm-headline-small mb-1 mb-lg-2">Description</h5>

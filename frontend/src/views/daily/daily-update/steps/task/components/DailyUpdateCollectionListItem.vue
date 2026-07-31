@@ -56,7 +56,7 @@ function selectTask(task: Task): void {
       class="rounded-lg">
       <v-progress-linear
         :model-value="percentageOfTaskCompleted"
-        color="collection lighten-2"
+        color="collection"
         height="4"
         class="flex-shrink-0" />
       <v-card-text>
@@ -83,7 +83,7 @@ function selectTask(task: Task): void {
                 variant="text"
                 density="comfortable"
                 size="small"
-                :color="isHovering ? 'grey' : 'grey darken-3'"
+                :color="isHovering ? 'grey' : 'grey-darken-3'"
                 class="ml-1"
                 title="Go to collection">
                 <v-icon size="small">mdi-open-in-new</v-icon>
@@ -139,7 +139,7 @@ function selectTask(task: Task): void {
   & > .v-card {
     height: 100%;
 
-    .v-card__text {
+    .v-card-text {
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -147,7 +147,7 @@ function selectTask(task: Task): void {
     }
 
     @media #{map.get(variables.$display-breakpoints, 'xs')} {
-      .v-card__text {
+      .v-card-text {
         padding: 12px;
       }
     }
@@ -165,7 +165,7 @@ function selectTask(task: Task): void {
   }
 }
 
-.collection-card-wrapper:not(.selected) .v-card__text {
+.collection-card-wrapper:not(.selected) .v-card-text {
   padding: 16px;
 }
 </style>

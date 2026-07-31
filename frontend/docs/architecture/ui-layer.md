@@ -42,9 +42,13 @@ Table **maintenue à la main** — la mettre à jour à tout ajout/suppression d
 | `info` / `success` / `warning` | — | Standard Vuetify | oui |
 | `error` | `#FF5252` | **Déclaré dans `light` uniquement** → le thème `dark` utilise le défaut Vuetify | incohérence |
 
-Les tâches complétées utilisent la palette Material générique (`green darken-2`) et non
+Les tâches complétées utilisent la palette Material générique (`green-darken-2`) et non
 `taskCompleted`. Voir [../patterns/styling.md](../patterns/styling.md) pour la conséquence
 (deux systèmes de couleur coexistent).
+
+⚠️ Les tokens de thème n'ont **aucune nuance** générée : aucune option `variations` n'est déclarée
+dans `vuetify.ts`, donc `bg-collection-lighten-2` & co. n'existent pas. Une nuance ne s'applique
+qu'aux couleurs de la palette Material (`grey-darken-3`, `green-darken-2`…).
 
 ## Défauts globaux de composants
 
@@ -68,10 +72,13 @@ Ce qui vit dans `global.scss` : le reset des marges `h1`-`h6`/`p` (dans
 `@layer vuetify-core.reset`), les utilitaires `gap-*`, `cursor-*`, `opacity-60`, `text-link`,
 `h-100`, `hide-scroll`, et les overrides de dialogs (`.half-dialog`, `.daily-detail-dialog`).
 
-**Plusieurs blocs d'override sont morts** — ils ciblent des classes internes qui n'existent plus
-en Vuetify 4 (vérifié dans `node_modules/vuetify/lib/`) : `.v-application--wrap` (Vuetify 2),
-`.v-stepper__header|__items|__wrapper|__content`, et le bloc `.v-chip/.v-tab ::before` de
-neutralisation du survol mobile. Voir [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+**Règle** : un override qui ne concerne qu'un seul composant vit dans le `<style scoped>` de ce
+composant, pas ici. C'est pourquoi le bloc `.daily-update-stepper` a été déplacé dans
+`DailyUpdate.vue` (ses descendants Vuetify passent par `:deep()`).
+
+**Il reste un bloc d'override mort** — le bloc `.v-chip/.v-tab ::before` de neutralisation du
+survol mobile : en Vuetify 4 le pseudo-élément est devenu un **élément** `__overlay`. Voir
+[../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
 
 Où écrire un style : [../patterns/styling.md](../patterns/styling.md).
 

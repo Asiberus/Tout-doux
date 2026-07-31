@@ -77,14 +77,14 @@ function emitDeleteEvent(): void {
 
 function getTextColor(section: 'icon' | 'date' | 'name' | 'description'): string {
   const colorConfig = {
-    icon: 'white--text',
-    date: 'grey--text text--lighten-3',
-    name: 'white--text',
-    description: 'grey-text text--lighten-2',
+    icon: 'text-white',
+    date: 'text-grey-lighten-3',
+    name: 'text-white',
+    description: 'text-grey-lighten-2',
   }
 
   let color: string
-  if (isPassed(props.event) && props.changePassedTextColor) color = 'grey--text'
+  if (isPassed(props.event) && props.changePassedTextColor) color = 'text-grey'
   else color = colorConfig[section]
 
   if (props.project?.archived) color += ' opacity-60'

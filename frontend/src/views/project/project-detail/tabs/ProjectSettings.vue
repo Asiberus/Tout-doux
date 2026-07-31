@@ -173,12 +173,9 @@ function deleteProject(): void {
         @keyup.enter.ctrl="updateProject()" />
 
       <h6
-        class="text-title-large text-grey"
-        :class="{
-          'text--lighten-2': !project.archived,
-          'text--darken-2': project.archived,
-        }">
-        <v-icon size="small" :color="project.archived ? 'grey darken-2' : 'grey lighten-2'">
+        class="text-title-large"
+        :class="project.archived ? 'text-grey-darken-2' : 'text-grey-lighten-2'">
+        <v-icon size="small" :color="project.archived ? 'grey-darken-2' : 'grey-lighten-2'">
           mdi-tag
         </v-icon>
         Tags

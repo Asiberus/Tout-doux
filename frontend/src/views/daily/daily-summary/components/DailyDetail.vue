@@ -148,7 +148,7 @@ function emitDailyTaskCompletedEvent(): void {
             variant="text"
             density="comfortable"
             :size="editBtnSize"
-            :color="isHovering ? 'grey lighten-1' : 'grey darken-3'"
+            :color="isHovering ? 'grey-lighten-1' : 'grey-darken-3'"
             class="ml-1"
             title="Edit day">
             <v-icon>mdi-pencil</v-icon>

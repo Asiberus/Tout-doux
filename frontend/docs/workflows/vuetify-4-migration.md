@@ -30,7 +30,7 @@
 - [x] 1.9 — `v-calendar` (Agenda) *(API classique restaurée en Vuetify 4 → pas de rewrite, juste correctifs de types)*
 - [x] 1.10 — Type `Route` (Vue Router 4)
 - [x] 1.11 — VAutocomplete : slot `item` → `internalItem` (Vuetify 4)
-- [ ] 1.12 — `ProfileAccount.vue` : `useRouter()` hors du scope `setup` → navigation morte
+- [x] 1.12 — `ProfileAccount.vue` : `useRouter()` hors du scope `setup` → navigation morte
 
 ### 2. 🟠 Iso-visuel
 - [x] 2.1 — `variant` des inputs (`underlined`)
@@ -45,8 +45,8 @@
 - [x] 2.10 — (Vuetify 4) CSS Layers + `!important` *(cas connu traité, cf. §2.10)*
 - [x] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
 - [ ] 2.12 — (Vuetify 4) Grille VRow/VCol
-- [ ] 2.13 — (Vuetify 4) Blocs CSS morts dans `global.scss` (2 correctifs visuels inactifs)
-- [ ] 2.14 — (Vuetify 4) Modificateurs de nuance `lighten-*`/`darken-*` silencieusement perdus
+- [x] 2.13 — (Vuetify 4) Blocs CSS morts dans `global.scss` *(+ bloc stepper déplacé dans `DailyUpdate.vue`)*
+- [x] 2.14 — (Vuetify 4) Modificateurs de nuance `lighten-*`/`darken-*` silencieusement perdus
 
 ### 3. 🟡 Nettoyage / dette
 - [x] 3.1 — Hack `loginGuard`
@@ -101,7 +101,7 @@
 ---
 
 <details>
-<summary><strong>1. 🔴 Bloquants — cassent le comportement — ✅ Terminé (11/11)</strong></summary>
+<summary><strong>1. 🔴 Bloquants — cassent le comportement — ✅ Terminé (12/12)</strong></summary>
 
 ### 1.1 `useDisplay()` : refs jamais déballés (`.value` manquant) — ✅ FAIT
 
@@ -521,7 +521,7 @@ En Vuetify 4, la prop de slot **`item`** des slots `#item` / `#selection` est re
 
 ---
 
-### 1.12 `ProfileAccount.vue` — `useRouter()` appelé hors du scope `setup`
+### 1.12 `ProfileAccount.vue` — `useRouter()` appelé hors du scope `setup` — ✅ FAIT
 
 Un composable Vue (`useRouter`, `useRoute`, `useDisplay`…) doit être appelé **pendant l'exécution de `setup()`**, car il résout sa valeur via le contexte d'injection du composant courant. Appelé plus tard, dans un gestionnaire d'événement, ce contexte n'existe plus.
 
@@ -567,14 +567,14 @@ function deleteAccount(): void {
 grep -rn "  const .* = use\(Router\|Route\|Display\|TemplateRef\)()" src --include='*.vue'
 ```
 
-⚠️ QA : supprimer un compte de test → doit rediriger vers `/login`. Ce point n'a **pas** été vérifié à l'exécution (il faut détruire un compte) ; le diagnostic repose sur la règle d'usage des composables Vue. Si le test montre que la redirection fonctionnait déjà, refermer ce point sans modification.
+⚠️ QA restante : supprimer un compte de test → doit rediriger vers `/login`. Le correctif est appliqué (composable remonté au niveau `<script setup>`) mais n'a **pas** été validé à l'exécution (il faut détruire un compte).
 
 </details>
 
 ---
 
 <details>
-<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 7/12 faits</strong></summary>
+<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 9/14 faits</strong></summary>
 
 ### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`) — ✅ FAIT
 
@@ -732,9 +732,15 @@ Refonte (marges négatives → CSS `gap`, certaines classes/comportements change
 
 ---
 
-### 2.13 (Vuetify 4) Blocs CSS morts dans `global.scss` — 2 correctifs visuels inactifs
+### 2.13 (Vuetify 4) Blocs CSS morts dans `global.scss` — ✅ FAIT
 
-Ces sélecteurs ciblent des classes internes qui **n'existent plus dans Vuetify 4**. Les règles ne matchent donc rien, **sans aucune erreur ni avertissement** — deux correctifs visuels sont silencieusement désactivés depuis la montée de version.
+Ces sélecteurs ciblaient des classes internes qui **n'existent plus dans Vuetify 4**. Les règles ne matchaient donc rien, **sans aucune erreur ni avertissement** — deux correctifs visuels étaient silencieusement désactivés depuis la montée de version.
+
+> **Correction du diagnostic initial** : le remplaçant de `.v-application--wrap` n'est **pas** `.v-application` mais **`.v-application__wrap`** (vérifié dans `node_modules/vuetify/lib/components/VApp/VApp.css`). V4 y applique déjà `min-height: 100dvh` ; l'override ne sert donc plus qu'à préférer `svh` (hauteur stable, barre d'URL visible) à `dvh` (qui reflue au scroll) — c'est le comportement d'avant migration, conservé.
+
+> Les 4 sélecteurs `.v-stepper__*` n'étaient pas seulement à supprimer : 3 ont un équivalent V4 et un effet réel (V4 met une `elevation-1` sur `.v-stepper-header` et `margin: 1.5rem` sur `.v-stepper-window`). Correspondance retenue : `__header` → `.v-stepper-header` ; `__items` (`flex-grow`) + `__content` (`height`/`padding`) → fusionnés sur `.v-stepper-window` (`flex-grow: 1`, `min-height: 0`, `margin: 0`) ; `__wrapper` → supprimé, son rôle est tenu par `.v-window__container`.
+
+> `.daily-update-stepper` n'étant utilisé que par `DailyUpdate.vue`, le bloc a été **déplacé dans le `<style scoped>` de ce composant**, les descendants passant par `:deep()` (la racine `.daily-update-stepper` porte l'attribut de scope du parent, ses enfants non).
 
 Vérification faite pour chaque classe (`grep -rl "<classe>" node_modules/vuetify/lib/`) :
 
@@ -786,7 +792,13 @@ grep -rl "v-nom-de-classe" node_modules/vuetify/lib/ | head -1   # vide = classe
 
 ---
 
-### 2.14 (Vuetify 4) Modificateurs de nuance `lighten-*` / `darken-*` silencieusement perdus
+### 2.14 (Vuetify 4) Modificateurs de nuance `lighten-*` / `darken-*` silencieusement perdus — ✅ FAIT
+
+> **L'inventaire ci-dessous était incomplet** : 6 occurrences manquaient, toutes traitées — `ProjectSettings.vue` (176-179 en `c`, 181 en `a`), `CommonTaskCard.vue:49` et `TaskCard.vue:38` (`'green darken-2'`), `EventItemCard.vue:83`.
+>
+> **Choix retenus** — `collection lighten-2` (3 sites) → **`color="collection"`** : aucune option `variations` n'est déclarée dans `src/plugins/vuetify.ts`, donc les tokens de thème n'ont **aucune** nuance générée, et en V2 les nuances étaient des sélecteurs composés réservés à la palette Material. Ce code **n'a donc jamais fonctionné** : retirer la nuance est un no-op visuel. Obtenir réellement un olive plus clair demanderait d'activer `variations` — c'est un choix de design, pas de la migration. Idem `accent variant-1` → `color="accent"` (`variant-1` n'existe dans aucune version).
+>
+> **Deux corrections changent le rendu actuel** parce que le code était déjà mort avant la migration : `EventItemCard.vue:83` (`'grey-text'`, un seul tiret — ni V2 ni V4) et `ProjectSettings.vue:176-179` (état mixte `text-grey` V4 + `text--lighten-2` V2). Les deux ont été alignées sur l'intention lisible du code.
 
 En Vuetify 2, `color="grey darken-3"` fonctionnait parce que `.darken-3` existait comme **classe autonome**. En Vuetify 4, les nuances sont **fusionnées dans le nom de la classe** (`.bg-grey-darken-3`), et les classes autonomes ont disparu.
 

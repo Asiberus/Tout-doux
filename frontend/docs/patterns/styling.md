@@ -59,8 +59,14 @@ Ordre des layers Vuetify 4 : `vuetify-core` → `vuetify-components` → `vuetif
 1. **Tokens de thème** — noms métier déclarés dans `vuetify.ts`, utilisables en prop
    (`color="event"`) ou en CSS via `rgb(var(--v-theme-event))`. Liste et statut :
    [../architecture/ui-layer.md](../architecture/ui-layer.md#thème-et-tokens).
-2. **Palette Material générique** — `green darken-2`, `grey-lighten-1`… classes codées en dur
+2. **Palette Material générique** — `green-darken-2`, `grey-lighten-1`… classes codées en dur
    dans Vuetify, **sans** variable CSS associée.
+
+⚠️ **La nuance fait partie du nom** : `color="grey-darken-3"`, jamais `color="grey darken-3"`.
+`computeColor()` produit `` `bg-${couleur}` `` sans interpréter l'espace → `class="bg-grey darken-3"`,
+soit deux classes dont une inexistante : **la couleur de base s'affiche, la nuance est perdue, sans
+erreur**. Et une nuance ne s'applique qu'à la palette Material : les **tokens de thème n'en ont
+aucune** (pas d'option `variations` dans `vuetify.ts`).
 
 ⚠️ **Ne pas construire un nom de variable CSS à partir d'une couleur dynamique** : ça ne marche
 que pour les tokens de thème, et casse silencieusement pour la palette générique.
@@ -72,11 +78,9 @@ const caretColor = computed(() => `rgb(var(--v-theme-${cardColor.value}))`)
 
 Préférer `background-color: inherit` sur le pseudo-élément, ou une classe conditionnelle.
 
-**Syntaxe Vuetify 2 résiduelle** : `'grey--text text--lighten-1'`, `'green darken-2'` — encore
-présente dans `src/utils/daily-task.utils.ts`, `DailySummaryCard.vue`, `EventItemCard.vue`. La
-forme moderne est `text-grey-lighten-1`. Les anciennes formes en **classe** n'ont plus d'effet ;
-en **prop `color`** elles fonctionnent encore. Migration non terminée — voir
-[../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+**Syntaxe Vuetify 2 (`'grey--text text--lighten-1'`, `'green darken-2'`) : entièrement éliminée**
+du code. La forme moderne est `text-grey-lighten-1` en classe, `grey-lighten-1` en prop `color`.
+Ne pas réintroduire les formes en `--text` / `text--` : elles n'appliquent **rien**.
 
 ## Typographie
 
@@ -99,12 +103,17 @@ préférer les composants `MainTitle` / `SecondaryTitle` / `TertiaryTitle`.
 
 ## Écarts assumés / code mort
 
-Blocs de `global.scss` qui ciblent des classes **disparues en Vuetify 4** (vérifié dans
-`node_modules/vuetify/lib/`) — sans effet aujourd'hui :
-`.v-application--wrap`, `.v-stepper__header|__items|__wrapper|__content`, et le bloc
-`.v-chip / .v-tab { &:hover::before }` de neutralisation du survol mobile (Vuetify utilise
-désormais `.v-chip__overlay` et `.v-btn__overlay`). Détail et impact :
+Bloc de `global.scss` qui cible encore des classes **disparues en Vuetify 4** (vérifié dans
+`node_modules/vuetify/lib/`) — sans effet aujourd'hui : `.v-chip / .v-tab { &:hover::before }`,
+la neutralisation du survol mobile (Vuetify utilise désormais `.v-chip__overlay` et
+`.v-btn__overlay`). Détail et impact :
 [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+
+**Méthode pour vérifier un sélecteur interne avant de l'écrire** :
+
+```bash
+grep -rl "v-nom-de-classe" node_modules/vuetify/lib/ | head -1   # vide = classe inexistante
+```
 
 ## Voir aussi
 

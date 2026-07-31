@@ -35,7 +35,7 @@ const uncompleteConfirmDialog = ref(false)
 const deleteConfirmDialog = ref(false)
 
 const cardColor = computed<string | undefined>(() =>
-  props.task.completed || props.selected ? 'green darken-2' : props.color
+  props.task.completed || props.selected ? 'green-darken-2' : props.color
 )
 
 function openEditDialog(): void {

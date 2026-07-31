@@ -19,10 +19,7 @@ const percentageOfCompletedTask = computed<number>(
     :color="collection.archived ? 'collectionArchived' : undefined"
     :ripple="false"
     class="rounded-lg">
-    <v-progress-linear
-      :model-value="percentageOfCompletedTask"
-      color="collection lighten-2"
-      height="6">
+    <v-progress-linear :model-value="percentageOfCompletedTask" color="collection" height="6">
     </v-progress-linear>
     <v-card-text class="d-flex justify-space-between align-center gap-1 pa-3 pa-sm-4">
       <div class="flex-shrink-1 overflow-hidden">

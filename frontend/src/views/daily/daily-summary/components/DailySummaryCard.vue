@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 // todo : Define colorArray
 const colorOfTaskCompleted = computed<string>(() => {
-  const colorArray = ['#163317', 'green darken-4', 'green darken-3', 'green darken-2', 'green']
+  const colorArray = ['#163317', 'green-darken-4', 'green-darken-3', 'green-darken-2', 'green']
   const index =
     Math.trunc(
       (props.dailySummary.totalTaskCompleted * colorArray.length) / props.dailySummary.totalTask
@@ -81,6 +81,7 @@ function openDailyDetailDialog(): void {
 
   .daily-event {
     font-size: 1.5rem;
+    line-height: 1;
     color: white;
 
     @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {

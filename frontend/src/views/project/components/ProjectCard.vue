@@ -65,6 +65,7 @@ const percentageOfCompletedTask = computed<number>(
 
   .event-count {
     font-size: 1.5rem;
+    line-height: 1;
     color: white;
 
     @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {

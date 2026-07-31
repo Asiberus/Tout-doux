@@ -50,7 +50,7 @@ function updateAction(value: DailyTaskAction | null): void {
             :key="option.value"
             density="compact"
             @click="updateAction(option.value)">
-            <span :class="{ 'font-italic grey--text': !option.value }">
+            <span :class="{ 'font-italic text-grey': !option.value }">
               {{ option.text }}
             </span>
           </v-list-item>

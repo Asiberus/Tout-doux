@@ -53,8 +53,8 @@ function deleteFeedback(id: number): void {
 }
 
 function getItemClass(item: Feedback): { class: string } {
-  if (item.isRead) return { class: 'grey--text text--lighten-2 font-weight-light' }
-  else return { class: 'white--text font-weight-bold' }
+  if (item.isRead) return { class: 'text-grey-lighten-2 font-weight-light' }
+  else return { class: 'text-white font-weight-bold' }
 }
 </script>
 

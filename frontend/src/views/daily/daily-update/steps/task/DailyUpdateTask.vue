@@ -160,7 +160,7 @@ function resetSelectedItem(): void {
     <v-tabs
       v-model="taskTab"
       bg-color="transparent"
-      color="accent variant-1"
+      color="accent"
       :direction="mdAndUp ? 'vertical' : 'horizontal'"
       :grow="smAndDown"
       show-arrows
@@ -197,7 +197,7 @@ function resetSelectedItem(): void {
               variant="text"
               density="comfortable"
               size="small"
-              :color="isHovering ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to project list">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>
@@ -240,7 +240,7 @@ function resetSelectedItem(): void {
               variant="text"
               density="comfortable"
               size="small"
-              :color="isHovering ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to collection">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>
@@ -282,7 +282,7 @@ function resetSelectedItem(): void {
               variant="text"
               density="comfortable"
               size="small"
-              :color="isHovering ? 'grey' : 'grey darken-3'"
+              :color="isHovering ? 'grey' : 'grey-darken-3'"
               title="Go to common task">
               <v-icon size="small">mdi-open-in-new</v-icon>
             </v-btn>
@@ -324,6 +324,11 @@ function resetSelectedItem(): void {
 
   &__tabs {
     flex: 0 0 auto;
+
+    // V4 : VTab force `justify-content: start` en direction verticale
+    &.v-slide-group--vertical .v-tab {
+      justify-content: center;
+    }
   }
 
   &__tabs-items {

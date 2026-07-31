@@ -173,7 +173,7 @@ input:-webkit-autofill:active {
   }
 }
 
-.v-application--wrap {
+.v-application__wrap {
   min-height: 100svh !important; // take in consideration of the mobile browser navbar
 }
 
@@ -190,40 +190,6 @@ input:-webkit-autofill:active {
   background-color: #0a0a0a;
   display: flex;
   flex-direction: column;
-}
-
-.daily-update-stepper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  box-shadow: none !important;
-  background: transparent !important;
-  border: none !important;
-
-  .v-stepper__header {
-    box-shadow: none !important;
-    margin-bottom: 4px;
-  }
-
-  .v-stepper__items {
-    flex-grow: 1;
-  }
-
-  .v-stepper__content {
-    height: 100%;
-    padding: 0 !important;
-  }
-
-  .v-stepper__wrapper,
-  .v-window__container {
-    height: 100%;
-  }
-
-  .v-window-item {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
 }
 
 // Remove hover for btn, chip and tab on mobile

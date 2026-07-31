@@ -125,6 +125,8 @@ function deleteEvent(id: number): void {
           color="event"
           :day-selected="true"
           :show-icon="true"
+          margin-bottom
+          caret
           :change-passed-text-color="false"
           :related-to-date="date"
           @update="updateEvent"

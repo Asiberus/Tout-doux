@@ -46,7 +46,7 @@ function emitDeleteEvent(): void {
 <template>
   <div>
     <v-card
-      :color="selected ? 'green darken-2' : undefined"
+      :color="selected ? 'green-darken-2' : undefined"
       :disabled="selected"
       :ripple="false"
       class="wrapper rounded-lg">

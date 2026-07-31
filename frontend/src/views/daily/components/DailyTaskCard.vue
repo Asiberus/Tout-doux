@@ -22,7 +22,7 @@ const name = computed<string>(() => {
   else return props.dailyTask.name as string // We know name is defined
 })
 
-const cardColor = computed(() => (props.dailyTask.completed ? 'green darken-2' : 'surface'))
+const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' : 'surface'))
 </script>
 
 <template>

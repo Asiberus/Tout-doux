@@ -5,8 +5,9 @@ import { authService } from '@/services'
 import TertiaryTitle from '@/components/TertiaryTitle.vue'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
 function deleteAccount(): void {
-  const router = useRouter()
   userApi
     .deleteAccount()
     .then(() => {

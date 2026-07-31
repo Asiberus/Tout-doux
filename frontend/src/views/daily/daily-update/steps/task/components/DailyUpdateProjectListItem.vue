@@ -130,7 +130,7 @@ function selectTask(task: Task): void {
                 variant="text"
                 density="comfortable"
                 size="small"
-                :color="isHovering ? 'grey' : 'grey darken-3'"
+                :color="isHovering ? 'grey' : 'grey-darken-3'"
                 class="mx-1"
                 title="Go to project">
                 <v-icon size="small">mdi-open-in-new</v-icon>
@@ -203,7 +203,7 @@ function selectTask(task: Task): void {
                   :small="true"
                   :completable="false"
                   :display-options="false"
-                  elevation="3"
+                  :elevation="3"
                   color="grey-darken-4"
                   @click="selectTask(task)">
                 </TaskCard>
@@ -225,7 +225,7 @@ function selectTask(task: Task): void {
   display: flex;
   flex-direction: column;
 
-  .v-card__text {
+  .v-card-text {
     flex-grow: 1;
     min-height: 0;
     display: flex;
@@ -262,7 +262,7 @@ function selectTask(task: Task): void {
   & > .project-card {
     height: 100%;
 
-    .v-card__text {
+    .v-card-text {
       .section-wrapper {
         flex-grow: 0;
       }
