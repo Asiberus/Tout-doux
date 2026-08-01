@@ -6,9 +6,16 @@ import prettierPluginEslint from 'eslint-plugin-prettier/recommended'
 
 import eslintConfigPrettier from 'eslint-config-prettier'
 
-// TODO : when eslint-plugin-vuetify support eslint v9, remove this subfolder and install the package from
-// https://github.com/vuetifyjs/eslint-plugin-vuetify/issues/93
-import pluginVuetify from './eslint-plugin-vuetify/src/configs/flat/base.js'
+import vuetify from 'eslint-plugin-vuetify'
+import vuetifyBase from 'eslint-plugin-vuetify/lib/configs/base.js'
+
+// Monté à la main : le `flat/base` du paquet redéclare le plugin `vue`, ce qui entre en conflit
+// avec pluginVue.configs['flat/recommended'] chargé plus haut (« Cannot redefine plugin "vue" »)
+const pluginVuetify = {
+  files: ['*.vue', '**/*.vue'],
+  plugins: { vuetify },
+  rules: { ...vuetifyBase.rules },
+}
 
 export default [
   {
@@ -51,9 +58,5 @@ export default [
       'vue/multi-word-component-names': 'off',
       'vue/require-default-prop': 'off',
     },
-  },
-
-  {
-    ignores: ['eslint-plugin-vuetify/'],
   },
 ]

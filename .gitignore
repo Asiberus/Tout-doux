@@ -1,7 +1,6 @@
 .DS_Store
 node_modules
 /dist
-frontend/eslint-plugin-vuetify
 
 
 /tests/e2e/reports/

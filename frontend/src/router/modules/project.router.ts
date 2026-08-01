@@ -11,12 +11,12 @@ export const projectRoutes: RouteRecordRaw[] = [
     path: '/project',
     name: 'project-list',
     component: ProjectListComponent,
-    props: (route: any) => ({ archived: route.query.archived === 'true' }),
+    props: route => ({ archived: route.query.archived === 'true' }),
   },
   {
     path: '/project/:id',
     component: ProjectDetailComponent,
-    props: (route: any) => ({ projectId: parseInt(route.params.id) }),
+    props: route => ({ projectId: parseInt(String(route.params.id)) }),
     children: [
       {
         path: '',
@@ -27,7 +27,7 @@ export const projectRoutes: RouteRecordRaw[] = [
         path: 'section/:sectionId?',
         name: 'project-detail-section',
         component: ProjectSection,
-        props: (route: any) => ({ sectionId: parseInt(route.params.sectionId) }),
+        props: route => ({ sectionId: parseInt(String(route.params.sectionId)) }),
       },
       {
         path: 'event',

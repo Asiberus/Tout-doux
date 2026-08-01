@@ -1,4 +1,4 @@
-import Agenda from '@/views/agenga/Agenda.vue'
+import Agenda from '@/views/agenda/Agenda.vue'
 import { createRouter, createWebHistory, START_LOCATION } from 'vue-router'
 import { authGuard } from '@/router/guards'
 import AuthenticatedLayout from '@/layout/AuthenticatedLayout.vue'

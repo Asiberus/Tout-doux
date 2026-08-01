@@ -84,7 +84,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
         <div class="daily-task-form-card__content__header">
           <DailyTaskActionChip
-            v-model:action="dailyTask.action"
+            :action="dailyTask.action"
             editable
             class="flex-shrink-0"
             @update="updateDailyTask({ action: $event })">

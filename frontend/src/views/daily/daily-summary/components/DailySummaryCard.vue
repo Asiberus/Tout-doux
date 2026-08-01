@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { dateFormat } from '@/pipes'
-import { DailySummary } from 'src/models/daily-summary.model'
+import { DailySummary } from '@/models/daily-summary.model'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { computed } from 'vue'
 

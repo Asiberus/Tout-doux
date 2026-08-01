@@ -81,9 +81,9 @@ function emitCloseEvent(): void {
         {{ section ? 'Update section' : 'New section' }}
       </h4>
 
-      <v-hover v-if="section" v-slot="{ isHovering, props }">
+      <v-hover v-if="section" v-slot="{ isHovering, props: hoverProps }">
         <v-btn
-          v-bind="props"
+          v-bind="hoverProps"
           :color="isHovering || confirmDelete ? 'error' : undefined"
           :size="xs ? 'small' : 'default'"
           @click="emitDeleteSection()">

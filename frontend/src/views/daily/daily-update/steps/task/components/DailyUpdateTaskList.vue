@@ -118,6 +118,12 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
   flex-direction: column;
   gap: 8px;
 
+  // `.v-card` est en `overflow: hidden`, donc sa taille minimale automatique se résout à 0 au
+  // lieu de la hauteur du contenu : sans ça les cartes se compriment au lieu de faire défiler
+  > * {
+    flex-shrink: 0;
+  }
+
   @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
     flex: 1 0 0;
   }

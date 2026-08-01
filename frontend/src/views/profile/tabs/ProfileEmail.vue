@@ -22,7 +22,7 @@ const form = ref<Form<UserChangeEmail>>({
       (value: string): boolean | string => value.length <= 100 || 'Max 100 characters',
       (value: string): boolean | string =>
         value.length === 0 ||
-        /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) ||
+        /^[\w.-]+@([\w-]+\.)+[\w-]{2,8}$/.test(value) ||
         'Invalid e-mail address',
     ],
   },

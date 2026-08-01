@@ -4,7 +4,6 @@ import { dateFormat } from '@/pipes'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDayDialog from '@/views/components/event/EventDayDialog.vue'
 import EventDialog from '@/views/components/event/EventDialog.vue'
-import EventTooltip from '@/views/components/event/EventTooltip.vue'
 import moment from 'moment'
 import MainTitle from '@/components/MainTitle.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
@@ -28,11 +27,6 @@ const weekdays = [1, 2, 3, 4, 5, 6, 0]
 const eventDialog = ref(false)
 const eventToUpdate = ref<EventExtendedModel>()
 const startDatePlaceholder = ref<string>()
-
-const eventTooltip = ref(false)
-const eventTooltipKey = ref(0)
-const eventSelected = ref<EventExtendedModel>()
-const eventTooltipElement = ref<Element>()
 
 const eventDayDialog = ref(false)
 const eventDayDialogDate = ref<string | null>(null)
@@ -77,7 +71,6 @@ function setDayDialogEventList(options: { sort: boolean } = { sort: true }): voi
 }
 
 function createEvent(event: EventPostOrPatch): void {
-  eventSelected.value = undefined
   eventApi.createEvent(event, { extended: true }).then(
     response => {
       events.value.push(response)
@@ -95,7 +88,6 @@ function updateEvent({ id, data }: { id: number; data: EventPostOrPatch }): void
       if (eventIndex === -1) return
 
       events.value.splice(eventIndex, 1, updatedEvent)
-      if (eventSelected.value?.id === updatedEvent.id) eventSelected.value = updatedEvent
       if (eventDayDialog.value) setDayDialogEventList()
       else eventDialog.value = false
     },
@@ -116,17 +108,6 @@ function deleteEvent(id: number): void {
     },
     error => console.error(error)
   )
-}
-
-// Tooltip removed temporally
-function openEventTooltip($event: { nativeEvent: MouseEvent; event: EventExtendedModel }): void {
-  const { nativeEvent, event } = $event
-
-  nativeEvent.stopImmediatePropagation()
-  eventTooltipKey.value += 1 // Hack to re-render v-menu component
-  eventSelected.value = event
-  eventTooltipElement.value = (nativeEvent.target as Element | null) ?? undefined
-  if (!eventTooltip.value) eventTooltip.value = true
 }
 
 function openDayDialog(date: string): void {
@@ -271,21 +252,6 @@ function nextMonth(): void {
           </div>
         </template>
       </v-calendar>
-      <!-- The Tooltip menu is removed temporally. See if we keep it or not. -->
-      <v-menu
-        :key="'event-info-' + eventTooltipKey"
-        v-model="eventTooltip"
-        :close-on-content-click="false"
-        :activator="eventTooltipElement"
-        min-width="30rem"
-        max-width="40rem">
-        <template v-if="eventSelected">
-          <EventTooltip
-            :event="eventSelected"
-            @update="openEventDialog({ event: $event as EventExtendedModel })">
-          </EventTooltip>
-        </template>
-      </v-menu>
     </v-sheet>
 
     <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">

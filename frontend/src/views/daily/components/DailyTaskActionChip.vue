@@ -8,9 +8,10 @@ import {
 } from '@/utils/daily-task.utils'
 import { computed } from 'vue'
 
-const action = defineModel<DailyTaskAction | null | undefined>('action', { required: true })
-
-defineProps<{
+// Contrat unidirectionnel : le chip n'écrit jamais l'action, il émet `update` et laisse le
+// propriétaire de la donnée décider. Un `v-model` ici reviendrait à muter un prop du parent.
+const props = defineProps<{
+  action: DailyTaskAction | null | undefined
   editable?: boolean
 }>()
 
@@ -19,10 +20,10 @@ const emit = defineEmits<{
 }>()
 
 const text = computed<string>(() =>
-  action.value ? getLiteralFormOfDailyActionEnum(action.value) : ''
+  props.action ? getLiteralFormOfDailyActionEnum(props.action) : ''
 )
-const color = computed<string>(() => getActionChipColor(action.value))
-const textColor = computed<string>(() => getActionChipTextColor(action.value))
+const color = computed<string>(() => getActionChipColor(props.action))
+const textColor = computed<string>(() => getActionChipTextColor(props.action))
 
 function updateAction(value: DailyTaskAction | null): void {
   emit('update', value)

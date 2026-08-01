@@ -3,7 +3,6 @@ import { DailyTask } from '@/models/daily-task.model'
 import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
-import moment from 'moment'
 import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue'
 import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
@@ -34,7 +33,6 @@ const isScrollingOnContent = ref(false)
 const numberOfDailyTaskCompleted = computed<number>(
   () => dailyTaskList.value.filter(({ completed }) => completed).length
 )
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
 const editBtnSize = computed<'large' | 'small' | 'default'>(() => {
   if (smAndUp.value) return 'large'
   else if (xs.value) return 'small'

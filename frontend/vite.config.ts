@@ -15,7 +15,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      // `import.meta.dirname` plutôt que `__dirname` : requis par le `configLoader: 'native'`
+      // qui deviendra le défaut dans une prochaine majeure de Vite
+      '@': path.resolve(import.meta.dirname, './src'),
     },
   },
   server: {

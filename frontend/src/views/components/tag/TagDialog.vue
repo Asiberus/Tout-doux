@@ -138,9 +138,9 @@ function emitCloseEvent(): void {
     <div class="d-flex justify-space-between align-center px-6 pt-4 pb-2">
       <h4 class="text-headline-small text-sm-headline-large text-capitalize">{{ title }}</h4>
       <div v-if="tag">
-        <v-hover v-slot="{ isHovering, props }">
+        <v-hover v-slot="{ isHovering, props: hoverProps }">
           <v-btn
-            v-bind="props"
+            v-bind="hoverProps"
             :color="isHovering || confirmDelete ? 'error' : undefined"
             @click="emitDeleteTag()">
             {{ confirmDelete ? 'Are you sure ?' : 'Delete Tag' }}
@@ -187,6 +187,7 @@ function emitCloseEvent(): void {
               <div class="color-picker">
                 <div
                   v-for="color of TAG_COLOR_OPTIONS"
+                  :key="color"
                   class="color-picker__item"
                   @click="selectColor(color)">
                   <div
