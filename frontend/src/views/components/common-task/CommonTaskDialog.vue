@@ -45,7 +45,7 @@ const commonTaskForm = ref<Form<CommonTaskForm>>({
   },
 })
 
-watch(show, (value: boolean) => {
+watch(show, value => {
   if (value) {
     // We need to wait for next tick to access the form and the input name
     nextTick(() => {

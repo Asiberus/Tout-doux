@@ -14,7 +14,7 @@ export const collectionRoutes: RouteRecordRaw[] = [
   {
     path: '/collection/:id',
     component: CollectionDetailComponent,
-    props: route => ({ collectionId: parseInt(route.params.id) }),
+    props: route => ({ collectionId: parseInt(String(route.params.id)) }),
     children: [
       {
         path: '',

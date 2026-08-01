@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouteLocation } from 'vue-router'
+import { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
 import { Project } from '@/models/project.model'
 
@@ -25,8 +25,8 @@ const title = computed<string>(() => {
   return str
 })
 
-const detailLocation = computed<RouteLocation | null>(() => {
-  if (!navigateToDetail) return null
+const detailLocation = computed<RouteLocationRaw | undefined>(() => {
+  if (!navigateToDetail) return undefined
   return { name: 'project-detail', params: { id: `${project.id}` } }
 })
 

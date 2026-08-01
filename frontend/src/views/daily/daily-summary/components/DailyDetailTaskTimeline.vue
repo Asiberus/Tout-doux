@@ -113,7 +113,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
       max-width: calc(100% - var(--divider-width));
     }
 
-    & :deep(.v-timeline-item__divider) {
+    & :deep(.v-timeline-divider) {
       min-width: var(--divider-width);
       justify-content: var(--divider-justify-content);
     }

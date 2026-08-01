@@ -129,7 +129,7 @@ function deleteDailyTask(id: number): void {
     .catch(error => console.error(error))
 }
 
-function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId: number }): void {
+function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }): void {
   const { tab, id, sectionId } = event
 
   taskTab.value = tab

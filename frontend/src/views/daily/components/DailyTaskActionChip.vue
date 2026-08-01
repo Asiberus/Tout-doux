@@ -8,7 +8,7 @@ import {
 } from '@/utils/daily-task.utils'
 import { computed } from 'vue'
 
-const action = defineModel<DailyTaskAction | null>('action', { required: true })
+const action = defineModel<DailyTaskAction | null | undefined>('action', { required: true })
 
 defineProps<{
   editable?: boolean
@@ -46,7 +46,7 @@ function updateAction(value: DailyTaskAction | null): void {
         <v-list>
           <v-list-item
             v-for="option in DailyActionOptions"
-            :key="option.value"
+            :key="option.value ?? 'none'"
             density="compact"
             @click="updateAction(option.value)">
             <span :class="{ 'font-italic text-grey': !option.value }">

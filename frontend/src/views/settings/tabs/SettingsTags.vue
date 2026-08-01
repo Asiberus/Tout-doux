@@ -4,13 +4,13 @@ import SettingsTagList from '@/views/settings/components/SettingsTagList.vue'
 import TertiaryTitle from '@/components/TertiaryTitle.vue'
 import { ref, useTemplateRef } from 'vue'
 
-const settingsTagListComponent = useTemplateRef<SettingsTagList>('tagList')
+const settingsTagListComponent = useTemplateRef<InstanceType<typeof SettingsTagList>>('tagList')
 
 const tab = ref<TagType>('project')
 const tagTypes: TagType[] = ['project', 'task']
 
 function openTagDialog(): void {
-  settingsTagListComponent.value.openTagDialog()
+  settingsTagListComponent.value?.openTagDialog()
 }
 </script>
 

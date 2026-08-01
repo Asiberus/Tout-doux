@@ -29,7 +29,7 @@ const isScrollingOnContent = ref(false)
 function touchStartEvent(): void {
   if (!scrollableElement.value) return
   // We detect if the touch-down is a scroll on the content
-  isScrollingOnContent.value = scrollableElement.value.scrollTop > 0
+  isScrollingOnContent.value = (scrollableElement.value.$el as HTMLElement).scrollTop > 0
 }
 
 function handleTouchEvent(type: string): void {

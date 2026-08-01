@@ -49,7 +49,7 @@ let passwordValidationTimer: ReturnType<typeof setTimeout> | undefined = undefin
 let passwordMatchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
 function validatePasswordStrength(value: string): void {
-  this.validatePasswordMatch()
+  validatePasswordMatch()
 
   clearTimeout(passwordValidationTimer)
   if (value === '') {

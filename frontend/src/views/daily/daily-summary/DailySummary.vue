@@ -91,7 +91,7 @@ function openDailyDetailDialog(date: string): void {
   dailyDetailDialog.value = true
 }
 
-function dailyDetailDialogInput(value: boolean): void {
+function dailyDetailDialogInput(value?: boolean): void {
   if (!value) removeDateParam({ push: true })
 }
 

@@ -22,9 +22,9 @@ const colorOfTaskCompleted = computed<string>(() => {
   return colorArray[index]
 })
 
-const backgroundColor = computed<string | null>(() => {
+const backgroundColor = computed<string | undefined>(() => {
   if (!props.dailySummary.totalTask && !props.dailySummary.totalEvent) return '#151515'
-  else if (!props.dailySummary.totalTaskCompleted) return null
+  else if (!props.dailySummary.totalTaskCompleted) return undefined
 
   return colorOfTaskCompleted.value
 })

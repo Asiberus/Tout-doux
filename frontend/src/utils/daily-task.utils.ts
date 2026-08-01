@@ -14,7 +14,7 @@ export function getLiteralFormOfDailyActionEnum(action: DailyTaskAction): string
   }
 }
 
-export function getActionChipColor(action: DailyTaskAction | null): string {
+export function getActionChipColor(action: DailyTaskAction | null | undefined): string {
   switch (action) {
     case DailyTaskAction.THINK:
       return 'teal-lighten-3'
@@ -27,7 +27,7 @@ export function getActionChipColor(action: DailyTaskAction | null): string {
   }
 }
 
-export function getActionChipTextColor(action: DailyTaskAction | null): string {
+export function getActionChipTextColor(action: DailyTaskAction | null | undefined): string {
   switch (action) {
     case DailyTaskAction.THINK:
       return 'text-teal-darken-3'

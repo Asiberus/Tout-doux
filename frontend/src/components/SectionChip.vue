@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Section } from 'src/models/section.model'
-import { RouteLocation } from 'vue-router'
+import { Section } from '@/models/section.model'
+import { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
 
 const {
@@ -25,8 +25,8 @@ const title = computed<string>(() => {
   return str
 })
 
-const detailLocation = computed<RouteLocation | null>(() => {
-  if (!navigateToDetail) return null
+const detailLocation = computed<RouteLocationRaw | undefined>(() => {
+  if (!navigateToDetail) return undefined
   return {
     name: 'project-detail-section',
     params: { id: `${section.project.id}`, sectionId: `${section.id}` },
@@ -50,7 +50,7 @@ function click(): void {
     variant="flat"
     :class="{ 'cursor-default': section.project.archived && !detailLocation }"
     class="section-chip px-0"
-    @click.stop="click($event)">
+    @click.stop="click()">
     <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
     <div class="name-wrapper">
       <span class="project-name text-truncate">{{ section.project.name }}</span>

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { DailyTask, DailyTaskPost, DailyUpdateTaskTab } from '@/models/daily-task.model'
+import {
+  DailyTask,
+  DailyTaskPatch,
+  DailyTaskPost,
+  DailyUpdateTaskTab,
+} from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
@@ -13,7 +18,7 @@ defineProps<{
 
 const emit = defineEmits<{
   create: [data: DailyTaskPost]
-  update: [event: { id: number; data: DailyTaskPost }]
+  update: [event: { id: number; data: DailyTaskPatch }]
   delete: [id: number]
   select: [event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }]
 }>()
@@ -34,7 +39,7 @@ function createDailyTask(data: DailyTaskPost): void {
   emit('create', data)
 }
 
-function updateDailyTask(id: number, data: DailyTaskPost): void {
+function updateDailyTask(id: number, data: DailyTaskPatch): void {
   selectedDailyTask.value = null
   emit('update', { id, data })
 }

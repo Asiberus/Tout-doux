@@ -42,7 +42,7 @@ function submit(): void {
 
 <template>
   <div class="feedback">
-    <MainTitle :icon="smAndUp ? 'mdi-comment-quote' : null" class="mb-3">
+    <MainTitle :icon="smAndUp ? 'mdi-comment-quote' : undefined" class="mb-3">
       Give us a Feedback!
     </MainTitle>
 

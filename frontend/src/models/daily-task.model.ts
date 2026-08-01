@@ -14,7 +14,8 @@ export interface DailyTaskPost {
   tagIds?: number[]
   taskId?: number
   commonTaskId?: number
-  action?: DailyTaskAction
+  // `null` = aucune action : c'est la valeur par défaut de DailyTaskForm, partagé avec l'édition
+  action?: DailyTaskAction | null
 }
 
 export interface DailyTaskPatch {

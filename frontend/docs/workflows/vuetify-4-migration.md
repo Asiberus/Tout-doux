@@ -36,11 +36,11 @@
 - [x] 2.1 — `variant` des inputs (`underlined`)
 - [x] 2.2 — `offset-*` / `nudge-*` supprimés
 - [ ] 2.3 — Hover mobile chips & tabs *(⚠️ confirmé cassé : voir §2.3)*
-- [ ] 2.4 — QA des sélecteurs `:deep()`
+- [x] 2.4 — QA des sélecteurs `:deep()` *(14/15 classes toujours valides ; `.v-timeline-item__divider` → `.v-timeline-divider`)*
 - [x] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
 - [x] 2.6 — (Vuetify 4) Typographie MD3 *(91 occurrences renommées, 51 fichiers)*
 - [ ] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`) *(décision prise : MD3 adopté tel quel, cf. §2.7)*
-- [ ] 2.8 — (Vuetify 4) `fill-height` / VContainer
+- [⛔] 2.8 — (Vuetify 4) `fill-height` / VContainer *(ANNULÉ : le rendu actuel convient, aucune action)*
 - [x] 2.9 — (Vuetify 4) VBtn (uppercase + grid→flex)
 - [x] 2.10 — (Vuetify 4) CSS Layers + `!important` *(cas connu traité, cf. §2.10)*
 - [x] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
@@ -53,7 +53,7 @@
 - [x] 3.2 — Typer `src/api/*.api.ts`
 - [ ] 3.3 — Husky v9
 - [x] 3.4 — Props booléennes verbeuses
-- [~] 3.5 — `exact` sur `v-tab` *(PRÉMISSE DU DOC FAUSSE : `exact` reste actif en Vuetify 3 → nécessaire sur les onglets dont le `:to` est un chemin parent. Retrait annulé/rétabli.)*
+- [⛔] 3.5 — `exact` sur `v-tab` *(ANNULÉ, PRÉMISSE DU DOC FAUSSE : `exact` reste actif en Vuetify **4** (`router.js` L.42/68) → nécessaire sur les onglets dont le `:to` est un chemin parent. Retrait annulé/rétabli.)*
 - [x] 3.6 — `formRef` sans `.value` *(+ `inputNameRef.focus()` corrigé)*
 - [x] 3.7 — `v-list-item-icon` *(déjà migré, confirmé : aucune occurrence)*
 - [ ] 3.8 — Dette de type : `string | null` → `string | undefined` *(1/7 corrigé, cf. §3.8)*
@@ -61,7 +61,7 @@
 - [x] 3.10 — Dette de type : `EventDialog`/events & divers *(la majorité corrigée en traitant les bugs runtime associés, reliquat listé en §3.10)*
 - [x] 3.11 — (Vuetify 4) Divers 🟡 (elevation, date range, thème `system`, labs) *(chaque sous-point conclut « aucune action requise »)*
 - [ ] 3.12 — Montée de **Vite** 6 → dernière stable
-- [ ] 3.13 — Amener `yarn type-check` à **0 erreur** (28 aujourd'hui, inventaire complet)
+- [x] 3.13 — Amener `yarn type-check` à **0 erreur** *(atteint : 28 → 0)*
 - [ ] 3.14 — Supprimer le service worker non fonctionnel
 - [ ] 3.15 — Renommer `src/views/agenga/` → `src/views/agenda/`
 - [ ] 3.16 — Remplacer le fork local `eslint-plugin-vuetify` par le paquet npm
@@ -574,7 +574,7 @@ grep -rn "  const .* = use\(Router\|Route\|Display\|TemplateRef\)()" src --inclu
 ---
 
 <details>
-<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 9/14 faits</strong></summary>
+<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 10/14 faits, 1 annulé</strong></summary>
 
 ### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`) — ✅ FAIT
 
@@ -621,13 +621,15 @@ Sur `v-menu`, ces props n'existent plus. En V3 le menu se place par défaut sous
 
 Le fichier a été extrait de `App.vue` vers `src/styles/global.scss` (voir aussi §2.10). Le bloc chips/tabs cible `.v-chip` / `.v-tab` via `&:focus::before, &:hover::before` — **structure V2/V3, obsolète en V4** comme détaillé ci-dessus. Tester sur viewport `sm-and-down` une fois corrigé.
 
-### 2.4 QA des sélecteurs `:deep()`
+### 2.4 QA des sélecteurs `:deep()` — ✅ FAIT
 
-Aucun `::v-deep`/`>>>` résiduel (déjà en `:deep()`). **Pas de changement de code**, mais re-tester visuellement que les classes internes ciblées existent encore en V3 (elles ont pu être renommées) :
-- `.v-slide-group__prev/__next`, `.v-tab` : `Settings.vue:51/57`, `CollectionDetail.vue:52/58`, `ProjectDetail.vue:57/63`, `ProjectSection.vue:127`, `Profile.vue:58/64`, `DailyUpdateProjectListItem.vue:228/234`
-- `.v-timeline-item__body/__divider` : `DailyDetailTaskTimeline.vue:120/124`, `DailyDetailEventTimeline.vue:89/93`
-- `.v-list-item__overlay` : `TheHeader.vue:106/110/116`
-- `.v-calendar-weekly__day` : `Agenda.vue:305`, `App.vue:70` (lié à §1.9)
+> **Vérifié par comparaison automatique** des 15 classes ciblées par un `:deep()` dans `src/` contre l'intégralité des `.sass`/`.css` de `vuetify@4.1.6`. Aucun `::v-deep`/`>>>` résiduel. **14 classes sur 15 existent toujours.**
+>
+> Une seule avait disparu : **`.v-timeline-item__divider`**, utilisée dans `DailyDetailTaskTimeline.vue` et `DailyDetailEventTimeline.vue` — ses règles `min-width`/`justify-content` ne s'appliquaient donc plus. En V4 le séparateur n'est plus un enfant BEM de l'item mais un composant frère : `.v-timeline-divider` (`VTimeline.sass:103`, même `display: flex; align-items: center`). Renommé dans les deux fichiers.
+>
+> Classes confirmées présentes : `.v-list-item__overlay`, `.v-slide-group__prev/__next`, `.v-tab`, `.v-stepper-header`, `.v-stepper-window`, `.v-window__container`, `.v-window-item`, `.v-timeline-item__body`, `.v-input__prepend`, `.v-field`, `.v-card__overlay`, `.v-calendar-weekly__head-weekday`, `.v-calendar-weekly__day`.
+>
+> ⚠️ Reste une QA **visuelle** : l'existence d'une classe ne garantit pas que le rôle de l'élément soit inchangé.
 
 ---
 
@@ -684,12 +686,14 @@ display: {
 ```
 Sinon (adopter MD3) : re-tester `xs`→`xl` sur chaque écran (dialogs plein écran, tailles boutons, colonnes, ProgressWheel).
 
-### 2.8 (Vuetify 4) `fill-height` / VContainer
+### 2.8 (Vuetify 4) `fill-height` / VContainer — ⛔ ANNULÉ
 
-`VContainer fill-height` **ne centre plus verticalement** ; max-widths réduits (md 900→700, lg 1200→1000). Fichiers :
+> **Point abandonné**, aucune action ne sera menée. Le rendu obtenu convient tel quel : aucun des écrans listés n'attendait réellement le centrage vertical que `fill-height` fournissait en V2.
+
+`VContainer fill-height` **ne centre plus verticalement** ; max-widths réduits (md 900→700, lg 1200→1000). Fichiers concernés à l'époque du relevé :
 - `src/views/agenga/Agenda.vue`, `src/views/components/event/EventDayDialog.vue`, `src/views/settings/Settings.vue`, `src/views/settings/components/SettingsTagList.vue`, `src/views/settings/tabs/SettingsCommonTasks.vue`, `src/views/settings/tabs/SettingsTags.vue`.
 
-Action : réintroduire `d-flex align-center` là où un centrage vertical était attendu.
+Action envisagée puis écartée : réintroduire `d-flex align-center` là où un centrage vertical était attendu.
 
 ### 2.9 (Vuetify 4) VBtn : uppercase supprimé + layout grid → flex — ✅ FAIT
 
@@ -873,7 +877,7 @@ grep -rn -- "--text\|text--" src --include='*.vue' --include='*.ts'
 ---
 
 <details>
-<summary><strong>3. 🟡 Nettoyage / dette technique — 7/12 faits, 2 partiels</strong></summary>
+<summary><strong>3. 🟡 Nettoyage / dette technique — 8/12 faits, 1 partiel, 1 annulé</strong></summary>
 
 ### 3.1 Hack `loginGuard` (`nonAuth.router.ts`) — ✅ FAIT
 
@@ -941,7 +945,9 @@ Simplifier `:prop="true"` → `prop` et `:prop="false"` → à supprimer (défau
 
 > ⚠️ Ne pas toucher les `:small="true"`, `:completable="false"`, `:display-options="false"`, `:editable="false"` sur les **composants custom** (`TaskCard`, `CommonTaskCard`…) : ce sont des props internes légitimes.
 
-### 3.5 Liens `exact` sur `v-tab` (VR4) — ⚠️ PRÉMISSE FAUSSE, RETRAIT ANNULÉ
+### 3.5 Liens `exact` sur `v-tab` (VR4) — ⛔ ANNULÉ, PRÉMISSE FAUSSE
+
+> **Re-vérifié sur Vuetify 4.1.6** : `exact` est toujours déclaré (`vuetify/lib/composables/router.js` — `makeRouterProps` L.68 : `exact: Boolean`) et toujours consommé (L.42 : `if (!props.exact) return link.value.isActive?.value ?? false`). La conclusion ci-dessous tient donc aussi en V4. **Point définitivement clos, ne rien retirer.**
 
 > **Correction** : contrairement à ce que dit ce point, `exact` **est toujours pris en compte par Vuetify 3** (cf. `vuetify/lib/composables/router.js` : `if (!props.exact) return isActive ; return isExactActive`). Sans `exact`, un `v-tab :to="/parent"` reste actif sur toutes les routes enfant `/parent/xxx` (match par préfixe) → onglet parent surligné en permanence + indicateur mal placé. `exact` a donc été **rétabli** sur les onglets `Profile`, `Settings`, `Administration`, `CollectionDetail` et le `Description` de `ProjectDetail`. Ne PAS retirer `exact` de ces onglets.
 
@@ -1008,14 +1014,26 @@ Vite est en **`^6.0.1`**. Monter vers la dernière stable (≥ 7, désormais per
 
 ---
 
-### 3.13 Amener `yarn type-check` à 0 erreur — inventaire complet des 28 erreurs
+### 3.13 Amener `yarn type-check` à 0 erreur — ✅ FAIT
+
+> **`yarn type-check` renvoie 0 erreur.** Les 28 du relevé initial ont toutes été traitées : 6 en corrigeant des bugs signalés à l'usage (§2.15 ci-dessous), les 22 restantes en une passe. `type-check` peut désormais devenir bloquant (hook `pre-commit` ou CI) — c'est le prérequis pour que le typage protège réellement des régressions.
+>
+> **Correctifs par groupe :**
+>
+> - **A, chips d'entité (7)** — `computed<RouteLocation | null>` → `computed<RouteLocationRaw | undefined>`. `RouteLocation` est le type d'une route *résolue* (`matched`, `fullPath`…), d'où le `TS2769` sur le littéral ; `:to` attend `RouteLocationRaw`. Au passage dans `SectionChip` : import `src/models/…` → `@/models/…`, et `click($event)` → `click()` (la fonction ne prend aucun argument).
+> - **B, `null` sur props Vuetify (3)** — `DailySummaryCard`, `Feedback`, `ProjectCard` : Vuetify attend `string | undefined`.
+> - **C, chaîne `DailyTaskActionChip` (3)** — modèle élargi en `DailyTaskAction | null | undefined` (et les deux helpers de `daily-task.utils.ts` avec), plutôt que de contraindre les deux appelants dont les types diffèrent (`DailyTask.action` est `| undefined`, `DailyTaskPatch.action` est `| null | undefined`). Plus `:key="option.value ?? 'none'"` — une clé de `v-for` doit être un `PropertyKey`.
+> - **D/E, `DailyTaskPost` vs `DailyTaskPatch` (2)** — `DailyUpdateTaskList` déclarait `Post` là où `DailyTaskFormCard` émet un `Patch`. **`DailyTaskPost.action` a été élargi à `DailyTaskAction | null`** : `DailyTaskForm` est partagé entre création et édition et a `action: null` pour défaut, donc un POST de création envoie déjà `null` aujourd'hui. Normaliser en `undefined` aurait modifié le corps de la requête ; élargir le modèle décrit la réalité sans rien changer au runtime.
+> - **F, divers (7)** — `parseInt(String(route.params.id))` ; `watch(show, value => …)` (`defineModel<boolean>()` produit `boolean | undefined`) ; `(scrollableElement.value.$el as HTMLElement).scrollTop` (le ref pointe un `v-card-text`, pas un élément) ; `dailyDetailDialogInput(value?: boolean)` ; `sectionId?: number` dans `select` ; `this.validatePasswordMatch()` → `validatePasswordMatch()` ; `useTemplateRef<InstanceType<typeof SettingsTagList>>` (+ `?.` sur l'appel, que le ref correctement typé a révélé nullable).
+>
+> ⚠️ **Aucun de ces correctifs n'a été validé à l'écran.** Plusieurs touchent des props réellement utilisées (`:to` des chips, `scrollTop` du dialog jour, chaîne d'action du daily) — une QA manuelle reste à faire.
 
 Cet inventaire **remplace** les listes partielles de §3.8, §3.9 et §3.10, qui datent d'un relevé antérieur. Relevé de référence : `yarn type-check` sur la branche `migrate-to-vue3`.
 
 **Pourquoi le faire** : tant que le compteur n'est pas à 0, `type-check` ne peut pas devenir bloquant (hook ou CI) et **rien ne protège contre les régressions de typage**. Le critère de travail intermédiaire est donc *« mon changement n'ajoute pas d'erreur »* :
 
 ```bash
-yarn type-check 2>&1 | grep -c "error TS"   # 28 aujourd'hui
+yarn type-check 2>&1 | grep -c "error TS"   # 0 aujourd'hui
 ```
 
 #### Groupe A — Chips d'entité : `:to` et `withDefaults` (7 erreurs)

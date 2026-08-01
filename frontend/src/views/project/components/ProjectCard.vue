@@ -16,7 +16,7 @@ const percentageOfCompletedTask = computed<number>(
 <template>
   <v-card
     :to="{ name: 'project-detail', params: { id: project.id } }"
-    :color="project.archived ? 'projectArchivedCard' : null"
+    :color="project.archived ? 'projectArchivedCard' : undefined"
     :ripple="false"
     class="project-card rounded-lg">
     <v-progress-linear :model-value="percentageOfCompletedTask" color="green-accent-2" height="6" />
