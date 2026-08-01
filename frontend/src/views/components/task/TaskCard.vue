@@ -79,10 +79,12 @@ function emitDeleteEvent(): void {
             <template #activator="{ props: menuProps }">
               <v-btn
                 v-bind="menuProps"
-                size="x-small"
-                variant="plain"
+                icon
+                variant="text"
+                size="small"
+                density="comfortable"
                 class="task-card__actions__btn">
-                <v-icon icon="mdi-dots-vertical" size="small" />
+                <v-icon icon="mdi-dots-vertical" />
               </v-btn>
             </template>
             <v-list density="compact">
@@ -184,7 +186,6 @@ function emitDeleteEvent(): void {
 
     &__btn {
       min-width: 0 !important;
-      padding: 0 !important;
     }
   }
 
@@ -198,10 +199,6 @@ function emitDeleteEvent(): void {
 @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .task-card {
     padding: 8px 24px 8px 8px;
-
-    &__actions {
-      right: 8px;
-    }
   }
 }
 </style>

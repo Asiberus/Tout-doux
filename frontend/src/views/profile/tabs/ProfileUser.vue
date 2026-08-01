@@ -120,7 +120,7 @@ function submit(): void {
         @keyup.enter.ctrl="submit()" />
 
       <v-btn
-        color="success"
+        :color="canSubmit ? 'success' : undefined"
         type="submit"
         :disabled="!canSubmit"
         :block="xs"

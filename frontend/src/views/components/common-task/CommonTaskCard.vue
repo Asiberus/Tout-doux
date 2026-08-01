@@ -64,8 +64,8 @@ function emitDeleteEvent(): void {
       <div v-if="editable" class="actions">
         <v-menu v-model="commonTaskMenu">
           <template #activator="{ props }">
-            <v-btn variant="text" icon density="comfortable" size="x-small" v-bind="props">
-              <v-icon icon="mdi-dots-vertical" size="small" />
+            <v-btn variant="text" icon size="small" density="comfortable" v-bind="props">
+              <v-icon icon="mdi-dots-vertical" />
             </v-btn>
           </template>
           <v-list density="compact">
@@ -132,7 +132,7 @@ function emitDeleteEvent(): void {
 
   .actions {
     position: absolute;
-    top: 8px;
+    top: 4px;
     right: 4px;
   }
 }
@@ -144,10 +144,6 @@ function emitDeleteEvent(): void {
 
     .content__title {
       line-height: 1.5rem;
-    }
-
-    .actions {
-      right: 8px;
     }
   }
 }

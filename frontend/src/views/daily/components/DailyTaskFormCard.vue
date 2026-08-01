@@ -57,23 +57,24 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
             <template #activator="{ props: menuProps }">
               <v-btn
                 v-bind="menuProps"
+                variant="text"
                 size="small"
-                variant="plain"
-                color="white"
+                density="comfortable"
+                icon
                 class="daily-task-form-card__actions__btn">
-                <v-icon icon="mdi-dots-vertical" size="small" />
+                <v-icon icon="mdi-dots-vertical" />
               </v-btn>
             </template>
             <v-list density="compact">
               <v-list-item v-if="!dailyTask.task && !dailyTask.commonTask" @click="showEditMode()">
                 <v-list-item-title class="d-flex align-center">
-                  <v-icon icon="mdi-pencil" size="small" start color="accent" />
+                  <v-icon icon="mdi-pencil" size="small" start />
                   Edit
                 </v-list-item-title>
               </v-list-item>
               <v-list-item @click="deleteDailyTask()">
                 <v-list-item-title class="d-flex align-center">
-                  <v-icon icon="mdi-trash-can" size="small" start color="error" />
+                  <v-icon icon="mdi-trash-can" size="small" start />
                   Delete
                 </v-list-item-title>
               </v-list-item>
@@ -174,7 +175,6 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
     &__btn {
       min-width: 0 !important;
-      padding: 0 !important;
     }
   }
 
@@ -208,10 +208,6 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .daily-task-form-card {
     padding: 16px 24px 16px 16px;
-
-    &__actions {
-      right: 8px;
-    }
   }
 }
 </style>

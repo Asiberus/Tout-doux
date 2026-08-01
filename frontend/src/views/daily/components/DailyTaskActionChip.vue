@@ -39,7 +39,7 @@ function updateAction(value: DailyTaskAction | null): void {
               <span class="font-weight-bold" :class="textColor">{{ text }}</span>
             </template>
             <template v-else>
-              <v-icon icon="mdi-bullseye-arrow" size="small" />
+              <v-icon icon="mdi-bullseye-arrow" />
             </template>
           </v-chip>
         </template>

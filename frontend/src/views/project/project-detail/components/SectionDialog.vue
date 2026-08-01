@@ -81,9 +81,10 @@ function emitCloseEvent(): void {
         {{ section ? 'Update section' : 'New section' }}
       </h4>
 
-      <v-hover v-if="section" v-slot="{ isHovering }">
+      <v-hover v-if="section" v-slot="{ isHovering, props }">
         <v-btn
-          :color="isHovering || confirmDelete ? 'error' : null"
+          v-bind="props"
+          :color="isHovering || confirmDelete ? 'error' : undefined"
           :size="xs ? 'small' : 'default'"
           @click="emitDeleteSection()">
           {{ confirmDelete ? 'Are you sure ?' : 'Delete section' }}
@@ -112,7 +113,7 @@ function emitCloseEvent(): void {
             cancel
           </v-btn>
           <v-btn
-            color="success"
+            :color="sectionForm.valid ? 'success' : undefined"
             variant="text"
             type="submit"
             :disabled="!sectionForm.valid"

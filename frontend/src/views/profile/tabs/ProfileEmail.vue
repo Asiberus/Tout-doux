@@ -100,7 +100,12 @@ function changeEmail(): void {
         counter="100"
         @update:model-value="validateEmail" />
 
-      <v-btn :disabled="!form.data.email" type="submit" color="green">Submit</v-btn>
+      <v-btn
+        :disabled="!form.data.email"
+        type="submit"
+        :color="form.data.email ? 'success' : undefined"
+        >Submit</v-btn
+      >
     </v-form>
 
     <ConfirmPasswordDialog v-model="confirmPasswordDialog" @password-confirmed="changeEmail()" />

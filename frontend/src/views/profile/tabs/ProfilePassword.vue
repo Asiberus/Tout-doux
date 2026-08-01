@@ -143,7 +143,7 @@ function submit(): void {
         type="submit"
         :disabled="!form.valid || form.pending"
         :block="$vuetify.display.xs"
-        color="green"
+        :color="form.valid && !form.pending ? 'success' : undefined"
         class="mt-5 float-sm-right">
         Change Password
       </v-btn>

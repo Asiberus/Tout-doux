@@ -218,8 +218,9 @@ function formattedDate(value: string | null | undefined): string {
         </template>
       </h4>
 
-      <v-hover v-if="event" v-slot="{ isHovering }">
+      <v-hover v-if="event" v-slot="{ isHovering, props }">
         <v-btn
+          v-bind="props"
           :color="isHovering || confirmDelete ? 'error' : undefined"
           class="align-self-end align-self-sm-center"
           @click="emitDeleteEvent()">
@@ -409,7 +410,7 @@ function formattedDate(value: string | null | undefined): string {
             cancel
           </v-btn>
           <v-btn
-            color="success"
+            :color="eventForm.valid && !relatedToDateError ? 'success' : undefined"
             variant="text"
             type="submit"
             class="flex-grow-1 flex-md-grow-0"

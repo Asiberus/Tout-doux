@@ -35,6 +35,7 @@ export const vuetifyOptions: VuetifyOptions = {
           info: '#2196F3',
           success: '#4CAF50',
           warning: '#FFC107',
+          error: '#FF5252',
           taskCompleted: '#497549',
           // taskCompleted: '#4CAF50',
           taskInCreation: '#181b1f',

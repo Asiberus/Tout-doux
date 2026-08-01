@@ -76,7 +76,7 @@ function cleanTagList(): void {
       @update:model-value="updateSelectedTags($event)">
       <template #item="{ props: itemProps, item }">
         <v-list-item v-bind="itemProps" :title="undefined">
-          <TagChip :tag="item.raw" />
+          <TagChip :tag="item" />
         </v-list-item>
       </template>
       <template #selection>

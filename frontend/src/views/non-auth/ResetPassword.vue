@@ -143,7 +143,7 @@ function submit(): void {
           :disabled="!form.valid || form.pending"
           :loading="submitLoading"
           type="submit"
-          color="green"
+          :color="form.valid && !form.pending ? 'success' : undefined"
           block
           class="mt-4 mb-2">
           Reset Password

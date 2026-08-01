@@ -21,6 +21,7 @@ defineEmits<{
     :closable="clearable && !disabled"
     :disabled
     variant="flat"
+    class="text-white"
     :class="{ small, 'x-small': xSmall }"
     @click:close="$emit('clear', tag.id)">
     {{ tag.name }}

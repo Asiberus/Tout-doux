@@ -14,7 +14,7 @@ withDefaults(
     <span class="value">{{ value }}</span>
     <span class="separator">/</span>
     <span class="max">{{ max }}</span>
-    <v-icon v-if="showIcon" icon="mdi-trophy" />
+    <v-icon v-if="showIcon" icon="mdi-trophy" size="x-large" />
   </div>
 </template>
 
@@ -45,6 +45,7 @@ withDefaults(
   line-height: 1.5rem;
   color: #{map.get(colors.$grey, 'lighten-2')};
   transform: translateY(1px);
+  margin-right: 2px;
 }
 
 @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {

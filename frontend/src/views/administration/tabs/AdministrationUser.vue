@@ -23,16 +23,16 @@ const userList = ref<User[]>([])
 const loading = ref(false)
 
 const headerDefinition = [
-  { text: 'Username', value: 'username' },
-  { text: 'First name', value: 'firstName', align: 'center' },
-  { text: 'Last name', value: 'lastName', align: 'center' },
-  { text: 'Email', value: 'email' },
-  { text: 'Account created', value: 'dateJoined', align: 'center' },
-  { text: 'Last login', value: 'lastLogin', align: 'center' },
-  { text: 'Active', value: 'isActive', align: 'center', sort: booleanSort },
-  { text: 'Staff', value: 'isStaff', align: 'center', sort: booleanSort },
-  { text: 'Actions', value: 'actions', align: 'center', sortable: false },
-]
+  { title: 'Username', value: 'username', sortable: true },
+  { title: 'First name', value: 'firstName', align: 'center', sortable: true },
+  { title: 'Last name', value: 'lastName', align: 'center', sortable: true },
+  { title: 'Email', value: 'email', sortable: true },
+  { title: 'Account created', value: 'dateJoined', align: 'center', sortable: true },
+  { title: 'Last login', value: 'lastLogin', align: 'center', sortable: true },
+  { title: 'Active', value: 'isActive', align: 'center', sort: booleanSort },
+  { title: 'Staff', value: 'isStaff', align: 'center', sort: booleanSort },
+  { title: 'Actions', value: 'actions', align: 'center', sortable: false },
+] as const
 
 function resendActivationEmail(id: number): void {
   userApi
@@ -102,7 +102,13 @@ function deleteUser(id: number): void {
       <template #item.actions="{ item }">
         <v-menu>
           <template #activator="{ props }">
-            <v-btn v-bind="props" :disabled="item.id === userStore.loadedUser.id" variant="plain">
+            <v-btn
+              v-bind="props"
+              :disabled="item.id === userStore.loadedUser.id"
+              size="small"
+              variant="plain"
+              density="comfortable"
+              icon>
               <v-icon icon="mdi-dots-vertical" />
             </v-btn>
           </template>

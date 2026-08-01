@@ -58,10 +58,10 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
       <v-spacer />
       <v-btn
         icon
-        variant="text"
         density="comfortable"
         size="small"
-        :color="createDailyTaskDisplayed ? 'accent' : null"
+        :variant="createDailyTaskDisplayed ? 'flat' : 'text'"
+        :color="createDailyTaskDisplayed ? 'accent' : undefined"
         @click="createDailyTaskDisplayed = !createDailyTaskDisplayed">
         <v-icon icon="mdi-plus" />
       </v-btn>

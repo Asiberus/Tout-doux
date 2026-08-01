@@ -163,7 +163,7 @@ function deleteCollection(): void {
 
       <div v-if="!collection.archived" class="d-flex justify-end mb-5">
         <v-btn
-          color="success"
+          :color="collectionForm.valid && !isFormUntouched ? 'success' : undefined"
           type="submit"
           :block="xs"
           :disabled="!collectionForm.valid || isFormUntouched">

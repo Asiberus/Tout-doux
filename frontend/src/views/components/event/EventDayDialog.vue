@@ -52,7 +52,7 @@ function scrollDownEvent(): void {
       }"
       height="100%"
       class="d-flex flex-column">
-      <v-toolbar class="flex-grow-0">
+      <v-toolbar color="grey-darken-4" :elevation="3" class="flex-grow-0">
         <div class="text-body-large text-sm-title-large mr-2 ml-4">
           Events : {{ dateFormat(date, 'D MMMM YYYY') }}
         </div>
@@ -61,8 +61,9 @@ function scrollDownEvent(): void {
           :size="xs ? 'small' : 'default'"
           :icon="xs"
           class="new-event-btn"
+          :class="{ 'ml-2': smAndUp }"
           @click="$emit('open-event-dialog', date)">
-          <v-icon icon="mdi-plus" />
+          <v-icon icon="mdi-plus" :start="smAndUp" />
           <template v-if="smAndUp">event</template>
         </v-btn>
 

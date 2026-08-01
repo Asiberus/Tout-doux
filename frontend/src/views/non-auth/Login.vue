@@ -69,7 +69,13 @@ function login(): void {
       Invalid credentials
     </p>
 
-    <v-btn :disabled="!form.valid" :loading="loading" type="submit" color="success">login</v-btn>
+    <v-btn
+      :disabled="!form.valid"
+      :loading="loading"
+      type="submit"
+      :color="form.valid ? 'success' : undefined"
+      >login</v-btn
+    >
 
     <div class="login__links">
       <router-link

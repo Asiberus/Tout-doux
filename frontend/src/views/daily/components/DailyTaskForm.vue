@@ -83,7 +83,7 @@ function removeTag(id: number): void {
     <v-card-actions class="justify-end">
       <v-btn variant="plain" size="small" @click="close()">cancel</v-btn>
       <v-btn
-        color="success"
+        :color="dailyTaskForm.valid ? 'success' : undefined"
         variant="text"
         size="small"
         :disabled="!dailyTaskForm.valid"

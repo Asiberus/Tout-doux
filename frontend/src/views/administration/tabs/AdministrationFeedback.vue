@@ -17,22 +17,26 @@ onBeforeMount(() => {
 
 const feedbackList = ref<Feedback[]>([])
 const headerDefinition = [
+  // Déclarée explicitement pour la placer à gauche : sinon V4 l'ajoute en fin de tableau
+  { key: 'data-table-expand' },
   { title: 'Title', value: 'title' },
   { title: 'User', value: 'user.username', width: 150, align: 'center' },
   { title: 'Date', value: 'date', width: 110, align: 'center' },
   { title: '', value: 'actions', width: 105, sortable: false },
-]
+] as const
 
-function feedbackExpanded(event: { item: Feedback; value: boolean }): void {
-  const { item, value } = event
-  if (item.isRead || !value) return
+function feedbackExpanded(expanded: number[]): void {
+  const id = expanded[0]
+  if (id === undefined) return
+
+  const feedback = feedbackList.value.find(item => item.id === id)
+  if (!feedback || feedback.isRead) return
 
   // We set first the isRead to true, and then we call the api.
   // This prevents a blinking effect
-  const feedback = feedbackList.value.find(({ id }) => item.id === id)
-  if (feedback) feedback.isRead = true
+  feedback.isRead = true
 
-  feedbackApi.setFeedbackReadProperty(item.id, true).catch(error => console.error(error))
+  feedbackApi.setFeedbackReadProperty(feedback.id, true).catch(error => console.error(error))
 }
 
 function setFeedbackAsUnread(id: number): void {
@@ -52,7 +56,7 @@ function deleteFeedback(id: number): void {
   })
 }
 
-function getItemClass(item: Feedback): { class: string } {
+function getItemClass({ item }: { item: Feedback }): { class: string } {
   if (item.isRead) return { class: 'text-grey-lighten-2 font-weight-light' }
   else return { class: 'text-white font-weight-bold' }
 }
@@ -66,9 +70,16 @@ function getItemClass(item: Feedback): { class: string } {
       :items="feedbackList"
       :headers="headerDefinition"
       show-expand
-      single-expand
+      expand-strategy="single"
       :cell-props="getItemClass"
-      @item-expanded="feedbackExpanded($event)">
+      @update:expanded="feedbackExpanded($event)">
+      <template #expanded-row="{ columns, item }">
+        <tr>
+          <td :colspan="columns.length" class="pa-5">
+            {{ item.message }}
+          </td>
+        </tr>
+      </template>
       <template #item.date="{ value }">{{ dateFormat(value, 'DD/MM/YYYY') }}</template>
       <template #item.actions="{ item }">
         <div class="d-flex justify-end align-center">
@@ -93,12 +104,6 @@ function getItemClass(item: Feedback): { class: string } {
             <p>Are you sure to delete this feedback ?</p>
           </ConfirmDialog>
         </div>
-      </template>
-
-      <template #expanded-row="{ headers, item }">
-        <td :colspan="headers.length" class="pa-5">
-          {{ item.message }}
-        </td>
       </template>
     </v-data-table>
   </div>

@@ -20,19 +20,19 @@ const userStore = useUserStore()
             show-arrows
             bg-color="transparent">
             <v-tab :to="{ name: 'profile-user' }" exact class="justify-start">
-              <v-icon icon="mdi-account-circle" start size="small" />
+              <v-icon icon="mdi-account-circle" start />
               Profile
             </v-tab>
             <v-tab :to="{ name: 'profile-email' }" exact class="justify-start">
-              <v-icon icon="mdi-at" start size="small" />
+              <v-icon icon="mdi-at" start />
               Email
             </v-tab>
             <v-tab :to="{ name: 'profile-password' }" exact class="justify-start">
-              <v-icon icon="mdi-lock" start size="small" />
+              <v-icon icon="mdi-lock" start />
               Password
             </v-tab>
             <v-tab :to="{ name: 'profile-account' }" exact class="justify-start">
-              <v-icon icon="mdi-cog" start size="small" />
+              <v-icon icon="mdi-cog" start />
               Account
             </v-tab>
           </v-tabs>

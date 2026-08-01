@@ -74,7 +74,12 @@ function submit(): void {
       </v-textarea>
 
       <div class="d-flex justify-end mt-2">
-        <v-btn type="submit" :disabled="!canSubmit" :block="xs" color="success" class="px-6">
+        <v-btn
+          type="submit"
+          :disabled="!canSubmit"
+          :block="xs"
+          :color="canSubmit ? 'success' : undefined"
+          class="px-6">
           submit
         </v-btn>
       </div>

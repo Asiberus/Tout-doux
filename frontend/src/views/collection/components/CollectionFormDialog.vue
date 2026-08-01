@@ -111,7 +111,7 @@ function emitCloseEvent(): void {
             cancel
           </v-btn>
           <v-btn
-            color="success"
+            :color="collectionForm.valid ? 'success' : undefined"
             variant="text"
             type="submit"
             :disabled="!collectionForm.valid"

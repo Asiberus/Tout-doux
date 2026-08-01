@@ -167,19 +167,19 @@ function resetSelectedItem(): void {
       class="daily-update-task__tabs"
       @update:model-value="resetSelectedItem()">
       <v-tab :value="0">
-        <v-icon icon="mdi-briefcase-variant" />
+        <v-icon icon="mdi-briefcase-variant" size="x-large" />
       </v-tab>
       <v-tab :value="1">
-        <v-icon icon="mdi-list-box" />
+        <v-icon icon="mdi-list-box" size="x-large" />
       </v-tab>
       <v-tab :value="2">
-        <v-icon icon="mdi-timeline" />
+        <v-icon icon="mdi-timeline" size="x-large" />
       </v-tab>
       <v-tab :value="3" disabled>
-        <v-icon icon="mdi-calendar-range" />
+        <v-icon icon="mdi-calendar-range" size="x-large" />
       </v-tab>
       <v-tab :value="4" disabled>
-        <v-icon icon="mdi-calendar-month" />
+        <v-icon icon="mdi-calendar-month" size="x-large" />
       </v-tab>
     </v-tabs>
 
@@ -190,18 +190,16 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="0" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-headline-small mr-2">Project</h5>
-          <v-hover v-slot="{ isHovering }">
-            <v-btn
-              :to="{ name: 'project-list' }"
-              icon
-              variant="text"
-              density="comfortable"
-              size="small"
-              :color="isHovering ? 'grey' : 'grey-darken-3'"
-              title="Go to project list">
-              <v-icon icon="mdi-open-in-new" size="small" />
-            </v-btn>
-          </v-hover>
+          <v-btn
+            :to="{ name: 'project-list' }"
+            icon
+            variant="text"
+            color="grey"
+            density="comfortable"
+            size="small"
+            title="Go to project list">
+            <v-icon icon="mdi-open-in-new" size="small" />
+          </v-btn>
         </div>
         <div
           class="daily-update-task__tabs-items__content"
@@ -233,18 +231,16 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="1" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-headline-small mr-2">Collection</h5>
-          <v-hover v-slot="{ isHovering }">
-            <v-btn
-              :to="{ name: 'collection-list' }"
-              icon
-              variant="text"
-              density="comfortable"
-              size="small"
-              :color="isHovering ? 'grey' : 'grey-darken-3'"
-              title="Go to collection">
-              <v-icon icon="mdi-open-in-new" size="small" />
-            </v-btn>
-          </v-hover>
+          <v-btn
+            :to="{ name: 'collection-list' }"
+            icon
+            variant="text"
+            color="grey"
+            density="comfortable"
+            size="small"
+            title="Go to collection">
+            <v-icon icon="mdi-open-in-new" size="small" />
+          </v-btn>
         </div>
         <div
           class="daily-update-task__tabs-items__content"
@@ -275,18 +271,16 @@ function resetSelectedItem(): void {
       <v-tabs-window-item :value="2" :transition="false" :reverse-transition="false">
         <div class="d-flex align-center mb-3">
           <h5 class="text-headline-small mr-2">Common task</h5>
-          <v-hover v-slot="{ isHovering }">
-            <v-btn
-              :to="{ name: 'settings-common-tasks' }"
-              icon
-              variant="text"
-              density="comfortable"
-              size="small"
-              :color="isHovering ? 'grey' : 'grey-darken-3'"
-              title="Go to common task">
-              <v-icon icon="mdi-open-in-new" size="small" />
-            </v-btn>
-          </v-hover>
+          <v-btn
+            :to="{ name: 'settings-common-tasks' }"
+            icon
+            variant="text"
+            color="grey"
+            density="comfortable"
+            size="small"
+            title="Go to common task">
+            <v-icon icon="mdi-open-in-new" size="small" />
+          </v-btn>
         </div>
         <div class="daily-update-task__tabs-items__content overflow">
           <DailyUpdateCommonTask

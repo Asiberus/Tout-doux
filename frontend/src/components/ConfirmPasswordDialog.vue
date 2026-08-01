@@ -118,7 +118,13 @@ function submit(): void {
               @click="setDialogStateTo(false)">
               Cancel
             </v-btn>
-            <v-btn type="submit" color="success" class="flex-grow-1 flex-sm-grow-0"> Submit </v-btn>
+            <v-btn
+              type="submit"
+              :disabled="!form.valid"
+              :color="form.valid ? 'success' : undefined"
+              class="flex-grow-1 flex-sm-grow-0">
+              Submit
+            </v-btn>
           </div>
         </v-form>
       </v-card-text>

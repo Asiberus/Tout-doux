@@ -154,7 +154,7 @@ function closeDialog(): void {
           </v-text-field>
 
           <h6 class="text-title-large text-grey-lighten-2">
-            <v-icon icon="mdi-tag" size="small" />
+            <v-icon icon="mdi-tag" size="x-small" />
             Tags
           </h6>
           <TagSearch v-model="tagList" type="task" class="mb-5" />
@@ -176,7 +176,7 @@ function closeDialog(): void {
               cancel
             </v-btn>
             <v-btn
-              color="success"
+              :color="commonTaskForm.valid && !commonTaskForm.pending ? 'success' : undefined"
               variant="text"
               type="submit"
               :disabled="!commonTaskForm.valid || commonTaskForm.pending"

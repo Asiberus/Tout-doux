@@ -103,7 +103,7 @@ function emitCloseEvent(): void {
             @keyup.enter.ctrl="emitSubmitEvent()" />
 
           <h6 class="text-title-large text-grey-lighten-2">
-            <v-icon icon="mdi-tag" size="small" />
+            <v-icon icon="mdi-tag" size="x-small" />
             Tags
           </h6>
           <TagSearch v-model="tagList" type="project" class="mb-5" />
@@ -123,7 +123,7 @@ function emitCloseEvent(): void {
             cancel
           </v-btn>
           <v-btn
-            color="success"
+            :color="projectForm.valid ? 'success' : undefined"
             variant="text"
             type="submit"
             :disabled="!projectForm.valid"

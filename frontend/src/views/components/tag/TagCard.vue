@@ -32,7 +32,7 @@ function deleteTag(id: number): void {
   <div>
     <v-card :color="tag.color" class="rounded-pill" @click="tagDialog = true">
       <v-card-text class="d-flex align-center px-6 py-3">
-        <v-icon icon="mdi-tag" class="mr-2" />
+        <v-icon icon="mdi-tag" class="mr-2" color="white" />
         <h3 class="text-white text-truncate">{{ tag.name }}</h3>
       </v-card-text>
     </v-card>

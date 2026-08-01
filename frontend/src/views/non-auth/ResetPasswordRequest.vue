@@ -70,7 +70,7 @@ async function submit(): Promise<void> {
           required
           autofocus />
 
-        <v-btn type="submit" color="green" block class="my-2">Reset Password</v-btn>
+        <v-btn type="submit" color="success" block class="my-2">Reset Password</v-btn>
         <router-link
           :to="{ name: 'login' }"
           class="text-body-large text-link text-green-lighten-1 float-right">

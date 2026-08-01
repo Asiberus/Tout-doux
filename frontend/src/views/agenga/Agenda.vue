@@ -202,7 +202,7 @@ function nextMonth(): void {
       <h4 class="text-body-large text-sm-headline-small flex-grow-1">{{ monthSelected }}</h4>
 
       <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
-        <v-icon icon="mdi-plus" />
+        <v-icon icon="mdi-plus" start />
         <template v-if="smAndUp">event</template>
       </v-btn>
     </div>
@@ -222,8 +222,9 @@ function nextMonth(): void {
         class="calendar"
         @click:day="handleClickOnDay">
         <template #day-label="{ day, present }">
-          <v-hover v-slot="{ isHovering }">
+          <v-hover v-slot="{ isHovering, props }">
             <div
+              v-bind="props"
               class="day-label"
               :class="{
                 'day-label--present': present,

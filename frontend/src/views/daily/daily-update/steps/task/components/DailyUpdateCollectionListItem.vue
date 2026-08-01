@@ -76,26 +76,19 @@ function selectTask(task: Task): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
-            <v-hover v-slot="{ isHovering }">
-              <v-btn
-                :to="{ name: 'collection-detail', params: { id: collection.id } }"
-                icon
-                variant="text"
-                density="comfortable"
-                size="small"
-                :color="isHovering ? 'grey' : 'grey-darken-3'"
-                class="ml-1"
-                title="Go to collection">
-                <v-icon icon="mdi-open-in-new" size="small" />
-              </v-btn>
-            </v-hover>
-            <v-spacer />
             <v-btn
-              color="red"
+              :to="{ name: 'collection-detail', params: { id: collection.id } }"
               icon
               variant="text"
               density="comfortable"
-              @click.stop="unselectCollection">
+              size="small"
+              class="ml-1"
+              color="grey"
+              title="Go to collection">
+              <v-icon icon="mdi-open-in-new" size="small" />
+            </v-btn>
+            <v-spacer />
+            <v-btn icon variant="text" density="comfortable" @click.stop="unselectCollection">
               <v-icon icon="mdi-close" />
             </v-btn>
           </template>

@@ -177,7 +177,7 @@ function deleteProject(): void {
         :class="project.archived ? 'text-grey-darken-2' : 'text-grey-lighten-2'">
         <v-icon
           icon="mdi-tag"
-          size="small"
+          size="x-small"
           :color="project.archived ? 'grey-darken-2' : 'grey-lighten-2'" />
         Tags
       </h6>
@@ -195,7 +195,7 @@ function deleteProject(): void {
 
       <div v-if="!project.archived" class="d-flex justify-end mb-5">
         <v-btn
-          color="success"
+          :color="projectForm.valid && !isFormUntouched ? 'success' : undefined"
           type="submit"
           :block="xs"
           :disabled="!projectForm.valid || isFormUntouched">

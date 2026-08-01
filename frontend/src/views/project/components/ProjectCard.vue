@@ -43,7 +43,7 @@ const percentageOfCompletedTask = computed<number>(
           :max="project.taskCount" />
         <div v-if="project.eventsToCome > 0" class="d-flex gap-1">
           <span class="event-count">{{ project.eventsToCome }}</span>
-          <v-icon icon="mdi-calendar-clock" />
+          <v-icon icon="mdi-calendar-clock" size="large" />
         </div>
       </div>
     </v-card-text>
