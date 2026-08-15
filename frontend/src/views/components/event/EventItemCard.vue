@@ -129,17 +129,15 @@ function isDateEqual(date1: string, date2: string): boolean {
           </template>
 
           <div class="flex-grow-1 d-flex flex-column overflow-hidden">
-            <div
-              class="date-text text-grey-lighten-3 font-weight-bold"
-              :class="[getTextColor('date')]">
+            <div class="date-text font-weight-bold" :class="[getTextColor('date')]">
               <template v-if="event.takesWholeDay && !daySelected">
-                <span title="Date">
+                <span title="Date" :class="[getTextColor('date')]">
                   {{ dateFormat(event.startDate, 'DD/MM/YY') }}
                 </span>
               </template>
 
               <template v-if="!event.takesWholeDay">
-                <span title="Start date">
+                <span title="Start date" :class="[getTextColor('date')]">
                   <template
                     v-if="
                       !daySelected ||
@@ -158,7 +156,7 @@ function isDateEqual(date1: string, date2: string): boolean {
                     :class="[getTextColor('date')]"
                     size="small"
                     class="mx-1" />
-                  <span title="End date">
+                  <span title="End date" :class="[getTextColor('date')]">
                     <template v-if="!isDateEqual(event.startDate, event.endDate)">
                       {{ dateFormat(event.endDate, 'DD/MM/YY') }}
                     </template>

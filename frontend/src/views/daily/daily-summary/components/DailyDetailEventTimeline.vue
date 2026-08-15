@@ -57,6 +57,9 @@ const eventText = computed<string>(() => {
 .v-timeline {
   padding-top: 0;
 
+  // Borne le 3e track, sinon le `auto` de Vuetify suit le max-content du texte en nowrap
+  grid-template-columns: 0 min-content minmax(0, 1fr);
+
   --bar-left: 47px;
   --divider-width: 96px;
   --divider-justify-content: center;
@@ -84,7 +87,6 @@ const eventText = computed<string>(() => {
 
     & :deep(.v-timeline-item__body) {
       width: 100%;
-      max-width: calc(100% - var(--divider-width));
     }
 
     & :deep(.v-timeline-divider) {
