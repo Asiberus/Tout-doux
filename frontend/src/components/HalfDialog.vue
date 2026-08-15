@@ -15,10 +15,9 @@ watch(show, value => {
 
 <template>
   <v-dialog
-    :model-value="show"
+    v-model="show"
     content-class="half-dialog"
-    :transition="width < 400 ? 'dialog-bottom-transition' : 'slide-x-reverse-transition'"
-    @update:model-value="show = $event">
+    :transition="width < 400 ? 'dialog-bottom-transition' : 'slide-x-reverse-transition'">
     <slot></slot>
   </v-dialog>
 </template>

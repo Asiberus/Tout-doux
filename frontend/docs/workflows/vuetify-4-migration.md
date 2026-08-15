@@ -38,7 +38,7 @@
 
 - [x] 2.1 — `variant` des inputs (`underlined`)
 - [x] 2.2 — `offset-*` / `nudge-*` supprimés
-- [ ] 2.3 — Hover mobile chips & tabs _(⚠️ confirmé cassé : voir §2.3)_
+- [x] 2.3 — Hover mobile chips & tabs _(`::before` mort → `.v-chip__overlay` ; `.v-tab` couvert par `.v-btn__overlay`)_
 - [x] 2.4 — QA des sélecteurs `:deep()` _(14/15 classes toujours valides ; `.v-timeline-item__divider` → `.v-timeline-divider`)_
 - [x] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
 - [x] 2.6 — (Vuetify 4) Typographie MD3 _(91 occurrences renommées, 51 fichiers)_
@@ -47,7 +47,7 @@
 - [x] 2.9 — (Vuetify 4) VBtn (uppercase + grid→flex)
 - [x] 2.10 — (Vuetify 4) CSS Layers + `!important` _(cas connu traité, cf. §2.10)_
 - [x] 2.11 — (Vuetify 4) Variables Sass (`settings.scss`)
-- [ ] 2.12 — (Vuetify 4) Grille VRow/VCol
+- [x] 2.12 — (Vuetify 4) Grille VRow/VCol _(surface recomptée : 1 v-container, 2 v-row, 4 v-col — clos sans action)_
 - [x] 2.13 — (Vuetify 4) Blocs CSS morts dans `global.scss` _(+ bloc stepper déplacé dans `DailyUpdate.vue`)_
 - [x] 2.14 — (Vuetify 4) Modificateurs de nuance `lighten-*`/`darken-*` silencieusement perdus
 
@@ -72,7 +72,7 @@
 
 ### 4. ⚪ Optionnel
 
-- [ ] §4 — Améliorations optionnelles
+- [ ] §4 — Améliorations optionnelles _(4.1 `v-model`, 4.3 audit des appels API, 4.4 factorisation des getters, 4.5 et 4.6 bugs latents : faits ; reste Vuelidate, reporté)_
 
 ### 5. Checklist QA finale
 
@@ -617,7 +617,7 @@ grep -rn "  const .* = use\(Router\|Route\|Display\|TemplateRef\)()" src --inclu
 ---
 
 <details>
-<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 10/14 faits, 1 annulé</strong></summary>
+<summary><strong>2. 🟠 Iso-visuel — pour ne rien changer au style — 12/14 faits, 1 annulé</strong></summary>
 
 ### 2.1 `variant` des inputs (défaut V3 = `filled`, on veut `underlined`) — ✅ FAIT
 
@@ -659,13 +659,13 @@ Sur `v-menu`, ces props n'existent plus. En V3 le menu se place par défaut sous
 
 > Comparer le positionnement avant/après ; ajuster via `location`/`offset` si le placement diffère.
 
-### 2.3 Hover mobile — chips & tabs (`src/styles/global.scss`, ex-`App.vue`)
+### 2.3 Hover mobile — chips & tabs (`src/styles/global.scss`, ex-`App.vue`) — ✅ FAIT
 
-> **⚠️ CONFIRMÉ CASSÉ** (vérifié dans `node_modules/vuetify/lib/components/VChip/VChip.sass` et `VTabs.sass`) : `.v-chip` neutralise son survol via un vrai élément **`.v-chip__overlay`** (pas un pseudo-élément), et `.v-tab` délègue au **`.v-btn__overlay`** (un `v-tab` est construit sur `VBtn` en interne). La règle actuelle `.v-chip, .v-tab { &:focus::before, &:hover::before { opacity: 0 !important } }` cible un `::before` qui n'existe plus pour ces deux composants → **du CSS mort, sans effet**. Seule la règle `.v-btn:hover .v-btn__overlay { opacity: 0 !important }` (déjà présente juste au-dessus) reste correcte et couvre `.v-tab` par ricochet (même classe interne).
+> Le bloc `.v-chip, .v-tab { &:focus::before, &:hover::before { … } }` était du **CSS mort** (vérifié dans `node_modules/vuetify/lib/components/VChip/VChip.sass` et `VTabs.sass`) : `.v-chip` neutralise son survol via un vrai élément **`.v-chip__overlay`** (pas un pseudo-élément), et `.v-tab` délègue au **`.v-btn__overlay`** (un `v-tab` est construit sur `VBtn` en interne). Le `::before` ciblé n'existe plus pour ces deux composants.
 >
-> **Correctif à faire** : remplacer le bloc `.v-chip, .v-tab { &:focus::before, ... }` par `.v-chip:hover .v-chip__overlay, .v-chip:focus .v-chip__overlay { opacity: 0 !important }`.
-
-Le fichier a été extrait de `App.vue` vers `src/styles/global.scss` (voir aussi §2.10). Le bloc chips/tabs cible `.v-chip` / `.v-tab` via `&:focus::before, &:hover::before` — **structure V2/V3, obsolète en V4** comme détaillé ci-dessus. Tester sur viewport `sm-and-down` une fois corrigé.
+> Remplacé par `.v-chip:focus .v-chip__overlay, .v-chip:hover .v-chip__overlay { opacity: 0 !important }`. `.v-tab` est sorti du sélecteur : il est déjà couvert par la règle `.v-btn:hover .v-btn__overlay` juste au-dessus, qui, elle, était correcte.
+>
+> ⚠️ QA restante : sur viewport `sm-and-down`, vérifier qu'aucun survol ne persiste sur les chips ni les onglets.
 
 ### 2.4 QA des sélecteurs `:deep()` — ✅ FAIT
 
@@ -792,9 +792,9 @@ Vuetify 4 impose les CSS layers → la spécificité des overrides change.
 
 - ✅ **`$button-colored-disabled` existe toujours en v4.1.6** (le `yarn build` passe sans erreur Sass). Aucune action requise ici. _(D'autres variables sont supprimées — `$grid-gutters`, `$form-grid-gutter`, `$counter-color`… — mais non utilisées par le projet.)_
 
-### 2.12 (Vuetify 4) Grille VRow/VCol (gap)
+### 2.12 (Vuetify 4) Grille VRow/VCol (gap) — ✅ FAIT (clos sans action)
 
-Refonte (marges négatives → CSS `gap`, certaines classes/comportements changent). **Surface faible** : 2 `v-container`, 4 `v-row`, 8 `v-col` (aucun `offset-*`). Action : re-tester les espacements de ces écrans ; pas de renommage systématique.
+Refonte (marges négatives → CSS `gap`, certaines classes/comportements changent). **Surface recomptée, plus faible qu'estimé** : 1 `v-container` (`AuthenticatedLayout.vue:34`), 2 `v-row` (`DailyDetail.vue:204`, `ProjectSectionItem.vue:124`), 4 `v-col`, aucun `offset-*`. Aucun renommage nécessaire, point clos sans modification.
 
 > Note d'investigation : un bug de layout signalé dans `DailyDetail.vue` (cards qui ne remplissaient plus la largeur disponible) faisait initialement suspecter ce point (`v-row`/`v-col`), mais la cause réelle était ailleurs (`.v-timeline-item__body`, cf. §3.10/timelines). `v-row`/`v-col` en tant que tel reste non vérifié pour ce qui est du `gap`.
 
@@ -1421,11 +1421,11 @@ Le dossier `frontend/eslint-plugin-vuetify/` (84 fichiers, 1 Mo) est un **fork e
 <details>
 <summary><strong>4. ⚪ Optionnel / améliorations (hors « iso-fonctionnel ») — non requis pour l'iso-fonctionnel</strong></summary>
 
-- **`:model-value` → `v-model`** : convertir **uniquement** quand `:model-value="x"` **+** `@update:model-value="x = $event"` portent sur la **même** valeur (ex. `HalfDialog.vue:21/24`, `ConfirmDialog.vue:36/39`, `CommonTaskDialog.vue:124/127`). **Ne pas** toucher : les `:model-value` en lecture seule (`ProgressDisk.vue:21`, `ProgressWheel.vue:43`, `ProjectCard.vue:22`, `CollectionCard.vue:23`, `ProjectSectionItem.vue:229`) ni les `@update:model-value` qui appellent une fonction (validation) sans liaison bidirectionnelle.
-- **Vuelidate** : remplacer la validation manuelle des forms — change le fonctionnement, hors lot iso-fonctionnel.
-- **Calls API via les stores** : `project`/`collection` passent déjà par leurs stores Pinia. Auditer si des composants appellent directement `*.api.ts` alors qu'un store existe.
-- **Getters Pinia « completed tasks »** du `currentProject` : factorisation.
-- **Bug latent** `src/store/project.store.ts:62` : `this.currentProject = { ...this.currentProject, response }` crée une clé littérale `response` au lieu de fusionner (`...response`). À corriger si la mise à jour des propriétés projet ne se reflète pas dans l'UI.
+- ✅ **`:model-value` → `v-model`** : converti sur `HalfDialog.vue` et `CommonTaskDialog.vue` (les deux exposent `show` via `defineModel()`, donc un ref inscriptible). `ConfirmDialog.vue` **n'était pas** un candidat : son `@update:model-value` appelle `setDialogStateTo()`, qui met à jour **deux** refs. Non touchés (lecture seule) : `ProgressDisk.vue:21`, `ProgressWheel.vue:43`, `ProjectCard.vue:22`, `CollectionCard.vue:23`, `ProjectSectionItem.vue:229`.
+- ⬜ **Vuelidate** : remplacer la validation manuelle des forms — change le fonctionnement, hors lot iso-fonctionnel. **Reporté.**
+- ✅ **Calls API via les stores** : audit fait. Seuls 3 appels directs subsistent dans un composant — `ProjectSettings.vue:92` (`deleteProject`), `ProjectList.vue:35/43` (`getProjectList`/`createProject`) — et tous portent sur la liste ou la suppression, hors périmètre des stores (qui ne gèrent que `currentProject`/`currentCollection`). Rien à corriger.
+- ✅ **Getters Pinia « completed tasks »** : le prédicat « terminée » était réécrit 7 fois dans 4 fichiers, et l'aplatissement projet+sections 3 fois sous deux orthographes (`concat(...map())` vs `concat(map().flat())`). Factorisé dans `src/utils/task.utils.ts` : `filterCompleted()`, `filterUncompleted()`, `flattenProjectTasks()`, consommés par `project.store.ts`, `collection.store.ts`, `ProjectSectionItem.vue` et `DailyUpdateProjectListItem.vue`. Le préfixe `filter` est imposé par `no-shadow` (le nom `completed` entre en collision avec les déstructurations de tâche existantes).
+- ✅ **Bug latent corrigé** `src/store/project.store.ts:117` : `{ ...this.currentProject, ...response }` — le spread manquant créait une clé littérale `response` au lieu de fusionner.
 - ✅ **Bug latent corrigé** `src/views/components/event/EventDialog.vue` : `emit('update', { id: eventToSubmit.id, … })` utilisait le mauvais id — corrigé en `emit('update', { id: event.id, ... })` avec la réécriture des date/time pickers (§1.8/§3.10).
 
 </details>

@@ -3,7 +3,12 @@ import { SectionPost, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { isPassed, sortEvents } from '@/utils/event.utils'
 import { ProjectDetail, ProjectPatch } from '@/models/project.model'
-import { sortByCompletionDate } from '@/utils/task.utils'
+import {
+  filterCompleted,
+  filterUncompleted,
+  flattenProjectTasks,
+  sortByCompletionDate,
+} from '@/utils/task.utils'
 import { defineStore } from 'pinia'
 import { eventApi, projectApi, sectionApi, taskApi } from '@/api'
 
@@ -58,23 +63,19 @@ export const useProjectStore = defineStore<
     },
     completedTasks(state): Task[] {
       if (!state.currentProject) return []
-      return state.currentProject.tasks.filter(({ completed }) => completed)
+      return filterCompleted(state.currentProject.tasks)
     },
     uncompletedTasks(state): Task[] {
       if (!state.currentProject) return []
-      return state.currentProject.tasks.filter(({ completed }) => !completed)
+      return filterUncompleted(state.currentProject.tasks)
     },
     allTasks(state): Task[] {
       if (!state.currentProject) return []
-      return state.currentProject.tasks.concat(
-        ...state.currentProject.sections.map(({ tasks }) => tasks)
-      )
+      return flattenProjectTasks(state.currentProject)
     },
     allCompletedTasks(state): Task[] {
       if (!state.currentProject) return []
-      return state.currentProject.tasks
-        .concat(...state.currentProject.sections.map(({ tasks }) => tasks))
-        .filter(({ completed }) => completed)
+      return filterCompleted(flattenProjectTasks(state.currentProject))
     },
     comingEvents(state): EventModel[] {
       if (!state.currentProject) return []

@@ -6,20 +6,21 @@ store n'est **pas** la voie par défaut d'accès aux données : la majorité des
 
 ## Inventaire
 
-| Store | Fichier | État | Rôle |
-|---|---|---|---|
-| `app` | `src/store/app.store.ts` | — (sans état) | Orchestration : `init()` / `exit()` |
-| `user` | `src/store/user.store.ts` | `user?: User` | Utilisateur connecté |
-| `preferences` | `src/store/preferences.store.ts` | `preferences?: Preferences` | Préférences UI |
-| `project` | `src/store/project.store.ts` | `currentProject?: ProjectDetail` | Agrégat de la page détail projet (8 getters dérivés) |
-| `collection` | `src/store/collection.store.ts` | `currentCollection?: CollectionDetail` | Idem pour une collection |
-| `auth` | `src/store/auth.store.ts` | — | **CODE MORT** — voir ci-dessous |
+| Store         | Fichier                          | État                                   | Rôle                                                 |
+| ------------- | -------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| `app`         | `src/store/app.store.ts`         | — (sans état)                          | Orchestration : `init()` / `exit()`                  |
+| `user`        | `src/store/user.store.ts`        | `user?: User`                          | Utilisateur connecté                                 |
+| `preferences` | `src/store/preferences.store.ts` | `preferences?: Preferences`            | Préférences UI                                       |
+| `project`     | `src/store/project.store.ts`     | `currentProject?: ProjectDetail`       | Agrégat de la page détail projet (8 getters dérivés) |
+| `collection`  | `src/store/collection.store.ts`  | `currentCollection?: CollectionDetail` | Idem pour une collection                             |
+| `auth`        | `src/store/auth.store.ts`        | —                                      | **CODE MORT** — voir ci-dessous                      |
 
 ## Règle : store ou appel direct ?
 
 Règle de fait, dérivée du code (27 composants appellent `@/api` en direct) :
 
 **Un store existe uniquement pour :**
+
 1. les **agrégats de page détail** qu'il faut muter par morceaux depuis plusieurs composants
    enfants (`currentProject`, `currentCollection` : ajout/édition/suppression de tâches,
    sections, événements depuis des sous-composants) ;

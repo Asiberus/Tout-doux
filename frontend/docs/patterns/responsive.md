@@ -11,21 +11,21 @@ aucune erreur ni avertissement. Ce piège a cassé toute la responsivité des di
 const { xs, smAndDown, mdAndUp } = useDisplay()
 ```
 
-| Contexte | Écriture | Pourquoi |
-|---|---|---|
-| `<script>` (computed, fonctions) | `xs.value` | c'est un `Ref` |
-| `<template>` | `xs` | Vue déballe les refs de premier niveau du setup |
+| Contexte                         | Écriture   | Pourquoi                                        |
+| -------------------------------- | ---------- | ----------------------------------------------- |
+| `<script>` (computed, fonctions) | `xs.value` | c'est un `Ref`                                  |
+| `<template>`                     | `xs`       | Vue déballe les refs de premier niveau du setup |
 
 **À ne jamais faire :**
 
 ```ts
 // ❌ display.xs est un objet Ref imbriqué dans un objet NON réactif
 const display = useDisplay()
-if (display.smAndDown) return null   // TOUJOURS vrai — un Ref est truthy
+if (display.smAndDown) return null // TOUJOURS vrai — un Ref est truthy
 ```
 
 En template, `display.xs` n'est pas déballé non plus (ref imbriqué) : le binding reçoit l'objet
-`Ref`, donc *truthy*.
+`Ref`, donc _truthy_.
 
 > **Preuve historique** : `src/utils/dialog.utils.ts#getDialogWidth()` (fichier **supprimé
 > depuis**) retournait de ce fait **toujours `null`** — tous les dialogs étaient en plein écran
@@ -43,13 +43,13 @@ Vuetify 4 a **réduit** les seuils par défaut par rapport à Vuetify 3, et le p
 les nouveaux tels quels** (aucun `display.thresholds` dans `src/plugins/vuetify.ts`) :
 
 | Breakpoint | Seuil V4 (actuel) | Seuil V3 (avant) |
-|---|---|---|
-| `xs` | 0 | 0 |
-| `sm` | 600 | 600 |
-| `md` | **840** | 960 |
-| `lg` | **1145** | 1280 |
-| `xl` | **1545** | 1920 |
-| `xxl` | **2138** | 2560 |
+| ---------- | ----------------- | ---------------- |
+| `xs`       | 0                 | 0                |
+| `sm`       | 600               | 600              |
+| `md`       | **840**           | 960              |
+| `lg`       | **1145**          | 1280             |
+| `xl`       | **1545**          | 1920             |
+| `xxl`      | **2138**          | 2560             |
 
 **Conséquence à garder en tête** : tout basculement de layout arrive **plus tôt** qu'avant. Une
 largeur entre 1145 et 1280 px, par exemple, est passée de `mdAndDown` à `lgAndUp` — ce qui a

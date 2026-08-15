@@ -19,20 +19,20 @@ models ◄── utils ── axios ──► api ──► store ──► serv
                              composables (aucune dépendance interne)
 ```
 
-| Couche | Rôle | Importe |
-|---|---|---|
-| `config/` | Lecture de la config runtime (balises `<meta>`) | — |
-| `models/` | Interfaces du contrat d'API, écrites à la main | — |
-| `utils/` | Fonctions pures de domaine (tri, prédicats temporels) | `models` |
-| `axios/` | Transport : instance + intercepteurs + wrapper `http` typé | `config`, `services`, `router` |
-| `api/` | Une fonction fine par endpoint | `axios`, `models` |
-| `store/` | État partagé Pinia | `api`, `models`, `services`, `utils` |
-| `services/` | Orchestration transverse — **`auth` uniquement** | `api`, `models`, `store` |
-| `router/` | Routes, guards, points d'entrée | `layout`, `views`, `services`, `store` |
-| `layout/` | Coquilles applicatives (navbar, header) | `config`, `services`, `store` |
-| `components/` | Composants partagés globalement | `api`, `composables`, `models`, `utils` |
-| `views/` | Features (9 zones) + composants partagés par domaine | tout sauf `axios`, `config`, `router` |
-| `composables/` | Un seul fichier, `useDialogWidth` | — |
+| Couche         | Rôle                                                       | Importe                                 |
+| -------------- | ---------------------------------------------------------- | --------------------------------------- |
+| `config/`      | Lecture de la config runtime (balises `<meta>`)            | —                                       |
+| `models/`      | Interfaces du contrat d'API, écrites à la main             | —                                       |
+| `utils/`       | Fonctions pures de domaine (tri, prédicats temporels)      | `models`                                |
+| `axios/`       | Transport : instance + intercepteurs + wrapper `http` typé | `config`, `services`, `router`          |
+| `api/`         | Une fonction fine par endpoint                             | `axios`, `models`                       |
+| `store/`       | État partagé Pinia                                         | `api`, `models`, `services`, `utils`    |
+| `services/`    | Orchestration transverse — **`auth` uniquement**           | `api`, `models`, `store`                |
+| `router/`      | Routes, guards, points d'entrée                            | `layout`, `views`, `services`, `store`  |
+| `layout/`      | Coquilles applicatives (navbar, header)                    | `config`, `services`, `store`           |
+| `components/`  | Composants partagés globalement                            | `api`, `composables`, `models`, `utils` |
+| `views/`       | Features (9 zones) + composants partagés par domaine       | tout sauf `axios`, `config`, `router`   |
+| `composables/` | Un seul fichier, `useDialogWidth`                          | —                                       |
 
 ## Règles
 
@@ -73,7 +73,7 @@ vérifie — ni au commit, ni en CI. Voir [../workflows/verification.md](../work
 - **Pas de génération de types depuis le backend** — voir
   [../adr/0003-hand-written-api-models.md](../adr/0003-hand-written-api-models.md).
 - **Pas de normalisation snake_case ↔ camelCase.** Les corps de requête/réponse sont en
-  camelCase, mais certains *query params* sont en snake_case (`exclude_ids`, `start_date`).
+  camelCase, mais certains _query params_ sont en snake_case (`exclude_ids`, `start_date`).
   C'est le contrat backend tel quel, assumé sans couche de transformation.
 - **Pas de lazy loading de routes** — voir [routing.md](routing.md).
 

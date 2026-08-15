@@ -5,11 +5,11 @@ placement explicite ; le thème est étendu de couleurs **métier** (pas seuleme
 
 ## Trois niveaux de composants
 
-| Niveau | Emplacement | Critère | Exemples |
-|---|---|---|---|
-| **Global** | `src/components/` (15) | Réutilisable **sans connaissance du domaine**, ou chip/avatar d'entité utilisé partout | `ConfirmDialog`, `HalfDialog`, `EmptyListDisplay`, `FilterChip`, `ProgressWheel`, `MainTitle`, `ProjectChip` |
-| **Partagé par domaine** | `src/views/components/<domaine>/` (13) | Lié à une entité, consommé par **≥ 2 features** | `task/TaskCard`, `event/EventDialog`, `tag/TagGroup`, `common-task/CommonTaskCard` |
-| **Local à une feature** | `src/views/<feature>/components/` | Utilisé par une seule feature | `daily/components/DailyTaskCard`, `project/project-detail/components/ProjectSectionItem` |
+| Niveau                  | Emplacement                            | Critère                                                                                | Exemples                                                                                                     |
+| ----------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Global**              | `src/components/` (15)                 | Réutilisable **sans connaissance du domaine**, ou chip/avatar d'entité utilisé partout | `ConfirmDialog`, `HalfDialog`, `EmptyListDisplay`, `FilterChip`, `ProgressWheel`, `MainTitle`, `ProjectChip` |
+| **Partagé par domaine** | `src/views/components/<domaine>/` (13) | Lié à une entité, consommé par **≥ 2 features**                                        | `task/TaskCard`, `event/EventDialog`, `tag/TagGroup`, `common-task/CommonTaskCard`                           |
+| **Local à une feature** | `src/views/<feature>/components/`      | Utilisé par une seule feature                                                          | `daily/components/DailyTaskCard`, `project/project-detail/components/ProjectSectionItem`                     |
 
 > **Nouveau composant** : commencer local. Le promouvoir vers `views/components/<domaine>/` au
 > 2ᵉ consommateur hors de sa feature, vers `src/components/` seulement s'il perd toute
@@ -26,21 +26,21 @@ l'app (0 `useTheme` dans `src/`) : le thème `light` est déclaré mais **inatte
 
 Table **maintenue à la main** — la mettre à jour à tout ajout/suppression de couleur.
 
-| Token | Valeur | Rôle | Utilisé ? |
-|---|---|---|---|
-| `primary` | `#ee44aa` | Accent principal (défaut de `VSwitch`) | oui |
-| `secondary` | `#424242` | Bordures, fonds neutres | oui |
-| `accent` | `#82B1FF` | Sélection, onglets actifs | oui |
-| `project` / `antiProject` | `#004D40` / `#99b7b2` | Fond / texte d'un avatar de projet | oui |
-| `projectArchived` / `antiProjectArchived` | `#82B1FF` / `#d9e7ff` | Idem, projet archivé | oui |
-| `projectArchivedCard` / `collectionArchived` | `#363e4d` | Fond de carte archivée | oui |
-| `collection` | `#827717` | Identité visuelle collection | oui |
-| `event` | `#009688` | Événement à venir | oui |
-| `passedEvent` | `#191919` | Événement passé | oui |
-| `taskCompleted` | `#497549` | — | **non — token mort** |
-| `taskInCreation` | `#181b1f` | — | **non — token mort** |
-| `info` / `success` / `warning` | — | Standard Vuetify | oui |
-| `error` | `#FF5252` | **Déclaré dans `light` uniquement** → le thème `dark` utilise le défaut Vuetify | incohérence |
+| Token                                        | Valeur                | Rôle                                                                            | Utilisé ?            |
+| -------------------------------------------- | --------------------- | ------------------------------------------------------------------------------- | -------------------- |
+| `primary`                                    | `#ee44aa`             | Accent principal (défaut de `VSwitch`)                                          | oui                  |
+| `secondary`                                  | `#424242`             | Bordures, fonds neutres                                                         | oui                  |
+| `accent`                                     | `#82B1FF`             | Sélection, onglets actifs                                                       | oui                  |
+| `project` / `antiProject`                    | `#004D40` / `#99b7b2` | Fond / texte d'un avatar de projet                                              | oui                  |
+| `projectArchived` / `antiProjectArchived`    | `#82B1FF` / `#d9e7ff` | Idem, projet archivé                                                            | oui                  |
+| `projectArchivedCard` / `collectionArchived` | `#363e4d`             | Fond de carte archivée                                                          | oui                  |
+| `collection`                                 | `#827717`             | Identité visuelle collection                                                    | oui                  |
+| `event`                                      | `#009688`             | Événement à venir                                                               | oui                  |
+| `passedEvent`                                | `#191919`             | Événement passé                                                                 | oui                  |
+| `taskCompleted`                              | `#497549`             | —                                                                               | **non — token mort** |
+| `taskInCreation`                             | `#181b1f`             | —                                                                               | **non — token mort** |
+| `info` / `success` / `warning`               | —                     | Standard Vuetify                                                                | oui                  |
+| `error`                                      | `#FF5252`             | **Déclaré dans `light` uniquement** → le thème `dark` utilise le défaut Vuetify | incohérence          |
 
 Les tâches complétées utilisent la palette Material générique (`green-darken-2`) et non
 `taskCompleted`. Voir [../patterns/styling.md](../patterns/styling.md) pour la conséquence
@@ -63,10 +63,10 @@ défaut. Un `variant` local **écrase** le défaut (`Feedback.vue` utilise volon
 
 `src/styles/` contient deux fichiers, avec des rôles distincts :
 
-| Fichier | Rôle | Chargé par |
-|---|---|---|
+| Fichier         | Rôle                                                                                     | Chargé par                                    |
+| --------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------- |
 | `settings.scss` | **Variables Sass Vuetify** (`@use 'vuetify/settings' with (...)`) — compilé dans Vuetify | `vite.config.ts` (option `styles.configFile`) |
-| `global.scss` | Classes utilitaires maison + overrides de composants Vuetify | `App.vue` |
+| `global.scss`   | Classes utilitaires maison + overrides de composants Vuetify                             | `App.vue`                                     |
 
 Ce qui vit dans `global.scss` : le reset des marges `h1`-`h6`/`p` (dans
 `@layer vuetify-core.reset`), les utilitaires `gap-*`, `cursor-*`, `opacity-60`, `text-link`,

@@ -13,20 +13,20 @@ Consommateurs : agenda (`views/agenga/Agenda.vue`), onglet événements d'un pro
 `startDate` est le **seul champ temporel obligatoire**. Tous sont des `string` :
 `'YYYY-MM-DD'` pour les dates, `'HH:mm'` (24 h) pour les heures.
 
-| Champ | Rôle |
-|---|---|
-| `startDate` | requis |
-| `startTime`, `endDate`, `endTime` | optionnels |
-| `takesWholeDay` | booléen — « toute la journée » |
+| Champ                             | Rôle                           |
+| --------------------------------- | ------------------------------ |
+| `startDate`                       | requis                         |
+| `startTime`, `endDate`, `endTime` | optionnels                     |
+| `takesWholeDay`                   | booléen — « toute la journée » |
 
 ## Combinaisons autorisées par le formulaire
 
-| Forme | Contrainte imposée par `EventDialog` |
-|---|---|
-| Journée entière | `takesWholeDay: true` **efface et désactive** `startTime`, `endDate`, `endTime` → il ne reste que `startDate` |
-| Événement horaire sur un jour (`startDate === endDate`) | `startTime` **et** `endTime` deviennent **requis** |
-| Événement sur plusieurs jours | `endDate` doit être **strictement après** `startDate` (comparaison date+heure, `'00:00'` par défaut) |
-| — | `endTime` est désactivé tant que `endDate` est vide → **pas d'heure de fin sans date de fin** |
+| Forme                                                   | Contrainte imposée par `EventDialog`                                                                          |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Journée entière                                         | `takesWholeDay: true` **efface et désactive** `startTime`, `endDate`, `endTime` → il ne reste que `startDate` |
+| Événement horaire sur un jour (`startDate === endDate`) | `startTime` **et** `endTime` deviennent **requis**                                                            |
+| Événement sur plusieurs jours                           | `endDate` doit être **strictement après** `startDate` (comparaison date+heure, `'00:00'` par défaut)          |
+| —                                                       | `endTime` est désactivé tant que `endDate` est vide → **pas d'heure de fin sans date de fin**                 |
 
 À la soumission, les chaînes vides sont normalisées en `null` (`EventPostOrPatch` déclare ces
 champs `string | null`).

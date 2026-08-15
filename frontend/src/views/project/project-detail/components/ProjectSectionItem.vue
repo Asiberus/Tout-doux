@@ -8,6 +8,7 @@ import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { filterCompleted, filterUncompleted } from '@/utils/task.utils'
 import { computed, ref } from 'vue'
 import { usePreferencesStore, useProjectStore } from '@/store'
 import { useDisplay } from 'vuetify'
@@ -30,13 +31,9 @@ const taskDialog = ref(false)
 const sectionDialog = ref(false)
 const displayCompletedTask = ref(false)
 
-const completedTasks = computed<Task[]>(() =>
-  props.section.tasks.filter(({ completed }) => completed)
-)
+const completedTasks = computed<Task[]>(() => filterCompleted(props.section.tasks))
 
-const uncompletedTasks = computed<Task[]>(() =>
-  props.section.tasks.filter(({ completed }) => !completed)
-)
+const uncompletedTasks = computed<Task[]>(() => filterUncompleted(props.section.tasks))
 
 const completedTasksPercentage = computed<number>(() => {
   if (props.section.tasks.length === 0) return 0

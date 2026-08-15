@@ -14,13 +14,13 @@
 
 2. **Déclarer/étendre les modèles** dans `src/models/<domaine>.model.ts`. Convention dominante :
 
-   | Type | Rôle |
-   |---|---|
-   | `XPost` | Corps de création (champs requis) |
-   | `XPatch` | Corps de mise à jour (tous optionnels) |
-   | `X` | Modèle de lecture de base |
-   | `XList` | `extends X` + compteurs pour les vues liste |
-   | `XDetail` | `extends X` + collections imbriquées |
+   | Type      | Rôle                                        |
+   | --------- | ------------------------------------------- |
+   | `XPost`   | Corps de création (champs requis)           |
+   | `XPatch`  | Corps de mise à jour (tous optionnels)      |
+   | `X`       | Modèle de lecture de base                   |
+   | `XList`   | `extends X` + compteurs pour les vues liste |
+   | `XDetail` | `extends X` + collections imbriquées        |
 
 3. **Écrire la fonction** dans `src/api/<domaine>.api.ts` — fonction libre, type de retour
    explicite, générique sur l'appel `http`, aucun `try`/`catch` :
@@ -73,16 +73,16 @@
 
 À **ne pas imiter** — ce sont des incohérences historiques, pas des modèles :
 
-| Écart | Où | Convention correcte |
-|---|---|---|
-| Type de params inline au lieu d'un modèle | `auth.api.ts:19` (`login`) | `LoginPost` existe déjà |
-| Interfaces de params déclarées dans `api/` | `common-task.api.ts:7`, `tag.api.ts:7,13`, `user.api.ts:13` | Les types vivent dans `src/models/` |
-| Suffixe `*Body`/`*Response` | tout `auth.model.ts` | `*Post`/`*Patch` |
-| `*Form` unique pour create+update | `tag.model.ts:10`, `common-task.model.ts:9` | `*Post` + `*Patch` séparés |
-| Corps construit depuis un primitif | `feedback.api.ts:14` (`setFeedbackReadProperty`) | Un `FeedbackPatch` |
-| PATCH envoyant le modèle de lecture complet | `preferences.api.ts:9` | Un `PreferencesPatch` |
-| Params en `snake_case` vs `camelCase` | `exclude_ids` (tag) vs `excludeId` (user) | Suivre le backend, mais vérifier : un nom erroné est ignoré **silencieusement** |
-| Import profond au lieu du barrel | `CommonTaskDialog.vue:5`, `TagDialog.vue:5` | `from '@/api'` |
+| Écart                                       | Où                                                          | Convention correcte                                                             |
+| ------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Type de params inline au lieu d'un modèle   | `auth.api.ts:19` (`login`)                                  | `LoginPost` existe déjà                                                         |
+| Interfaces de params déclarées dans `api/`  | `common-task.api.ts:7`, `tag.api.ts:7,13`, `user.api.ts:13` | Les types vivent dans `src/models/`                                             |
+| Suffixe `*Body`/`*Response`                 | tout `auth.model.ts`                                        | `*Post`/`*Patch`                                                                |
+| `*Form` unique pour create+update           | `tag.model.ts:10`, `common-task.model.ts:9`                 | `*Post` + `*Patch` séparés                                                      |
+| Corps construit depuis un primitif          | `feedback.api.ts:14` (`setFeedbackReadProperty`)            | Un `FeedbackPatch`                                                              |
+| PATCH envoyant le modèle de lecture complet | `preferences.api.ts:9`                                      | Un `PreferencesPatch`                                                           |
+| Params en `snake_case` vs `camelCase`       | `exclude_ids` (tag) vs `excludeId` (user)                   | Suivre le backend, mais vérifier : un nom erroné est ignoré **silencieusement** |
+| Import profond au lieu du barrel            | `CommonTaskDialog.vue:5`, `TagDialog.vue:5`                 | `from '@/api'`                                                                  |
 
 Nommage : `updateTaskById` / `updateEventById` cohabitent avec `updateProject` / `updateTag`
 pour la même sémantique. Aucune des deux formes n'est « la bonne » — suivre celle du domaine

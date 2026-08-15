@@ -12,8 +12,8 @@ l'activation du bouton de soumission.
    import { Form } from '@/models/common.model'
 
    const form = ref<Form<UserPatch>>({
-     valid: false,        // écrit par v-form via v-model
-     pending: false,      // requête en cours (optionnel)
+     valid: false, // écrit par v-form via v-model
+     pending: false, // requête en cours (optionnel)
      data: { username: '', firstName: '' },
      rules: {
        username: [
@@ -57,7 +57,7 @@ l'activation du bouton de soumission.
 ## Appeler `validate()` — asynchrone
 
 En Vuetify 3+, `v-form.validate()` renvoie une **`Promise`**. Tester sa valeur de retour
-directement ne bloque **jamais** (une promesse est toujours *truthy*) :
+directement ne bloque **jamais** (une promesse est toujours _truthy_) :
 
 ```ts
 // ❌ ne bloque rien

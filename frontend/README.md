@@ -17,13 +17,13 @@ yarn dev      # serveur de dev sur http://localhost:3000
 Un backend doit être accessible — par défaut `http://localhost:8000/`, configuré dans une balise
 `<meta>` de `index.html` et **non** dans un `.env`.
 
-| Commande | Effet |
-|---|---|
-| `yarn dev` | Serveur de développement (port 3000) |
-| `yarn build` | Build de production dans `dist/` — **ne vérifie pas les types** |
-| `yarn type-check` | `vue-tsc --noEmit` |
-| `yarn lint` | `eslint --fix` |
-| `yarn format` | `prettier --write` |
+| Commande          | Effet                                                           |
+| ----------------- | --------------------------------------------------------------- |
+| `yarn dev`        | Serveur de développement (port 3000)                            |
+| `yarn build`      | Build de production dans `dist/` — **ne vérifie pas les types** |
+| `yarn type-check` | `vue-tsc --noEmit`                                              |
+| `yarn lint`       | `eslint --fix`                                                  |
+| `yarn format`     | `prettier --write`                                              |
 
 Détail, configuration Docker et pièges :
 [docs/workflows/development.md](docs/workflows/development.md).
@@ -32,14 +32,14 @@ Détail, configuration Docker et pièges :
 
 Toute la documentation de référence est dans **[`docs/`](docs/)** :
 
-| Pour… | Aller à |
-|---|---|
-| Comprendre l'organisation du code | [docs/architecture/overview.md](docs/architecture/overview.md) |
-| Comprendre le vocabulaire métier | [docs/domain/glossary.md](docs/domain/glossary.md) |
-| Ajouter un endpoint, un dialog, un formulaire | [docs/patterns/](docs/patterns/) |
-| Savoir ce qui est vérifié avant un commit | [docs/workflows/verification.md](docs/workflows/verification.md) |
-| Savoir ce qui est cassé ou risqué | [docs/quality/](docs/quality/) |
-| Comprendre pourquoi un choix a été fait | [docs/adr/](docs/adr/) |
+| Pour…                                         | Aller à                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| Comprendre l'organisation du code             | [docs/architecture/overview.md](docs/architecture/overview.md)   |
+| Comprendre le vocabulaire métier              | [docs/domain/glossary.md](docs/domain/glossary.md)               |
+| Ajouter un endpoint, un dialog, un formulaire | [docs/patterns/](docs/patterns/)                                 |
+| Savoir ce qui est vérifié avant un commit     | [docs/workflows/verification.md](docs/workflows/verification.md) |
+| Savoir ce qui est cassé ou risqué             | [docs/quality/](docs/quality/)                                   |
+| Comprendre pourquoi un choix a été fait       | [docs/adr/](docs/adr/)                                           |
 
 Le contrat de maintenance de cette doc (quand créer ou mettre à jour quoi) est dans
 [docs/README.md](docs/README.md).

@@ -6,12 +6,12 @@ un comportement responsive et un scroll incohérents.
 
 ## Choisir la brique
 
-| Besoin | Utiliser | Fichier |
-|---|---|---|
-| Formulaire de création/édition | `v-dialog` + `useDialogWidth` | pattern ci-dessous |
-| Demander une confirmation | `ConfirmDialog` | `src/components/ConfirmDialog.vue` |
-| Confirmer par mot de passe (action sensible) | `ConfirmPasswordDialog` | `src/components/ConfirmPasswordDialog.vue` |
-| Panneau latéral (détail contextuel) | `HalfDialog` | `src/components/HalfDialog.vue` |
+| Besoin                                       | Utiliser                      | Fichier                                    |
+| -------------------------------------------- | ----------------------------- | ------------------------------------------ |
+| Formulaire de création/édition               | `v-dialog` + `useDialogWidth` | pattern ci-dessous                         |
+| Demander une confirmation                    | `ConfirmDialog`               | `src/components/ConfirmDialog.vue`         |
+| Confirmer par mot de passe (action sensible) | `ConfirmPasswordDialog`       | `src/components/ConfirmPasswordDialog.vue` |
+| Panneau latéral (détail contextuel)          | `HalfDialog`                  | `src/components/HalfDialog.vue`            |
 
 ## Recette — dialog de formulaire
 
@@ -23,7 +23,7 @@ un comportement responsive et un scroll incohérents.
    ```
 
    ```html
-   <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
+   <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen"></v-dialog>
    ```
 
    `dialogWidth` vaut `undefined` (= plein écran) en `smAndDown`, `'80%'` en `mdAndDown`, `'60%'`

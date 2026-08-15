@@ -11,15 +11,15 @@
 
 ## Commandes
 
-| Commande | Effet | Remarque |
-|---|---|---|
-| `yarn` | Installe les dépendances | |
-| `yarn dev` | Serveur Vite, port **3000**, host exposé | |
-| `yarn build` | Build de production dans `dist/` | **ne vérifie aucun type** |
-| `yarn type-check` | `vue-tsc --noEmit` | ne bloque rien, voir [verification.md](verification.md) |
-| `yarn lint` | `eslint --fix` | |
-| `yarn format` | `prettier --write` | |
-| `yarn serve` | Prévisualise le build | ⚠️ pas le serveur de dev |
+| Commande          | Effet                                    | Remarque                                                |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------- |
+| `yarn`            | Installe les dépendances                 |                                                         |
+| `yarn dev`        | Serveur Vite, port **3000**, host exposé |                                                         |
+| `yarn build`      | Build de production dans `dist/`         | **ne vérifie aucun type**                               |
+| `yarn type-check` | `vue-tsc --noEmit`                       | ne bloque rien, voir [verification.md](verification.md) |
+| `yarn lint`       | `eslint --fix`                           |                                                         |
+| `yarn format`     | `prettier --write`                       |                                                         |
+| `yarn serve`      | Prévisualise le build                    | ⚠️ pas le serveur de dev                                |
 
 Docker (depuis `frontend/`, utilise les fichiers du monorepo parent) :
 `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.

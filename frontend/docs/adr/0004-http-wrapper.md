@@ -41,7 +41,7 @@ export const http = {
 - **Une classe `ApiClient` injectable** — écarté : le projet n'utilise aucune injection de
   dépendances, et aucun besoin de mock (il n'y a pas de tests).
 - **Ajouter la gestion d'erreur dans le wrapper** — délibérément **non fait** : `http` reste un
-  wrapper *mince*. La seule erreur traitée globalement est le 401, dans l'intercepteur.
+  wrapper _mince_. La seule erreur traitée globalement est le 401, dans l'intercepteur.
 
 ## Conséquences
 

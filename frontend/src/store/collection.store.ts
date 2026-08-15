@@ -1,6 +1,6 @@
 import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
-import { sortByCompletionDate } from '@/utils/task.utils'
+import { filterCompleted, filterUncompleted, sortByCompletionDate } from '@/utils/task.utils'
 import { defineStore } from 'pinia'
 import { collectionApi, taskApi } from '@/api'
 
@@ -37,11 +37,11 @@ export const useCollectionStore = defineStore<
   getters: {
     completedTasks(state: CollectionStoreState): Task[] {
       if (!state.currentCollection) return []
-      return state.currentCollection.tasks.filter(({ completed }) => completed)
+      return filterCompleted(state.currentCollection.tasks)
     },
     uncompletedTasks(state: CollectionStoreState): Task[] {
       if (!state.currentCollection) return []
-      return state.currentCollection.tasks.filter(({ completed }) => !completed)
+      return filterUncompleted(state.currentCollection.tasks)
     },
     loadedCollection(state): CollectionDetail {
       if (!state.currentCollection)

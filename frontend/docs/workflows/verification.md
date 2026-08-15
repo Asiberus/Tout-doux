@@ -4,14 +4,14 @@
 
 ## Ce qui est réellement contrôlé
 
-| Contrôle | Où | Bloquant ? |
-|---|---|---|
-| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged` | ✅ **oui** |
-| `prettier --write` | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate) |
-| Message de commit conventionnel | hook `commit-msg` → `commitlint` | ✅ oui |
-| `vue-tsc` (`yarn type-check`) | — | ❌ **non** — nulle part |
-| Tests | — | ❌ **aucun test n'existe** |
-| CI | `.github/workflows/deployment.yml` | ❌ déploiement **manuel** (`workflow_dispatch`), aucun contrôle qualité |
+| Contrôle                                         | Où                                                          | Bloquant ?                                                              |
+| ------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged`                           | ✅ **oui**                                                              |
+| `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                                                      |
+| Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                                                  |
+| `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — nulle part                                                 |
+| Tests                                            | —                                                           | ❌ **aucun test n'existe**                                              |
+| CI                                               | `.github/workflows/deployment.yml`                          | ❌ déploiement **manuel** (`workflow_dispatch`), aucun contrôle qualité |
 
 **Le hook pre-commit est le seul garde-fou automatique du projet.** Il est fonctionnel (testé),
 même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de husky v8
@@ -25,7 +25,7 @@ même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de husky v8
 
 1. `yarn type-check`
    **État actuel : 28 erreurs préexistantes.** Ce n'est pas 0, donc le critère utile est
-   *« mon changement n'en ajoute pas »*. Comparer avant/après :
+   _« mon changement n'en ajoute pas »_. Comparer avant/après :
 
    ```sh
    yarn type-check 2>&1 | grep -c "error TS"

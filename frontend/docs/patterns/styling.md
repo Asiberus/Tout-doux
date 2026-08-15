@@ -7,13 +7,13 @@ surcharger.
 
 ## Où écrire un style
 
-| Portée | Emplacement | Notes |
-|---|---|---|
-| Un seul composant | `<style scoped lang="scss">` du SFC | Le cas par défaut |
-| Interne d'un composant Vuetify enfant | `:deep(.v-xxx)` dans le SFC | ⚠️ voir le piège ci-dessous |
-| Utilitaire réutilisable | `src/styles/global.scss` | `gap-*`, `cursor-*`, `text-link`… |
-| Variable Sass Vuetify | `src/styles/settings.scss` | Compilé **dans** Vuetify |
-| Couleur métier | `theme.themes.dark.colors` de `src/plugins/vuetify.ts` | Voir tokens ci-dessous |
+| Portée                                | Emplacement                                            | Notes                             |
+| ------------------------------------- | ------------------------------------------------------ | --------------------------------- |
+| Un seul composant                     | `<style scoped lang="scss">` du SFC                    | Le cas par défaut                 |
+| Interne d'un composant Vuetify enfant | `:deep(.v-xxx)` dans le SFC                            | ⚠️ voir le piège ci-dessous       |
+| Utilitaire réutilisable               | `src/styles/global.scss`                               | `gap-*`, `cursor-*`, `text-link`… |
+| Variable Sass Vuetify                 | `src/styles/settings.scss`                             | Compilé **dans** Vuetify          |
+| Couleur métier                        | `theme.themes.dark.colors` de `src/plugins/vuetify.ts` | Voir tokens ci-dessous            |
 
 ## Piège 1 — `:deep()` ne cible pas la racine du composant
 
@@ -23,10 +23,14 @@ ne matche jamais — un élément ne peut pas être son propre descendant.
 
 ```scss
 /* ❌ sans effet si la v-card est la racine du SFC */
-:deep(.v-card.caret) { overflow: visible; }
+:deep(.v-card.caret) {
+  overflow: visible;
+}
 
 /* ✅ sélecteur scoped normal → .v-card.caret[data-v-hash] */
-.v-card.caret { overflow: visible; }
+.v-card.caret {
+  overflow: visible;
+}
 ```
 
 `:deep()` est **réservé aux internes d'un composant enfant** (`:deep(.v-timeline-item__body)`,
@@ -40,8 +44,17 @@ il doit être **dans** un layer. Exemple réel, le reset des marges de titres da
 
 ```scss
 @layer vuetify-core.reset {
-  h1, h2, h3, h4, h5, h6 { margin: 0; }
-  p { margin: 0 0 16px; }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+  p {
+    margin: 0 0 16px;
+  }
 }
 ```
 
@@ -88,15 +101,15 @@ Vuetify 4 a renommé toutes les classes typographiques (MD2 → MD3). Les ancien
 (`text-h1`…`text-h6`, `text-subtitle-*`, `text-body-1|2`, `text-caption`, `text-overline`)
 **n'existent plus** et n'appliquent rien.
 
-| Ancien | Nouveau |
-|---|---|
-| `text-h2` / `text-h3` | `text-display-large` / `text-display-medium` |
+| Ancien                            | Nouveau                                                            |
+| --------------------------------- | ------------------------------------------------------------------ |
+| `text-h2` / `text-h3`             | `text-display-large` / `text-display-medium`                       |
 | `text-h4` / `text-h5` / `text-h6` | `text-headline-large` / `text-headline-small` / `text-title-large` |
-| `text-subtitle-1` / `text-body-1` | `text-body-large` |
-| `text-subtitle-2` | `text-title-small` |
-| `text-body-2` | `text-body-medium` |
-| `text-caption` | `text-body-small` |
-| `text-overline` | `text-label-medium` + `text-uppercase` |
+| `text-subtitle-1` / `text-body-1` | `text-body-large`                                                  |
+| `text-subtitle-2`                 | `text-title-small`                                                 |
+| `text-body-2`                     | `text-body-medium`                                                 |
+| `text-caption`                    | `text-body-small`                                                  |
+| `text-overline`                   | `text-label-medium` + `text-uppercase`                             |
 
 Les variantes responsive suivent la même convention (`text-sm-headline-large`). Pour les titres,
 préférer les composants `MainTitle` / `SecondaryTitle` / `TertiaryTitle`.

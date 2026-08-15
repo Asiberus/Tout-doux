@@ -38,7 +38,7 @@ Le token d'authentification **n'est pas** dans un store : il est géré exclusiv
   intégralement `auth.service.ts`, y compris une seconde constante `TOKEN_KEY`.
   **L'implémentation vivante est le service.** Le store mort reste à supprimer.
 
-*Rationale inféré* : aucun commit ne motive explicitement le périmètre ; il est déduit de la
+_Rationale inféré_ : aucun commit ne motive explicitement le périmètre ; il est déduit de la
 régularité du découpage (2 agrégats + 2 singletons, 27 appels directs).
 
 ## Conséquences

@@ -12,11 +12,11 @@ Deux écrans : le **wizard** (`daily-update`, préparer la journée) et le **ré
 
 Un `DailyTask` provient de l'une de ces trois sources, **exclusivement** :
 
-| Origine | Corps envoyé | Déclenché depuis |
-|---|---|---|
-| Une **Task** (projet ou collection) | `{ taskId }` | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47` |
-| Un **CommonTask** | `{ commonTaskId }` | `DailyUpdateCommonTask.vue:19` |
-| **Libre** (ad hoc) | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue` |
+| Origine                             | Corps envoyé               | Déclenché depuis                                                            |
+| ----------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
+| Une **Task** (projet ou collection) | `{ taskId }`               | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47` |
+| Un **CommonTask**                   | `{ commonTaskId }`         | `DailyUpdateCommonTask.vue:19`                                              |
+| **Libre** (ad hoc)                  | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue`                           |
 
 ⚠️ **Aucune validation n'existe.** `DailyTaskPost` a ses champs **tous optionnels** : un corps
 vide passe le typage, et un DailyTask sans origine rendrait un titre vide. L'invariant est
@@ -27,12 +27,12 @@ Logique dupliquée à l'identique dans `DailyTaskCard.vue:19` et `DailyTaskFormC
 
 ## Cycle de vie
 
-| Champ | Modifiable | Où |
-|---|---|---|
-| `action` | ✅ | wizard, chip éditable → `PATCH` immédiat |
-| `completed` | ✅ | **résumé uniquement** (dialog de détail) |
-| `name`, `tagIds` | ✅ mais **seulement pour un DailyTask libre** | wizard, menu « Edit » |
-| `date` | ❌ | absent de `DailyTaskPatch` — un DailyTask ne peut pas changer de jour |
+| Champ            | Modifiable                                    | Où                                                                    |
+| ---------------- | --------------------------------------------- | --------------------------------------------------------------------- |
+| `action`         | ✅                                            | wizard, chip éditable → `PATCH` immédiat                              |
+| `completed`      | ✅                                            | **résumé uniquement** (dialog de détail)                              |
+| `name`, `tagIds` | ✅ mais **seulement pour un DailyTask libre** | wizard, menu « Edit »                                                 |
+| `date`           | ❌                                            | absent de `DailyTaskPatch` — un DailyTask ne peut pas changer de jour |
 
 **Règle de séparation des écrans** : on **prépare** dans le wizard, on **exécute** dans le
 résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wizard.
@@ -42,11 +42,11 @@ résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wi
 Marqueur d'intention **pour la journée** — jamais porté par la Task ou le CommonTask. Codes
 courts côté API, libellés et couleurs mappés dans `src/utils/daily-task.utils.ts` :
 
-| Code | Libellé | Sens |
-|---|---|---|
-| `TH` | Think | juste y réfléchir aujourd'hui |
-| `WO` | Work | y travailler |
-| `FI` | Finish | la terminer |
+| Code | Libellé | Sens                          |
+| ---- | ------- | ----------------------------- |
+| `TH` | Think   | juste y réfléchir aujourd'hui |
+| `WO` | Work    | y travailler                  |
+| `FI` | Finish  | la terminer                   |
 
 `null` (« No action ») est une valeur légitime, c'est ainsi qu'on efface une action.
 ⚠️ `daily-task.utils.ts` **lève des chaînes de caractères**, pas des `Error`, sur un code inconnu.

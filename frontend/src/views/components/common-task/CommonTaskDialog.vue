@@ -119,11 +119,7 @@ function closeDialog(): void {
 </script>
 
 <template>
-  <v-dialog
-    :model-value="show"
-    :width="dialogWidth"
-    :fullscreen="dialogFullscreen"
-    @update:model-value="show = $event">
+  <v-dialog v-model="show" :width="dialogWidth" :fullscreen="dialogFullscreen">
     <template #activator="{ props }">
       <slot name="activator" :props="props"></slot>
     </template>

@@ -11,54 +11,54 @@ Elle sert aussi de **carte des features** (voir [../README.md](../README.md#feat
 
 ### Arbre authentifié — `src/router/index.ts:22`, modules dans `src/router/modules/`
 
-| Chemin | Nom | Vue | Props depuis la route |
-|---|---|---|---|
-| `/` | `home` | *(redirect → `daily-summary`)* | — |
-| `/daily/:date?` | `daily-summary` | `DailySummary.vue` | `date` |
-| `/daily/:date/update/:step(task\|event)` | `daily-update` | `DailyUpdate.vue` | `date`, `step` — **guard** `dailyUpdateGuard` |
-| `/project` | `project-list` | `ProjectList.vue` | `archived` (`query.archived === 'true'`) |
-| `/project/:id` | `project-detail` | `ProjectDescription.vue` | `projectId` (`parseInt`) |
-| `/project/:id/section/:sectionId?` | `project-detail-section` | `ProjectSection.vue` | `sectionId` (`parseInt`) |
-| `/project/:id/event` | `project-detail-event` | `ProjectEvent.vue` | — |
-| `/project/:id/settings` | `project-detail-settings` | `ProjectSettings.vue` | — |
-| `/collection` | `collection-list` | `CollectionList.vue` | `archived` |
-| `/collection/:id` | `collection-detail` | `CollectionGeneral.vue` | `collectionId` (`parseInt`) |
-| `/collection/:id/settings` | `collection-detail-settings` | `CollectionSettings.vue` | — |
-| `/agenda` | `agenda` | `views/agenga/Agenda.vue` ⚠️ dossier mal orthographié | — |
-| `/settings` | `settings-preferences` | `SettingsPreferences.vue` | — |
-| `/settings/common-tasks` | `settings-common-tasks` | `SettingsCommonTasks.vue` | — |
-| `/settings/tags` | `settings-tags` | `SettingsTags.vue` | — |
-| `/profile` | `profile-user` | `ProfileUser.vue` | — |
-| `/profile/email` | `profile-email` | `ProfileEmail.vue` | — |
-| `/profile/password` | `profile-password` | `ProfilePassword.vue` | — |
-| `/profile/account` | `profile-account` | `ProfileAccount.vue` | — |
-| `/administration/user-list` | `administration-user-list` | `AdministrationUser.vue` | — **guard** `adminGuard` (sur le parent) |
-| `/administration/feedback` | `administration-feedback` | `AdministrationFeedback.vue` | — **guard** `adminGuard` |
-| `/feedback` | `feedback` | `views/feedback/Feedback.vue` | — |
+| Chemin                                   | Nom                          | Vue                                                   | Props depuis la route                         |
+| ---------------------------------------- | ---------------------------- | ----------------------------------------------------- | --------------------------------------------- |
+| `/`                                      | `home`                       | _(redirect → `daily-summary`)_                        | —                                             |
+| `/daily/:date?`                          | `daily-summary`              | `DailySummary.vue`                                    | `date`                                        |
+| `/daily/:date/update/:step(task\|event)` | `daily-update`               | `DailyUpdate.vue`                                     | `date`, `step` — **guard** `dailyUpdateGuard` |
+| `/project`                               | `project-list`               | `ProjectList.vue`                                     | `archived` (`query.archived === 'true'`)      |
+| `/project/:id`                           | `project-detail`             | `ProjectDescription.vue`                              | `projectId` (`parseInt`)                      |
+| `/project/:id/section/:sectionId?`       | `project-detail-section`     | `ProjectSection.vue`                                  | `sectionId` (`parseInt`)                      |
+| `/project/:id/event`                     | `project-detail-event`       | `ProjectEvent.vue`                                    | —                                             |
+| `/project/:id/settings`                  | `project-detail-settings`    | `ProjectSettings.vue`                                 | —                                             |
+| `/collection`                            | `collection-list`            | `CollectionList.vue`                                  | `archived`                                    |
+| `/collection/:id`                        | `collection-detail`          | `CollectionGeneral.vue`                               | `collectionId` (`parseInt`)                   |
+| `/collection/:id/settings`               | `collection-detail-settings` | `CollectionSettings.vue`                              | —                                             |
+| `/agenda`                                | `agenda`                     | `views/agenga/Agenda.vue` ⚠️ dossier mal orthographié | —                                             |
+| `/settings`                              | `settings-preferences`       | `SettingsPreferences.vue`                             | —                                             |
+| `/settings/common-tasks`                 | `settings-common-tasks`      | `SettingsCommonTasks.vue`                             | —                                             |
+| `/settings/tags`                         | `settings-tags`              | `SettingsTags.vue`                                    | —                                             |
+| `/profile`                               | `profile-user`               | `ProfileUser.vue`                                     | —                                             |
+| `/profile/email`                         | `profile-email`              | `ProfileEmail.vue`                                    | —                                             |
+| `/profile/password`                      | `profile-password`           | `ProfilePassword.vue`                                 | —                                             |
+| `/profile/account`                       | `profile-account`            | `ProfileAccount.vue`                                  | —                                             |
+| `/administration/user-list`              | `administration-user-list`   | `AdministrationUser.vue`                              | — **guard** `adminGuard` (sur le parent)      |
+| `/administration/feedback`               | `administration-feedback`    | `AdministrationFeedback.vue`                          | — **guard** `adminGuard`                      |
+| `/feedback`                              | `feedback`                   | `views/feedback/Feedback.vue`                         | —                                             |
 
 ### Arbre non authentifié — `src/router/modules/nonAuth.router.ts`
 
-| Chemin | Nom | Vue | Guard |
-|---|---|---|---|
-| `/login` | `login` | `Login.vue` | `loginGuard` |
-| `/register` | `register` | `Register.vue` | `loginGuard` |
-| `/password-reset-request` | `password-reset-request` | `ResetPasswordRequest.vue` | `loginGuard` |
-| `/activate` | `activate` | `ActivateUser.vue` | — (lien e-mail) |
-| `/password-reset` | `password-reset` | `ResetPassword.vue` | — (lien e-mail) |
-| `/confirm-email` | `confirm-email` | `ConfirmEmail.vue` | — (lien e-mail) |
+| Chemin                    | Nom                      | Vue                        | Guard           |
+| ------------------------- | ------------------------ | -------------------------- | --------------- |
+| `/login`                  | `login`                  | `Login.vue`                | `loginGuard`    |
+| `/register`               | `register`               | `Register.vue`             | `loginGuard`    |
+| `/password-reset-request` | `password-reset-request` | `ResetPasswordRequest.vue` | `loginGuard`    |
+| `/activate`               | `activate`               | `ActivateUser.vue`         | — (lien e-mail) |
+| `/password-reset`         | `password-reset`         | `ResetPassword.vue`        | — (lien e-mail) |
+| `/confirm-email`          | `confirm-email`          | `ConfirmEmail.vue`         | — (lien e-mail) |
 
 ## Guards
 
-Quatre guards dans `src/router/guards/`, **tous en style Vue Router 4+** : ils *retournent* une
+Quatre guards dans `src/router/guards/`, **tous en style Vue Router 4+** : ils _retournent_ une
 valeur (`undefined` pour continuer, un objet de route pour rediriger), aucun n'appelle `next()`.
 
-| Guard | Enregistrement | Logique |
-|---|---|---|
-| *(anonyme)* | global `beforeEach` **n°1** (`index.ts:58`) | `if (from === START_LOCATION && isAuthenticated()) await appStore.init()` |
-| `authGuard` | global `beforeEach` **n°2** (`index.ts:62`) | non authentifié + route hors liste blanche → `login` avec `?next=` |
-| `loginGuard` | `beforeEnter` sur 3 routes | déjà authentifié → `home` |
-| `adminGuard` | `beforeEnter` sur le parent `/administration` | `!user.isStaff` → `home` |
-| `dailyUpdateGuard` | `beforeEnter` sur `daily-update` | date ≠ aujourd'hui → même route avec la date du jour |
+| Guard              | Enregistrement                                | Logique                                                                   |
+| ------------------ | --------------------------------------------- | ------------------------------------------------------------------------- |
+| _(anonyme)_        | global `beforeEach` **n°1** (`index.ts:58`)   | `if (from === START_LOCATION && isAuthenticated()) await appStore.init()` |
+| `authGuard`        | global `beforeEach` **n°2** (`index.ts:62`)   | non authentifié + route hors liste blanche → `login` avec `?next=`        |
+| `loginGuard`       | `beforeEnter` sur 3 routes                    | déjà authentifié → `home`                                                 |
+| `adminGuard`       | `beforeEnter` sur le parent `/administration` | `!user.isStaff` → `home`                                                  |
+| `dailyUpdateGuard` | `beforeEnter` sur `daily-update`              | date ≠ aujourd'hui → même route avec la date du jour                      |
 
 **L'ordre des deux guards globaux est porteur.** Le n°1 est le seul endroit où `userStore.user`
 est peuplé au chargement à froid, et il **`await`**. Or `adminGuard` lit `userStore.user` : il
@@ -96,13 +96,13 @@ pendant/après `mount()`. L'ordre sûr est pinia → router. Inscrit au
 
 ## Layouts
 
-| | `AuthenticatedLayout.vue` | `NonAuthenticatedLayout.vue` |
-|---|---|---|
-| Racine | `v-app` **conditionnée à `userStore.user`** | `v-app` sans dépendance au store |
-| Chrome | `TheHeader` (app-bar) + `TheNavbar` (drawer) | aucun — juste un titre « Tout Doux » cliquable |
-| Navigation mobile | drawer fermé par défaut, hamburger dans le header, swipe gauche/droite | — |
+|                   | `AuthenticatedLayout.vue`                                              | `NonAuthenticatedLayout.vue`                   |
+| ----------------- | ---------------------------------------------------------------------- | ---------------------------------------------- |
+| Racine            | `v-app` **conditionnée à `userStore.user`**                            | `v-app` sans dépendance au store               |
+| Chrome            | `TheHeader` (app-bar) + `TheNavbar` (drawer)                           | aucun — juste un titre « Tout Doux » cliquable |
+| Navigation mobile | drawer fermé par défaut, hamburger dans le header, swipe gauche/droite | —                                              |
 
-Le menu du drawer est un tableau local à `TheNavbar.vue:17` (Dashboard *(désactivé, sans route)*,
+Le menu du drawer est un tableau local à `TheNavbar.vue:17` (Dashboard _(désactivé, sans route)_,
 Daily, Projects, Collections, Agenda). **`/settings`, `/profile`, `/administration` et
 `/feedback` ne sont accessibles que par le menu du header** (`TheHeader.vue:30`), pas par le
 drawer. L'entrée Administration y est masquée par `v-if="userStore.loadedUser.isStaff"` — la

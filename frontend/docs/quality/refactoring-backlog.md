@@ -7,13 +7,13 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > **Cycle de vie** : quand un item est résolu, **supprimer sa ligne et sa section**. Ne pas le
 > marquer « Fait » — `git log` est déjà le registre du corrigé.
 
-| ID | Titre | Priorité | Raison de la priorité |
-|---|---|---|---|
-| R1 | Dockerfile de production cassé (`package-lock.json` inexistant) | **haute** | Le build de prod ne peut pas aboutir |
-| R2 | Intercepteur 401 : `error.response` déréférencé sans garde | **haute** | Masque toute erreur réseau par un `TypeError` |
-| R5 | Dérive doc↔code des fichiers d'instruction | moyenne | Cause de code erroné généré ; c'est ce que `docs/` corrige |
-| R6 | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne | Deux implémentations d'auth, risque de confusion |
-| R10 | `README.md` du dossier `frontend/` obsolète | basse | Traité en même temps que R5 |
+| ID  | Titre                                                              | Priorité  | Raison de la priorité                                      |
+| --- | ------------------------------------------------------------------ | --------- | ---------------------------------------------------------- |
+| R1  | Dockerfile de production cassé (`package-lock.json` inexistant)    | **haute** | Le build de prod ne peut pas aboutir                       |
+| R2  | Intercepteur 401 : `error.response` déréférencé sans garde         | **haute** | Masque toute erreur réseau par un `TypeError`              |
+| R5  | Dérive doc↔code des fichiers d'instruction                        | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige |
+| R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion           |
+| R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                |
 
 > **Items transférés au tracker de migration.** Sept items relevant du chantier Vuetify 4 ont été
 > déplacés vers [../workflows/vuetify-4-migration.md](../workflows/vuetify-4-migration.md), qui est
@@ -21,15 +21,15 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > liste des fichiers à modifier. Ils y sont suivis par les cases à cocher de la section
 > « Avancement ».
 >
-> | Ancien ID | Devenu | Sujet |
-> |---|---|---|
-> | R3 | §1.12 | `ProfileAccount` : `useRouter()` hors du scope `setup` |
-> | R7 | §2.13 | Blocs CSS morts dans `global.scss` |
-> | R9 | §2.14 | Modificateurs de nuance `lighten-*`/`darken-*` perdus |
-> | R8 | §3.13 | Amener `type-check` à 0 erreur (inventaire des 28) |
-> | R4 | §3.14 | Service worker non fonctionnel |
-> | R11 | §3.15 | Dossier `src/views/agenga/` |
-> | W11 | §3.16 | Fork local `eslint-plugin-vuetify` |
+> | Ancien ID | Devenu | Sujet                                                  |
+> | --------- | ------ | ------------------------------------------------------ |
+> | R3        | §1.12  | `ProfileAccount` : `useRouter()` hors du scope `setup` |
+> | R7        | §2.13  | Blocs CSS morts dans `global.scss`                     |
+> | R9        | §2.14  | Modificateurs de nuance `lighten-*`/`darken-*` perdus  |
+> | R8        | §3.13  | Amener `type-check` à 0 erreur (inventaire des 28)     |
+> | R4        | §3.14  | Service worker non fonctionnel                         |
+> | R11       | §3.15  | Dossier `src/views/agenga/`                            |
+> | W11       | §3.16  | Fork local `eslint-plugin-vuetify`                     |
 >
 > **À la suppression du tracker de migration** (quand le chantier atterrit), tout item encore
 > ouvert doit être **réinscrit ici** avant de supprimer le fichier.
@@ -78,7 +78,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Origine** : `src/store/auth.store.ts:22` (`// TODO: Not used ? see if needed`) ; aucun
   `useAuthStore()` dans `src/`.
 - **Contexte** : ce store réimplémente intégralement `src/services/auth.service.ts` — token,
-  `isAuthenticated`, `login`, `logout`, `resetStore` — y compris une **seconde constante
+  `isAuthenticated`, `login`, `logout`, `resetStore` — y compris une \*\*seconde constante
   `TOKEN_KEY = 'td_token'`. Il est toujours exporté par `src/store/index.ts`, donc découvrable et
   utilisable par erreur. Il contient aussi un piège de nommage : son getter `getToken` masque
   l'import du même nom venant du service.
@@ -89,4 +89,3 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 
 Traité avec R5 : réécrit en pointeur. Conservé comme ligne distincte car le fichier a un
 public différent (visiteur du dépôt vs assistant IA).
-

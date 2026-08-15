@@ -30,13 +30,13 @@ index.html <meta>  →  src/config/          config runtime (API_URL, VERSION)
 
 ## Règles
 
-| Règle | Statut |
-|---|---|
-| Un fichier `*.api.ts` par domaine, fonctions libres, jamais de classe | DISCIPLINE |
-| Type de retour `Promise<T>` explicite + générique sur l'appel `http` | DISCIPLINE (65/65 annotent le retour) |
-| Une fonction d'API ne fait **aucun** `try`/`catch` | DISCIPLINE (respecté : 0 catch dans `src/api/`) |
-| Les types du contrat vivent dans `src/models/`, pas dans `src/api/` | DISCIPLINE — **6 écarts**, voir ci-dessous |
-| Passer par le wrapper `http`, jamais `axiosInstance` | DISCIPLINE (respecté) |
+| Règle                                                                 | Statut                                          |
+| --------------------------------------------------------------------- | ----------------------------------------------- |
+| Un fichier `*.api.ts` par domaine, fonctions libres, jamais de classe | DISCIPLINE                                      |
+| Type de retour `Promise<T>` explicite + générique sur l'appel `http`  | DISCIPLINE (65/65 annotent le retour)           |
+| Une fonction d'API ne fait **aucun** `try`/`catch`                    | DISCIPLINE (respecté : 0 catch dans `src/api/`) |
+| Les types du contrat vivent dans `src/models/`, pas dans `src/api/`   | DISCIPLINE — **6 écarts**, voir ci-dessous      |
+| Passer par le wrapper `http`, jamais `axiosInstance`                  | DISCIPLINE (respecté)                           |
 
 Recette complète pour ajouter un endpoint :
 [../patterns/adding-an-endpoint.md](../patterns/adding-an-endpoint.md).

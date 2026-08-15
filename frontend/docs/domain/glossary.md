@@ -8,17 +8,17 @@ Tout-Doux est une application d'organisation personnelle : on range son travail 
 
 ## Entités
 
-| Entité | Définition dans cette app | Contient | Modèle |
-|---|---|---|---|
-| **Project** | Corps de travail structuré, taggable, jalonné d'événements | Sections, Tasks, Events, Tags | `project.model.ts` |
-| **Section** | Subdivision d'un projet | Tasks | `section.model.ts` |
-| **Collection** | Liste plate d'items homogènes (« liste de X ») | Tasks | `collection.model.ts` |
-| **Task** | To-do réel et persistant, appartenant à un conteneur | Tags | `task.model.ts` |
-| **CommonTask** | **Modèle** de tâche récurrente, réutilisable, sans conteneur | Tags | `common-task.model.ts` |
-| **DailyTask** | Ligne du plan **d'une journée précise** | Tags | `daily-task.model.ts` |
-| **Event** | Élément d'agenda, daté, éventuellement rattaché à un projet | — | `event.model.ts` |
-| **Tag** | Étiquette colorée, typée `project` ou `task` | — | `tag.model.ts` |
-| **DailySummary** | Agrégat en lecture seule d'une journée (compteurs) | — | `daily-summary.model.ts` |
+| Entité           | Définition dans cette app                                    | Contient                      | Modèle                   |
+| ---------------- | ------------------------------------------------------------ | ----------------------------- | ------------------------ |
+| **Project**      | Corps de travail structuré, taggable, jalonné d'événements   | Sections, Tasks, Events, Tags | `project.model.ts`       |
+| **Section**      | Subdivision d'un projet                                      | Tasks                         | `section.model.ts`       |
+| **Collection**   | Liste plate d'items homogènes (« liste de X »)               | Tasks                         | `collection.model.ts`    |
+| **Task**         | To-do réel et persistant, appartenant à un conteneur         | Tags                          | `task.model.ts`          |
+| **CommonTask**   | **Modèle** de tâche récurrente, réutilisable, sans conteneur | Tags                          | `common-task.model.ts`   |
+| **DailyTask**    | Ligne du plan **d'une journée précise**                      | Tags                          | `daily-task.model.ts`    |
+| **Event**        | Élément d'agenda, daté, éventuellement rattaché à un projet  | —                             | `event.model.ts`         |
+| **Tag**          | Étiquette colorée, typée `project` ou `task`                 | —                             | `tag.model.ts`           |
+| **DailySummary** | Agrégat en lecture seule d'une journée (compteurs)           | —                             | `daily-summary.model.ts` |
 
 ## Relations
 
@@ -48,13 +48,13 @@ Tag ──n-n──► Project | Task | CommonTask | DailyTask
 
 ### Task vs CommonTask vs DailyTask
 
-| | Task | CommonTask | DailyTask |
-|---|---|---|---|
-| Nature | to-do réel | **gabarit** réutilisable | **planification** d'un jour |
-| Rattachée à | projet / section / collection | rien (niveau utilisateur) | une date |
-| A un état d'achèvement | ✅ `completed` + `completedAt` | ❌ aucun | ✅ `completed` (pour ce jour) |
-| Achever fait progresser | le projet / la collection | rien | rien globalement |
-| Gérée depuis | détail projet / collection | Réglages → Common tasks | wizard daily |
+|                         | Task                           | CommonTask                | DailyTask                     |
+| ----------------------- | ------------------------------ | ------------------------- | ----------------------------- |
+| Nature                  | to-do réel                     | **gabarit** réutilisable  | **planification** d'un jour   |
+| Rattachée à             | projet / section / collection  | rien (niveau utilisateur) | une date                      |
+| A un état d'achèvement  | ✅ `completed` + `completedAt` | ❌ aucun                  | ✅ `completed` (pour ce jour) |
+| Achever fait progresser | le projet / la collection      | rien                      | rien globalement              |
+| Gérée depuis            | détail projet / collection     | Réglages → Common tasks   | wizard daily                  |
 
 Un **CommonTask** est une corvée récurrente (« sortir le chien », « faire les courses »), décrite
 comme telle dans l'UI (`SettingsCommonTasks.vue:61`). Il n'a pas d'état : le « faire » un jour
@@ -68,12 +68,12 @@ Seul un DailyTask adossé à une **Task** affiche les chips projet / section / c
 
 Les deux contiennent des Tasks et sont archivables. Ce qui les sépare, d'après le code :
 
-| | Project | Collection |
-|---|---|---|
-| Sections | ✅ | ❌ |
-| Events | ✅ | ❌ |
-| Tags | ✅ | ❌ |
-| `itemName` (libellé libre des items) | ❌ | ✅ (défaut `'task'`) |
+|                                      | Project | Collection           |
+| ------------------------------------ | ------- | -------------------- |
+| Sections                             | ✅      | ❌                   |
+| Events                               | ✅      | ❌                   |
+| Tags                                 | ✅      | ❌                   |
+| `itemName` (libellé libre des items) | ❌      | ✅ (défaut `'task'`) |
 
 Un **Project** est un travail structuré et planifié dans le temps ; une **Collection** est une
 liste plate et homogène d'items dont l'utilisateur choisit le nom (« livres », « courses »),

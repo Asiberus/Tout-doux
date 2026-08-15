@@ -198,12 +198,10 @@ input:-webkit-autofill:active {
     opacity: 0 !important;
   }
 
-  .v-chip,
-  .v-tab {
-    &:focus::before,
-    &:hover::before {
-      opacity: 0 !important;
-    }
+  // `.v-tab` est absent : c'est un VBtn en interne, déjà couvert par la règle ci-dessus
+  .v-chip:focus .v-chip__overlay,
+  .v-chip:hover .v-chip__overlay {
+    opacity: 0 !important;
   }
 }
 

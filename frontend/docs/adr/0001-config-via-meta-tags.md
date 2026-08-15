@@ -32,7 +32,7 @@ ces balises par `sed` à partir des variables d'environnement fournies par `dock
 - **Endpoint `/config.json` chargé au démarrage** — aurait ajouté un aller-retour réseau bloquant
   avant le premier rendu.
 
-*Rationale inféré* : aucun commit n'explicite le raisonnement, il est déduit du montage Docker
+_Rationale inféré_ : aucun commit n'explicite le raisonnement, il est déduit du montage Docker
 (`ARG` → `ENV` → `sed` sur `index.html`).
 
 ## Conséquences

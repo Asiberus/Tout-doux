@@ -30,19 +30,19 @@ Si le diff est vide, s'arrêter et le dire.
 
 Table de correspondance (identique à celle de `frontend/CLAUDE.md`) :
 
-| Fichier modifié | Doc à vérifier |
-|---|---|
-| `src/router/**`, `src/main.ts` | `docs/architecture/routing.md` — ⚠️ table des routes **maintenue à la main** |
-| `src/store/**` | `docs/architecture/state.md` |
-| `src/axios/**`, `src/api-routes.ts`, `src/api/**` | `docs/architecture/api-layer.md`, `docs/patterns/adding-an-endpoint.md` |
-| `src/plugins/vuetify.ts`, `src/styles/**` | `docs/architecture/ui-layer.md` — ⚠️ table des tokens **maintenue à la main** — et `docs/patterns/styling.md` |
-| `src/components/**`, `src/layout/**`, `src/views/components/**` | `docs/architecture/ui-layer.md` |
-| `src/models/**`, `src/utils/*.utils.ts` | `docs/domain/glossary.md`, `daily-rules.md`, `events.md` |
-| `src/views/daily/**` | `docs/domain/daily-rules.md` |
-| `src/views/components/event/**` | `docs/domain/events.md` |
-| `src/composables/**` | `docs/patterns/responsive.md`, `docs/patterns/dialogs.md` |
-| `package.json`, `.husky/**`, `eslint.config.mjs`, `vite.config.ts`, `tsconfig.json`, `../.github/**` | `docs/workflows/development.md`, `docs/workflows/verification.md` |
-| `src/config/**`, `index.html`, `../.conf/**` | `docs/adr/0001-config-via-meta-tags.md`, `docs/workflows/development.md` |
+| Fichier modifié                                                                                      | Doc à vérifier                                                                                                |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `src/router/**`, `src/main.ts`                                                                       | `docs/architecture/routing.md` — ⚠️ table des routes **maintenue à la main**                                  |
+| `src/store/**`                                                                                       | `docs/architecture/state.md`                                                                                  |
+| `src/axios/**`, `src/api-routes.ts`, `src/api/**`                                                    | `docs/architecture/api-layer.md`, `docs/patterns/adding-an-endpoint.md`                                       |
+| `src/plugins/vuetify.ts`, `src/styles/**`                                                            | `docs/architecture/ui-layer.md` — ⚠️ table des tokens **maintenue à la main** — et `docs/patterns/styling.md` |
+| `src/components/**`, `src/layout/**`, `src/views/components/**`                                      | `docs/architecture/ui-layer.md`                                                                               |
+| `src/models/**`, `src/utils/*.utils.ts`                                                              | `docs/domain/glossary.md`, `daily-rules.md`, `events.md`                                                      |
+| `src/views/daily/**`                                                                                 | `docs/domain/daily-rules.md`                                                                                  |
+| `src/views/components/event/**`                                                                      | `docs/domain/events.md`                                                                                       |
+| `src/composables/**`                                                                                 | `docs/patterns/responsive.md`, `docs/patterns/dialogs.md`                                                     |
+| `package.json`, `.husky/**`, `eslint.config.mjs`, `vite.config.ts`, `tsconfig.json`, `../.github/**` | `docs/workflows/development.md`, `docs/workflows/verification.md`                                             |
+| `src/config/**`, `index.html`, `../.conf/**`                                                         | `docs/adr/0001-config-via-meta-tags.md`, `docs/workflows/development.md`                                      |
 
 ## 3. Vérifier chaque doc candidate
 
@@ -71,9 +71,9 @@ Le format et le déclencheur exact de chaque type de doc sont dans `frontend/doc
 
 Un tableau, rien d'autre :
 
-| Fichier de doc | Action | Quoi précisément |
-|---|---|---|
-| … | à mettre à jour / à créer / à supprimer / OK | … |
+| Fichier de doc | Action                                       | Quoi précisément |
+| -------------- | -------------------------------------------- | ---------------- |
+| …              | à mettre à jour / à créer / à supprimer / OK | …                |
 
 Puis, **si des mises à jour sont nécessaires** : proposer les modifications et attendre
 validation avant d'éditer.

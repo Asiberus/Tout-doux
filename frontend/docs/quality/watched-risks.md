@@ -10,20 +10,20 @@ raison est indiquée pour chaque item.
 > **Cycle de vie** : si un déclencheur est atteint, **déplacer l'item vers le backlog**. Si un
 > item est résolu, **supprimer sa ligne et sa section**.
 
-| ID | Titre | Nature | Déclencheur |
-|---|---|---|---|
-| W1 | Aucun test automatisé | Fiabilité | > 1 développeur, ou 2 régressions sur un même écran |
-| W2 | Aucune règle de frontière outillée | Architecture | Une violation d'import atteint `master` |
-| W3 | Aucun garde-fou en CI | Fiabilité | Un commit cassant `yarn build` atteint `master` |
-| W4 | Pas de timeout sur les requêtes | Robustesse | Un signalement d'écran figé |
-| W5 | 401 global appliqué aux endpoints d'auth | Sécurité / UX | Un signalement de déconnexion pendant un formulaire |
-| W6 | Divergences modèle ↔ API | Fiabilité | Voir [ADR 0003](../adr/0003-hand-written-api-models.md) |
-| W7 | Aucun découpage de bundle | Performance | Bundle initial > 1,5 Mo ou FCP > 3 s en 4G |
-| W8 | Token en `localStorage`, expiration ignorée | Sécurité | Passage à des données multi-utilisateurs ou audit de sécurité |
-| W9 | Aucun retour d'erreur à l'utilisateur | UX | Un signalement de « rien ne se passe » |
-| W10 | Aucune route 404 | UX | Un signalement de page blanche |
-| W12 | Polices et icônes chargées depuis des CDN | Robustesse | Besoin de fonctionnement hors ligne ou d'un déploiement intranet |
-| W13 | Cycles d'imports entre axios, services, router | Architecture | Une erreur d'initialisation de module |
+| ID  | Titre                                          | Nature        | Déclencheur                                                      |
+| --- | ---------------------------------------------- | ------------- | ---------------------------------------------------------------- |
+| W1  | Aucun test automatisé                          | Fiabilité     | > 1 développeur, ou 2 régressions sur un même écran              |
+| W2  | Aucune règle de frontière outillée             | Architecture  | Une violation d'import atteint `master`                          |
+| W3  | Aucun garde-fou en CI                          | Fiabilité     | Un commit cassant `yarn build` atteint `master`                  |
+| W4  | Pas de timeout sur les requêtes                | Robustesse    | Un signalement d'écran figé                                      |
+| W5  | 401 global appliqué aux endpoints d'auth       | Sécurité / UX | Un signalement de déconnexion pendant un formulaire              |
+| W6  | Divergences modèle ↔ API                      | Fiabilité     | Voir [ADR 0003](../adr/0003-hand-written-api-models.md)          |
+| W7  | Aucun découpage de bundle                      | Performance   | Bundle initial > 1,5 Mo ou FCP > 3 s en 4G                       |
+| W8  | Token en `localStorage`, expiration ignorée    | Sécurité      | Passage à des données multi-utilisateurs ou audit de sécurité    |
+| W9  | Aucun retour d'erreur à l'utilisateur          | UX            | Un signalement de « rien ne se passe »                           |
+| W10 | Aucune route 404                               | UX            | Un signalement de page blanche                                   |
+| W12 | Polices et icônes chargées depuis des CDN      | Robustesse    | Besoin de fonctionnement hors ligne ou d'un déploiement intranet |
+| W13 | Cycles d'imports entre axios, services, router | Architecture  | Une erreur d'initialisation de module                            |
 
 ---
 
@@ -185,5 +185,5 @@ raison est indiquée pour chaque item.
 - **Décision** : ne pas agir. Le montage est stable et le casser demanderait d'introduire une
   indirection (injection ou bus d'événements) disproportionnée pour un seul intercepteur.
 - **Déclencheur** : une erreur d'initialisation de module au démarrage (`Cannot access '…' before
-  initialization`, import résolvant `undefined`), typiquement après une montée de version de Vite
+initialization`, import résolvant `undefined`), typiquement après une montée de version de Vite
   ou un changement de format de bundle.

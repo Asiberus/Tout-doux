@@ -28,7 +28,7 @@ Convention de variantes : `XPost` / `XPatch` / `X` / `XList` / `XDetail`.
 - **Validation runtime par schéma** (`zod`, `io-ts`) — non adoptée. Aurait détecté les divergences
   au prix d'un doublon schéma/type et d'un coût runtime.
 
-*Rationale inféré* : aucun ADR ni commit ne motive ce choix. Vu la taille du projet (un seul
+_Rationale inféré_ : aucun ADR ni commit ne motive ce choix. Vu la taille du projet (un seul
 développeur, front et back dans le même dépôt), le coût d'une chaîne de génération a
 vraisemblablement paru supérieur au bénéfice.
 

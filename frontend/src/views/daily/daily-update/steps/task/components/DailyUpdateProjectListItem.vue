@@ -6,6 +6,7 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
+import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { computed, ref, watch } from 'vue'
 
 const selected = defineModel<boolean>('selected')
@@ -44,15 +45,9 @@ const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(()
   return sections
 })
 
-const allTasks = computed<Task[]>(() =>
-  props.project.tasks.concat(props.project.sections.map(({ tasks }) => tasks).flat())
-)
-const allTasksCompleted = computed<Task[]>(() =>
-  allTasks.value.filter(({ completed }) => completed)
-)
-const allTasksUncompleted = computed<Task[]>(() =>
-  allTasks.value.filter(({ completed }) => !completed)
-)
+const allTasks = computed<Task[]>(() => flattenProjectTasks(props.project))
+const allTasksCompleted = computed<Task[]>(() => filterCompleted(allTasks.value))
+const allTasksUncompleted = computed<Task[]>(() => filterUncompleted(allTasks.value))
 const percentageOfTaskCompleted = computed<number>(
   () => (allTasksCompleted.value.length / allTasks.value.length) * 100
 )
