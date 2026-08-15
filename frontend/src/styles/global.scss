@@ -1,6 +1,11 @@
 @use 'sass:map';
 @use 'vuetify/lib/styles/settings/_variables';
 
+// Ce fichier est chargé AVANT Vuetify : sans cette déclaration, c'est le premier `@layer` écrit
+// ici qui fixerait la position du layer, donc avant `vuetify-components` — et tout override
+// serait perdu. Doit rester aligné sur `vuetify/lib/styles/main.css`.
+@layer vuetify-core, vuetify-components, vuetify-overrides, vuetify-utilities, vuetify-final;
+
 #app {
   font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -25,6 +30,29 @@ body {
 
   p {
     margin: 0 0 16px;
+  }
+}
+
+// Vuetify 4 empile trois opacités sur le soulignement d'un champ désactivé
+// (champ 0.5 × trait 0.38 × couleur 0.5 ≈ 0.09, contre 0.38 en Vuetify 2).
+// On repasse par background-image : le border-image + color-mix d'origine
+// ne s'affiche pas sur Firefox.
+@layer vuetify-overrides {
+  .v-input--disabled {
+    .v-field--variant-underlined .v-field__outline::before,
+    .v-field--variant-filled .v-field__outline::before {
+      opacity: 1;
+      border-bottom-width: 0;
+      border-image: none;
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(var(--v-theme-on-surface), 0.76) 0 2px,
+        transparent 2px 4px
+      );
+      background-size: 100% 1px;
+      background-repeat: repeat-x;
+      background-position: bottom left;
+    }
   }
 }
 

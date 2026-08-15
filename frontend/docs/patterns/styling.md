@@ -67,6 +67,30 @@ inopérantes sur les titres.
 Ordre des layers Vuetify 4 : `vuetify-core` → `vuetify-components` → `vuetify-overrides` →
 `vuetify-utilities` → `vuetify-final`.
 
+Entre les deux, `vuetify-overrides` est le layer prévu pour surcharger un composant Vuetify tout
+en restant surchargeable par les utilitaires. C'est ce qu'utilise le pointillé des champs
+désactivés (ci-dessous) — préférer ce layer au hors-layer + `!important` quand c'est possible.
+
+## Champs désactivés : le soulignement pointillé est réécrit
+
+`src/styles/global.scss` redessine le soulignement des champs `disabled` (variantes `underlined`
+et `filled`). Deux raisons cumulées, vérifiées dans le DOM :
+
+1. **Contraste.** Vuetify 4 empile trois opacités là où Vuetify 2 n'en appliquait qu'une :
+   `.v-field--disabled { opacity }` (nouveau en v3/v4, `0.5` en dark), `::before { opacity }`
+   (`$field-outline-opacity`, `0.38`) et la couleur du dégradé (`on-surface` ×
+   `--v-disabled-opacity`). Soit ≈ `0.09` d'alpha effectif contre `0.38` en Vuetify 2 : sur le
+   fond `#121212` les points se confondent avec le fond.
+2. **Firefox.** La règle d'origine
+   (`node_modules/vuetify/lib/components/VField/VField.sass`) passe par `border-image` avec un
+   `repeating-linear-gradient` dont la couleur est un `color-mix()`. Ça s'affiche sur Chrome,
+   pas sur Firefox. L'override n'utilise ni l'un ni l'autre : `background-image` +
+   `background-size: 100% 1px`, rendu identique et sans dépendance à ces deux features.
+
+⚠️ La règle Vuetify d'origine ne cible **que** `underlined` et `filled`. Un champ passé en
+`outlined` ou `solo` n'a aucun pointillé à l'état désactivé — ni avant ni après cet override.
+Les défauts du projet (`src/plugins/vuetify.ts`) mettent tous les champs en `underlined`.
+
 ## Couleurs : deux systèmes coexistent
 
 1. **Tokens de thème** — noms métier déclarés dans `vuetify.ts`, utilisables en prop
