@@ -13,26 +13,29 @@ tout le code.
 **Couvert** : tout `frontend/` (SPA Vue 3 + Vuetify 4 + Pinia + Vue Router, ~13 500 lignes,
 86 SFC / 70 modules TS).
 
-**Référencé, non documenté** : le monorepo parent — `backend/` (Django), `.conf/*/frontend/`
-(Dockerfiles + injection de config), `docker-compose*.yml`, `.github/workflows/`. Ces éléments
-ne sont cités que lorsqu'ils déterminent le comportement du front (voir
+**Référencé, non documenté** : le monorepo parent — `backend/` (Django, qui a **sa propre
+doc** : [`../../backend/docs/`](../../backend/docs/)), `.conf/*/frontend/` (Dockerfiles +
+injection de config), `docker-compose*.yml`, `.github/workflows/`. Ces éléments ne sont cités
+que lorsqu'ils déterminent le comportement du front (voir
 [workflows/development.md](workflows/development.md)).
 
-**Propriété d'autrui** : le contrat d'API est défini côté Django. Il n'existe **aucune
-génération de types** ; `openapi.yaml` à la racine du monorepo est un stub de 13 lignes,
-non maintenu et non utilisé. Voir [adr/0003-hand-written-api-models.md](adr/0003-hand-written-api-models.md).
+**Propriété d'autrui** : le contrat d'API appartient au backend Django, dans le même monorepo —
+sa référence est [`../../backend/docs/architecture/api-surface.md`](../../backend/docs/architecture/api-surface.md).
+Il n'existe **aucune génération de types** ; `openapi.yaml` à la racine du monorepo est un stub
+de 13 lignes, non maintenu et non utilisé. Voir
+[adr/0003-hand-written-api-models.md](adr/0003-hand-written-api-models.md).
 
 ## Index
 
-| Dossier / fichier | Purpose |
-|---|---|
+| Dossier / fichier              | Purpose                                                                                |
+| ------------------------------ | -------------------------------------------------------------------------------------- |
 | [architecture/](architecture/) | Une fiche par couche : responsabilité, briques, dépendances, contraintes non évidentes |
-| [patterns/](patterns/) | Comment on résout les problèmes techniques **récurrents de ce projet** |
-| [workflows/](workflows/) | Procédures pas-à-pas de dev et de vérification |
-| [domain/](domain/) | Langage métier : vocabulaire de référence et règles implicites |
-| [adr/](adr/) | Décisions structurantes et leur pourquoi |
-| [quality/](quality/) | Registre **évaluatif** : ce qui est cassé, risqué, ou à refactorer |
-| [features/](features/) | **Non peuplé** — voir la section dédiée ci-dessous |
+| [patterns/](patterns/)         | Comment on résout les problèmes techniques **récurrents de ce projet**                 |
+| [workflows/](workflows/)       | Procédures pas-à-pas de dev et de vérification                                         |
+| [domain/](domain/)             | Langage métier : vocabulaire de référence et règles implicites                         |
+| [adr/](adr/)                   | Décisions structurantes et leur pourquoi                                               |
+| [quality/](quality/)           | Registre **évaluatif** : ce qui est cassé, risqué, ou à refactorer                     |
+| [features/](features/)         | **Non peuplé** — voir la section dédiée ci-dessous                                     |
 
 Point d'entrée conseillé : [architecture/overview.md](architecture/overview.md).
 
@@ -45,6 +48,7 @@ qu'est-ce qui n'est pas déductible du code ? ». Une fiche par couche structura
 dossier.
 
 **When to create / update** :
+
 - une couche change de responsabilité ou de surface publique ;
 - une **dépendance entre couches** est ajoutée ou supprimée (ex. un store se met à appeler une
   nouvelle API, une couche importe une couche qu'elle n'importait pas) ;
@@ -67,18 +71,23 @@ le dossier source.
 <1-3 phrases : responsabilité, et la frontière avec les couches voisines.>
 
 ## Chaîne / briques
+
 <Fichiers clés avec chemins. Le flux, pas l'exhaustivité.>
 
 ## Règles
+
 <Ce qu'on doit respecter. Marquer OUTILLÉ ou DISCIPLINE pour chacune.>
 
 ## Contraintes non évidentes
+
 <Ordre d'init, cycles, pièges. Ce qui ne se lit pas dans le code.>
 
 ## Décisions négatives
+
 <Ce qui a été volontairement écarté, et pourquoi. Sinon quelqu'un le « corrigera ».>
 
 ## Voir aussi
+
 <Liens relatifs.>
 ```
 
@@ -97,6 +106,7 @@ le dossier source.
 idiome standard de Vue ou Vuetify : si la doc officielle le dit déjà, on ne le recopie pas.
 
 **When to create / update** :
+
 - **créer** quand la même solution technique apparaît pour la 3ᵉ fois dans le code ;
 - **mettre à jour** quand on ajoute un cas d'usage qui ne rentre pas dans la recette, ou quand
   une variante devient la norme ;
@@ -114,12 +124,15 @@ idiome standard de Vue ou Vuetify : si la doc officielle le dit déjà, on ne le
 **Problème** — <ce que ça résout, en une phrase.>
 
 ## Recette
+
 <Étapes numérotées, avec un exemple réel du dépôt et son chemin.>
 
 ## Variantes légitimes
+
 <Si plusieurs approches coexistent : le critère de choix pour un nouveau cas.>
 
 ## Écarts assumés / non migrés
+
 <Les endroits qui ne suivent pas, en les nommant. Dette ou décision ?>
 
 ## Voir aussi
@@ -130,6 +143,7 @@ idiome standard de Vue ou Vuetify : si la doc officielle le dit déjà, on ne le
 **Purpose** — procédures exécutables : installer, lancer, vérifier, migrer.
 
 **When to update** :
+
 - un script de `package.json` est ajouté, renommé ou supprimé ;
 - la façon de lancer/configurer l'app change (port, Docker, injection de config) ;
 - un point de contrôle qualité est ajouté ou retiré (hook, CI, script) ;
@@ -147,10 +161,13 @@ quand elle est terminée** — l'historique git suffit ensuite.
 **Quand** — <dans quelle situation on suit cette procédure.>
 
 ## Prérequis
+
 ## Étapes
+
 <Numérotées, avec les commandes exactes.>
 
 ## Pièges
+
 <Ce qui échoue silencieusement, et comment le détecter.>
 ```
 
@@ -160,6 +177,7 @@ quand elle est terminée** — l'historique git suffit ensuite.
 les types. Sert à éviter la dérive de nommage et les régressions sur des invariants implicites.
 
 **When to update** :
+
 - une entité, un champ ou une valeur d'énumération métier est ajouté, renommé ou supprimé ;
 - une relation entre entités change (cardinalité, optionnalité) ;
 - une règle métier est ajoutée, ou passe d'« implicite en UI » à « garantie par le type / le
@@ -174,12 +192,15 @@ les types. Sert à éviter la dérive de nommage et les régressions sur des inv
 # <Domaine>
 
 ## Entités / règles
+
 <Tables pour les entités et les énumérations.>
 
 ## Distinctions à ne pas confondre
+
 <Les concepts voisins et ce qui les sépare vraiment.>
 
 ## Règles appliquées par l'UI seulement
+
 <⚠️ Ce qui casse si on contourne le composant. Le plus précieux du dossier.>
 
 ## Voir aussi
@@ -207,8 +228,11 @@ renseigne le champ `Statut` de l'ancien.
 - **Date** : YYYY-MM (ou « inconnue — inféré de <commit> »)
 
 ## Contexte
+
 ## Décision
+
 ## Alternatives écartées
+
 <Et la raison du rejet.>
 ## Conséquences
 <Y compris les négatives.>
@@ -216,7 +240,7 @@ renseigne le champ `Statut` de l'ancien.
 <Commits, fichiers:lignes, ou « rationale inféré » si le pourquoi n'est pas tracé.>
 ```
 
-> **Honnêteté requise** : si le *pourquoi* n'est pas documenté dans l'historique, écrire
+> **Honnêteté requise** : si le _pourquoi_ n'est pas documenté dans l'historique, écrire
 > « rationale inféré » plutôt que d'inventer une justification.
 
 ## quality/
@@ -231,12 +255,13 @@ signalée pour un modèle. C'est la raison de la séparation en sous-arbre.
 
 Deux natures d'entrées, **jamais mélangées dans le même fichier** :
 
-| Fichier | Nature | Contenu |
-|---|---|---|
-| [quality/refactoring-backlog.md](quality/refactoring-backlog.md) | **Intention d'agir** | Priorité + raison de la priorité |
-| [quality/watched-risks.md](quality/watched-risks.md) | **Aucune intention d'agir** | Veille assumée + **condition de déclenchement** explicite |
+| Fichier                                                          | Nature                      | Contenu                                                   |
+| ---------------------------------------------------------------- | --------------------------- | --------------------------------------------------------- |
+| [quality/refactoring-backlog.md](quality/refactoring-backlog.md) | **Intention d'agir**        | Priorité + raison de la priorité                          |
+| [quality/watched-risks.md](quality/watched-risks.md)             | **Aucune intention d'agir** | Veille assumée + **condition de déclenchement** explicite |
 
 **When to update** :
+
 - une faiblesse, un contrat implicite ou une règle non outillée est découvert → l'inscrire ;
 - une condition de déclenchement d'un risque surveillé est atteinte → déplacer l'item vers le
   backlog ;
@@ -248,6 +273,7 @@ Deux natures d'entrées, **jamais mélangées dans le même fichier** :
 
 ```markdown
 ## <ID> — <Titre>
+
 - **Origine** : <fichier:ligne, ou comment ça a été trouvé>
 - **Contexte** : <le fait technique, vérifiable>
 - **Décision** : <agir / ne pas agir, et pourquoi c'est raisonnable aujourd'hui>
@@ -269,6 +295,7 @@ routes. La seule feature à mécanique réellement non évidente — le « daily
 
 **Déclencheur de création** — créer `features/<nom>.md` quand une feature remplit **au moins
 une** condition :
+
 - son parcours utilisateur ne se déduit **pas** de la route + du glossaire (états multiples,
   wizard, machine à états) ;
 - elle coordonne ≥ 3 zones de `src/views/` ;
@@ -284,10 +311,13 @@ une** condition :
 **Fichiers** — <points d'entrée>
 
 ## Parcours
+
 <Les états et les transitions. C'est la raison d'être de la fiche.>
 
 ## Règles d'accès
+
 ## Hors périmètre
+
 <Ce que la feature ne fait délibérément pas.>
 ```
 
@@ -301,11 +331,11 @@ liens e-mail hors application).
 
 ## Ce qu'on ne documente **pas** ici
 
-| Sujet | Où ça vit |
-|---|---|
-| Contrat d'API, schémas de réponse | Côté backend Django (hors de ce dépôt). Le front en tient une copie **manuelle** dans `src/models/` |
-| Idiomes Vue / Vuetify / Pinia standard | Documentation officielle des libs |
-| Ce que le code exprime déjà clairement | Le code. Ne pas paraphraser une signature de fonction |
-| Historique des corrections | `git log`. Un item résolu de `quality/` est **supprimé**, pas archivé |
-| Infra, déploiement, backend | Monorepo parent (`.conf/`, `docker-compose*.yml`, `backend/`) |
-| Règles à charger en contexte immédiat pour générer du code | [`../CLAUDE.md`](../CLAUDE.md), qui **pointe** vers ici sans dupliquer |
+| Sujet                                                      | Où ça vit                                                                                                                                                       |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contrat d'API, schémas de réponse                          | [`../../backend/docs/architecture/api-surface.md`](../../backend/docs/architecture/api-surface.md). Le front en tient une copie **manuelle** dans `src/models/` |
+| Idiomes Vue / Vuetify / Pinia standard                     | Documentation officielle des libs                                                                                                                               |
+| Ce que le code exprime déjà clairement                     | Le code. Ne pas paraphraser une signature de fonction                                                                                                           |
+| Historique des corrections                                 | `git log`. Un item résolu de `quality/` est **supprimé**, pas archivé                                                                                           |
+| Infra, déploiement, backend                                | Monorepo parent (`.conf/`, `docker-compose*.yml`) et [`../../backend/docs/`](../../backend/docs/)                                                               |
+| Règles à charger en contexte immédiat pour générer du code | [`../CLAUDE.md`](../CLAUDE.md), qui **pointe** vers ici sans dupliquer                                                                                          |
