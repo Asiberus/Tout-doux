@@ -1,158 +1,137 @@
-<template>
-    <div class="flex-grow-1 d-flex flex-column">
-        <div class="d-flex align-center column-gap-2 row-gap-1 mb-3">
-            <h3 class="text-h6 text-sm-h5 flex-grow-1">Events</h3>
-
-            <div class="d-flex justify-space-between align-center gap-2">
-                <FilterChip
-                    v-if="project.events.length > 0"
-                    v-model="displayPassedEvent"
-                    color="event"
-                    icon="mdi-clock-check-outline">
-                    Passed
-                </FilterChip>
-
-                <v-dialog
-                    v-model="eventDialog"
-                    :width="getDialogWidth()"
-                    :fullscreen="$vuetify.breakpoint.smAndDown">
-                    <template #activator="{ on, attrs }">
-                        <v-btn
-                            v-bind="attrs"
-                            v-on="on"
-                            :disabled="project.archived"
-                            :block="$vuetify.breakpoint.xsOnly && project.events.length === 0">
-                            <v-icon left>mdi-plus</v-icon>
-                            event
-                        </v-btn>
-                    </template>
-                    <EventDialog
-                        :is-dialog-open="eventDialog"
-                        @submit="createEvent($event)"
-                        @close="eventDialog = false">
-                    </EventDialog>
-                </v-dialog>
-            </div>
-        </div>
-
-        <template v-if="!displayPassedEvent">
-            <template v-if="comingEvents.length > 0">
-                <div class="pl-3">
-                    <EventItemCard
-                        v-for="event of comingEvents"
-                        :key="event.id"
-                        :event="event"
-                        :disabled="project.archived"
-                        :show-icon="true"
-                        @update="updateEvent($event)"
-                        @delete="deleteEvent($event)">
-                    </EventItemCard>
-                </div>
-            </template>
-            <template v-else>
-                <EmptyListDisplay
-                    message="This project has no coming events."
-                    class="empty-list-display">
-                    <template #img>
-                        <img
-                            src="../../../../assets/no_events.svg"
-                            alt="No events"
-                            class="empty-list-display__img" />
-                    </template>
-                </EmptyListDisplay>
-            </template>
-        </template>
-        <template v-else>
-            <template v-if="passedEvents.length > 0">
-                <div class="pl-3">
-                    <EventItemCard
-                        v-for="event of passedEvents"
-                        :key="event.id"
-                        :event="event"
-                        :show-icon="true"
-                        :disabled="project.archived"
-                        @update="updateEvent($event)"
-                        @delete="deleteEvent($event)">
-                    </EventItemCard>
-                </div>
-            </template>
-            <template v-else>
-                <EmptyListDisplay
-                    message="This project has no past events."
-                    class="empty-list-display">
-                    <template #img>
-                        <img
-                            src="../../../../assets/no_events.svg"
-                            alt="No events"
-                            class="empty-list-display__img" />
-                    </template>
-                </EmptyListDisplay>
-            </template>
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
-import { EventModel, EventPostOrPatch } from '@/models/event.model'
-import { ProjectDetail } from '@/models/project.model'
-import { projectActions } from '@/store/modules/project.store'
-import { isPassed } from '@/utils/event.utils'
+import { EventPostOrPatch } from '@/models/event.model'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
-import { Component, Vue } from 'vue-property-decorator'
-import { getDialogWidth } from '@/utils/dialog.utils'
+import { useDialogWidth } from '@/composables/useDialogWidth'
+import { ref } from 'vue'
+import { useProjectStore } from '@/store'
+import { useDisplay } from 'vuetify'
 
-@Component({
-    methods: { getDialogWidth },
-    components: { EventDialog, EventItemCard, EmptyListDisplay, FilterChip },
-})
-export default class ProjectEvent extends Vue {
-    eventDialog = false
-    displayPassedEvent = false
+const { xs } = useDisplay()
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
+const projectStore = useProjectStore()
 
-    get project(): ProjectDetail {
-        return this.$store.state.project.currentProject
-    }
+const eventDialog = ref(false)
+const displayPassedEvent = ref(false)
 
-    get comingEvents(): EventModel[] {
-        return this.project.events.filter(event => !isPassed(event))
-    }
+function createEvent(event: EventPostOrPatch): void {
+  eventDialog.value = false
+  event.projectId = projectStore.loadedProject.id
+  projectStore.addEvent(event)
+}
 
-    get passedEvents(): EventModel[] {
-        return this.project.events.filter(event => isPassed(event)).reverse()
-    }
+function updateEvent(payload: { id: number; data: EventPostOrPatch }): void {
+  const { id, data } = payload
+  projectStore.editEvent(id, data)
+}
 
-    createEvent(event: EventPostOrPatch): void {
-        this.eventDialog = false
-        event.projectId = this.project.id
-        this.$store.dispatch(projectActions.event.addEvent, event)
-    }
-
-    updateEvent(payload: { id: number; data: EventPostOrPatch }): void {
-        this.$store.dispatch(projectActions.event.editEvent, payload)
-    }
-
-    deleteEvent(id: number): void {
-        this.$store.dispatch(projectActions.event.deleteEvent, id)
-    }
+function deleteEvent(id: number): void {
+  projectStore.deleteEvent(id)
 }
 </script>
 
+<template>
+  <div class="flex-grow-1 d-flex flex-column">
+    <div class="d-flex align-center column-gap-2 row-gap-1 mb-3">
+      <h3 class="text-title-large text-sm-headline-small flex-grow-1">Events</h3>
+
+      <div class="d-flex justify-space-between align-center gap-2">
+        <FilterChip
+          v-if="projectStore.loadedProject.events.length > 0"
+          v-model="displayPassedEvent"
+          color="event"
+          icon="mdi-clock-check-outline">
+          Passed
+        </FilterChip>
+
+        <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              :disabled="projectStore.loadedProject.archived"
+              :block="xs && projectStore.loadedProject.events.length === 0">
+              <v-icon icon="mdi-plus" start />
+              event
+            </v-btn>
+          </template>
+          <EventDialog
+            :is-dialog-open="eventDialog"
+            @submit="createEvent($event)"
+            @close="eventDialog = false">
+          </EventDialog>
+        </v-dialog>
+      </div>
+    </div>
+
+    <template v-if="!displayPassedEvent">
+      <template v-if="projectStore.comingEvents.length > 0">
+        <div class="pl-3">
+          <EventItemCard
+            v-for="event of projectStore.comingEvents"
+            :key="event.id"
+            :event
+            :disabled="projectStore.loadedProject.archived"
+            :show-icon="true"
+            @update="updateEvent($event)"
+            @delete="deleteEvent($event)">
+          </EventItemCard>
+        </div>
+      </template>
+      <template v-else>
+        <EmptyListDisplay message="This project has no coming events." class="empty-list-display">
+          <template #img>
+            <img
+              src="../../../../assets/no_events.svg"
+              alt="No events"
+              class="empty-list-display__img" />
+          </template>
+        </EmptyListDisplay>
+      </template>
+    </template>
+    <template v-else>
+      <template v-if="projectStore.passedEvents.length > 0">
+        <div class="pl-3">
+          <EventItemCard
+            v-for="event of projectStore.passedEvents"
+            :key="event.id"
+            :event
+            :show-icon="true"
+            :disabled="projectStore.loadedProject.archived"
+            @update="updateEvent($event)"
+            @delete="deleteEvent($event)">
+          </EventItemCard>
+        </div>
+      </template>
+      <template v-else>
+        <EmptyListDisplay message="This project has no past events." class="empty-list-display">
+          <template #img>
+            <img
+              src="../../../../assets/no_events.svg"
+              alt="No events"
+              class="empty-list-display__img" />
+          </template>
+        </EmptyListDisplay>
+      </template>
+    </template>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .empty-list-display {
-    padding-top: 20px;
-    flex-grow: 1;
+  padding-top: 20px;
+  flex-grow: 1;
 
-    &__img {
-        width: clamp(200px, 50%, 300px);
+  &__img {
+    width: clamp(200px, 50%, 300px);
 
-        @media #{map-get($display-breakpoints, 'xl-only')} {
-            width: clamp(200px, 50%, 400px);
-        }
+    @media #{map.get(variables.$display-breakpoints, 'xl')} {
+      width: clamp(200px, 50%, 400px);
     }
+  }
 }
 </style>

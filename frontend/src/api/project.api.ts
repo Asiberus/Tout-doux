@@ -1,39 +1,39 @@
 import { apiRoutes } from '@/api-routes'
-import Vue from 'vue'
-import { ProjectPostOrPatch } from '@/models/project.model'
+import {
+  Project,
+  ProjectDetail,
+  ProjectList,
+  ProjectPatch,
+  ProjectPost,
+} from '@/models/project.model'
+import { Pagination } from '@/models/pagination.model'
+import { http } from '@/axios/http'
 
-const getProjectList = (params = {}) => {
-    return Vue.http.get(apiRoutes.project, { params: { size: 0, ...params } })
+export function getProjectList(params = {}): Promise<Pagination<ProjectList[]>> {
+  return http.get<Pagination<ProjectList[]>>(apiRoutes.project, { params: { size: 0, ...params } })
 }
 
-const getProjectListDetailed = (params = {}) => {
-    return Vue.http.get(apiRoutes.projectDetailed, { params: { size: 0, ...params } })
+export function getProjectListDetailed(params = {}): Promise<Pagination<ProjectDetail[]>> {
+  return http.get<Pagination<ProjectDetail[]>>(apiRoutes.projectDetailed, {
+    params: { size: 0, ...params },
+  })
 }
 
-const getProjectById = (projectId: number) => {
-    return Vue.http.get(apiRoutes.projectById.replace(':projectId', projectId.toString()))
+export function getProjectById(projectId: number): Promise<ProjectDetail> {
+  return http.get<ProjectDetail>(apiRoutes.projectById.replace(':projectId', projectId.toString()))
 }
 
-const createProject = (project: ProjectPostOrPatch) => {
-    return Vue.http.post(apiRoutes.project, project)
+export function createProject(project: ProjectPost): Promise<Project> {
+  return http.post<Project>(apiRoutes.project, project)
 }
 
-const updateProject = (projectId: number, project: ProjectPostOrPatch) => {
-    return Vue.http.patch(
-        apiRoutes.projectById.replace(':projectId', projectId.toString()),
-        project
-    )
+export function updateProject(projectId: number, project: ProjectPatch): Promise<Project> {
+  return http.patch<Project>(
+    apiRoutes.projectById.replace(':projectId', projectId.toString()),
+    project
+  )
 }
 
-const deleteProject = (projectId: number) => {
-    return Vue.http.delete(apiRoutes.projectById.replace(':projectId', projectId.toString()))
-}
-
-export const projectService = {
-    getProjectList,
-    getProjectListDetailed,
-    getProjectById,
-    createProject,
-    updateProject,
-    deleteProject,
+export function deleteProject(projectId: number): Promise<void> {
+  return http.delete(apiRoutes.projectById.replace(':projectId', projectId.toString()))
 }

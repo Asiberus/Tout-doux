@@ -1,36 +1,37 @@
-import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { PaginationParams } from '@/models/common.model'
-import { TagForm, TagType } from '@/models/tag.model'
+import { Pagination, PaginationParams } from '@/models/pagination.model'
+import { Tag, TagForm, TagType } from '@/models/tag.model'
+import { UniqueResponse } from '@/models/common.model'
+import { http } from '@/axios/http'
 
 export interface IsTagNameUniqueParams {
-    type: TagType
-    name: string
-    exclude_id?: number
+  type: TagType
+  name: string
+  exclude_id?: number
 }
 
 interface TagListParams extends PaginationParams {
-    type: TagType
-    search?: string
-    exclude_ids?: string
+  type: TagType
+  search?: string
+  exclude_ids?: string
 }
 
-export function getTagList(params: TagListParams) {
-    return Vue.http.get(apiRoutes.tag, { params })
+export function getTagList(params: TagListParams): Promise<Pagination<Tag[]>> {
+  return http.get<Pagination<Tag[]>>(apiRoutes.tag, { params })
 }
 
-export function isNameUnique(params: IsTagNameUniqueParams) {
-    return Vue.http.get(apiRoutes.tagUnique, { params })
+export function isNameUnique(params: IsTagNameUniqueParams): Promise<UniqueResponse> {
+  return http.get<UniqueResponse>(apiRoutes.tagUnique, { params })
 }
 
-export function createTag(tag: TagForm) {
-    return Vue.http.post(apiRoutes.tag, tag)
+export function createTag(tag: TagForm): Promise<Tag> {
+  return http.post<Tag>(apiRoutes.tag, tag)
 }
 
-export function updateTag(id: number, tag: TagForm) {
-    return Vue.http.patch(apiRoutes.tagById.replace(':id', id.toString()), tag)
+export function updateTag(id: number, tag: TagForm): Promise<Tag> {
+  return http.patch<Tag>(apiRoutes.tagById.replace(':id', id.toString()), tag)
 }
 
-export function deleteTag(id: number) {
-    return Vue.http.delete(apiRoutes.tagById.replace(':id', id.toString()))
+export function deleteTag(id: number): Promise<void> {
+  return http.delete(apiRoutes.tagById.replace(':id', id.toString()))
 }

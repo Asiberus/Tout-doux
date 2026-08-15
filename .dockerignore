@@ -8,6 +8,7 @@ npm-debug.log
 **/dist
 **/.husky
 **/tests
+yarn.lock
 
 # Docker
 docker-compose*.yml

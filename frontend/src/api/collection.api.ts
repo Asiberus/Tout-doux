@@ -1,41 +1,44 @@
 import { apiRoutes } from '@/api-routes'
-import Vue from 'vue'
-import { CollectionPatch, CollectionPost } from '@/models/collection.model'
+import {
+  Collection,
+  CollectionDetail,
+  CollectionList,
+  CollectionPatch,
+  CollectionPost,
+} from '@/models/collection.model'
+import { http } from '@/axios/http'
+import { Pagination } from '@/models/pagination.model'
 
-const getCollectionList = (params = {}) => {
-    return Vue.http.get(apiRoutes.collection, { params: { size: 0, ...params } })
+export function getCollectionList(params = {}): Promise<Pagination<CollectionList[]>> {
+  return http.get<Pagination<CollectionList[]>>(apiRoutes.collection, {
+    params: { size: 0, ...params },
+  })
 }
 
-const getCollectionListDetailed = (params = {}) => {
-    return Vue.http.get(apiRoutes.collectionDetailed, { params: { size: 0, ...params } })
+export function getCollectionListDetailed(params = {}): Promise<Pagination<CollectionDetail[]>> {
+  return http.get<Pagination<CollectionDetail[]>>(apiRoutes.collectionDetailed, {
+    params: { size: 0, ...params },
+  })
 }
 
-const getCollectionById = (collectionId: number) => {
-    return Vue.http.get(apiRoutes.collectionById.replace(':collectionId', collectionId.toString()))
+export function getCollectionById(collectionId: number): Promise<CollectionDetail> {
+  const url = apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+  return http.get<CollectionDetail>(url)
 }
 
-const createCollection = (collectionForm: CollectionPost) => {
-    return Vue.http.post(apiRoutes.collection, collectionForm)
+export function createCollection(collectionForm: CollectionPost): Promise<Collection> {
+  return http.post<Collection>(apiRoutes.collection, collectionForm)
 }
 
-const updateCollection = (collectionId: number, collectionForm: CollectionPatch) => {
-    return Vue.http.patch(
-        apiRoutes.collectionById.replace(':collectionId', collectionId.toString()),
-        collectionForm
-    )
+export function updateCollection(
+  collectionId: number,
+  collectionForm: CollectionPatch
+): Promise<Collection> {
+  const url = apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+  return http.patch<Collection>(url, collectionForm)
 }
 
-const deleteCollection = (collectionId: number) => {
-    return Vue.http.delete(
-        apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
-    )
-}
-
-export const collectionService = {
-    getCollectionList,
-    getCollectionListDetailed,
-    getCollectionById,
-    createCollection,
-    updateCollection,
-    deleteCollection,
+export function deleteCollection(collectionId: number): Promise<void> {
+  const url = apiRoutes.collectionById.replace(':collectionId', collectionId.toString())
+  return http.delete(url)
 }

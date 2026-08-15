@@ -1,105 +1,162 @@
-<template>
-    <div class="daily-update">
-        <div class="d-flex flex-column flex-sm-row justify-space-between align-center gap-2 mb-2">
-            <SecondaryTitle class="text-center text-sm-start">
-                <span class="grey--text">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
-            </SecondaryTitle>
-
-            <v-btn
-                @click="goToDailyDetail()"
-                :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
-                color="accent"
-                rounded>
-                Start the day
-                <v-icon right>mdi-arrow-right</v-icon>
-            </v-btn>
-        </div>
-
-        <v-stepper
-            @change="onStepperChange($event)"
-            :value="dailyStepper"
-            non-linear
-            alt-labels
-            class="daily-update-stepper">
-            <v-stepper-header>
-                <v-divider></v-divider>
-                <v-stepper-step :step="1" editable color="accent">
-                    Task
-                    <template v-if="dailyTaskCount > 0"> ({{ dailyTaskCount }}) </template>
-                </v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step :step="2" editable color="accent">
-                    Event
-                    <template v-if="dailyEventCount > 0"> ({{ dailyEventCount }}) </template>
-                </v-stepper-step>
-                <v-divider></v-divider>
-            </v-stepper-header>
-            <v-stepper-items>
-                <v-stepper-content :step="1">
-                    <DailyUpdateTask
-                        :date="date"
-                        @daily-task-count="dailyTaskCount = $event"></DailyUpdateTask>
-                </v-stepper-content>
-                <v-stepper-content :step="2">
-                    <DailyUpdateEvent
-                        :date="date"
-                        @daily-event-count="dailyEventCount = $event"></DailyUpdateEvent>
-                </v-stepper-content>
-            </v-stepper-items>
-        </v-stepper>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import MainTitle from '@/components/MainTitle.vue'
 import SecondaryTitle from '@/components/SecondaryTitle.vue'
+import { onBeforeMount, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 
-@Component({ components: { SecondaryTitle, DailyUpdateTask, DailyUpdateEvent } })
-export default class DailyUpdate extends Vue {
-    @Prop({ required: true }) readonly date!: string
-    @Prop({ validator: value => value === 'task' || value === 'event' })
-    readonly step!: 'task' | 'event'
+const router = useRouter()
 
-    dailyStepper = 1
-    dailyTaskCount = 0
-    dailyEventCount = 0
+const props = defineProps<{
+  date: string
+  step: 'task' | 'event'
+}>()
 
-    private beforeMount(): void {
-        if (this.step === 'task') this.dailyStepper = 1
-        else if (this.step === 'event') this.dailyStepper = 2
-    }
+onBeforeMount(() => {
+  if (props.step === 'task') dailyStepper.value = 1
+  else if (props.step === 'event') dailyStepper.value = 2
+})
 
-    goToDailyDetail(): void {
-        this.$router.push({ name: 'daily-summary', params: { date: this.date } })
-    }
+const dailyStepper = ref(1)
+const dailyTaskCount = ref(0)
+const dailyEventCount = ref(0)
 
-    onStepperChange(index: number): void {
-        const step = index === 1 ? 'task' : 'event'
-        this.$router.replace({ params: { step } })
-    }
-
-    dateFormat(date: string, format: string): string {
-        return dateFormat(date, format)
-    }
+function goToDailyDetail(): void {
+  router.push({ name: 'daily-summary', params: { date: props.date } })
 }
+
+watch(dailyStepper, index => {
+  const step = index === 1 ? 'task' : 'event'
+  router.replace({ params: { step } })
+})
 </script>
 
+<template>
+  <div class="daily-update">
+    <div class="d-flex flex-column flex-sm-row justify-space-between align-center gap-2 mb-2">
+      <SecondaryTitle class="text-center text-sm-start">
+        <span class="text-grey">Daily : </span>{{ dateFormat(date, 'dddd DD MMMM Y') }}
+      </SecondaryTitle>
+
+      <v-btn
+        :disabled="dailyTaskCount === 0 && dailyEventCount === 0"
+        color="accent"
+        rounded
+        @click="goToDailyDetail()">
+        Start the day
+        <v-icon icon="mdi-arrow-right" end />
+      </v-btn>
+    </div>
+
+    <v-stepper
+      v-model="dailyStepper"
+      non-linear
+      alt-labels
+      mobile-breakpoint="lg"
+      class="daily-update-stepper">
+      <v-stepper-header>
+        <v-divider />
+        <v-stepper-item :value="1" editable color="accent" icon="mdi-trophy" edit-icon="mdi-trophy">
+          <template #title>
+            Task
+            <template v-if="dailyTaskCount > 0">({{ dailyTaskCount }})</template>
+          </template>
+        </v-stepper-item>
+        <v-divider />
+        <v-stepper-item
+          :value="2"
+          editable
+          color="accent"
+          icon="mdi-calendar-clock"
+          edit-icon="mdi-calendar-clock">
+          <template #title>
+            Event
+            <template v-if="dailyEventCount > 0">({{ dailyEventCount }})</template>
+          </template>
+        </v-stepper-item>
+        <v-divider />
+      </v-stepper-header>
+      <v-stepper-window>
+        <!-- `eager` : sans lui l'étape non sélectionnée n'est pas montée, son appel API ne part
+             pas et son compteur reste vide dans l'en-tête du stepper -->
+        <v-stepper-window-item :value="1" eager>
+          <DailyUpdateTask :date @daily-task-count="dailyTaskCount = $event" />
+        </v-stepper-window-item>
+        <v-stepper-window-item :value="2" eager>
+          <DailyUpdateEvent :date @daily-event-count="dailyEventCount = $event" />
+        </v-stepper-window-item>
+      </v-stepper-window>
+    </v-stepper>
+  </div>
+</template>
+
 <style scoped lang="scss">
-@import '~vuetify/src/styles/styles.sass';
+@use 'sass:map';
+@use 'vuetify/lib/styles/settings/_variables';
 
 .daily-update {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
+    .v-stepper-item:hover {
+      background: inherit;
+    }
+  }
+}
+
+.daily-update-stepper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+
+  --stepper-avatar-size: 35px;
+  --stepper-icon-size: 18px;
+
+  // Taille de l'avatar codée en dur (`size: 24`) dans VStepperItem, donc posée en style inline
+  :deep(.v-stepper-item__avatar.v-avatar) {
+    width: var(--stepper-avatar-size) !important;
+    height: var(--stepper-avatar-size) !important;
+
+    .v-icon {
+      font-size: var(--stepper-icon-size);
+    }
+  }
+
+  :deep(.v-stepper-header) {
+    box-shadow: none !important;
+    margin-bottom: 4px;
+
+    // V4 : le raccourci `margin` de `alt-labels` réécrase le reset des marges négatives sur les
+    // dividers d'extrémité, qui débordent alors de 67px → scroll horizontal (overflow-x: auto)
+    .v-divider:first-child {
+      margin-inline-start: 0;
+    }
+
+    .v-divider:last-child {
+      margin-inline-end: 0;
+    }
+  }
+
+  :deep(.v-stepper-window) {
+    flex-grow: 1;
+    min-height: 0;
+    margin: 0 !important; // V4 remplace le padding du content par margin: 1.5rem
+  }
+
+  :deep(.v-window__container) {
+    height: 100%;
+  }
+
+  :deep(.v-window-item) {
     height: 100%;
     display: flex;
     flex-direction: column;
-
-    @media #{map-get($display-breakpoints, 'sm-and-down')} {
-        .v-stepper__step--editable:hover {
-            background: inherit;
-        }
-    }
+  }
 }
 </style>

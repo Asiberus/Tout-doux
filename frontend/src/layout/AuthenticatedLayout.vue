@@ -1,46 +1,39 @@
-<template>
-    <v-app v-touch="{ left: hideNavbar }" v-if="user">
-        <v-navigation-drawer v-model="displayNavbar" app touchless>
-            <TheNavbar :display-navbar.sync="displayNavbar"></TheNavbar>
-        </v-navigation-drawer>
-        <v-app-bar app dense>
-            <TheHeader :header-menu.sync="headerMenu" :display-navbar.sync="displayNavbar">
-            </TheHeader>
-        </v-app-bar>
-        <v-main v-touch="{ right: showNavbar }">
-            <v-container fluid class="pa-3 pa-sm-5 pa-lg-6 h-100">
-                <router-view />
-            </v-container>
-        </v-main>
-    </v-app>
-</template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
-import { User } from '@/models/user.model'
+import { useDisplay } from 'vuetify'
+import { ref } from 'vue'
+import { useUserStore } from '@/store'
 
-@Component({ components: { TheNavbar, TheHeader } })
-export default class AuthenticatedLayout extends Vue {
-    displayNavbar = !this.$vuetify.breakpoint.mobile
-    headerMenu = false
+const { mobile } = useDisplay()
+const userStore = useUserStore()
 
-    get user(): User | undefined {
-        return this.$store.state.user.user
-    }
+const navbarDisplayed = ref(!mobile.value)
+const headerMenu = ref(false)
 
-    showNavbar(): void {
-        if (!this.$vuetify.breakpoint.mobile) return
+function showNavbar(): void {
+  if (!mobile.value) return
 
-        this.displayNavbar = true
-        this.headerMenu = false
-    }
+  navbarDisplayed.value = true
+  headerMenu.value = false
+}
 
-    hideNavbar(): void {
-        if (!this.$vuetify.breakpoint.mobile) return
+function hideNavbar(): void {
+  if (!mobile.value) return
 
-        this.displayNavbar = false
-    }
+  navbarDisplayed.value = false
 }
 </script>
+
+<template>
+  <v-app v-if="userStore.user" v-touch="{ left: hideNavbar }">
+    <TheNavbar v-model="navbarDisplayed" />
+    <TheHeader v-model:header-menu="headerMenu" v-model:navbar-displayed="navbarDisplayed" />
+
+    <v-main v-touch="{ right: showNavbar }">
+      <v-container fluid class="pa-3 pa-sm-5 pa-lg-6 h-100">
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
