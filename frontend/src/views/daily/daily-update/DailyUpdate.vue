@@ -115,6 +115,19 @@ watch(dailyStepper, index => {
   background: transparent !important;
   border: none !important;
 
+  --stepper-avatar-size: 35px;
+  --stepper-icon-size: 18px;
+
+  // Taille de l'avatar codée en dur (`size: 24`) dans VStepperItem, donc posée en style inline
+  :deep(.v-stepper-item__avatar.v-avatar) {
+    width: var(--stepper-avatar-size) !important;
+    height: var(--stepper-avatar-size) !important;
+
+    .v-icon {
+      font-size: var(--stepper-icon-size);
+    }
+  }
+
   :deep(.v-stepper-header) {
     box-shadow: none !important;
     margin-bottom: 4px;
