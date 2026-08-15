@@ -8,7 +8,7 @@
     "build": "vite build",
     "type-check": "vue-tsc --noEmit",
     "serve": "vite preview",
-    "lint": "eslint --ignore-pattern .gitignore --fix",
+    "lint": "eslint --fix",
     "format": "prettier . --write",
     "prepare": "cd .. && husky frontend/.husky",
     "docker:build": "docker compose --env-file ../.conf/development/conf.env build",

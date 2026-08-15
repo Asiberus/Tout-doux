@@ -18,8 +18,9 @@ const pluginVuetify = {
 }
 
 export default [
+  { ignores: ['dist/**', 'eslint.config.mjs'] },
+
   {
-    ignores: ['./eslint.config.mjs'],
     languageOptions: {
       parser: 'vue-eslint-parser',
       parserOptions: {
