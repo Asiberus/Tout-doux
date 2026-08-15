@@ -255,7 +255,8 @@ function formattedDate(value: string | null | undefined): string {
             rows="1"
             auto-grow
             class="flex-grow-0"
-            @keyup.enter.ctrl="emitSubmitEvent()">
+            @keydown.enter.ctrl.prevent="emitSubmitEvent()"
+            @keydown.enter.meta.prevent="emitSubmitEvent()">
           </v-textarea>
 
           <div class="d-flex flex-column flex-sm-row column-gap-6 date-time-section">

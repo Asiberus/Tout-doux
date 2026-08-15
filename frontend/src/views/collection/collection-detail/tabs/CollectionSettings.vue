@@ -60,6 +60,8 @@ function resetForm(): void {
 }
 
 function updateCollection(): void {
+  if (!collectionForm.value.valid || isFormUntouched.value) return
+
   collectionStore.updateProperties(collectionForm.value.data)
 }
 
@@ -147,7 +149,8 @@ function deleteCollection(): void {
         rows="2"
         auto-grow
         class="mb-2"
-        @keyup.enter.ctrl="updateCollection()">
+        @keydown.enter.ctrl.prevent="updateCollection()"
+        @keydown.enter.meta.prevent="updateCollection()">
       </v-textarea>
 
       <div class="item-name-wrapper mb-2">

@@ -85,6 +85,8 @@ function resetForm(): void {
 }
 
 function updateProject(): void {
+  if (!projectForm.value.valid || isFormUntouched.value) return
+
   projectStore.updateProperties(projectForm.value.data)
 }
 
@@ -170,7 +172,8 @@ function deleteProject(): void {
         rows="2"
         auto-grow
         class="mb-2"
-        @keyup.enter.ctrl="updateProject()" />
+        @keydown.enter.ctrl.prevent="updateProject()"
+        @keydown.enter.meta.prevent="updateProject()" />
 
       <h6
         class="text-title-large"

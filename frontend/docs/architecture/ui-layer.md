@@ -54,10 +54,15 @@ qu'aux couleurs de la palette Material (`grey-darken-3`, `green-darken-2`…).
 
 `vuetify.ts` → bloc `defaults` : tous les champs de saisie en `variant: 'underlined'` (le défaut
 Vuetify 4 est `filled` — ce bloc restaure l'apparence historique de l'app), `VSwitch` en
-`color: 'primary'`, `VChip` en `variant: 'flat'`.
+`color: 'primary'`, `VDialog` en `transition: 'scale-transition'`.
+
+`VDialog` : le défaut Vuetify 4 n'est pas une transition CSS mais le **composant**
+`VDialogTransition`, qui mesure la boîte de l'activateur et fait grandir la dialog **depuis le
+bouton**. `scale-transition` rétablit le scale depuis le centre de l'écran, comme en Vuetify 2.
 
 **Conséquence** : ne pas remettre `variant="underlined"` localement sur un champ, c'est déjà le
-défaut. Un `variant` local **écrase** le défaut (`Feedback.vue` utilise volontairement `filled`).
+défaut. Un `variant` local **écrase** le défaut (`Feedback.vue` utilise volontairement `filled`),
+de même qu'un `transition` local (`DailyDetail.vue` et `HalfDialog.vue` gardent le leur).
 
 ## Styles globaux
 

@@ -72,6 +72,39 @@ Deux fichiers seulement appellent `validate()` explicitement
 (`ResetPasswordRequest.vue:36`, `ProfileEmail.vue:58`) ; partout ailleurs on se repose sur
 `form.valid` mis à jour en continu par `v-model`.
 
+## Soumettre un textarea au clavier
+
+Dans un `v-text-field`, Entrée soumet nativement le formulaire ; dans un `v-textarea`, elle
+insère un saut de ligne. Les 7 textareas de l'app exposent donc **ctrl+entrée / cmd+entrée** :
+
+```html
+<v-textarea
+  v-model="form.data.description"
+  @keydown.enter.ctrl.prevent="submit()"
+  @keydown.enter.meta.prevent="submit()" />
+```
+
+Trois points non négociables :
+
+- **`keydown`, pas `keyup`** — sur macOS, les `keyup` des autres touches ne sont pas
+  systématiquement délivrés tant que Cmd est enfoncée, donc `@keyup.enter.meta` peut ne jamais
+  se déclencher.
+- **`.prevent`** — sans lui, le saut de ligne est inséré dans le champ avant la soumission.
+- **Deux bindings** — Vue combine les modificateurs en **ET**, il n'existe pas de OU :
+  `.ctrl.meta` exigerait les deux touches à la fois.
+
+⚠️ Le raccourci appelle la fonction de soumission **directement**, il ne passe pas par le bouton.
+La condition du `:disabled` doit donc être répliquée en garde en tête de la fonction, sinon le
+raccourci soumet un formulaire invalide ou inchangé :
+
+```ts
+function updateProject(): void {
+  if (!projectForm.value.valid || isFormUntouched.value) return
+
+  projectStore.updateProperties(projectForm.value.data)
+}
+```
+
 ## Validation d'unicité côté serveur (debounce)
 
 Pattern pour les champs uniques (nom d'utilisateur, e-mail, nom de tag, nom de common task) :

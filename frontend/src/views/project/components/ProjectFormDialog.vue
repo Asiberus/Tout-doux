@@ -100,7 +100,8 @@ function emitCloseEvent(): void {
             rows="1"
             auto-grow
             class="mb-2"
-            @keyup.enter.ctrl="emitSubmitEvent()" />
+            @keydown.enter.ctrl.prevent="emitSubmitEvent()"
+            @keydown.enter.meta.prevent="emitSubmitEvent()" />
 
           <h6 class="text-title-large text-grey-lighten-2">
             <v-icon icon="mdi-tag" size="x-small" />

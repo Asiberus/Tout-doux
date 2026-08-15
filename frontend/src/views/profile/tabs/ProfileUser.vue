@@ -117,7 +117,8 @@ function submit(): void {
         rows="4"
         auto-grow
         class="mb-5"
-        @keyup.enter.ctrl="submit()" />
+        @keydown.enter.ctrl.prevent="submit()"
+        @keydown.enter.meta.prevent="submit()" />
 
       <v-btn
         :color="canSubmit ? 'success' : undefined"

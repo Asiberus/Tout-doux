@@ -92,7 +92,8 @@ function emitCloseEvent(): void {
             rows="1"
             auto-grow
             class="mb-2"
-            @keyup.enter.ctrl="emitSubmitEvent()">
+            @keydown.enter.ctrl.prevent="emitSubmitEvent()"
+            @keydown.enter.meta.prevent="emitSubmitEvent()">
           </v-textarea>
 
           <div class="item-name-wrapper mb-2">

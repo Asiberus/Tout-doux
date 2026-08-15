@@ -70,7 +70,8 @@ function submit(): void {
         counter="2000"
         rows="10"
         variant="filled"
-        @keyup.enter.ctrl="submit()">
+        @keydown.enter.ctrl.prevent="submit()"
+        @keydown.enter.meta.prevent="submit()">
       </v-textarea>
 
       <div class="d-flex justify-end mt-2">
