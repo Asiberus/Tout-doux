@@ -100,7 +100,7 @@ function removeTag(id: number): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .tag-wrapper {
   display: flex;

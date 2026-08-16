@@ -157,7 +157,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .daily-task-form-card {
   display: flex;

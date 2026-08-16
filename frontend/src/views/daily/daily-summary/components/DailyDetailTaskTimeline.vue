@@ -78,7 +78,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .v-timeline {
   padding-top: 0;

@@ -216,7 +216,7 @@ function isDateEqual(date1: string, date2: string): boolean {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .v-card.caret {
   overflow: visible;

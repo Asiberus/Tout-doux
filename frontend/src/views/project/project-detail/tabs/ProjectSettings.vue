@@ -211,7 +211,7 @@ function deleteProject(): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 @media #{map.get(variables.$display-breakpoints, 'md-and-up')} {
   .form-wrapper {

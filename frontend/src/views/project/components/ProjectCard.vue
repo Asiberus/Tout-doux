@@ -52,7 +52,7 @@ const percentageOfCompletedTask = computed<number>(
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .project-card {
   min-height: 122px;

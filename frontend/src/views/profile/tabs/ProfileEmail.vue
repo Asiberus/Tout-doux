@@ -114,7 +114,7 @@ function changeEmail(): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .profile-email {
   @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {

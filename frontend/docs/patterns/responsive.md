@@ -39,34 +39,48 @@ Ne pas recalculer une largeur de dialog à partir des breakpoints — utiliser
 
 ## Breakpoints
 
-Vuetify 4 a **réduit** les seuils par défaut par rapport à Vuetify 3, et le projet a **adopté
-les nouveaux tels quels** (aucun `display.thresholds` dans `src/plugins/vuetify.ts`) :
+Vuetify 4 (MD3) a **réduit** les seuils par défaut. Le projet les **remet aux valeurs
+historiques** (celles de Vuetify 2/3) :
 
-| Breakpoint | Seuil V4 (actuel) | Seuil V3 (avant) |
-| ---------- | ----------------- | ---------------- |
-| `xs`       | 0                 | 0                |
-| `sm`       | 600               | 600              |
-| `md`       | **840**           | 960              |
-| `lg`       | **1145**          | 1280             |
-| `xl`       | **1545**          | 1920             |
-| `xxl`      | **2138**          | 2560             |
+| Breakpoint | Seuil du projet | Défaut Vuetify 4 |
+| ---------- | --------------- | ---------------- |
+| `xs`       | 0               | 0                |
+| `sm`       | 600             | 600              |
+| `md`       | **960**         | 840              |
+| `lg`       | **1280**        | 1145             |
+| `xl`       | **1920**        | 1545             |
+| `xxl`      | **2560**        | 2138             |
 
-**Conséquence à garder en tête** : tout basculement de layout arrive **plus tôt** qu'avant. Une
-largeur entre 1145 et 1280 px, par exemple, est passée de `mdAndDown` à `lgAndUp` — ce qui a
-changé le layout de `DailyDetail.vue` (onglets ↔ deux colonnes) sans modification de code.
+⚠️ **Trois consommateurs doivent rester alignés.** Ne jamais en modifier un seul : un utilitaire
+`d-lg-none` basculerait à un seuil différent d'une media query voisine.
+
+| Consommateur                              | Source à modifier                      |
+| ----------------------------------------- | -------------------------------------- |
+| `useDisplay()` (JS)                       | `display.thresholds` de `vuetify.ts`   |
+| Utilitaires et grille Vuetify (`d-md-*`…) | `$grid-breakpoints` de `settings.scss` |
+| Media queries des `<style>` de SFC        | `src/styles/_breakpoints.scss`         |
+
+Les trois lisent la même map, `src/styles/_breakpoint-values.scss` pour les deux premières côté
+Sass. **Modifier la map suffit** ; c'est le seul endroit à toucher.
 
 ## Côté SCSS
 
-Utiliser la map de breakpoints Vuetify, pas des valeurs en dur :
+Passer par le module **du projet**, pas directement par celui de Vuetify :
 
 ```scss
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 @media #{map.get(variables.$display-breakpoints, 'xs')} {
   ...
 }
 ```
+
+⚠️ `@use 'vuetify/lib/styles/settings/_variables'` en direct **compile avec les seuils MD3** :
+le `configFile` de `vite-plugin-vuetify` ne s'applique qu'aux styles de Vuetify, pas aux blocs
+`<style>` des SFC, qui sont des compilations Sass séparées. L'erreur est **silencieuse** — le
+build passe, seules les media queries sont fausses. Les 46 SFC concernés utilisent le module du
+projet ; garder cette forme.
 
 Exemple réel : `src/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue`.
 
@@ -85,7 +99,9 @@ Exemple réel : `src/views/daily/daily-summary/components/DailyDetailTaskTimelin
   un redimensionnement ne réajuste pas la pagination. Volontairement figé pour ne pas refetch.
 - **L'état initial du drawer** (`AuthenticatedLayout.vue:11`) est un `ref(!mobile.value)` : il ne
   réagit pas au franchissement d'un breakpoint après le montage.
-- **La QA responsive complète n'a pas été refaite** depuis le passage aux seuils V4 — voir
+- **La QA responsive complète `xs`→`xl` n'a jamais été menée** sur cette app. Le rétablissement
+  des seuils V2/V3 doit lui rendre son comportement d'avant migration, mais ça n'a pas été
+  vérifié écran par écran — voir
   [../workflows/vuetify-4-migration.md](../workflows/vuetify-4-migration.md) point 2.7.
 
 ## Voir aussi

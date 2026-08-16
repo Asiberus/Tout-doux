@@ -109,7 +109,7 @@ function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .daily-task-wrapper {
   overflow-y: auto;

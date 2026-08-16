@@ -1,0 +1,11 @@
+// Seuils Vuetify 2/3. Vuetify 4 (MD3) les abaisse (md 840, lg 1145, xl 1545, xxl 2138), ce qui
+// décale tout le responsive de l'app. Consommé par _breakpoints.scss (SFC) et settings.scss
+// (utilitaires Vuetify) ; le pendant JS est `display.thresholds` dans plugins/vuetify.ts.
+$grid-breakpoints: (
+  'xs': 0,
+  'sm': 600px,
+  'md': 960px,
+  'lg': 1280px,
+  'xl': 1920px,
+  'xxl': 2560px,
+);

@@ -93,7 +93,7 @@ watch(dailyStepper, index => {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .daily-update {
   height: 100%;

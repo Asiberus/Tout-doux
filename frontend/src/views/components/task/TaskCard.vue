@@ -165,7 +165,7 @@ function emitDeleteEvent(): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .task-card {
   min-height: 72px;

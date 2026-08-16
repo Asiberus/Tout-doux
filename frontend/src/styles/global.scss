@@ -1,5 +1,5 @@
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 // Ce fichier est chargé AVANT Vuetify : sans cette déclaration, c'est le premier `@layer` écrit
 // ici qui fixerait la position du layer, donc avant `vuetify-components` — et tout override

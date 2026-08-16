@@ -58,7 +58,7 @@ function updatePreferences(progressWheelMode: ProgressWheelMode): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 @use 'vuetify/lib/styles/settings/colors';
 
 .progress-wheel-wrapper {

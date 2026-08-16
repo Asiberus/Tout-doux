@@ -74,7 +74,7 @@ function openDailyDetailDialog(): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .daily-summary-card {
   min-height: 96px;

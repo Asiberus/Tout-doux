@@ -126,7 +126,7 @@ function changeRouteParam(index: number): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .v-tab {
   max-width: 300px;

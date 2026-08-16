@@ -1,4 +1,7 @@
+@use './breakpoint-values' as values;
+
 @use 'vuetify/settings' with (
   $button-colored-disabled: false,
-  $button-text-transform: uppercase
+  $button-text-transform: uppercase,
+  $grid-breakpoints: values.$grid-breakpoints
 );

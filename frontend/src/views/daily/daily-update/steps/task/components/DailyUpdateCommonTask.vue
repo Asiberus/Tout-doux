@@ -53,7 +53,7 @@ function isCommonTaskSelected(id: number): boolean {
 
 <style lang="scss" scoped>
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .common-task-list {
   display: grid;

@@ -42,7 +42,7 @@
 - [x] 2.4 — QA des sélecteurs `:deep()` _(14/15 classes toujours valides ; `.v-timeline-item__divider` → `.v-timeline-divider`)_
 - [x] 2.5 — slot `v-hover` `{ hover }` → `{ isHovering }` (Vuetify 3 manqué)
 - [x] 2.6 — (Vuetify 4) Typographie MD3 _(91 occurrences renommées, 51 fichiers)_
-- [ ] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`) _(décision prise : MD3 adopté tel quel, cf. §2.7)_
+- [x] 2.7 — (Vuetify 4) Breakpoints réduits (`useDisplay`) _(décision **inversée** : les seuils V2/V3 sont rétablis sur les 3 consommateurs, cf. §2.7)_
 - [⛔] 2.8 — (Vuetify 4) `fill-height` / VContainer _(ANNULÉ : le rendu actuel convient, aucune action)_
 - [x] 2.9 — (Vuetify 4) VBtn (uppercase + grid→flex)
 - [x] 2.10 — (Vuetify 4) CSS Layers + `!important` _(cas connu traité, cf. §2.10)_
@@ -720,7 +720,7 @@ Occurrences par classe : `text-body-1` (23), `text-h5` (19), `text-h6` (18), `te
 
 ### 2.7 (Vuetify 4) Breakpoints réduits → `useDisplay`
 
-> **Décision prise (implicite)** : les seuils MD3 par défaut (`md: 840`, `lg: 1145`, `xl: 1545`, `xxl: 2138`) ont été **adoptés tels quels**, pas figés à l'ancien découpage. Ça a d'ailleurs servi de piste de diagnostic pour un bug de layout `DailyDetail.vue` (bascule tabs ↔ 2-colonnes à une largeur différente qu'avant). Reste à faire : la **QA responsive complète** `xs`→`xl` n'a pas été menée systématiquement — cocher la case seulement après un passage écran par écran.
+> **Décision inversée (2026-08-17)** : les seuils MD3 avaient d'abord été adoptés tels quels ; ils sont désormais **rétablis aux valeurs V2/V3**. Déclencheur : la grille de `ProjectList` tombait à 2 colonnes au lieu de 3 vers 1700 px, `xl` ayant glissé de 1920 à 1545. ⚠️ La recommandation ci-dessous (`display.thresholds` seul) est **insuffisante** : elle ne pilote que `useDisplay()`. Les media queries des SFC et les utilitaires Vuetify ont chacun leur propre source — voir [../patterns/responsive.md](../patterns/responsive.md). Ça a d'ailleurs servi de piste de diagnostic pour un bug de layout `DailyDetail.vue` (bascule tabs ↔ 2-colonnes à une largeur différente qu'avant). Reste à faire : la **QA responsive complète** `xs`→`xl` n'a pas été menée systématiquement — cocher la case seulement après un passage écran par écran.
 
 Les seuils par défaut sont réduits (MD3) → tout le responsive se décale. **~30 fichiers** utilisent `useDisplay()` + le composable central `src/composables/useDialogWidth.ts` (consommé par ~20 dialogs/cartes). Repérer : `grep -rl "useDisplay" src/`.
 

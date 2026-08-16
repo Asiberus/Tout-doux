@@ -52,7 +52,7 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .v-tabs :deep(.v-slide-group__prev, .v-slide-group__next) {
   min-width: initial;

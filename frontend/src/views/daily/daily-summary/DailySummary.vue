@@ -150,7 +150,7 @@ function removeDateParam(options: { push?: boolean } = {}): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .daily-wrapper {
   display: grid;

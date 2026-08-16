@@ -138,7 +138,7 @@ function submit(): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
-@use 'vuetify/lib/styles/settings/_variables';
+@use '@/styles/breakpoints' as variables;
 
 .profile-user {
   display: flex;
