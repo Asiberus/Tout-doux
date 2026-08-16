@@ -11,14 +11,14 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | --- | ------------------------------------------------------------------------ | --------- | ------------------------------------------------------------- |
 | R1  | Contrôle d'appartenance écrit avec `is not` (13 occurrences)             | **haute** | Rend l'application inutilisable pour tout compte d'`id` > 256 |
 | R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`   | **haute** | Atteint tout compte créé hors inscription, dont le superuser  |
-| R6  | Django 3.2.9, DRF 3.12.4 et Python 3.9 hors support                      | **haute** | Aucun correctif de sécurité amont                             |
+| R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`)  | **haute** | Deux surfaces d'administration mortes, et une doc qui ment    |
 | R4  | « Aujourd'hui » calculé en UTC alors que `TIME_ZONE` vaut `Europe/Paris` | moyenne   | Fenêtre de dysfonctionnement quotidienne de 1 à 2 h           |
-| R5  | `django.conf.urls.url` : routes non ancrées, et supprimé depuis Django 4 | moyenne   | Bloque R6                                                     |
 | R8  | Cycle d'imports entre les barrels de `serializers/`                      | moyenne   | Un réordonnancement anodin casse le démarrage                 |
 | R10 | Dérive doc↔code des références du monorepo                              | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige    |
 | R2  | `print(request.method)` résiduel dans `CreateOrAdmin`                    | basse     | Correction d'une ligne                                        |
 | R7  | `openapi.yaml` : stub mort à la racine du monorepo                       | basse     | Laisse croire à un contrat maintenu                           |
 | R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`                | basse     | Configuration morte                                           |
+| R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé          | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
 
 ---
 
@@ -57,17 +57,27 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Voir aussi** : [W7](watched-risks.md) — l'utilisateur `anonymous` est ce qui rend ce bug
   silencieux.
 
-## R6 — Django 3.2.9, DRF 3.12.4 et Python 3.9 hors support
+## R11 — Admin Django et API browsable inaccessibles
 
-- **Origine** : `backend/requirements.txt`, `.conf/*/backend/Dockerfile`.
-- **Contexte** : Django 3.2 LTS a cessé de recevoir des correctifs de sécurité le **1er avril
-  2024** ; la version épinglée est 3.2.9 (novembre 2021), donc en retard même sur sa propre
-  branche. DRF 3.12.4 date de 2021. L'image est `python:3.9-alpine`, or Python 3.9 est en fin de
-  vie depuis **octobre 2025**. Aucune CVE n'a été recherchée pour cette fiche — l'exposition
-  exacte reste à établir.
-- **Décision** : agir, mais R5 est un préalable technique (`django.conf.urls.url` n'existe plus
-  en Django 4). L'ordre naturel est R5 → Django 4.2 LTS → DRF récent → image Python.
-- **Sévérité** : haute — dépendances sans correctif amont sur un service exposé à internet.
+- **Origine** : `backend/settings.py:118` (`AUTHENTICATION_BACKENDS`),
+  `tout_doux/auth/email_backend.py:6`.
+- **Contexte** : `AUTHENTICATION_BACKENDS` ne contient qu'`EmailBackend`, qui **remplace**
+  `ModelBackend` au lieu de s'y ajouter. Or `EmailBackend.authenticate()` n'accepte que le kwarg
+  `email`, tandis que le formulaire de l'admin Django et celui de `/api-auth/login/` appellent
+  `authenticate(request, username=…, password=…)`. Vérifié dans le conteneur :
+  `authenticate(email='…')` renvoie l'utilisateur, `authenticate(username='…')` renvoie `None`,
+  que la valeur passée soit l'e-mail ou le nom d'utilisateur. Le POST de connexion réaffiche donc
+  le formulaire (200) ; il n'est pas refusé par le CSRF (403). **Antérieur à la migration Django
+  6.1** : comportement identique sous Django 3.2.
+- **Conséquence** : l'admin est inatteignable alors que `td.sh` demande explicitement un
+  `createsuperuser` au premier démarrage, et
+  [../workflows/verification.md](../workflows/verification.md) documentait une procédure de
+  connexion à l'API browsable qui ne peut pas aboutir.
+- **Décision** : agir, mais **pas dans une montée de versions**. Le correctif tient en une ligne
+  — ajouter `'django.contrib.auth.backends.ModelBackend'` à la suite — mais il rouvre
+  l'authentification par nom d'utilisateur sur **toute** l'application, `/auth/login/` compris.
+  C'est un changement de comportement à arbitrer pour lui-même.
+- **Voir aussi** : R3 — les comptes créés par `createsuperuser` sont déjà un angle mort.
 
 ## R4 — « Aujourd'hui » calculé en UTC
 
@@ -82,17 +92,6 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Décision** : agir. `django.utils.timezone.localdate()` respecte `TIME_ZONE` et corrige les
   trois points. Pour `auto_now_add`, il faut remplacer le champ par un `default=` appelable —
   `DateField.pre_save` utilise `date.today()` en dur.
-
-## R5 — `django.conf.urls.url` : routes non ancrées
-
-- **Origine** : `backend/urls.py:16`, `tout_doux/urls.py:1`.
-- **Contexte** : `url()` est l'alias déprécié de `re_path()`, qui applique `re.search` et non
-  `re.match`. Les 13 routes explicites et les 2 routes racine ne sont donc **pas ancrées**.
-  Vérifié sur le resolver : `/xxx/auth/login/` résout vers `LoginView`, `/nope/admin/` vers
-  l'admin Django. Aucune conséquence de sécurité connue (les vues cibles restent protégées),
-  mais toute analyse de trafic par chemin est faussée. `url()` a été **supprimé en Django 4.0**.
-- **Décision** : agir, en même temps que R6. Remplacer par `path()` pour les 13 routes
-  d'authentification (aucune n'a de paramètre) et par `re_path(r'^…')` pour les deux `include`.
 
 ## R8 — Cycle d'imports entre les barrels de `serializers/`
 
@@ -153,3 +152,18 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Décision** : agir — soit retirer le backend, soit ajouter
   `search_fields = ('title', 'message')`, ce qui est vraisemblablement l'intention initiale
   pour un écran d'administration des retours utilisateurs.
+
+## R12 — `Tag` sans `Meta.ordering` alors qu'il est paginé
+
+- **Origine** : `models/tag.py:37` — découvert par un `UnorderedObjectListWarning` de Django émis
+  depuis `pagination.py:25` pendant les tests.
+- **Contexte** : `Tag.Meta` déclare des `constraints` mais **pas d'`ordering`**, alors que les
+  onze autres modèles en ont un. `TagViewSet` utilise pourtant `ExtendedPageNumberPagination`.
+  PostgreSQL ne garantit aucun ordre pour un `SELECT` sans `ORDER BY` : deux pages successives
+  peuvent renvoyer la même ligne, ou en omettre une. Django émet l'avertissement à chaque appel
+  paginé de `tag/`.
+- **Décision** : agir — ajouter `ordering = ('pk',)` à `Tag.Meta`, par cohérence avec
+  `CommonTask` et `DailyTask` qui utilisent déjà cette valeur. Génère une migration
+  `AlterModelOptions`, sans SQL.
+- **Portée réelle** : faible tant qu'un utilisateur a moins de 20 tags (la taille de page par
+  défaut) — le défaut ne se manifeste qu'à partir de la deuxième page.

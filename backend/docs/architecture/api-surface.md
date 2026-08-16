@@ -14,9 +14,9 @@ Postman, `openapi.yaml` à la racine du monorepo est un stub mort de 13 lignes
 `backend/urls.py` monte l'admin puis `tout_doux/urls.py`, qui combine :
 
 - un `routers.DefaultRouter()` — 10 ressources enregistrées (`tout_doux/urls.py:12`) ;
-- 13 `url(...)` explicites pour l'authentification et les préférences.
+- 13 `path(...)` explicites pour l'authentification et les préférences.
 
-Permission par défaut : **`IsAuthenticated`** (`settings.py:121`). Les exceptions sont dans la
+Permission par défaut : **`IsAuthenticated`** (`settings.py:122`). Les exceptions sont dans la
 colonne « Accès ».
 
 ## Authentification
@@ -97,7 +97,7 @@ en croyant qu'elle est morte.
 { "count": 42, "page": 1, "size": 20, "first": true, "last": false, "content": [ ... ] }
 ```
 
-- Paramètres : `page`, `size` (défaut 20, `settings.py:131`).
+- Paramètres : `page`, `size` (défaut 20, `settings.py:132`).
 - **`size=0` renvoie tout** : `get_all` passe à `true`, `content` contient le queryset complet,
   `size` est renvoyé à `0` et `first`/`last` sont forcés à `true`. `count` reste le total réel.
   C'est le mode utilisé par le front pour presque toutes ses listes.
@@ -111,11 +111,10 @@ délèguent à `list()` : ils **sont** paginés, comme les listes ordinaires.
 
 ## Contraintes non évidentes
 
-- **Les routes ne sont pas ancrées.** `tout_doux/urls.py` utilise `django.conf.urls.url`, alias
-  déprécié de `re_path`, qui applique `re.search` et non `re.match`. Vérifié :
-  `/xxx/auth/login/` résout vers `LoginView` et `/nope/admin/` vers l'admin Django. Aucun impact
-  fonctionnel connu, mais ça fausse toute analyse de logs par chemin, et `url` est **supprimé
-  depuis Django 4.0** — voir [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R5.
+- **Les routes sont ancrées.** `backend/urls.py` et `tout_doux/urls.py` utilisent `path()`.
+  Vérifié : `POST /prefixe/auth/login/` répond **404**. Ne pas revenir à `re_path()` sans motif
+  ancré (`r'^…$'`) : il applique `re.search`, ce qui ferait résoudre n'importe quel chemin
+  contenant la route.
 - **Suffixes de format.** `DefaultRouter` double chaque route par une variante
   `…​.<format>` (`project.json`, `user/1.api`). Non utilisée par le front, jamais testée.
 - **`GET /`** sert l'API browsable de DRF (`APIRootView`), et `api-auth/login|logout/` la page de

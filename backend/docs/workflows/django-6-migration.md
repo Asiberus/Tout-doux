@@ -35,38 +35,38 @@ supprimer leurs lignes et leurs sections dans ce fichier — ne pas les marquer 
 
 ### 0. Préalables
 
-- [ ] §0.1 — Décider le palier cible (Django 6.1 ou 5.2 LTS) et l'inscrire ici
-- [ ] §0.2 — Poser un filet de vérification minimal (au moins un test de fumée)
-- [ ] §0.3 — Sauvegarder la base de production (`backupdb`) avant tout déploiement
+- [x] §0.2 — Palier cible arrêté : **Django 6.1**
+- [ ] §0.3 — Poser un filet de vérification minimal (test de fumée)
+- [ ] §0.5 — Sauvegarder la base de production (`backupdb`) avant tout déploiement
 
 ### 1. 🔴 Bloquants
 
-- [ ] 1.1 — `django.conf.urls.url` supprimé (Django 4.0) — 16 occurrences, 2 fichiers
-- [ ] 1.2 — `USE_L10N` supprimé (Django 5.0)
-- [ ] 1.3 — `CORS_ORIGIN_ALLOW_ALL` supprimé (django-cors-headers 4.0)
-- [ ] 1.4 — `psycopg2` épinglé `<2.8.7` alors que Django 6.0 exige `≥2.9.9`
-- [ ] 1.5 — `django-mailjet` abandonné depuis 2017 → remplacement
-- [ ] 1.6 — `django-rest-knox` 4.\* → 5.1 : **tous les jetons existants sont invalidés**
-- [ ] 1.7 — Images Docker `python:3.9-alpine` → `3.14-alpine` (dev **et** prod)
-- [ ] 1.8 — `requirements.txt` réécrit et épinglé
+- [x] 1.1 — `django.conf.urls.url` → `path()` (16 occurrences, 2 fichiers)
+- [x] 1.2 — `USE_L10N` supprimé (Django 5.0)
+- [x] 1.3 — `CORS_ORIGIN_ALLOW_ALL` → `CORS_ALLOW_ALL_ORIGINS` _(header vérifié en direct)_
+- [x] 1.4 — `psycopg2==2.9.12`
+- [x] 1.5 — `django-mailjet` → `django-anymail[mailjet]==15.1` _(+ `'anymail'` dans `INSTALLED_APPS`, omis de la rédaction initiale)_
+- [x] 1.6 — `django-rest-knox==5.1.0` _(migration `knox.0009` appliquée ; jetons invalidés)_
+- [x] 1.7 — Images Docker `python:3.14-alpine` (dev **et** prod)
+- [x] 1.8 — `requirements.txt` réécrit et épinglé exactement
 
 ### 2. 🟠 Iso-comportement
 
-- [ ] 2.1 — CSRF/`Origin` derrière nginx : admin et API browsable cassés en production
-- [ ] 2.2 — `wait_for_db` importe `psycopg2` en dur
-- [ ] 2.3 — uWSGI 2.0.31 : compilation sur Python 3.14 + musl
-- [ ] 2.4 — `django-extensions` 4.1 n'est testé que jusqu'à Django 5.2
-- [ ] 2.5 — DRF 3.18 : format des erreurs des sérialiseurs `many=True`
-- [ ] 2.6 — Django 6.0 a réécrit `EmailMessage` : vérifier les 4 e-mails
-- [ ] 2.7 — Django 6.1 exige PostgreSQL ≥ 15 (le projet est en 16 → OK, à confirmer en prod)
-- [ ] 2.8 — `DEFAULT_AUTO_FIELD` et `ToutDouxConfig` : vérifier qu'aucune migration n'apparaît
+- [x] 2.1 — 🟠 CSRF/`Origin` derrière nginx _(réduit à `uwsgi_param UWSGI_SCHEME` ; `settings.py` non modifié — `SECURE_PROXY_SSL_HEADER` et `CSRF_TRUSTED_ORIGINS` écrits puis retirés, cf. §2.1)_
+- [⛔] 2.2 — `wait_for_db` importe `psycopg2` _(SANS OBJET : on reste sur psycopg2. Ne concerne que §4.1)_
+- [x] 2.3 — uWSGI 2.0.31 _(compile sur Python 3.14 + musl — **aucune action requise**)_
+- [x] 2.4 — `django-extensions` 4.1 _(fonctionne sous Django 6.1 malgré ses classifiers — **aucune action requise**)_
+- [x] 2.5 — DRF 3.18 : erreurs `many=True` _(forme `{champ: [message]}` inchangée, vérifiée)_
+- [ ] 2.6 — Les 4 e-mails _(templates + `alternatives` couverts par les tests ; **transport Mailjet réel non testé**)_
+- [ ] 2.7 — Version PostgreSQL **en production** à confirmer (≥ 15)
+- [x] 2.8 — Migration `0005_alter_user_related_names` générée _(11 `AlterField`, tous `(no-op)`)_
 
 ### 3. 🟡 Dette à traiter au passage
 
-- [ ] 3.1 — R5 : ancrer les routes (fait mécaniquement par §1.1, à valider explicitement)
-- [ ] 3.2 — Nettoyer les `__pycache__` versionnés (`.cpython-38/39.pyc`)
-- [ ] 3.3 — Mettre à jour [development.md](development.md) et [verification.md](verification.md)
-- [ ] 3.4 — Renseigner le nouveau niveau de référence de `check --deploy`
+- [x] 3.1 — R5 : routes ancrées _(vérifié : `POST /prefixe/auth/login/` → 404)_
+- [x] 3.2 — 7 `.pyc` CPython 3.8 désindexés et supprimés
+- [x] 3.3 — Doc mise à jour _(development, verification, CLAUDE.md, backlog : R5 et R6 supprimés, R11 ajouté)_
+- [x] 3.4 — `check --deploy` : **inchangé à 6 avertissements** — aucune action
 
 ### 4. ⚪ Optionnel
 
@@ -111,9 +111,10 @@ supprimer leurs lignes et leurs sections dans ce fichier — ne pas les marquer 
   en retard. Sa matrice `tox` teste néanmoins `djmaster` sur Python 3.13/3.14, donc le suivi
   amont existe.
 
-### 0.2 🔴 Décision préalable : quel palier viser ?
+### 0.2 ✅ Palier cible — **Django 6.1** (arrêté le 16/08/2026)
 
-**Deux cibles défendables. Trancher avant de commencer et inscrire le choix ici.**
+**Cible retenue : Django 6.1 + DRF 3.18.0 + Python 3.14.** L'arbitrage ci-dessous est conservé
+comme trace de la décision, pas comme question ouverte.
 
 | Cible                                   | Fin de support | Pour                                                                                            | Contre                                                                                              |
 | --------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -125,10 +126,11 @@ que viser la LTS. Django 6.1 sort du support principal en avril 2027 et meurt en
 alors que 5.2 LTS vit jusqu'en avril 2028. Sur un projet sans tests et sans CI, ce sont 4 mois de
 sursis en plus et zéro dépendance hors matrice déclarée.
 
-**Recommandation** : viser **Django 6.1** comme demandé, mais traiter §2.4 (django-extensions)
-comme un vrai point de blocage potentiel. Si `manage.py check` ou `show_urls` casse sous 6.1, se
-replier sur **5.2 LTS** — le reste du présent document est identique dans les deux cas (toutes les
-suppressions listées en §1 sont antérieures à 5.2, sauf mention contraire).
+Ce point a été pesé et **6.1 est retenu quand même**. Conséquence opérationnelle : §2.4
+(django-extensions, testé au mieux jusqu'à Django 5.2) devient le point de rupture le plus
+probable. **La procédure si django-extensions casse le démarrage est de le retirer
+d'`INSTALLED_APPS`**, pas de redescendre en 5.2 — aucun code du projet ne l'importe, et son seul
+usage outillé (`show_urls`) a un substitut documenté en §2.4.
 
 **Faut-il passer par des paliers intermédiaires ?** Non, sauf si la §5 échoue. L'audit du code a
 montré que la surface touchée est très étroite : aucun usage de `ugettext`, `force_text`,
@@ -422,6 +424,19 @@ django-mailjet
 django-anymail[mailjet]==15.1
 ```
 
+⚠️ **`'anymail'` doit être ajouté à `INSTALLED_APPS`** — omis de la première rédaction de cette
+fiche, et invisible en développement puisque `BACKEND_USE_EMAIL_FILE_SYSTEM=1` court-circuite
+Mailjet. C'est exactement le trou que cette section décrit.
+
+```python
+# backend/settings.py — INSTALLED_APPS
+    'django_filters',
+    'corsheaders',
+    'anymail',
+    'tout_doux',
+]
+```
+
 ```python
 # backend/settings.py — AVANT (L.137-143)
 if bool(int(os.environ.get('BACKEND_USE_EMAIL_FILE_SYSTEM', 0))):
@@ -608,10 +623,22 @@ Notes :
 
 ## 2. 🟠 Iso-comportement
 
-### 2.1 🔴 en production — CSRF / `Origin` derrière nginx
+### 2.1 🟠 CSRF / `Origin` derrière nginx — correctif appliqué, portée réduite
 
-**Ce point ne se voit pas en développement et casse l'admin en production.** À traiter comme un
-bloquant si l'admin Django ou l'API browsable sont utilisés en prod.
+> ⚠️ **Correction de la rédaction initiale.** Ce point était classé 🔴 « casse l'admin en
+> production ». Vérification faite, **l'admin Django et `/api-auth/login/` ne fonctionnaient déjà
+> pas** — `AUTHENTICATION_BACKENDS` ne contient qu'`EmailBackend`, qui n'accepte que le kwarg
+> `email`, alors que les deux formulaires postent `username`. Comportement identique sous Django
+> 3.2 : **rien à voir avec la migration**. Voir
+> [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) **R11**.
+>
+> **Le correctif a lui aussi été réduit** — il tient désormais en **une ligne nginx**. Les deux
+> autres gestes que cette fiche prescrivait initialement (`SECURE_PROXY_SSL_HEADER` et
+> `CSRF_TRUSTED_ORIGINS`) ont été écrits, puis **retirés** après vérification : voir « Pourquoi
+> pas `SECURE_PROXY_SSL_HEADER` » plus bas. `backend/settings.py` n'est donc **pas** modifié par
+> §2.1.
+
+Le raisonnement d'origine, qui reste valable sur le fond :
 
 Django 4.0 a ajouté la **vérification de l'en-tête `Origin`** dans `CsrfViewMiddleware`, en plus
 de l'ancienne vérification du `Referer`. Django compare `Origin` à l'origine reconstruite depuis
@@ -634,31 +661,64 @@ Ce que ça casse : le formulaire de connexion de `/admin/` et celui de `/api-aut
 > traiter comme une hypothèse forte à confirmer au premier déploiement, pas comme un fait
 > observé.)_
 
-**Correctif** — deux gestes, les deux nécessaires :
+**Correctif appliqué — un seul geste :**
 
 ```nginx
-# .conf/production/frontend/uwsgi_params — ajouter en fin de fichier
+# .conf/production/frontend/uwsgi_params — ajouté en fin de fichier
 uwsgi_param UWSGI_SCHEME $scheme;
 ```
 
-```python
-# backend/settings.py — ajouter près de ALLOWED_HOSTS (après L.30)
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_TRUSTED_ORIGINS = [
-    f'https://{host}' for host in ALLOWED_HOSTS if host != '*'
-]
+`UWSGI_SCHEME` est une **variable magique du protocole uwsgi**, pas un en-tête HTTP : un client
+qui enverrait `UWSGI-SCHEME:` arriverait dans `HTTP_UWSGI_SCHEME`, une clé différente. Elle n'est
+donc pas injectable depuis l'extérieur.
+
+⚠️ La documentation uWSGI la décrit comme « définit le schéma d'URL quand il ne peut pas être
+déterminé de façon fiable », mais **ne confirme pas explicitement** qu'elle alimente
+`wsgi.url_scheme`. Non testable sans uwsgi derrière nginx — **à confirmer au premier
+déploiement**.
+
+#### Pourquoi pas `SECURE_PROXY_SSL_HEADER` ni `CSRF_TRUSTED_ORIGINS`
+
+Ces deux réglages ont été écrits, puis retirés. Les deux raisons sont vérifiées, pas supposées.
+
+**`SECURE_PROXY_SSL_HEADER` rend le schéma usurpable par le client.** Mesuré sur `RequestFactory` :
+
+```
+sans en-tête                    -> is_secure() = False
+avec X-Forwarded-Proto: https   -> is_secure() = True
 ```
 
-⚠️ `CSRF_TRUSTED_ORIGINS` exige le **schéma** depuis Django 4.0 (`'example.com'` n'est plus
-accepté, il faut `'https://example.com'`). Et `ALLOWED_HOSTS` vaut `*` en développement : le
-filtre ci-dessus produit alors une liste vide, ce qui est correct (pas de HTTPS en dev).
+Le serveur de développement expose le port 8000 en direct, et en production nginx transmet les
+en-têtes client à uwsgi par défaut (`uwsgi_pass_request_headers on`) : rien ne garantit qu'un
+`uwsgi_param` explicite l'emporte sur un en-tête envoyé par le client. Le réglage **ouvre une
+surface d'usurpation qui n'existait pas**, pour un gain nul par rapport à `UWSGI_SCHEME`.
 
-> **À vérifier avant d'appliquer** : que `SECURE_PROXY_SSL_HEADER` et `UWSGI_SCHEME` ne se
-> contredisent pas. `UWSGI_SCHEME` suffit peut-être seul — le tester en production sur un
-> déploiement de validation, l'admin étant le seul consommateur.
+**`CSRF_TRUSTED_ORIGINS` est inutile ici, et sa dérivation était fausse.** Lecture de
+`CsrfViewMiddleware._origin_verified` (Django 6.1) : l'`Origin` est **d'abord** comparé à
+`"%s://%s" % ("https" if request.is_secure() else "http", request.get_host())`. L'admin étant
+servi depuis l'hôte de l'API, c'est du même-origine — corriger le schéma suffit, et
+`allowed_origins_exact` n'est jamais consulté.
 
-**Vérification** : après déploiement, se connecter à `https://<api_host>/admin/`. Un 403 « CSRF
-verification failed » signe que le correctif n'a pas pris.
+Quant à la dérivation `[f'https://{host}' for host in ALLOWED_HOSTS if host != '*']`, elle est
+**fausse pour la syntaxe de sous-domaine générique**. Mesuré :
+
+| `ALLOWED_HOSTS`    | Valeur produite                    | Verdict                                                                        |
+| ------------------ | ---------------------------------- | ------------------------------------------------------------------------------ |
+| `host`             | `https://host`                     | ✅                                                                             |
+| `host;api.host`    | `https://host`, `https://api.host` | ✅                                                                             |
+| `host:8021`        | `https://host:8021`                | ✅                                                                             |
+| `*`                | `[]`                               | ✅ (pas de HTTPS en dev)                                                       |
+| `*.example.com`    | `https://*.example.com`            | ✅                                                                             |
+| **`.example.com`** | **`https://.example.com`**         | ❌ **invalide depuis Django 4.0** — aucune erreur de `check`, ne matche jamais |
+
+**Vérifié en développement** : un POST de session avec `Client(enforce_csrf_checks=True)` sur
+`/admin/login/` **passe le contrôle CSRF** — il répond 200 (formulaire réaffiché, identifiants
+refusés par R11), pas 403. Le contrôle CSRF n'est donc pas en cause en dev, avec ou sans ces
+réglages.
+
+**En production, une fois R11 corrigé** : un 403 « CSRF verification failed » sur
+`https://<api_host>/admin/` signerait qu'`UWSGI_SCHEME` n'a pas l'effet attendu. Tant que R11 est
+ouvert, ce scénario n'est pas observable.
 
 ---
 

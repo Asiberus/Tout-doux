@@ -2,17 +2,17 @@
 
 **Quand** — avant chaque commit sur `backend/`.
 
-## Il n'y a aucun garde-fou automatique
+## Le garde-fou est minimal
 
 C'est un fait, pas une omission de cette doc :
 
-| Outil                 | État                                                                                                     |
-| --------------------- | -------------------------------------------------------------------------------------------------------- |
-| Tests                 | **aucun**. `tout_doux/tests.py` est le squelette de `startapp`, jamais rempli                            |
-| Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                |
-| Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                              |
-| Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                     |
-| CI                    | **aucune**. `.github/workflows/deployment.yml` déploie, ne vérifie rien, et n'est déclenché qu'à la main |
+| Outil                 | État                                                                                                                                                      |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tests                 | **13 tests de fumée** dans `tout_doux/tests.py` : résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail. **Aucun test métier** |
+| Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                                                                 |
+| Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                                                                               |
+| Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                                                                      |
+| CI                    | **aucune**. `.github/workflows/deployment.yml` déploie, ne vérifie rien, et n'est déclenché qu'à la main                                                  |
 
 Conséquence pratique : **rien n'empêche un commit qui ne démarre même pas.** La seule
 protection est la procédure manuelle ci-dessous.
@@ -29,21 +29,26 @@ docker exec tout_doux_backend python manage.py check
 # 2. Aucune dérive entre les modèles et les migrations
 docker exec tout_doux_backend python manage.py makemigrations --check --dry-run
 
-# 3. Les routes attendues existent (django_extensions)
+# 3. Le garde-fou de plomberie
+docker exec tout_doux_backend python manage.py test tout_doux
+
+# 4. Les routes attendues existent (django_extensions)
 docker exec tout_doux_backend python manage.py show_urls | grep <ta-ressource>
 
-# 4. Le serveur redémarre sans erreur
+# 5. Le serveur redémarre sans erreur
 docker logs --tail 30 tout_doux_backend
 ```
 
 Les étapes 1 et 2 attrapent la majorité des régressions bêtes : import cassé, sérialiseur
-référençant un champ inexistant, `Meta.fields` désynchronisé, migration oubliée.
+référençant un champ inexistant, `Meta.fields` désynchronisé, migration oubliée. L'étape 3
+attrape ce que `check` ne voit pas — il ne charge pas les vues.
 
 ### Exercer l'endpoint
 
-L'API browsable de DRF est le moyen le plus rapide, et elle est active en développement :
-se connecter via `http://localhost:8000/api-auth/login/`, puis naviguer depuis
-`http://localhost:8000/`.
+⚠️ **L'API browsable de DRF est consultable mais on ne peut pas s'y connecter** :
+`/api-auth/login/` poste `username`, que le backend d'authentification du projet n'accepte pas —
+voir [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R11. Passer par un
+jeton.
 
 Pour un endpoint exigeant un jeton :
 
@@ -73,7 +78,8 @@ Pour tout changement touchant un sérialiseur d'écriture, vérifier expliciteme
 docker exec tout_doux_backend python manage.py check --deploy
 ```
 
-Remonte aujourd'hui **6 avertissements** (`W004`, `W008`, `W009`, `W012`, `W016`, `W018`). Ils
+Remonte aujourd'hui **6 avertissements** (`W004`, `W008`, `W009`, `W012`, `W016`, `W018`) — compte
+inchangé après la montée en Django 6.1. Ils
 ne sont pas tous pertinents : en développement `DEBUG=1` et la `SECRET_KEY` est volontairement
 factice, et le HTTPS est terminé par nginx en production, pas par Django. Ce compte de 6 est le
 **niveau de référence** : s'il augmente après un changement, l'avertissement supplémentaire est

@@ -17,7 +17,7 @@ alors que Django impose `username` comme identifiant.
 Trois choix pris ensemble :
 
 1. **`django-rest-knox`** comme classe d'authentification par défaut, avec le préfixe d'en-tête
-   forcé à `Bearer` (`settings.py:128`), un TTL de **7 jours** et `AUTO_REFRESH` actif.
+   forcé à `Bearer` (`settings.py:129`), un TTL de **7 jours** et `AUTO_REFRESH` actif.
 2. **Un modèle `User` maison** (`AUTH_USER_MODEL = "tout_doux.User"`) qui rend `email` unique.
    `username` reste obligatoire et unique, mais ne sert plus à se connecter.
 3. **Deux classes maison** pour découpler la connexion du reste : `EmailBackend`
@@ -56,7 +56,7 @@ Trois choix pris ensemble :
 
 ## Preuve
 
-`settings.py:117-129`, `auth/email_backend.py`, `auth/json_authentication.py`. Les trois commits
+`settings.py:118-130`, `auth/email_backend.py`, `auth/json_authentication.py`. Les trois commits
 d'avril 2023 sont consécutifs. Aucun message ne motive le choix : **rationale inféré** des
 contraintes de déploiement (deux vhosts distincts) et des trois points de révocation présents
 dans le code.

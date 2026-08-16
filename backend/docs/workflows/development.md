@@ -8,7 +8,7 @@ dépendances directes, sans lockfile.
 
 ## Prérequis
 
-`docker` et `docker compose`. Rien d'autre — Python 3.9 vit dans l'image
+`docker` et `docker compose`. Rien d'autre — Python 3.14 vit dans l'image
 (`.conf/development/backend/Dockerfile`).
 
 ## Étapes
@@ -45,15 +45,15 @@ change.
 `docker-compose.yml` les transmet depuis `.conf/development/conf.env`, généré par `td.sh` et
 **gitignored** — le modèle versionné est `.conf/development/conf.tpl.env`.
 
-| Variable                          | Effet dans `settings.py`                                      | Valeur de dev              |
-| --------------------------------- | ------------------------------------------------------------- | -------------------------- |
-| `SECRET_KEY`                      | ligne 24 — **défaut `'secret'` si absente**                   | `secretKeyHasToBeChanged!` |
-| `DEBUG`                           | ligne 27, `bool(int(...))` — donc `0`/`1`, pas `true`/`false` | `1`                        |
-| `ALLOWED_HOSTS`                   | ligne 30, séparé par des **`;`**                              | `*`                        |
-| `SERVER_URL`                      | ligne 32 — base des liens d'e-mail, **doit finir par `/`**    | `http://localhost:8080/`   |
-| `DB_HOST/PORT/NAME/USER/PASSWORD` | ligne 87                                                      |                            |
-| `BACKEND_USE_EMAIL_FILE_SYSTEM`   | ligne 137 — `1` écrit sur disque au lieu d'envoyer            | `1`                        |
-| `MAILJET_API_KEY` / `_SECRET`     | ligne 142, ignorées si la précédente vaut `1`                 |                            |
+| Variable                          | Effet dans `settings.py`                                                                      | Valeur de dev              |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------- |
+| `SECRET_KEY`                      | ligne 24 — **défaut `'secret'` si absente**                                                   | `secretKeyHasToBeChanged!` |
+| `DEBUG`                           | ligne 27, `bool(int(...))` — donc `0`/`1`, pas `true`/`false`                                 | `1`                        |
+| `ALLOWED_HOSTS`                   | ligne 30, séparé par des **`;`**                                                              | `*`                        |
+| `SERVER_URL`                      | ligne 32 — base des liens d'e-mail, **doit finir par `/`**                                    | `http://localhost:8080/`   |
+| `DB_HOST/PORT/NAME/USER/PASSWORD` | ligne 88                                                                                      |                            |
+| `BACKEND_USE_EMAIL_FILE_SYSTEM`   | ligne 138 — `1` écrit sur disque au lieu d'envoyer                                            | `1`                        |
+| `MAILJET_API_KEY` / `_SECRET`     | ligne 144 — mappées vers `ANYMAIL` (`MAILJET_SECRET_KEY`), ignorées si la précédente vaut `1` |                            |
 
 ## Lire les e-mails envoyés en local
 
@@ -74,9 +74,12 @@ docker exec -it tout_doux_backend python manage.py migrate
 docker exec -it tout_doux_backend python manage.py makemigrations --check --dry-run   # doit être vide
 ```
 
-Les 4 migrations existantes sont des **squashs par release** (`0003_release_v0_3`,
-`0004_release_v0_4`) : la convention est de regrouper, pas d'accumuler une migration par
-changement. Une migration intermédiaire créée pendant le développement d'une release a vocation
+Les 5 migrations existantes sont des **squashs par release** (`0003_release_v0_3`,
+`0004_release_v0_4`), plus `0005_alter_user_related_names` — issue de la montée en Django 6.1, qui
+sérialise désormais `related_name='%(class)ss'` non résolu au lieu de sa valeur résolue. Elle ne
+produit **aucun SQL** (11 `AlterField`, tous `(no-op)` à `sqlmigrate`) et a vocation à être
+fusionnée dans le squash de la prochaine release. La convention est de regrouper, pas d'accumuler
+une migration par changement. Une migration intermédiaire créée pendant le développement d'une release a vocation
 à être fusionnée avant le merge.
 
 ## Commandes `manage.py` maison
@@ -102,8 +105,9 @@ Deux différences qui changent le comportement du code :
 - `DEBUG=0` : le fichier statique n'est plus servi par Django mais par nginx
   (`STATIC_ROOT=/vol/web/static`, volume partagé `td_static_files`, exposé par nginx en
   `/static`) ;
-- `BACKEND_USE_EMAIL_FILE_SYSTEM=0` : Mailjet devient le transport, et un échec d'envoi devient
-  silencieux.
+- `BACKEND_USE_EMAIL_FILE_SYSTEM=0` : Mailjet devient le transport, **via `django-anymail`**, et
+  un échec d'envoi devient silencieux. **C'est le seul chemin que le développement n'exerce
+  jamais** : à tester avec de vraies clés avant tout déploiement.
 
 Le déploiement (`.github/workflows/deployment.yml`) tourne sur un runner auto-hébergé et est en
 **`workflow_dispatch` uniquement** : le déclenchement sur `push` est commenté. **Aucun test,

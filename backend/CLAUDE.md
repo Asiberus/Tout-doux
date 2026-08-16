@@ -9,12 +9,13 @@ ce fichier.
 ## Contexte
 
 `backend` est l'API de **Tout-Doux** (organisation personnelle : projets, collections,
-planification journalière). **Django 3.2 + DRF 3.12 + Knox**, PostgreSQL, une seule application
-`tout_doux` (3 455 lignes, 12 modèles, 41 sérialiseurs, 0 test). Monorepo : `../frontend` (SPA
-Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)), `../docker-compose.yml`,
-`../td.sh`.
+planification journalière). **Django 6.1 + DRF 3.18 + Knox 5**, PostgreSQL, une seule application
+`tout_doux` (12 modèles, 41 sérialiseurs, 13 tests de fumée, 0 test métier). Monorepo :
+`../frontend` (SPA Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)),
+`../docker-compose.yml`, `../td.sh`.
 
-Le backend est **stable depuis décembre 2023** pendant que le front migre vers Vuetify 4.
+Une montée Django 3.2 → 6.1 / DRF 3.12 → 3.18 / Python 3.9 → 3.14 est **en cours** :
+[docs/workflows/django-6-migration.md](docs/workflows/django-6-migration.md).
 
 ## Commandes
 
@@ -26,14 +27,15 @@ Tout passe par Docker — **il n'existe pas de mode Python local** (ni venv, ni 
 docker exec -it tout_doux_backend python manage.py createsuperuser
 docker exec tout_doux_backend python manage.py check
 docker exec tout_doux_backend python manage.py makemigrations --check --dry-run
+docker exec tout_doux_backend python manage.py test tout_doux
 docker exec tout_doux_backend python manage.py show_urls      # django_extensions
 ```
 
 Les migrations sont jouées **automatiquement** au démarrage du conteneur. Le code est monté en
 volume : pas de rebuild sauf si `requirements.txt` change.
 
-**Aucun test, aucun linter, aucun formateur, aucune CI n'existe sur le backend.** Le seul
-garde-fou est la procédure manuelle de
+**13 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`). **Aucun test métier, aucun
+linter, aucun formateur, aucune CI.** Le reste passe par la procédure manuelle de
 [docs/workflows/verification.md](docs/workflows/verification.md).
 
 ## Règles à respecter en écrivant du code
@@ -68,7 +70,7 @@ par ligne en texte brut, sans tiret ni puce.
 | Daily task             | Cocher un daily ne clôt la tâche source que si l'action est vide ou `FI`                                                   | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)             |
 | Événements             | `takesWholeDay: true` **efface silencieusement** heures et date de fin ; un projet lié ne peut plus être changé ni détaché | [docs/domain/events.md](docs/domain/events.md)                       |
 | Pagination             | `size=0` renvoie **tout**. `event/` et `daily-task/summary/` ne sont **pas** paginés                                       | [docs/architecture/api-surface.md](docs/architecture/api-surface.md) |
-| Routes                 | `url()` applique `re.search` : les routes ne sont **pas ancrées**                                                          | [R5](docs/quality/refactoring-backlog.md)                            |
+| Admin                  | L'admin Django et `/api-auth/login/` sont **inaccessibles** (`AUTHENTICATION_BACKENDS` n'accepte que `email=`)             | [R11](docs/quality/refactoring-backlog.md)                           |
 
 ## Documentation
 

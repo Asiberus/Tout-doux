@@ -21,7 +21,7 @@ POST auth/login/ {email, password}
 `else`.
 
 Ensuite, chaque requête porte `Authorization: Bearer <token>` — préfixe non standard pour Knox
-(`Token` par défaut), imposé par `settings.py:128`.
+(`Token` par défaut), imposé par `settings.py:129`.
 
 ## Les trois familles de jetons
 
@@ -55,7 +55,7 @@ toutes. Comportement non tranché — dette ou choix, l'historique git ne le dit
 
 ## Permissions
 
-Défaut global : `IsAuthenticated` (`settings.py:121`). Trois exceptions seulement.
+Défaut global : `IsAuthenticated` (`settings.py:122`). Trois exceptions seulement.
 
 | Classe          | Utilisée par                                                          | Effet                                                  |
 | --------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
@@ -74,7 +74,7 @@ cloisonnement passe entièrement par les querysets —
 
 ## Mots de passe
 
-`AUTH_PASSWORD_VALIDATORS` (`settings.py:108`) : 3 validateurs Django (longueur minimale, mots
+`AUTH_PASSWORD_VALIDATORS` (`settings.py:109`) : 3 validateurs Django (longueur minimale, mots
 de passe courants, non entièrement numérique) **plus 3 maison** dans `validators/` — au moins un
 chiffre, une majuscule, un caractère spécial pris dans une liste explicite
 (`special_character_validator.py:4`, qui inclut l'espace et `ù £ € ° ¨`).
