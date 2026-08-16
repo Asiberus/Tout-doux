@@ -21,7 +21,7 @@ raison est indiquée pour chaque item.
 | W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base                  |
 | W8  | Requêtes N+1 sur les listes et le résumé journalier           | Performance | > 50 projets, ou > 300 ms sur `GET /project/`, ou résumé > 60 jours |
 | W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`               |
-| W10 | `CORS_ORIGIN_ALLOW_ALL = True` en production                  | Sécurité    | Passage à une authentification par cookie                           |
+| W10 | `CORS_ALLOW_ALL_ORIGINS = True` en production                 | Sécurité    | Passage à une authentification par cookie                           |
 | W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                                |
 
 ---
@@ -87,7 +87,7 @@ raison est indiquée pour chaque item.
 
 ## W5 — Pas de limitation de débit, et énumération d'e-mails possible
 
-- **Origine** : absence de `DEFAULT_THROTTLE_CLASSES` dans `settings.py:119` ;
+- **Origine** : absence de `DEFAULT_THROTTLE_CLASSES` dans `settings.py:120` ;
   `views/user.py:163` (`is_email_unique`, `AllowAny`).
 - **Contexte** : deux faiblesses liées. D'une part `auth/login/` accepte un nombre illimité de
   tentatives. D'autre part, `reset-password-request` a été **délibérément** conçu pour répondre
@@ -172,9 +172,9 @@ where u.username = 'anonymous';`).
 - **Sévérité** : nulle aujourd'hui ; CWE-256 (stockage de mot de passe en clair) si l'ordre est
   rompu.
 
-## W10 — `CORS_ORIGIN_ALLOW_ALL = True`
+## W10 — `CORS_ALLOW_ALL_ORIGINS = True`
 
-- **Origine** : `settings.py:82`, sans distinction d'environnement.
+- **Origine** : `settings.py:83`, sans distinction d'environnement.
 - **Contexte** : n'importe quelle origine peut appeler l'API depuis un navigateur. Le risque
   habituel — qu'un site tiers agisse au nom de l'utilisateur — ne se matérialise **pas** ici :
   l'authentification repose sur un en-tête `Authorization: Bearer` lu depuis le `localStorage`
