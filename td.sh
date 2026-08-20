@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-vers="0.4.1" # Must match package.json version number
+vers="0.5.0" # Must match package.json version number
 basedir=$(dirname "${0}")
 unset backendsecretkey
 unset serverhost
@@ -58,7 +58,8 @@ updateVariables() {
 
     # django secret key
     while [ -z ${backendsecretkey} ]; do
-      read -rp "  Enter the backend secret key : " backendsecretkey
+      read -rsp "  Enter the backend secret key : " backendsecretkey
+      echo
     done
   fi
 
@@ -68,16 +69,19 @@ updateVariables() {
   done
   # Database password (not empty and >10 characters)
   while [[ ${dbpassword} = "" || ${#dbpassword} -lt 10 ]]; do
-    read -rp "  Enter the database password (> 10 characters) : " dbpassword
+    read -rsp "  Enter the database password (> 10 characters) : " dbpassword
+    echo
   done
 
   # Mailjet API key
   while [ -z ${mailjetkey} ]; do
-    read -rp "  Enter the MailJet API key : " mailjetkey
+    read -rsp "  Enter the MailJet API key : " mailjetkey
+    echo
   done
   # Mailjet API secret
   while [ -z ${mailjetsecret} ]; do
-    read -rp "  Enter the MailJet API secret : " mailjetsecret
+    read -rsp "  Enter the MailJet API secret : " mailjetsecret
+    echo
   done
 }
 

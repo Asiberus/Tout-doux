@@ -567,21 +567,26 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
 
 ## 7. Ordre de traitement suggéré
 
-1. **B2 puis B1** — retirer `yarn.lock` de `.dockerignore`, puis basculer le Dockerfile de
-   production sur `yarn install --frozen-lockfile`. Ces deux points débloquent le déploiement et
-   rendent les builds reproductibles ; B1 est vérifiable immédiatement en relançant le build.
-2. **S1** — supprimer la publication des ports `8021` et `8022` en production. Correctif de deux
-   lignes, gain de sécurité important.
-3. **F5 puis Q1** — rendre le chemin de production de `td.sh` fonctionnel (`docker compose`),
-   puis réparer `editConfFile`, sans quoi la configuration de production ne peut pas être
-   modifiée depuis un serveur Linux.
-4. **B3** — aligner les trois sources du port frontend, pour que `./td.sh install dev` produise
-   un environnement fonctionnel.
+1. ~~**B2 puis B1**~~ ✅ fait — `yarn.lock` retiré de `.dockerignore`, Dockerfile de production
+   basculé sur `yarn install --frozen-lockfile` (commit `2e93c06`).
+2. ~~**S1**~~ ✅ fait — publication des ports `8021` et `8022` supprimée en production
+   (`docker-compose.prod.yml`) ; `backend` et `db` ne sont plus joignables que depuis le réseau
+   interne Docker.
+3. ~~**F5**~~ ✅ fait — `td.sh` appelle `docker compose` partout, y compris en production
+   (commit `df06f83`). **Q1** reste à faire (réparer `editConfFile`), sans quoi la configuration
+   de production ne peut pas être modifiée depuis un serveur Linux.
+4. **B3** — aligner les trois sources du port frontend (`conf.tpl.env`, `td.sh`, `vite.config.ts`).
+   N'affecte que le développement conteneurisé : la production utilise `SERVER_PORT` de façon
+   cohérente sur les trois fichiers équivalents, donc **aucun impact en production**.
 5. **F1, F2, F3** — arrêt propre d'uwsgi, journaux sur la sortie standard, `depends_on` sur le
    frontend. Trois correctifs courts qui améliorent nettement l'exploitabilité.
-6. **S2, S3, S5** — CORS, saisie masquée des secrets, exclusion de `conf.env` du contexte.
-7. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
-8. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
+6. ~~**S2, S3**~~ ✅ fait — CORS restreint à `SERVER_URL` (`CORS_ALLOWED_ORIGINS`), saisie des
+   secrets masquée dans `td.sh` (`read -rs`).
+7. **S5** — exclure `.conf/*/conf.env` de `.dockerignore` : le fichier contenant les vrais
+   secrets transite dans le contexte de build Docker à chaque build sans y être nécessaire (aucun
+   `COPY` ne le cible). Pas encore corrigé.
+8. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
+9. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
 
 ## 8. Points ouverts
 

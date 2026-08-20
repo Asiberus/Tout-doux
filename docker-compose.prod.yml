@@ -37,8 +37,6 @@ services:
       BACKEND_USE_EMAIL_FILE_SYSTEM: ${BACKEND_USE_EMAIL_FILE_SYSTEM}
       MAILJET_API_KEY: ${MAILJET_API_KEY}
       MAILJET_API_SECRET: ${MAILJET_API_SECRET}
-    ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
       - td_static_files:/vol/web
     depends_on:
@@ -52,8 +50,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       PGPORT: ${DB_PORT}
-    ports:
-      - ${DB_PORT}:${DB_PORT}
     volumes:
       - td_db:/var/lib/postgresql/data
 volumes:
