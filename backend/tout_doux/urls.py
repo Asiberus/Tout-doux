@@ -1,5 +1,4 @@
-from django.conf.urls import url
-from django.urls import include
+from django.urls import include, path
 from knox.views import LogoutView
 from rest_framework import routers
 
@@ -21,18 +20,18 @@ router.register(r'user', UserViewSet, basename='user')
 router.register(r'feedback', FeedbackViewSet, basename='feedback')
 
 urlpatterns = [
-    url('', include(router.urls)),
-    url('auth/login/', LoginView.as_view(), name='login'),
-    url('auth/logout/', LogoutView.as_view(), name='logout'),
-    url('auth/register/', UserRegisterView.as_view(), name='register'),
-    url('auth/activate/', UserActivationView.as_view(), name='activate'),
-    url('auth/resend-activation-email/', ResendActivationEmailView.as_view(), name='resend_activation_email'),
-    url('auth/reset-password-request/', ResetPasswordRequestView.as_view(), name='reset_password_request'),
-    url('auth/reset-password/', ResetPasswordView.as_view(), name='reset_password'),
-    url('auth/validate-password/', ValidatePasswordView.as_view(), name='validate_password'),
-    url('auth/confirm-email-change/', ConfirmEmailView.as_view(), name='confirm_email_change'),
-    url('auth/check-token/', CheckTokenView.as_view(), name='check_token'),
-    url('auth/check-password/', CheckPasswordView.as_view(), name='check_password'),
-    url('preferences/', PreferencesViewSet.as_view(), name='preferences'),
-    url('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('', include(router.urls)),
+    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/register/', UserRegisterView.as_view(), name='register'),
+    path('auth/activate/', UserActivationView.as_view(), name='activate'),
+    path('auth/resend-activation-email/', ResendActivationEmailView.as_view(), name='resend_activation_email'),
+    path('auth/reset-password-request/', ResetPasswordRequestView.as_view(), name='reset_password_request'),
+    path('auth/reset-password/', ResetPasswordView.as_view(), name='reset_password'),
+    path('auth/validate-password/', ValidatePasswordView.as_view(), name='validate_password'),
+    path('auth/confirm-email-change/', ConfirmEmailView.as_view(), name='confirm_email_change'),
+    path('auth/check-token/', CheckTokenView.as_view(), name='check_token'),
+    path('auth/check-password/', CheckPasswordView.as_view(), name='check_password'),
+    path('preferences/', PreferencesViewSet.as_view(), name='preferences'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

@@ -1,80 +1,79 @@
-<template>
-    <v-chip
-        :to="detailLocation"
-        label
-        :color="archived ? 'projectArchived' : 'project'"
-        :ripple="ripple"
-        :small="small"
-        :title="title"
-        :class="{ 'cursor-default': this.project.archived && !this.detailLocation }"
-        @click="click($event)"
-        class="section-chip px-0">
-        <v-icon small class="ml-2 mr-1">mdi-briefcase-variant</v-icon>
-        <div class="name-wrapper">
-            <span class="project-name text-truncate">{{ project.name }}</span>
-            <span class="mx-1">•</span>
-            <span class="section-name text-truncate">{{ section.name }}</span>
-        </div>
-    </v-chip>
-</template>
+<script setup lang="ts">
+import { Section } from '@/models/section.model'
+import { RouteLocationRaw } from 'vue-router'
+import { computed } from 'vue'
 
-<script lang="ts">
-import { Project } from 'src/models/project.model'
-import { Section } from 'src/models/section.model'
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Location } from 'vue-router'
+const {
+  section,
+  ripple = false,
+  small = false,
+  navigateToDetail = true,
+} = defineProps<{
+  section: Section
+  ripple?: boolean
+  small?: boolean
+  navigateToDetail?: boolean
+}>()
 
-@Component
-export default class SectionChip extends Vue {
-    @Prop({ required: true }) section!: Section
-    @Prop({ default: false }) ripple!: boolean
-    @Prop({ default: false }) small!: boolean
-    @Prop({ default: true }) navigateToDetail!: boolean
+const emit = defineEmits<{
+  click: []
+}>()
 
-    get project(): Project {
-        return this.section.project
-    }
+const title = computed<string>(() => {
+  let str = `Go to : ${section.project.name} • ${section.name}`
+  if (section.project.archived) str += ' (Archived)'
+  return str
+})
 
-    get archived(): boolean {
-        return this.project.archived
-    }
+const detailLocation = computed<RouteLocationRaw | undefined>(() => {
+  if (!navigateToDetail) return undefined
+  return {
+    name: 'project-detail-section',
+    params: { id: `${section.project.id}`, sectionId: `${section.id}` },
+  }
+})
 
-    get detailLocation(): Location | undefined {
-        if (!this.navigateToDetail) return
-        return {
-            name: 'project-detail-section',
-            params: { id: `${this.project.id}`, sectionId: `${this.section.id}` },
-        }
-    }
-
-    get title(): string {
-        let title = `Go to : ${this.project.name} • ${this.section.name}`
-        if (this.project.archived) title += ' (Archived)'
-        return title
-    }
-
-    click(event: Event): void {
-        if (this.project.archived) return
-
-        this.$emit('click', event)
-    }
+function click(): void {
+  if (section.project.archived) return
+  emit('click')
 }
 </script>
 
+<template>
+  <v-chip
+    :to="detailLocation"
+    label
+    :color="section.project.archived ? 'projectArchived' : 'project'"
+    :ripple
+    :size="small ? 'small' : 'default'"
+    :title
+    variant="flat"
+    :class="{ 'cursor-default': section.project.archived && !detailLocation }"
+    class="section-chip px-0"
+    @click.stop="click()">
+    <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
+    <div class="name-wrapper">
+      <span class="project-name text-truncate">{{ section.project.name }}</span>
+      <span class="mx-1">•</span>
+      <span class="section-name text-truncate">{{ section.name }}</span>
+    </div>
+  </v-chip>
+</template>
+
 <style scoped lang="scss">
 .section-chip {
-    min-width: 32px;
+  min-width: 32px;
 
-    .name-wrapper {
-        display: flex;
-        overflow: hidden;
-        margin-right: 8px;
+  .name-wrapper {
+    display: flex;
+    overflow: hidden;
+    margin-right: 8px;
 
-        .project-name,
-        .section-name {
-            flex: 1 1 auto;
-            min-width: 1ch;
-        }
+    .project-name,
+    .section-name {
+      flex: 1 1 auto;
+      min-width: 1ch;
     }
+  }
 }
 </style>

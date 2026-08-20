@@ -1,23 +1,17 @@
 import { apiRoutes } from '@/api-routes'
-import { SectionPatch, SectionPost } from '@/models/section.model'
-import Vue from 'vue'
+import { SectionPatch, SectionPost, SectionTask } from '@/models/section.model'
+import { http } from '@/axios/http'
 
-const createSection = (section: SectionPost) => {
-    return Vue.http.post(apiRoutes.section, section)
+export function createSection(section: SectionPost): Promise<SectionTask> {
+  return http.post<SectionTask>(apiRoutes.section, section)
 }
 
-const updateSection = (id: number, section: SectionPatch) => {
-    const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
-    return Vue.http.patch(url, section)
+export function updateSection(id: number, section: SectionPatch): Promise<SectionTask> {
+  const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
+  return http.patch<SectionTask>(url, section)
 }
 
-const deleteSection = (id: number) => {
-    const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
-    return Vue.http.delete(url)
-}
-
-export const sectionService = {
-    createSection,
-    updateSection,
-    deleteSection,
+export function deleteSection(id: number): Promise<void> {
+  const url = apiRoutes.sectionById.replace(':sectionId', id.toString())
+  return http.delete(url)
 }

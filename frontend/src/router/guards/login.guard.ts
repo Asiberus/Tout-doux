@@ -1,7 +1,7 @@
-import { NavigationGuard, NavigationGuardNext, Route } from 'vue-router/types/router'
+import { NavigationGuard } from 'vue-router'
 import { authService } from '@/services'
 
-export const loginGuard: NavigationGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
-    if (authService.isAuthenticated()) next({ name: 'home' })
-    else next()
+export const loginGuard: NavigationGuard = () => {
+  if (authService.isAuthenticated()) return { name: 'home' }
+  return undefined
 }

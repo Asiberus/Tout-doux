@@ -37,7 +37,7 @@ isInstalled() {
   command -v "${1}" >/dev/null 2>&1
   if [[ $? -ne 0 ]]; then
     echo -e "\e[31mERROR\e[39m ${1} is not installed on the system"
-    echo -e "      Ensure docker and npm are installed"
+    echo -e "      Ensure docker and yarn, docker-compose are installed"
     echo -e "      On a production environment, nginx must be installed as well"
     exit 0
   fi

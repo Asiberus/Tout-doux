@@ -1,42 +1,38 @@
 import { apiRoutes } from '@/api-routes'
-import { EventPostOrPatch } from '@/models/event.model'
-import Vue from 'vue'
+import {
+  EventExtendedModel,
+  EventModel,
+  EventPostOrPatch,
+  EventPostOrPatchOptions,
+  EventQueryOptions,
+} from '@/models/event.model'
+import { http } from '@/axios/http'
 
-export interface EventQueryOptions {
-    date?: string
-    month?: number
-    year?: number
+type EventReturn<T extends EventPostOrPatchOptions> = T['extended'] extends true
+  ? EventExtendedModel
+  : EventModel
+
+export function getEvents(params: EventQueryOptions = {}): Promise<EventExtendedModel[]> {
+  return http.get<EventExtendedModel[]>(apiRoutes.event, { params })
 }
 
-interface EventPostOrPatchOptions {
-    extended?: boolean
+export function createEvent<Params extends EventPostOrPatchOptions>(
+  event: EventPostOrPatch,
+  params: Params
+): Promise<EventReturn<Params>> {
+  return http.post<EventReturn<Params>>(apiRoutes.event, event, { params })
 }
 
-const getEvents = (params: EventQueryOptions = {}) => {
-    return Vue.http.get(apiRoutes.event, { params })
+export function updateEventById<Params extends EventPostOrPatchOptions>(
+  eventId: number,
+  event: EventPostOrPatch,
+  params: Params
+): Promise<EventReturn<Params>> {
+  const url = apiRoutes.eventById.replace(':eventId', eventId.toString())
+  return http.patch<EventReturn<Params>>(url, event, { params })
 }
 
-const createEvent = (event: EventPostOrPatch, params: EventPostOrPatchOptions = {}) => {
-    return Vue.http.post(apiRoutes.event, event, { params })
-}
-
-const updateEventById = (
-    eventId: number,
-    event: EventPostOrPatch,
-    params: EventPostOrPatchOptions = {}
-) => {
-    return Vue.http.patch(apiRoutes.eventById.replace(':eventId', eventId.toString()), event, {
-        params,
-    })
-}
-
-const deleteEventById = (eventId: number) => {
-    return Vue.http.delete(apiRoutes.eventById.replace(':eventId', eventId.toString()))
-}
-
-export const eventService = {
-    getEvents,
-    createEvent,
-    updateEventById,
-    deleteEventById,
+export function deleteEventById(eventId: number): Promise<void> {
+  const url = apiRoutes.eventById.replace(':eventId', eventId.toString())
+  return http.delete(url)
 }

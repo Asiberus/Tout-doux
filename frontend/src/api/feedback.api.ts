@@ -1,20 +1,22 @@
-import Vue from 'vue'
-import { FeedbackPost } from '@/models/feedback.model'
+import { Feedback, FeedbackPost } from '@/models/feedback.model'
 import { apiRoutes } from '@/api-routes'
-import { PaginationParams } from '@/models/common.model'
+import { Pagination, PaginationParams } from '@/models/pagination.model'
+import { http } from '@/axios/http'
 
-export function getFeedback(params: PaginationParams = {}) {
-    return Vue.http.get(apiRoutes.feedback, { params })
+export function getFeedback(params: PaginationParams = {}): Promise<Pagination<Feedback[]>> {
+  return http.get<Pagination<Feedback[]>>(apiRoutes.feedback, { params })
 }
 
-export function createFeedback(data: FeedbackPost) {
-    return Vue.http.post(apiRoutes.feedback, data)
+export function createFeedback(data: FeedbackPost): Promise<Feedback> {
+  return http.post<Feedback>(apiRoutes.feedback, data)
 }
 
-export function setFeedbackReadProperty(id: number, value: boolean) {
-    return Vue.http.patch(apiRoutes.feedbackById.replace(':id', id.toString()), { isRead: value })
+export function setFeedbackReadProperty(id: number, value: boolean): Promise<Feedback> {
+  return http.patch<Feedback>(apiRoutes.feedbackById.replace(':id', id.toString()), {
+    isRead: value,
+  })
 }
 
-export function deleteFeedback(id: number) {
-    return Vue.http.delete(apiRoutes.feedbackById.replace(':id', id.toString()))
+export function deleteFeedback(id: number): Promise<void> {
+  return http.delete(apiRoutes.feedbackById.replace(':id', id.toString()))
 }

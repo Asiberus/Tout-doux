@@ -1,0 +1,5 @@
+@use './breakpoint-values' as values;
+
+@forward 'vuetify/lib/styles/settings/_variables' with (
+  $grid-breakpoints: values.$grid-breakpoints
+);

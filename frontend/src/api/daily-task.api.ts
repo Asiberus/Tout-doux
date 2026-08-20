@@ -1,39 +1,32 @@
-import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { DailyTaskPatch, DailyTaskPost } from '@/models/daily-task.model'
+import { DailyTask, DailyTaskPatch, DailyTaskPost } from '@/models/daily-task.model'
+import { http } from '@/axios/http'
+import { DailySummary } from '@/models/daily-summary.model'
+import { Pagination } from '@/models/pagination.model'
 
-const getDailySummary = (startDate: string, endDate: string) => {
-    const params = {
-        start_date: startDate,
-        end_date: endDate,
-    }
-    return Vue.http.get(apiRoutes.dailyTaskSummary, { params })
+export function getDailySummary(startDate: string, endDate: string): Promise<DailySummary[]> {
+  const params = { start_date: startDate, end_date: endDate }
+  return http.get<DailySummary[]>(apiRoutes.dailyTaskSummary, { params })
 }
 
-const getDailyTasksByDate = (date: string) => {
-    const params = { date, size: 0 }
-    return Vue.http.get(apiRoutes.dailyTask, { params })
+export function getDailyTasksByDate(date: string): Promise<Pagination<DailyTask[]>> {
+  const params = { date, size: 0 }
+  return http.get<Pagination<DailyTask[]>>(apiRoutes.dailyTask, { params })
 }
 
-const createDailyTask = (dailyTaskForm: DailyTaskPost) => {
-    return Vue.http.post(apiRoutes.dailyTask, dailyTaskForm)
+export function createDailyTask(dailyTaskForm: DailyTaskPost): Promise<DailyTask> {
+  return http.post<DailyTask>(apiRoutes.dailyTask, dailyTaskForm)
 }
 
-const updateDailyTask = (dailyTaskId: number, dailyTaskForm: DailyTaskPatch) => {
-    return Vue.http.patch(
-        apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()),
-        dailyTaskForm
-    )
+export function updateDailyTask(
+  dailyTaskId: number,
+  dailyTaskForm: DailyTaskPatch
+): Promise<DailyTask> {
+  const url = apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString())
+  return http.patch<DailyTask>(url, dailyTaskForm)
 }
 
-const deleteDailyTask = (dailyTaskId: number) => {
-    return Vue.http.delete(apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString()))
-}
-
-export const dailyTaskService = {
-    getDailySummary,
-    getDailyTasksByDate,
-    createDailyTask,
-    updateDailyTask,
-    deleteDailyTask,
+export function deleteDailyTask(dailyTaskId: number): Promise<void> {
+  const url = apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString())
+  return http.delete(url)
 }

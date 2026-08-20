@@ -1,14 +1,14 @@
 export type TagType = 'project' | 'task'
 
 export interface Tag {
-    id: number
-    type: TagType
-    name: string
-    color: string
+  id: number
+  type: TagType
+  name: string
+  color: string
 }
 
 export interface TagForm {
-    type: TagType
-    name: string
-    color: string
+  type: TagType
+  name: string
+  color: string
 }

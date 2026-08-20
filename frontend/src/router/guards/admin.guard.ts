@@ -1,9 +1,8 @@
-import { NavigationGuard, NavigationGuardNext, Route } from 'vue-router/types/router'
-import { User } from '@/models/user.model'
-import store from '@/store'
+import { useUserStore } from '@/store'
+import { NavigationGuard } from 'vue-router'
 
-export const adminGuard: NavigationGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
-    const user: User | undefined = store.state.user.user
-    if (!user || !user.isStaff) next({ name: 'home' })
-    else next()
+export const adminGuard: NavigationGuard = () => {
+  const userStore = useUserStore()
+  if (!userStore.user || !userStore.user.isStaff) return { name: 'home' }
+  return undefined
 }

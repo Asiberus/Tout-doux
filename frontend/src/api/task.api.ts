@@ -1,21 +1,15 @@
-import Vue from 'vue'
 import { apiRoutes } from '@/api-routes'
-import { TaskPatch, TaskPost } from '@/models/task.model'
+import { Task, TaskPatch, TaskPost } from '@/models/task.model'
+import { http } from '@/axios/http'
 
-const createTask = (task: TaskPost) => {
-    return Vue.http.post(apiRoutes.task, task)
+export function createTask(task: TaskPost): Promise<Task> {
+  return http.post<Task>(apiRoutes.task, task)
 }
 
-const updateTaskById = (taskId: number, task: TaskPatch) => {
-    return Vue.http.patch(apiRoutes.taskById.replace(':taskId', taskId.toString()), task)
+export function updateTaskById(taskId: number, task: TaskPatch): Promise<Task> {
+  return http.patch<Task>(apiRoutes.taskById.replace(':taskId', taskId.toString()), task)
 }
 
-const deleteTaskById = (taskId: number) => {
-    return Vue.http.delete(apiRoutes.taskById.replace(':taskId', taskId.toString()))
-}
-
-export const taskService = {
-    createTask,
-    updateTaskById,
-    deleteTaskById,
+export function deleteTaskById(taskId: number): Promise<void> {
+  return http.delete(apiRoutes.taskById.replace(':taskId', taskId.toString()))
 }

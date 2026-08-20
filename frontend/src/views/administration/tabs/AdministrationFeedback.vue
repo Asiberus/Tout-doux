@@ -1,117 +1,110 @@
-<template>
-    <div>
-        <TertiaryTitle>Feedback</TertiaryTitle>
-
-        <v-data-table
-            :items="feedbackList"
-            :headers="headers"
-            show-expand
-            single-expand
-            :item-class="getItemClass"
-            @item-expanded="feedbackExpanded($event)">
-            <template #item.user="{ value }">{{ value.username }}</template>
-            <template #item.date="{ value }">{{ dateFormat(value, 'DD/MM/YYYY') }}</template>
-            <template #item.actions="{ item }">
-                <div class="d-flex justify-end align-center">
-                    <v-btn
-                        @click="setFeedbackAsUnread(item.id)"
-                        v-show="item.isRead"
-                        icon
-                        title="Mark as unread">
-                        <v-icon>mdi-email-mark-as-unread</v-icon>
-                    </v-btn>
-                    <ConfirmDialog @confirm="deleteFeedback(item.id)">
-                        <template #activator="{ attrs, on }">
-                            <v-btn v-bind="attrs" v-on="on" icon title="Delete">
-                                <v-icon>mdi-trash-can</v-icon>
-                            </v-btn>
-                        </template>
-                        <template #icon>
-                            <v-icon x-large>mdi-trash-can</v-icon>
-                        </template>
-                        <p>Are you sure to delete this feedback ?</p>
-                    </ConfirmDialog>
-                </div>
-            </template>
-
-            <template #expanded-item="{ headers, item }">
-                <td :colspan="headers.length" class="pa-5">
-                    {{ item.message }}
-                </td>
-            </template>
-        </v-data-table>
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
 import { feedbackApi } from '@/api'
 import { Feedback } from '@/models/feedback.model'
-import { DataTableHeader } from 'vuetify'
 import { dateFormat } from '@/pipes'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import TertiaryTitle from '@/components/TertiaryTitle.vue'
+import { onBeforeMount, ref } from 'vue'
 
-@Component({
-    components: { TertiaryTitle, ConfirmDialog },
+onBeforeMount(() => {
+  feedbackApi
+    .getFeedback()
+    .then(response => {
+      feedbackList.value = response.content
+    })
+    .catch(error => console.error(error))
 })
-export default class AdministrationFeedback extends Vue {
-    feedbackList: Feedback[] = []
-    headers: DataTableHeader[] = [
-        { text: 'Title', value: 'title' },
-        { text: 'User', value: 'user', width: 150, align: 'center' },
-        { text: 'Date', value: 'date', width: 110, align: 'center' },
-        { text: '', value: 'actions', width: 105, sortable: false },
-    ]
 
-    created(): void {
-        feedbackApi
-            .getFeedback()
-            .then((response: any) => {
-                this.feedbackList = response.body.content
-            })
-            .catch((error: any) => console.error(error))
-    }
+const feedbackList = ref<Feedback[]>([])
+const headerDefinition = [
+  // Déclarée explicitement pour la placer à gauche : sinon V4 l'ajoute en fin de tableau
+  { key: 'data-table-expand' },
+  { title: 'Title', value: 'title' },
+  { title: 'User', value: 'user.username', width: 150, align: 'center' },
+  { title: 'Date', value: 'date', width: 110, align: 'center' },
+  { title: '', value: 'actions', width: 105, sortable: false },
+] as const
 
-    feedbackExpanded(event: { item: Feedback; value: boolean }): void {
-        const { item, value } = event
-        if (item.isRead || !value) return
+function feedbackExpanded(expanded: number[]): void {
+  const id = expanded[0]
+  if (id === undefined) return
 
-        // We set first the isRead to true, and then we call the api.
-        // This prevents a blinking effect
-        const feedback = this.feedbackList.find(({ id }) => item.id === id)
-        if (feedback) feedback.isRead = true
+  const feedback = feedbackList.value.find(item => item.id === id)
+  if (!feedback || feedback.isRead) return
 
-        feedbackApi
-            .setFeedbackReadProperty(item.id, true)
-            .catch((error: any) => console.error(error))
-    }
+  // We set first the isRead to true, and then we call the api.
+  // This prevents a blinking effect
+  feedback.isRead = true
 
-    setFeedbackAsUnread(id: number): void {
-        feedbackApi
-            .setFeedbackReadProperty(id, false)
-            .then(() => {
-                const feedback = this.feedbackList.find(item => item.id === id)
-                if (feedback) feedback.isRead = false
-            })
-            .catch((error: any) => console.error(error))
-    }
+  feedbackApi.setFeedbackReadProperty(feedback.id, true).catch(error => console.error(error))
+}
 
-    deleteFeedback(id: number): void {
-        feedbackApi.deleteFeedback(id).then(() => {
-            const index = this.feedbackList.findIndex(feedback => feedback.id === id)
-            if (index !== -1) this.feedbackList.splice(index, 1)
-        })
-    }
+function setFeedbackAsUnread(id: number): void {
+  feedbackApi
+    .setFeedbackReadProperty(id, false)
+    .then(() => {
+      const feedback = feedbackList.value.find(item => item.id === id)
+      if (feedback) feedback.isRead = false
+    })
+    .catch(error => console.error(error))
+}
 
-    getItemClass(item: Feedback): string {
-        return item.isRead
-            ? 'grey--text text--lighten-2 font-weight-light'
-            : 'white--text font-weight-bold'
-    }
+function deleteFeedback(id: number): void {
+  feedbackApi.deleteFeedback(id).then(() => {
+    const index = feedbackList.value.findIndex(feedback => feedback.id === id)
+    if (index !== -1) feedbackList.value.splice(index, 1)
+  })
+}
 
-    dateFormat(date: string, format: string): string {
-        return dateFormat(date, format)
-    }
+function getItemClass({ item }: { item: Feedback }): { class: string } {
+  if (item.isRead) return { class: 'text-grey-lighten-2 font-weight-light' }
+  else return { class: 'text-white font-weight-bold' }
 }
 </script>
+
+<template>
+  <div>
+    <TertiaryTitle>Feedback</TertiaryTitle>
+
+    <v-data-table
+      :items="feedbackList"
+      :headers="headerDefinition"
+      show-expand
+      expand-strategy="single"
+      :cell-props="getItemClass"
+      @update:expanded="feedbackExpanded($event)">
+      <template #expanded-row="{ columns, item }">
+        <tr>
+          <td :colspan="columns.length" class="pa-5">
+            {{ item.message }}
+          </td>
+        </tr>
+      </template>
+      <template #item.date="{ value }">{{ dateFormat(value, 'DD/MM/YYYY') }}</template>
+      <template #item.actions="{ item }">
+        <div class="d-flex justify-end align-center">
+          <v-btn
+            v-show="item.isRead"
+            icon
+            variant="text"
+            density="comfortable"
+            title="Mark as unread"
+            @click="setFeedbackAsUnread(item.id)">
+            <v-icon icon="mdi-email-mark-as-unread" />
+          </v-btn>
+          <ConfirmDialog @confirm="deleteFeedback(item.id)">
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon variant="text" density="comfortable" title="Delete">
+                <v-icon icon="mdi-trash-can" />
+              </v-btn>
+            </template>
+            <template #icon>
+              <v-icon icon="mdi-trash-can" size="x-large" />
+            </template>
+            <p>Are you sure to delete this feedback ?</p>
+          </ConfirmDialog>
+        </div>
+      </template>
+    </v-data-table>
+  </div>
+</template>

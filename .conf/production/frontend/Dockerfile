@@ -1,4 +1,4 @@
-FROM node:14.18.1-alpine3.12 as build-stage
+FROM node:22-alpine as build-stage
 
 ARG ARG_VERSION
 ARG ARG_API_URL
@@ -17,12 +17,12 @@ RUN chown node:node /frontend && \
     rm -rf /var/cache/apk/*
 
 USER node
-COPY --chown=node:node ./frontend/package.json ./frontend/package-lock.json ./
-RUN npm install
+COPY --chown=node:node ./frontend/package.json ./frontend/yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 COPY --chown=node:node ./frontend .
 RUN ./setup-config.sh && \
-    npm run build
+    yarn build
 
 FROM nginx:1.24-alpine as production-stage
 
