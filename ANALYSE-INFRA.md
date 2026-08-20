@@ -582,9 +582,8 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
    frontend. Trois correctifs courts qui améliorent nettement l'exploitabilité.
 6. ~~**S2, S3**~~ ✅ fait — CORS restreint à `SERVER_URL` (`CORS_ALLOWED_ORIGINS`), saisie des
    secrets masquée dans `td.sh` (`read -rs`).
-7. **S5** — exclure `.conf/*/conf.env` de `.dockerignore` : le fichier contenant les vrais
-   secrets transite dans le contexte de build Docker à chaque build sans y être nécessaire (aucun
-   `COPY` ne le cible). Pas encore corrigé.
+7. ~~**S5**~~ ✅ fait — `.conf/*/conf.env` ajouté à `.dockerignore` : les fichiers contenant les
+   vrais secrets ne transitent plus dans le contexte de build Docker.
 8. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
 9. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
 

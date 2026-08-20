@@ -12,6 +12,7 @@ npm-debug.log
 # Docker
 docker-compose*.yml
 Dockerfile
+.conf/*/conf.env
 
 # Python
 app/__pycache__/
