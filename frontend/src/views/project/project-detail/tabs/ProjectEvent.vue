@@ -74,6 +74,9 @@ function deleteEvent(id: number): void {
             :event
             :disabled="projectStore.loadedProject.archived"
             :show-icon="true"
+            margin-bottom
+            caret
+            clickable
             @update="updateEvent($event)"
             @delete="deleteEvent($event)">
           </EventItemCard>
@@ -98,6 +101,9 @@ function deleteEvent(id: number): void {
             :key="event.id"
             :event
             :show-icon="true"
+            margin-bottom
+            caret
+            clickable
             :disabled="projectStore.loadedProject.archived"
             @update="updateEvent($event)"
             @delete="deleteEvent($event)">
