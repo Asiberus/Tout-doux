@@ -76,6 +76,11 @@ const eventText = computed<string>(() => {
     --divider-justify-content: flex-start;
   }
 
+  // Le modificateur est nécessaire pour égaler la spécificité du sélecteur Vuetify qui pose ces 24px
+  &.v-timeline--side-end .v-timeline-item :deep(.v-timeline-item__body) {
+    padding-inline-start: 0;
+  }
+
   .v-timeline-item {
     @media #{map.get(variables.$display-breakpoints, 'xs')} {
       padding-bottom: 16px;

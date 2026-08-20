@@ -29,7 +29,7 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
   <v-card
     :color="cardColor"
     class="daily-task-card rounded-lg pa-3 pa-sm-4"
-    :ripple="false"
+    ripple
     :class="{ caret }"
     @click="$emit('toggle')">
     <div class="daily-task-card__header">
