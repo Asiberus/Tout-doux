@@ -39,7 +39,7 @@ const taskForm = ref<Form<TaskPost>>({
   rules: {
     name: [
       (value: string): boolean | string => !!value || 'Task name is required',
-      (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
+      (value: string): boolean | string => value.length <= 150 || 'Max 150 characters',
     ],
   },
 })
@@ -106,7 +106,7 @@ function emitCloseEvent(): void {
           ref="name"
           v-model="taskForm.data.name"
           label="Name"
-          counter="50"
+          counter="150"
           required
           :rules="taskForm.rules?.name"
           :autofocus="!task"

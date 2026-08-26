@@ -6,7 +6,7 @@ from tout_doux.models.user import UserRelatedModel
 
 
 class CommonTask(UserRelatedModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
     tags = models.ManyToManyField(
         Tag,
         limit_choices_to={'type': Tag.Type.TASK},

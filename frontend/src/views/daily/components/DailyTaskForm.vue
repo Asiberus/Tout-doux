@@ -27,7 +27,7 @@ const dailyTaskForm = ref<Form<DailyTaskPatch>>({
   rules: {
     name: [
       (value: string): boolean | string => !!value || 'Name is required',
-      (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
+      (value: string): boolean | string => value.length <= 150 || 'Max 150 characters',
     ],
   },
 })
@@ -73,7 +73,7 @@ function removeTag(id: number): void {
         v-model="dailyTaskForm.data.name"
         :rules="dailyTaskForm.rules?.name"
         label="Name"
-        counter="50"
+        counter="150"
         required
         autofocus
         class="mb-2" />
