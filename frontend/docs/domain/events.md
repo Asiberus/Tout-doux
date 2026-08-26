@@ -56,7 +56,9 @@ granularité du **jour**. Sinon : même jour que `startDate`. **Ignore les heure
 `takesWholeDay`.**
 
 Utilisé pour garder une liste de journée cohérente après création/édition, pour valider le
-formulaire dans le wizard (`relatedToDate`), et pour remplir le dialog de jour de l'agenda.
+formulaire dans le wizard (`relatedToDate`), pour remplir le dialog de jour de l'agenda, et pour
+ordonner le tableau passé à `<v-calendar>` — ce dernier n'ordonne pas les événements d'une même
+case, il conserve l'ordre du tableau.
 
 ### `sortEvents(e1, e2, { handlePassedEvent })` — ordre d'affichage
 

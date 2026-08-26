@@ -41,12 +41,21 @@ const isCurrentMonthSelected = computed<boolean>(() => {
   return moment(value.value).isSame(moment(), 'month')
 })
 
+// L'ordre du tableau décide de l'ordre d'affichage dans une case du calendrier : Vuetify ne
+// départage pas deux événements qui commencent et finissent le même jour.
+function sortEventList(): void {
+  events.value.sort((event1, event2) => sortEvents(event1, event2))
+}
+
 function retrieveEvents(): void {
   events.value = []
   const month = moment(value.value).month() + 1 // Month count start at 0
   const year = moment(value.value).year()
   eventApi.getEvents({ month, year }).then(
-    response => (events.value = response),
+    response => {
+      events.value = response
+      sortEventList()
+    },
     error => console.error(error)
   )
 }
@@ -73,6 +82,7 @@ function createEvent(event: EventPostOrPatch): void {
   eventApi.createEvent(event, { extended: true }).then(
     response => {
       events.value.push(response)
+      sortEventList()
       eventDialog.value = false
       if (eventDayDialog.value) setDayDialogEventList()
     },
@@ -87,6 +97,7 @@ function updateEvent({ id, data }: { id: number; data: EventPostOrPatch }): void
       if (eventIndex === -1) return
 
       events.value.splice(eventIndex, 1, updatedEvent)
+      sortEventList()
       if (eventDayDialog.value) setDayDialogEventList()
       else eventDialog.value = false
     },
