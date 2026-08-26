@@ -517,19 +517,99 @@ développement se fera sous Linux, via un `ARG UID` passé au build.
 
 ### Q8 — Points mineurs
 
-| Constat                                                                                                                                                                                                                                                                                             | Emplacement                                 | Preuve  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------- |
-| `image: adminer` sans tag de version — seule image non épinglée, alors que `postgres`, `node` et `nginx` le sont.                                                                                                                                                                                   | `docker-compose.yml:56`                     | Lu      |
-| `FROM … as …` en minuscules : BuildKit émet `FromAsCasing` aux lignes 1 et 27 (warnings observés pendant le build de vérification).                                                                                                                                                                 | `.conf/production/frontend/Dockerfile:1,27` | Exécuté |
-| Le numéro de version est dupliqué à la main entre `td.sh:2` et `frontend/package.json`. Les deux valent bien `0.4.1` aujourd'hui, mais le commentaire « Must match package.json version number » décrit un piège plutôt qu'il ne l'évite. Un `grep` sur `package.json` supprimerait la duplication. | `td.sh:2`                                   | Lu      |
-| `python3 make g++` installés dans l'étape de build de production pour node-gyp ; probablement inutiles aujourd'hui, à valider par un build d'essai.                                                                                                                                                 | `.conf/production/frontend/Dockerfile:16`   | Déduit  |
-| Aucun `HEALTHCHECK` sur les trois services de production.                                                                                                                                                                                                                                           | `docker-compose.prod.yml`                   | Lu      |
-| Pas de `SECURE_PROXY_SSL_HEADER` : nginx transmet la requête en clair à uwsgi, donc `request.is_secure()` est toujours faux derrière le proxy, alors que le trafic externe est en HTTPS.                                                                                                            | `backend/backend/settings.py`               | Lu      |
-| nginx tourne en root dans l'image de production (comportement par défaut de l'image officielle).                                                                                                                                                                                                    | `.conf/production/frontend/Dockerfile`      | Déduit  |
-| `td.sh` n'active ni `set -e` ni `set -u` ; plusieurs variables sont déréférencées sans guillemets (`td.sh:50,55,60,66`), ce qui provoque `too many arguments` si une saisie contient une espace.                                                                                                    | `td.sh`                                     | Lu      |
-| Les `eval` autour des commandes docker (`td.sh:237,240,249,…`) sont inutiles : aucune expansion différée n'est nécessaire, et ils fragilisent le script si `${basedir}` contient une espace.                                                                                                        | `td.sh`                                     | Lu      |
-| `.conf/production/conf.env` n'existe pas sur cette machine : `./td.sh edit prod` ferait un `grep` sur un fichier absent, sans message clair (voir Q1, la condition ligne 214 masque l'erreur).                                                                                                      | —                                           | Exécuté |
-| `run.sh:3` — `BACKEND_PORT=${BACKEND_PORT}` est une réassignation sans effet ; `set -e` ligne 4 gagnerait à être placé en tête.                                                                                                                                                                     | `.conf/production/backend/run.sh`           | Lu      |
+| Constat                                                                                                                                                                                          | Emplacement                                 | Preuve  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- | ------- |
+| `image: adminer` sans tag de version — seule image non épinglée, alors que `postgres`, `node` et `nginx` le sont.                                                                                | `docker-compose.yml:56`                     | Lu      |
+| `FROM … as …` en minuscules : BuildKit émet `FromAsCasing` aux lignes 1 et 27 (warnings observés pendant le build de vérification).                                                              | `.conf/production/frontend/Dockerfile:1,27` | Exécuté |
+| `python3 make g++` installés dans l'étape de build de production pour node-gyp ; probablement inutiles aujourd'hui, à valider par un build d'essai.                                              | `.conf/production/frontend/Dockerfile:16`   | Déduit  |
+| Aucun `HEALTHCHECK` sur les trois services de production.                                                                                                                                        | `docker-compose.prod.yml`                   | Lu      |
+| Pas de `SECURE_PROXY_SSL_HEADER` : nginx transmet la requête en clair à uwsgi, donc `request.is_secure()` est toujours faux derrière le proxy, alors que le trafic externe est en HTTPS.         | `backend/backend/settings.py`               | Lu      |
+| nginx tourne en root dans l'image de production (comportement par défaut de l'image officielle).                                                                                                 | `.conf/production/frontend/Dockerfile`      | Déduit  |
+| `td.sh` n'active ni `set -e` ni `set -u` ; plusieurs variables sont déréférencées sans guillemets (`td.sh:50,55,60,66`), ce qui provoque `too many arguments` si une saisie contient une espace. | `td.sh`                                     | Lu      |
+| Les `eval` autour des commandes docker (`td.sh:237,240,249,…`) sont inutiles : aucune expansion différée n'est nécessaire, et ils fragilisent le script si `${basedir}` contient une espace.     | `td.sh`                                     | Lu      |
+| `.conf/production/conf.env` n'existe pas sur cette machine : `./td.sh edit prod` ferait un `grep` sur un fichier absent, sans message clair (voir Q1, la condition ligne 214 masque l'erreur).   | —                                           | Exécuté |
+| `run.sh:3` — `BACKEND_PORT=${BACKEND_PORT}` est une réassignation sans effet ; `set -e` ligne 4 gagnerait à être placé en tête.                                                                  | `.conf/production/backend/run.sh`           | Lu      |
+
+### Q9 — Le numéro de version est dupliqué à la main à quatre endroits
+
+**Fichiers** : `frontend/package.json`, `td.sh:2`, `frontend/index.html:7`, `.conf/production/conf.env` (sur le serveur, non versionné)
+**Preuve** : **Lu** (les trois premiers), **Déduit** (le comportement du quatrième)
+
+`td.sh:2` porte lui-même le commentaire « Must match package.json version number » — l'intention a
+toujours été que `package.json` soit la source de référence, mais rien ne l'impose. Quatre
+endroits doivent être maintenus synchronisés à la main à chaque release :
+
+1. `frontend/package.json` (champ `version`).
+2. `td.sh:2` (`vers="..."`), une valeur littérale, jamais comparée à `package.json`.
+3. `frontend/index.html:7` (`<meta property="VERSION" content="...">`) — valeur par défaut
+   committée, visible uniquement en `yarn dev` local (en build de production, `setup-config.sh`
+   la réécrit à la volée dans l'image).
+4. `.conf/production/conf.env` **sur le serveur** — absent de Git, édité en SSH à la main. C'est
+   pourtant cette valeur qui alimente réellement `ARG_VERSION` au build Docker de production via
+   `docker-compose.prod.yml`. `td.sh update prod` ne la régénère jamais : seul `td.sh install
+prod` l'écrit, une fois, à l'installation initiale — toute nouvelle version déployée depuis
+   nécessite une édition manuelle distante.
+
+Oublier un seul de ces quatre points désynchronise silencieusement la version affichée de la
+version réellement déployée — aucune erreur ne le signale.
+
+**Correctif** (trois volets, `package.json` comme unique source) :
+
+1. Faire lire `td.sh` dans `package.json` plutôt que de coder `vers` en dur :
+
+   ```diff
+    #!/usr/bin/env bash
+   -vers="0.5.0" # Must match package.json version number
+    basedir=$(dirname "${0}")
+   +vers=$(grep -m1 '"version"' "${basedir}/frontend/package.json" | sed -E 's/.*"version": *"([^"]*)".*/\1/')
+   ```
+
+2. Ajouter une fonction qui réécrit `VERSION=` dans le `conf.env` déjà en place (dev ou prod) à
+   chaque build, pour supprimer l'édition SSH manuelle du point 4 :
+
+   ```sh
+   function syncVersion(){
+     if [ "${1}" = "dev" ]; then
+       envFile="${basedir}/.conf/development/conf.env"
+     elif [ "${1}" = "prod" ]; then
+       envFile="${basedir}/.conf/production/conf.env"
+     fi
+     if [ -f "${envFile}" ]; then
+       sed -i.bak "s/^VERSION=.*/VERSION=${vers}/" "${envFile}" && rm -f "${envFile}.bak"
+     fi
+   }
+   ```
+
+   Appelée en tête de `buildApp()` (`td.sh:238`), elle couvre `build` et `update` (`updateApp`
+   enchaîne `quitApp` → `buildApp` → `startApp`). `sed -i.bak` est la syntaxe portable identique
+   en BSD/macOS et Linux — évite le piège déjà noté en Q1 avec `sed -i ''`.
+
+3. Injecter la version dans `frontend/index.html` à la volée (dev **et** build) depuis
+   `package.json`, via un hook Vite, pour ne plus committer de valeur par défaut (point 3) :
+
+   ```ts
+   // frontend/vite.config.ts
+   import fs from 'fs'
+   const { version } = JSON.parse(
+     fs.readFileSync(path.resolve(import.meta.dirname, './package.json'), 'utf-8'),
+   )
+   // dans plugins: [...]
+   {
+     name: 'inject-version',
+     transformIndexHtml: (html) =>
+       html.replace(/<meta property="VERSION" content=".*?" \/>/, `<meta property="VERSION" content="${version}" />`),
+   }
+   ```
+
+   Le mécanisme existant (`setup-config.sh` qui patch `index.html` dans l'image de production via
+   `ARG_VERSION`) continue de fonctionner sans conflit en parallèle : les deux dérivent désormais
+   de la même source et écrivent toujours la même valeur. Sa suppression complète (`ARG_VERSION`,
+   `ENV VERSION`, la ligne `sed` correspondante dans `setup-config.sh`) est une simplification
+   possible mais séparée, qui touche aussi `docker-compose.prod.yml` et l'équivalent en
+   développement.
+
+Avec ces trois volets, un seul geste (éditer `package.json`, ou `yarn version`) suffit pour
+toute release — plus aucune édition manuelle ailleurs, y compris sur le serveur.
 
 ---
 
@@ -585,7 +665,10 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
 7. ~~**S5**~~ ✅ fait — `.conf/*/conf.env` ajouté à `.dockerignore` : les fichiers contenant les
    vrais secrets ne transitent plus dans le contexte de build Docker.
 8. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
-9. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
+9. **Q9** — unifier le numéro de version sur `package.json` comme seule source (`td.sh` la lit,
+   `conf.env` du serveur est resynchronisé automatiquement à chaque build, `index.html` l'injecte
+   via Vite). Supprime l'édition manuelle SSH du `conf.env` de production à chaque release.
+10. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
 
 ## 8. Points ouverts
 
