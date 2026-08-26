@@ -16,7 +16,7 @@ models ◄── utils ── axios ──► api ──► store ──► serv
    └──────────── views ◄── router ──────┘          │
                    ▲         │                     │
             components    layout ──────────────────┘
-                             composables (aucune dépendance interne)
+                             composables ──► api, store
 ```
 
 | Couche         | Rôle                                                       | Importe                                 |
@@ -32,7 +32,7 @@ models ◄── utils ── axios ──► api ──► store ──► serv
 | `layout/`      | Coquilles applicatives (navbar, header)                    | `config`, `services`, `store`           |
 | `components/`  | Composants partagés globalement                            | `api`, `composables`, `models`, `utils` |
 | `views/`       | Features (9 zones) + composants partagés par domaine       | tout sauf `axios`, `config`, `router`   |
-| `composables/` | Un seul fichier, `useDialogWidth`                          | —                                       |
+| `composables/` | `useDialogWidth`, `useAddTaskToDaily`                      | `api`, `store`                          |
 
 ## Règles
 

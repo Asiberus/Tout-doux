@@ -7,6 +7,7 @@ import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import SectionDialog from '@/views/project/project-detail/components/SectionDialog.vue'
+import { useAddTaskToDaily } from '@/composables/useAddTaskToDaily'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { filterCompleted, filterUncompleted } from '@/utils/task.utils'
 import { computed, ref } from 'vue'
@@ -15,6 +16,7 @@ import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp, smAndDown, mdAndDown, lgAndDown } = useDisplay()
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
+const { addTaskToDaily } = useAddTaskToDaily()
 const projectStore = useProjectStore()
 const preferencesStore = usePreferencesStore()
 
@@ -153,6 +155,7 @@ function deleteTask(id: number): void {
               :task
               :disabled
               class="mb-2"
+              @add-to-daily="addTaskToDaily($event)"
               @toggle-state="toggleTaskState"
               @update="updateTask"
               @delete="deleteTask" />
@@ -187,6 +190,7 @@ function deleteTask(id: number): void {
               :task
               :disabled
               class="mb-2"
+              @add-to-daily="addTaskToDaily($event)"
               @toggle-state="toggleTaskState"
               @update="updateTask"
               @delete="deleteTask">

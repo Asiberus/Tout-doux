@@ -3,10 +3,11 @@ import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { useDisplay } from 'vuetify'
 import { ref } from 'vue'
-import { useUserStore } from '@/store'
+import { useNotificationStore, useUserStore } from '@/store'
 
-const { mobile } = useDisplay()
+const { mobile, xs } = useDisplay()
 const userStore = useUserStore()
+const notificationStore = useNotificationStore()
 
 const navbarDisplayed = ref(!mobile.value)
 const headerMenu = ref(false)
@@ -35,5 +36,16 @@ function hideNavbar(): void {
         <router-view />
       </v-container>
     </v-main>
+
+    <v-snackbar-queue
+      v-model="notificationStore.queue"
+      :location="xs ? 'top' : 'top right'"
+      closable>
+      <template #actions="{ props: closeProps }">
+        <v-btn v-bind="closeProps" icon variant="text" size="small" density="comfortable">
+          <v-icon icon="mdi-close" />
+        </v-btn>
+      </template>
+    </v-snackbar-queue>
   </v-app>
 </template>

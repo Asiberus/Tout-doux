@@ -101,12 +101,36 @@ Où écrire un style : [../patterns/styling.md](../patterns/styling.md).
 - **Icônes MDI et police Roboto chargées depuis des CDN** (`index.html:12-17`), pas bundlées :
   l'app se dégrade hors ligne / derrière un proxy filtrant.
 
+## Notifier l'utilisateur
+
+Un **unique `<v-snackbar-queue>`** est monté dans `AuthenticatedLayout.vue`, alimenté par le store
+`notification`. Ne jamais poser de `v-snackbar` dans un composant : notifier tient en une ligne,
+depuis n'importe où.
+
+```ts
+const notificationStore = useNotificationStore()
+notificationStore.notifySuccess("Task added to today's daily")
+notificationStore.notifyError("Could not add the task to today's daily")
+```
+
+La position est décidée à ce seul endroit : `top right`, et `top` (haut-centré) sous `xs`. Chaque
+notification porte une croix de fermeture (`closable`) en plus de sa fermeture automatique au
+bout de 5 s. La file est à double sens — le composant réémet le tableau privé de l'élément
+qu'il vient d'afficher.
+
+⚠️ **Rien ne s'affiche depuis les écrans non authentifiés** : `NonAuthenticatedLayout` a son propre
+`v-app` et ne monte pas la file. Voir
+[../adr/0005-notifications-via-snackbar-queue.md](../adr/0005-notifications-via-snackbar-queue.md).
+
 ## Décisions négatives
 
 - **Pas de bascule de thème, pas de mode clair** — le thème `light` déclaré est du code mort
   (aucune UI ne permet d'y accéder).
 - **Pas d'i18n** (0 `vue-i18n` / `useI18n`). Les libellés sont en anglais en dur dans les
   templates, alors que `index.html` déclare `lang="fr"`. La locale Vuetify est figée à `en`.
+- **Pas de gestion d'erreurs globale** : le canal d'affichage existe (ci-dessus), mais
+  l'intercepteur axios ne notifie pas et les `console.error` des stores restent muets pour
+  l'utilisateur. Notifier est un choix par appel.
 - **Pas de design system formalisé** (pas de Storybook, pas de tokens exportés) : la référence
   est le code des composants partagés.
 - **Pas de feature flags** (0 occurrence). Les fonctionnalités non finies sont des éléments

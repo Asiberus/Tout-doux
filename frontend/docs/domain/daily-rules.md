@@ -12,11 +12,11 @@ Deux écrans : le **wizard** (`daily-update`, préparer la journée) et le **ré
 
 Un `DailyTask` provient de l'une de ces trois sources, **exclusivement** :
 
-| Origine                             | Corps envoyé               | Déclenché depuis                                                            |
-| ----------------------------------- | -------------------------- | --------------------------------------------------------------------------- |
-| Une **Task** (projet ou collection) | `{ taskId }`               | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47` |
-| Un **CommonTask**                   | `{ commonTaskId }`         | `DailyUpdateCommonTask.vue:19`                                              |
-| **Libre** (ad hoc)                  | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue`                           |
+| Origine                             | Corps envoyé               | Déclenché depuis                                                                                           |
+| ----------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Une **Task** (projet ou collection) | `{ taskId }`               | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47`, `TaskCard.vue` (context menu) |
+| Un **CommonTask**                   | `{ commonTaskId }`         | `DailyUpdateCommonTask.vue:19`                                                                             |
+| **Libre** (ad hoc)                  | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue`                                                          |
 
 ⚠️ **Aucune validation n'existe.** `DailyTaskPost` a ses champs **tous optionnels** : un corps
 vide passe le typage, et un DailyTask sans origine rendrait un titre vide. L'invariant est
@@ -63,7 +63,10 @@ crée ou modifie des DailyTasks.**
    `/daily/2026-01-01/update/task` afficherait les tâches du 1ᵉʳ janvier tout en créant les
    nouvelles sur aujourd'hui : l'écran et les données divergeraient silencieusement.
 3. **Pas de doublon dans une journée** — une même Task ou CommonTask ne peut pas être ajoutée
-   deux fois. Vérifié par `isTaskSelected` / `isCommonTaskSelected`, qui rendent la carte inerte.
+   deux fois. Dans le wizard, vérifié par `isTaskSelected` / `isCommonTaskSelected`, qui rendent
+   la carte inerte. ⚠️ **Le context menu de `TaskCard` n'a pas cet état** : il ne connaît pas le
+   daily du jour. Il poste, et un **409** du serveur signifie « déjà présente » — traité comme
+   un succès par `useAddTaskToDaily`, le résultat étant le même pour l'utilisateur.
 4. **Seules les tâches non complétées sont planifiables**, et seuls les projets/collections non
    archivés apparaissent (filtres serveur `archived: false`, `has_uncompleted_task: true`, plus
    des filtres locaux).

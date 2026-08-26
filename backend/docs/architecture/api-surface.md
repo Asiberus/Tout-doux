@@ -41,32 +41,32 @@ Détail des jetons, des e-mails et du cycle de vie de compte : [auth.md](auth.md
 
 Sauf mention contraire : accès **connecté**, réponse de liste **paginée** (voir plus bas).
 
-| Endpoint                      | Méthodes                | Sérialiseurs (par action)                    | Filtres                                                      | Notes                                                        |
-| ----------------------------- | ----------------------- | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `project/`                    | GET, POST               | `ProjectList` / `ProjectPostOrPatch`         | `archived`, `has_uncompleted_task`                           |                                                              |
-| `project/detailed/`           | GET                     | `ProjectDetail`                              | idem                                                         | délègue à `list()`                                           |
-| `project/{pk}/`               | GET, PUT, PATCH, DELETE | `ProjectDetail` / `ProjectPostOrPatch`       |                                                              |                                                              |
-| `collection/`                 | GET, POST               | `CollectionList` / `CollectionPostOrPatch`   | `archived`, `has_uncompleted_task`                           |                                                              |
-| `collection/detailed/`        | GET                     | `CollectionDetail`                           | idem                                                         | délègue à `list()`                                           |
-| `collection/{pk}/`            | GET, PUT, PATCH, DELETE | `CollectionDetail` / `CollectionPostOrPatch` |                                                              |                                                              |
-| `task/`                       | **POST seul**           | `TaskPost`                                   |                                                              | pas de liste ni de détail                                    |
-| `task/{pk}/`                  | PUT, PATCH, DELETE      | `TaskPatch`                                  |                                                              |                                                              |
-| `section/`                    | **POST seul**           | `SectionPost`                                |                                                              |                                                              |
-| `section/{pk}/`               | PUT, PATCH, DELETE      | `SectionPatch`                               |                                                              |                                                              |
-| `daily-task/`                 | GET, POST               | `DailyTask` / `DailyTaskPost`                | `date`                                                       |                                                              |
-| `daily-task/summary/`         | GET                     | `DailySummary`                               | `start_date`, `end_date` **obligatoires**                    | **non paginé**                                               |
-| `daily-task/{pk}/`            | GET, PUT, PATCH, DELETE | `DailyTask` / `DailyTaskPatch`               |                                                              | DELETE refusé hors du jour courant                           |
-| `event/`                      | GET, POST               | `EventExtended` / `EventPostOrPatch`         | `date`, ou `month`+`year`                                    | **non paginé**                                               |
-| `event/{pk}/`                 | GET, PUT, PATCH, DELETE | `EventExtended` / `EventPostOrPatch`         | `extended` (forme de la réponse d'écriture)                  |                                                              |
-| `tag/`                        | GET, POST               | `Tag`                                        | `type`, `search`, `exclude_ids`                              |                                                              |
-| `tag/is-name-unique/`         | GET                     | —                                            | `name` **obligatoire**, `type` **obligatoire**, `exclude_id` | `{unique: bool}`                                             |
-| `tag/{pk}/`                   | GET, PUT, PATCH, DELETE | `Tag`                                        |                                                              |                                                              |
-| `common-task/`                | GET, POST               | `CommonTask`                                 |                                                              |                                                              |
-| `common-task/is-name-unique/` | GET                     | —                                            | `name` **obligatoire**, `exclude_id`                         | `{unique: bool}`                                             |
-| `common-task/{pk}/`           | GET, PUT, PATCH, DELETE | `CommonTask`                                 |                                                              |                                                              |
-| `feedback/`                   | GET, POST               | `Feedback`                                   | `is_read`                                                    | **POST libre pour tout connecté, lecture réservée au staff** |
-| `feedback/{pk}/`              | GET, PUT, PATCH, DELETE | `Feedback`                                   |                                                              | staff seulement                                              |
-| `preferences/`                | GET, PATCH              | `Preferences`                                |                                                              | **hors routeur**, `APIView`                                  |
+| Endpoint                      | Méthodes                | Sérialiseurs (par action)                    | Filtres                                                      | Notes                                                          |
+| ----------------------------- | ----------------------- | -------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| `project/`                    | GET, POST               | `ProjectList` / `ProjectPostOrPatch`         | `archived`, `has_uncompleted_task`                           |                                                                |
+| `project/detailed/`           | GET                     | `ProjectDetail`                              | idem                                                         | délègue à `list()`                                             |
+| `project/{pk}/`               | GET, PUT, PATCH, DELETE | `ProjectDetail` / `ProjectPostOrPatch`       |                                                              |                                                                |
+| `collection/`                 | GET, POST               | `CollectionList` / `CollectionPostOrPatch`   | `archived`, `has_uncompleted_task`                           |                                                                |
+| `collection/detailed/`        | GET                     | `CollectionDetail`                           | idem                                                         | délègue à `list()`                                             |
+| `collection/{pk}/`            | GET, PUT, PATCH, DELETE | `CollectionDetail` / `CollectionPostOrPatch` |                                                              |                                                                |
+| `task/`                       | **POST seul**           | `TaskPost`                                   |                                                              | pas de liste ni de détail                                      |
+| `task/{pk}/`                  | PUT, PATCH, DELETE      | `TaskPatch`                                  |                                                              |                                                                |
+| `section/`                    | **POST seul**           | `SectionPost`                                |                                                              |                                                                |
+| `section/{pk}/`               | PUT, PATCH, DELETE      | `SectionPatch`                               |                                                              |                                                                |
+| `daily-task/`                 | GET, POST               | `DailyTask` / `DailyTaskPost`                | `date`                                                       | POST répond **409** si la tâche est déjà dans le daily du jour |
+| `daily-task/summary/`         | GET                     | `DailySummary`                               | `start_date`, `end_date` **obligatoires**                    | **non paginé**                                                 |
+| `daily-task/{pk}/`            | GET, PUT, PATCH, DELETE | `DailyTask` / `DailyTaskPatch`               |                                                              | DELETE refusé hors du jour courant                             |
+| `event/`                      | GET, POST               | `EventExtended` / `EventPostOrPatch`         | `date`, ou `month`+`year`                                    | **non paginé**                                                 |
+| `event/{pk}/`                 | GET, PUT, PATCH, DELETE | `EventExtended` / `EventPostOrPatch`         | `extended` (forme de la réponse d'écriture)                  |                                                                |
+| `tag/`                        | GET, POST               | `Tag`                                        | `type`, `search`, `exclude_ids`                              |                                                                |
+| `tag/is-name-unique/`         | GET                     | —                                            | `name` **obligatoire**, `type` **obligatoire**, `exclude_id` | `{unique: bool}`                                               |
+| `tag/{pk}/`                   | GET, PUT, PATCH, DELETE | `Tag`                                        |                                                              |                                                                |
+| `common-task/`                | GET, POST               | `CommonTask`                                 |                                                              |                                                                |
+| `common-task/is-name-unique/` | GET                     | —                                            | `name` **obligatoire**, `exclude_id`                         | `{unique: bool}`                                               |
+| `common-task/{pk}/`           | GET, PUT, PATCH, DELETE | `CommonTask`                                 |                                                              |                                                                |
+| `feedback/`                   | GET, POST               | `Feedback`                                   | `is_read`                                                    | **POST libre pour tout connecté, lecture réservée au staff**   |
+| `feedback/{pk}/`              | GET, PUT, PATCH, DELETE | `Feedback`                                   |                                                              | staff seulement                                                |
+| `preferences/`                | GET, PATCH              | `Preferences`                                |                                                              | **hors routeur**, `APIView`                                    |
 
 ### `user/` — trois régimes d'accès dans une seule vue
 
@@ -140,7 +140,9 @@ délèguent à `list()` : ils **sont** paginés, comme les listes ordinaires.
 - **Pas de schéma généré** — [adr/0004](../adr/0004-no-openapi-schema.md).
 - **Pas de gestion d'erreur personnalisée** : les erreurs sont les formes DRF standard
   (`{"detail": …}` pour les exceptions, `{"champ": ["…"]}` pour la validation). Aucun
-  `exception_handler` n'est configuré.
+  `exception_handler` n'est configuré. Une seule `APIException` maison existe,
+  `AlreadyInDailyError` (`exceptions.py`), pour le seul code hors 400/401/403/404 de l'API :
+  le **409** de `daily-task/`.
 - **Pas de limitation de débit** (`throttling`), y compris sur `auth/login/` et les endpoints
   d'unicité ouverts — voir [../quality/watched-risks.md](../quality/watched-risks.md) W5.
 

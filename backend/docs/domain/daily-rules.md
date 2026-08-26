@@ -36,6 +36,12 @@ passé par l'API.
 que voulu — les `NULL` n'entrent pas en conflit. Voir
 [../architecture/data-model.md](../architecture/data-model.md).
 
+Le doublon est refusé par une garde écrite à la main dans `validate()`, qui répond **409**
+(`AlreadyInDailyError`, `exceptions.py`). Elle est nécessaire parce que `date` est en
+`auto_now_add` : le champ est hors du sérialiseur, DRF ne peut donc pas dériver la contrainte
+d'unicité, et l'insertion remontait auparavant en **500**. Deux POST simultanés peuvent encore
+passer la garde et lever un `IntegrityError`.
+
 ## À la modification — `serializers/daily_task/daily_task_patch.py`
 
 | Règle                                                              | Ligne | Message                                                          |
