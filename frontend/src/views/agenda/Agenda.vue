@@ -22,7 +22,6 @@ const calendar = useTemplateRef('calendar')
 
 const events = ref<EventExtendedModel[]>([]) // TODO : think of using Set
 const value = ref(moment().format('YYYY-MM-DD'))
-const weekdays = [1, 2, 3, 4, 5, 6, 0]
 
 const eventDialog = ref(false)
 const eventToUpdate = ref<EventExtendedModel>()
@@ -193,7 +192,7 @@ function nextMonth(): void {
         ref="calendar"
         v-model="value"
         :events="events"
-        :weekdays="weekdays"
+        :first-day-of-week="1"
         event-color="event"
         event-start="startDate"
         event-end="endDate"
