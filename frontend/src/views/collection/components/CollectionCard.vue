@@ -29,6 +29,7 @@ const percentageOfCompletedTask = computed<number>(
           {{ collection.name }}
         </h5>
         <p
+          v-if="collection.description"
           class="text-title-small text-sm-body-large text-truncate mb-0"
           :title="collection.description">
           {{ collection.description }}

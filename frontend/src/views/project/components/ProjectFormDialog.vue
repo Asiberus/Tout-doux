@@ -31,10 +31,7 @@ const projectForm = ref<Form<ProjectPost>>({
       (value: string): boolean | string => !!value || 'Project name is required',
       (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
     ],
-    description: [
-      (value: string): boolean | string => !!value || 'Project description is required',
-      (value: string): boolean | string => value.length <= 500 || 'Max 500 characters',
-    ],
+    description: [(value: string): boolean | string => value.length <= 500 || 'Max 500 characters'],
   },
 })
 
@@ -96,7 +93,6 @@ function emitCloseEvent(): void {
             :rules="projectForm.rules?.description"
             label="Description"
             counter="500"
-            required
             rows="1"
             auto-grow
             class="mb-2"

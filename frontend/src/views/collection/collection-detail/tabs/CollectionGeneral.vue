@@ -184,6 +184,7 @@ function deleteTask(id: number): void {
       <v-card class="rounded-lg">
         <v-card-text>
           <div
+            v-if="collection.description"
             ref="description"
             class="collection-general__description__content text-body-medium"
             :class="{
@@ -192,6 +193,9 @@ function deleteTask(id: number): void {
             }"
             @click="displayDescription = !displayDescription">
             {{ collection.description }}
+          </div>
+          <div v-else class="text-body-medium font-italic text-grey-lighten-1">
+            This collection has no description.
           </div>
 
           <div class="d-flex justify-end align-center mt-1" title="Created on">

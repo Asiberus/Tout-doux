@@ -68,6 +68,7 @@ function deleteTask(id: number): void {
         <v-card class="rounded-lg mb-3">
           <v-card-text>
             <div
+              v-if="project.description"
               ref="description"
               class="project-description__description__content text-body-medium"
               :class="{
@@ -76,6 +77,9 @@ function deleteTask(id: number): void {
               }"
               @click="displayDescription = !displayDescription">
               {{ project.description }}
+            </div>
+            <div v-else class="text-body-medium font-italic text-grey-lighten-1">
+              This project has no description.
             </div>
             <div class="d-flex justify-end align-center mt-1" title="Created on">
               <v-icon icon="mdi-clock" size="small" />

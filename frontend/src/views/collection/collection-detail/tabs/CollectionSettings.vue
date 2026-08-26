@@ -26,10 +26,7 @@ const collectionForm = ref<Form<CollectionPatch>>({
       (value: string): boolean | string => !!value || 'This field is required',
       (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
     ],
-    description: [
-      (value: string): boolean | string => !!value || 'This field is required',
-      (value: string): boolean | string => value.length <= 500 || 'Max 500 characters',
-    ],
+    description: [(value: string): boolean | string => value.length <= 500 || 'Max 500 characters'],
     itemName: [
       (value: string): boolean | string => !!value || 'This field is required',
       (value: string): boolean | string => value.length <= 15 || 'Max 15 characters',
@@ -145,7 +142,6 @@ function deleteCollection(): void {
         :disabled="collection.archived"
         label="Description"
         counter="500"
-        required
         rows="2"
         auto-grow
         class="mb-2"
