@@ -95,11 +95,20 @@ docker exec -it tout_doux_backend python manage.py migrate
 docker exec -it tout_doux_backend python manage.py makemigrations --check --dry-run   # doit être vide
 ```
 
-Les 5 migrations existantes sont des **squashs par release** (`0003_release_v0_3`,
-`0004_release_v0_4`), plus `0005_alter_user_related_names` — issue de la montée en Django 6.1, qui
-sérialise désormais `related_name='%(class)ss'` non résolu au lieu de sa valeur résolue. Elle ne
-produit **aucun SQL** (11 `AlterField`, tous `(no-op)` à `sqlmigrate`) et a vocation à être
-fusionnée dans le squash de la prochaine release. La convention est de regrouper, pas d'accumuler
+Les migrations sont des **squashs par release** produits par `manage.py squashmigrations` :
+`0003_release_v0_3`, `0004_release_v0_4`, `0005_release_v0_5`, `0006_release_v0_6`.
+`0005_release_v0_5` contient les 11 `AlterField` de la montée en Django 6.1 — qui sérialise
+désormais `related_name='%(class)ss'` non résolu au lieu de sa valeur résolue — et ne produit
+**aucun SQL** (tous `(no-op)` à `sqlmigrate`).
+
+⚠️ `0005_release_v0_5` porte encore `replaces` et `0005_alter_user_related_names` reste en place :
+ce nom est celui déployé en production depuis `v0.5.0`, et `replaces` est ce qui évite aux bases
+existantes de rejouer la migration. Les deux ne partent qu'une fois `v0.6` déployée et
+`0005_release_v0_5` enregistrée partout. Un squash dont les migrations remplacées ne sont livrées
+dans aucune release, lui, se termine tout de suite : supprimer les fichiers et retirer `replaces`
+(c'est ce qui a été fait pour `0006_release_v0_6`).
+
+La convention est de regrouper, pas d'accumuler
 une migration par changement. Une migration intermédiaire créée pendant le développement d'une release a vocation
 à être fusionnée avant le merge.
 
