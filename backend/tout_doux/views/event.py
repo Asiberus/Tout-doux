@@ -18,7 +18,9 @@ class EventViewSet(viewsets.ModelViewSet):
             return EventSerializer
 
     def get_queryset(self):
-        queryset = self.request.user.events.all()
+        queryset = self.request.user.events.select_related('project').prefetch_related(
+            'project__tags'
+        )
 
         if 'date' in self.request.query_params:
             queryset = self.filter_queryset_by_date(queryset, self.request.query_params.get('date'))

@@ -40,7 +40,7 @@ const commonTaskForm = ref<Form<CommonTaskForm>>({
   rules: {
     name: [
       (value: string): boolean | string => !!value || 'Name is required',
-      (value: string): boolean | string => value.length <= 50 || 'Max 50 characters',
+      (value: string): boolean | string => value.length <= 150 || 'Max 150 characters',
     ],
   },
 })
@@ -139,7 +139,7 @@ function closeDialog(): void {
             ref="name"
             v-model="commonTaskForm.data.name"
             label="Name"
-            counter="50"
+            counter="150"
             required
             :loading="inputNameLoading"
             :rules="commonTaskForm.rules?.name"

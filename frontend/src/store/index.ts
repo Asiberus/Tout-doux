@@ -1,6 +1,7 @@
 export * from './app.store'
 export * from './auth.store'
 export * from './collection.store'
+export * from './notification.store'
 export * from './preferences.store'
 export * from './project.store'
 export * from './user.store'

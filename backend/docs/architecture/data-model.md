@@ -1,6 +1,6 @@
 # Modèle de données
 
-12 modèles dans `tout_doux/models/`, un par fichier. Les **4 migrations** de
+12 modèles dans `tout_doux/models/`, un par fichier. Les **7 migrations** de
 `tout_doux/migrations/` font foi sur le schéma réel ; `makemigrations --check` est propre
 (vérifié). Le vocabulaire métier est dans [../domain/glossary.md](../domain/glossary.md) — ici
 on ne décrit que la mécanique.

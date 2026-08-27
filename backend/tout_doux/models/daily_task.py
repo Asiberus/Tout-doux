@@ -33,7 +33,7 @@ class DailyTask(UserRelatedModel):
         blank=True
     )
     name = models.CharField(
-        max_length=50,
+        max_length=150,
         null=True,
         blank=True
     )

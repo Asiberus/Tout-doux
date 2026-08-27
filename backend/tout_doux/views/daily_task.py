@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
 from tout_doux.pagination import ExtendedPageNumberPagination
+from tout_doux.queries import daily_summary_counts
 from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer, \
     DailySummarySerializer
 from tout_doux.utils.date import daterange
@@ -16,7 +17,19 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     filterset_fields = ('date',)
 
     def get_queryset(self):
-        return self.request.user.dailytasks.all()
+        queryset = self.request.user.dailytasks.all()
+
+        # `destroy` ne lit que `date` ; les autres actions répondent toutes avec la chaîne
+        # imbriquée complète, y compris les écritures via `to_representation`.
+        if self.action != 'destroy':
+            queryset = queryset.select_related(
+                'task__project', 'task__section__project', 'task__collection', 'common_task',
+            ).prefetch_related(
+                'tags', 'task__tags', 'task__project__tags', 'task__section__project__tags',
+                'common_task__tags',
+            )
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -44,7 +57,7 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
         except ValueError:
             raise ParseError('Date not valid.')
 
-        summary_range = [{'date': d} for d in daterange(start_date, end_date)]
-        data = DailySummarySerializer(summary_range, many=True, context={'user': request.user}).data
+        summary_range = daily_summary_counts(request.user, list(daterange(start_date, end_date)))
+        data = DailySummarySerializer(summary_range, many=True).data
 
         return Response(data)

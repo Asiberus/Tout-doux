@@ -10,5 +10,5 @@ paths:
     get:
       summary: Get all project
       responses:
-        '200':
+        "200":
           description: Success

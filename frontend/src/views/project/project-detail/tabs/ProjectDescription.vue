@@ -7,6 +7,7 @@ import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
+import { useAddTaskToDaily } from '@/composables/useAddTaskToDaily'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -15,6 +16,7 @@ import { dateFormat } from '@/pipes'
 
 const { xs, smAndUp, smAndDown, mdAndDown, lgAndDown } = useDisplay()
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
+const { addTaskToDaily } = useAddTaskToDaily()
 const projectStore = useProjectStore()
 const preferencesStore = usePreferencesStore()
 
@@ -68,6 +70,7 @@ function deleteTask(id: number): void {
         <v-card class="rounded-lg mb-3">
           <v-card-text>
             <div
+              v-if="project.description"
               ref="description"
               class="project-description__description__content text-body-medium"
               :class="{
@@ -76,6 +79,9 @@ function deleteTask(id: number): void {
               }"
               @click="displayDescription = !displayDescription">
               {{ project.description }}
+            </div>
+            <div v-else class="text-body-medium font-italic text-grey-lighten-1">
+              This project has no description.
             </div>
             <div class="d-flex justify-end align-center mt-1" title="Created on">
               <v-icon icon="mdi-clock" size="small" />
@@ -162,6 +168,7 @@ function deleteTask(id: number): void {
             :key="task.id"
             :task="task"
             :disabled="project.archived"
+            @add-to-daily="addTaskToDaily($event)"
             @toggle-state="toggleTaskState"
             @update="updateTask"
             @delete="deleteTask" />
@@ -201,6 +208,7 @@ function deleteTask(id: number): void {
             :key="task.id"
             :task="task"
             :disabled="project.archived"
+            @add-to-daily="addTaskToDaily($event)"
             @toggle-state="toggleTaskState"
             @update="updateTask"
             @delete="deleteTask" />

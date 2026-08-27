@@ -24,6 +24,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
+  'add-to-daily': [id: number]
   'toggle-state': [id: number, value: boolean]
   update: [id: number, data: TaskPatch]
   delete: [id: number]
@@ -48,6 +49,10 @@ function openDeleteDialog(): void {
 
 function openUncompleteDialog(): void {
   uncompleteConfirmDialog.value = true
+}
+
+function emitAddToDailyEvent(): void {
+  emit('add-to-daily', props.task.id)
 }
 
 function emitToggleStateEvent(): void {
@@ -88,6 +93,12 @@ function emitDeleteEvent(): void {
               </v-btn>
             </template>
             <v-list density="compact">
+              <v-list-item v-if="!task.completed" @click="emitAddToDailyEvent()">
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-calendar-plus" size="small" start />
+                  Add to daily
+                </v-list-item-title>
+              </v-list-item>
               <v-list-item @click="openEditDialog()">
                 <v-list-item-title class="d-flex align-center">
                   <v-icon icon="mdi-pencil" size="small" start />

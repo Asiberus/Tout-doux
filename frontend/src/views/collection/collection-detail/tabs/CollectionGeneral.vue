@@ -6,6 +6,7 @@ import { CollectionDetail } from '@/models/collection.model'
 import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
+import { useAddTaskToDaily } from '@/composables/useAddTaskToDaily'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -14,6 +15,7 @@ import { dateFormat } from '@/pipes'
 
 const { xs, smAndDown, mdAndDown, lgAndDown } = useDisplay()
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
+const { addTaskToDaily } = useAddTaskToDaily()
 
 const preferencesStore = usePreferencesStore()
 const collectionStore = useCollectionStore()
@@ -108,6 +110,7 @@ function deleteTask(id: number): void {
             :disabled="collection.archived"
             :item-name="collection.itemName"
             class="mb-2"
+            @add-to-daily="addTaskToDaily($event)"
             @toggle-state="toggleTaskState"
             @update="updateTask"
             @delete="deleteTask" />
@@ -150,6 +153,7 @@ function deleteTask(id: number): void {
             :disabled="collection.archived"
             :item-name="collection.itemName"
             class="mb-2"
+            @add-to-daily="addTaskToDaily($event)"
             @toggle-state="toggleTaskState"
             @update="updateTask"
             @delete="deleteTask">
@@ -184,6 +188,7 @@ function deleteTask(id: number): void {
       <v-card class="rounded-lg">
         <v-card-text>
           <div
+            v-if="collection.description"
             ref="description"
             class="collection-general__description__content text-body-medium"
             :class="{
@@ -192,6 +197,9 @@ function deleteTask(id: number): void {
             }"
             @click="displayDescription = !displayDescription">
             {{ collection.description }}
+          </div>
+          <div v-else class="text-body-medium font-italic text-grey-lighten-1">
+            This collection has no description.
           </div>
 
           <div class="d-flex justify-end align-center mt-1" title="Created on">

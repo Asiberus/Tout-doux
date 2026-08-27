@@ -54,17 +54,17 @@ renvoie **jamais** le libellé :
 
 ## Ce que le serveur refuse
 
-| Règle                                                                                | Où                                                         | Message                                                                  |
-| ------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Une tâche doit être liée à un projet, une section **ou** une collection              | `task_post.py:87`                                          | `You must link a task to either a project, a section or a collection`    |
-| …​et à **une seule** des trois                                                       | `task_post.py:93`                                          | `You can't create a task related to a project, a section and collection` |
-| `description` d'un projet ou d'une collection **obligatoire et non vide**            | modèle, sans `blank=True`                                  | erreur DRF standard                                                      |
-| Un tag de type `project` ne peut pas être posé sur une tâche                         | `queryset=Tag.objects.filter(type=…)` dans chaque `tagIds` | `Invalid pk …`                                                           |
-| Deux tags de même `(nom, type)` pour un utilisateur                                  | contrainte base                                            | erreur d'unicité                                                         |
-| Deux tâches récurrentes de même nom pour un utilisateur                              | contrainte base                                            | erreur d'unicité                                                         |
-| Un objet appartenant à un autre utilisateur                                          | 13 `validate_<champ>`                                      | `Invalid pk "…" - object does not exist.`                                |
-| Toute écriture sur un projet/collection archivé, ou sur son contenu                  | 12 sites                                                   | [archive-guards](../patterns/archive-guards.md)                          |
-| Longueurs : nom 50, tag 20, description 500, `itemName` 15, message de feedback 2000 | modèles                                                    | erreur DRF standard                                                      |
+| Règle                                                                                                          | Où                                                         | Message                                                                  |
+| -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Une tâche doit être liée à un projet, une section **ou** une collection                                        | `task_post.py:87`                                          | `You must link a task to either a project, a section or a collection`    |
+| …​et à **une seule** des trois                                                                                 | `task_post.py:93`                                          | `You can't create a task related to a project, a section and collection` |
+| Une tâche ou tâche récurrente **déjà présente dans le daily du jour**                                          | `daily_task_post.py`                                       | **409** `This task is already in today's daily`                          |
+| Un tag de type `project` ne peut pas être posé sur une tâche                                                   | `queryset=Tag.objects.filter(type=…)` dans chaque `tagIds` | `Invalid pk …`                                                           |
+| Deux tags de même `(nom, type)` pour un utilisateur                                                            | contrainte base                                            | erreur d'unicité                                                         |
+| Deux tâches récurrentes de même nom pour un utilisateur                                                        | contrainte base                                            | erreur d'unicité                                                         |
+| Un objet appartenant à un autre utilisateur                                                                    | 13 `validate_<champ>`                                      | `Invalid pk "…" - object does not exist.`                                |
+| Toute écriture sur un projet/collection archivé, ou sur son contenu                                            | 12 sites                                                   | [archive-guards](../patterns/archive-guards.md)                          |
+| Longueurs : nom de tâche 150, autres noms 50, tag 20, description 500, `itemName` 15, message de feedback 2000 | modèles                                                    | erreur DRF standard                                                      |
 
 ## Ce que le serveur accepte, alors qu'on pourrait croire l'inverse
 
@@ -81,6 +81,9 @@ C'est la partie qui compte : ne pas se reposer sur ces règles côté client.
   n'expose pas ces champs, donc la règle tient — mais elle tiendrait par omission, pas par
   contrôle.
 - **Un `Event` sans projet est parfaitement valide** : c'est un événement personnel.
+- **La `description` d'un projet ou d'une collection peut être absente ou vide.** Le modèle porte
+  `default='', blank=True`, donc DRF en fait un champ `required=False, allow_blank=True` ; la valeur
+  est une chaîne vide, jamais `null`.
 - **`itemName` n'est pas exposé par la liste des collections**, seulement par le détail — voir
   [../architecture/serializers.md](../architecture/serializers.md).
 - **Aucune limite au nombre de tags par objet**, ni de projets, ni de tâches.

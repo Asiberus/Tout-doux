@@ -6,7 +6,7 @@ from tout_doux.models.user import UserRelatedModel
 
 class Project(UserRelatedModel):
     name = models.CharField(max_length=50)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=500, default='', blank=True)
     tags = models.ManyToManyField(
         Tag,
         limit_choices_to={'type': Tag.Type.PROJECT},

@@ -9,7 +9,7 @@ from tout_doux.models.user import UserRelatedModel
 
 
 class Task(UserRelatedModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=150)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, editable=False)
