@@ -61,6 +61,12 @@ Les autres sections ne sont jamais découpées.
 ### 7. Restituer
 
 Afficher le markdown en chat, puis le copier avec `pbcopy`.
+
+Donner ensuite le titre de la release dans un texte à part, hors du markdown copié :
+quelques mots en anglais sur le thème dominant de la plage, sans numéro de version ni
+préfixe. Mêmes règles de rédaction que le reste — formel, concis, aucun terme technique,
+pas d'énumération. Sans thème dominant, nommer les deux ou trois domaines touchés.
+
 Les incertitudes restantes se disent en chat, sous le changelog — jamais dedans.
 
 ## Règles de rédaction
@@ -105,3 +111,5 @@ Attendus :
     ## Performance
 
     - Faster loading of the project, collection, agenda and daily screens.
+
+Titre donné à part : `Daily planning and performance`
