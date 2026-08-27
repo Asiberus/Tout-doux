@@ -88,6 +88,12 @@ CORS_ALLOWED_ORIGINS = list(filter(None, [os.environ.get('SERVER_URL', '').rstri
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        # Connexion persistante par worker. Sans ça, Django en ouvre et en ferme une à chaque
+        # requête HTTP. Sans effet sous `runserver`, qui ferme tout après chaque requête.
+        'CONN_MAX_AGE': 60,
+        # Indispensable dès que CONN_MAX_AGE est non nul : sans ce contrôle, une connexion
+        # fermée côté serveur passe inaperçue et la requête suivante échoue.
+        'CONN_HEALTH_CHECKS': True,
         'HOST': os.environ.get('DB_HOST'),
         'PORT': os.environ.get('DB_PORT'),
         'NAME': os.environ.get('DB_NAME'),

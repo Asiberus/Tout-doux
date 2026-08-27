@@ -5,10 +5,13 @@ Ces tests ne couvrent pas le métier : ils couvrent la plomberie que la montée 
 danger — résolution d'URL, knox, DRF, pagination maison, django-filter, django-cors-headers, ORM
 et rendu des templates d'e-mail.
 """
+import time
 from unittest.mock import patch
 
 from django.core import mail
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.core.signals import request_started
+from django.db import connection
+from django.test import SimpleTestCase, TestCase, TransactionTestCase, override_settings
 from django.urls import Resolver404, resolve, reverse
 from rest_framework.test import APIClient
 
@@ -171,3 +174,52 @@ class EmailTest(TestCase):
             with self.subTest(subject=message.subject):
                 self.assertEqual(len(message.alternatives), 1)
                 self.assertEqual(message.alternatives[0][1], 'text/html')
+
+
+def terminate_the_server_side_backend():
+    """Coupe la connexion de Django depuis PostgreSQL, comme le fait un redémarrage de la base.
+
+    La seconde connexion passe par `get_new_connection` : elle est indépendante de la première,
+    reste donc valide après le `pg_terminate_backend`, et ne dépend pas du pilote installé.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT pg_backend_pid()')
+        pid = cursor.fetchone()[0]
+
+    intruder = connection.get_new_connection(connection.get_connection_params())
+    try:
+        with intruder.cursor() as cursor:
+            cursor.execute('SELECT pg_terminate_backend(%s)', [pid])
+    finally:
+        intruder.close()
+
+
+class PersistentConnectionTest(TransactionTestCase):
+    """`CONN_MAX_AGE` non nul fait survivre la connexion à la requête, ce qui crée un état à
+    surveiller : réutilisée, elle peut avoir été fermée côté serveur entre-temps.
+
+    `TransactionTestCase` est nécessaire — sous `TestCase`, le test s'exécute dans une
+    transaction et `close()` n'y libère pas l'objet connexion, il le marque seulement.
+    """
+
+    def setUp(self):
+        self.addCleanup(connection.close)
+
+    def test_the_connection_outlives_a_request(self):
+        connection.ensure_connection()
+        request_started.send(sender=None)
+        self.assertIsNotNone(connection.connection)
+
+    def test_a_connection_past_its_max_age_is_recycled(self):
+        connection.ensure_connection()
+        connection.close_at = time.monotonic() - 1
+        request_started.send(sender=None)
+        self.assertIsNone(connection.connection)
+
+    def test_a_connection_closed_by_the_server_is_recovered(self):
+        connection.ensure_connection()
+        terminate_the_server_side_backend()
+        request_started.send(sender=None)
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+            self.assertEqual(cursor.fetchone(), (1,))

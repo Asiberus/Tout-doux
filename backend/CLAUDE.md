@@ -10,7 +10,7 @@ ce fichier.
 
 `backend` est l'API de **Tout-Doux** (organisation personnelle : projets, collections,
 planification journalière). **Django 6.1 + DRF 3.18 + Knox 5**, PostgreSQL, une seule application
-`tout_doux` (12 modèles, 41 sérialiseurs, 14 tests de fumée, 44 tests de non-régression, 0 test
+`tout_doux` (12 modèles, 41 sérialiseurs, 17 tests de fumée, 44 tests de non-régression, 0 test
 métier). Monorepo :
 `../frontend` (SPA Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)),
 `../docker-compose.yml`, `../td.sh`.
@@ -35,7 +35,7 @@ docker exec tout_doux_backend python manage.py show_urls      # django_extension
 Les migrations sont jouées **automatiquement** au démarrage du conteneur. Le code est monté en
 volume : pas de rebuild sauf si `requirements.txt` change.
 
-**14 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **44 tests de
+**17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **44 tests de
 non-régression** gèlent le contrat d'API et le nombre de requêtes SQL pour le chantier N+1
 (`test_api_contract.py`, `test_query_counts.py` — voir
 [docs/workflows/n-plus-one-optimization.md](docs/workflows/n-plus-one-optimization.md)).

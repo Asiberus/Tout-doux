@@ -55,6 +55,27 @@ change.
 | `BACKEND_USE_EMAIL_FILE_SYSTEM`   | ligne 138 — `1` écrit sur disque au lieu d'envoyer                                            | `1`                        |
 | `MAILJET_API_KEY` / `_SECRET`     | ligne 144 — mappées vers `ANYMAIL` (`MAILJET_SECRET_KEY`), ignorées si la précédente vaut `1` |                            |
 
+### Connexions à la base
+
+`CONN_MAX_AGE = 60` : chaque worker garde sa connexion PostgreSQL une minute au lieu d'en ouvrir
+une par requête HTTP. En production, `run.sh` lance uWSGI en `--workers 4` sans `--threads`, soit
+**4 connexions** au plus, pour un `max_connections` de 100.
+
+⚠️ **Sans effet en développement**, et ce n'est pas un réglage à ajuster : `ThreadedWSGIServer`
+de `runserver` appelle `connections.close_all()` dans son `close_request()`. Toute connexion est
+donc fermée à la fin de chaque requête, quelle que soit la valeur de `CONN_MAX_AGE`. Le gain ne
+s'observe que derrière uWSGI.
+
+⚠️ Ne pas passer à `CONN_MAX_AGE = None` (persistance illimitée) : une connexion laissée avec une
+transaction ouverte ne serait jamais recyclée.
+
+`CONN_HEALTH_CHECKS = True` va avec, et n'est pas facultatif : Django ne vérifie pas de lui-même
+qu'une connexion réutilisée est encore vivante. Sans ce réglage, un redémarrage de la base — un
+`./td.sh start dev` de plus, un `docker restart tout_doux_db` — fait échouer la requête suivante
+de chaque worker avec `OperationalError: server closed the connection unexpectedly`. Les trois
+tests de `PersistentConnectionTest` (`tout_doux/tests.py`) couvrent les deux réglages, dont la
+reprise après une connexion tuée côté serveur.
+
 ## Lire les e-mails envoyés en local
 
 Avec `BACKEND_USE_EMAIL_FILE_SYSTEM=1`, chaque e-mail est écrit dans

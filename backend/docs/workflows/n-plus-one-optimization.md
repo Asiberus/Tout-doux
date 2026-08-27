@@ -1213,38 +1213,263 @@ connexion, et l'application répond après plus de 60 secondes d'inactivité.
   laquelle on ne met pas `CONN_MAX_AGE=None` (persistance illimitée).
 - ⚠️ Ce changement relève de `workflows/development.md` : le mettre à jour dans le même commit.
 
+> ✅ **§8 est fait** — `CONN_MAX_AGE = 60` **et `CONN_HEALTH_CHECKS = True`**, documentés dans
+> `development.md`.
+> ✓ **Bug attrapé par la vérification** : `CONN_MAX_AGE` seul introduisait une régression.
+> `close_if_unusable_or_obsolete()` ne teste que l'âge et les erreurs, jamais la vitalité ; le
+> contrôle de santé vit dans `close_if_health_check_failed()`, qui sort immédiatement quand
+> `CONN_HEALTH_CHECKS` est faux — et c'est le défaut. Prouvé en tuant le backend PostgreSQL par
+> `pg_terminate_backend` : sans le réglage, la requête suivante lève `OperationalError` ; avec,
+> elle passe. Chaque redémarrage de la base aurait produit un 500 par worker.
+> Trois tests posés dans `tests.py` (`PersistentConnectionTest`), d'où **17 tests de fumée**.
+> **Vérifié, et c'est une nuance que le plan n'avait pas** : le réglage est **sans effet en
+> développement**. `ThreadedWSGIServer.close_request()` appelle `connections.close_all()`
+> (`django/core/servers/basehttp.py`), donc `runserver` ferme tout après chaque requête quelle
+> que soit la valeur. Le gain n'existe que derrière uWSGI, en production.
+> **psycopg 3 écarté ici** : le pooling de Django 6 n'apporterait rien à `--workers 4` sans
+> `--threads` — chaque worker est mono-thread, `CONN_MAX_AGE` lui donne déjà sa connexion
+> unique et persistante, soit 4 connexions pour un `max_connections` de 100. Le sujet reste
+> ouvert dans `django-6-migration.md` §4.1, pour la simplification du build, pas la performance.
+
 ---
 
-### §9 — `DailySummarySerializer` (optionnel)
+### §9 — `daily-task/summary/` : trois requêtes par jour affiché
 
-**Statut : à trancher** — Q3 de [`AMELIORATIONS-FETCH.md`](../../../AMELIORATIONS-FETCH.md).
-Sauter cette section si la réponse est « dehors ».
+**Statut : conçu et mesuré.** La version précédente de cette section était une esquisse ; elle
+proposait un `date__range` qui **ne fonctionne pas** sur les appels réels du front (voir « La
+contrainte que l'esquisse avait manquée »). Ce qui suit la remplace.
 
-**Pourquoi** — `DailySummarySerializer` exécute **trois requêtes par jour** de l'intervalle
-demandé (`serializers/daily_task/daily_summary.py:14-28`). Un résumé sur 30 jours coûte 90
-requêtes, un résumé annuel plus de 1 000. C'est le même défaut que §2, appliqué à une boucle
-sur des dates plutôt que sur des objets.
+**Pourquoi** — `DailySummarySerializer` (`serializers/daily_task/daily_summary.py:14-29`)
+exécute trois `SELECT COUNT(*)` par jour de l'intervalle : un pour les daily tasks, un pour
+celles qui sont terminées, un pour les événements. La vue construit `[{'date': d} for d in
+daterange(...)]` et laisse chaque instance interroger la base. C'est le défaut de §2 appliqué à
+une boucle sur des dates plutôt que sur des objets.
 
-**Ce qui change** — la vue construit `summary_range` puis instancie le sérialiseur avec
-`many=True`. La correction consiste à faire **deux agrégations groupées par date** dans
-`summary()` et à passer les résultats au sérialiseur par le contexte, plutôt qu'à laisser
-chaque instance interroger la base :
+**Mesuré** — `DailySummary.vue:63` dimensionne la page selon la largeur d'écran, et chaque
+défilement en recharge autant :
 
-```python
-# tout_doux/views/daily_task.py, dans summary()
-        tasks_by_date = dict(
-            DailyTask.objects.filter(user=request.user, date__range=(start_date, end_date))
-            .values('date')
-            .annotate(total=Count('pk'), completed=Count('pk', filter=Q(completed=True)))
-            .values_list('date', 'total', 'completed')  # → à remodeler en dict de tuples
-        )
+| Écran                | Jours par page | Requêtes SQL par appel |
+| -------------------- | -------------- | ---------------------- |
+| `xs`                 | 10             | **30**                 |
+| `lgAndDown` (défaut) | 21             | **63**                 |
+| `xl`                 | 42             | **126**                |
+
+Exactement 3 × le nombre de jours, sans plancher : l'endpoint n'exécute rien d'autre.
+
+#### §9.0 — Il n'y a aucun filet sur cet endpoint
+
+Contrairement aux six endpoints traités jusqu'ici, `daily-task/summary/` n'est couvert **ni par
+`test_api_contract.py`, ni par `test_query_counts.py`, ni par `tests.py`**. Vérifié : le mot
+`summary` n'apparaît dans aucun des trois. Cette section doit donc commencer par son propre §0,
+sinon elle réécrit à l'aveugle la seule partie de l'API qui n'a jamais été gelée.
+
+Tests de caractérisation à écrire **avant** de toucher au code, verts sur le code actuel :
+
+| Test                                                             | Ce qu'il gèle                                                  |
+| ---------------------------------------------------------------- | -------------------------------------------------------------- |
+| `test_the_response_keys_are_unchanged`                           | `{date, totalTask, totalTaskCompleted, totalEvent}`            |
+| `test_a_descending_range_is_served_newest_first`                 | **le seul mode utilisé par le front** — voir ci-dessous        |
+| `test_an_ascending_range_is_served_oldest_first`                 | `daterange` gère les deux sens                                 |
+| `test_a_single_day_range_returns_one_row`                        | bornes incluses des deux côtés                                 |
+| `test_a_day_without_anything_reports_zeros`                      | des `0`, pas des `null` ni des trous dans la liste             |
+| `test_tasks_are_counted_per_day_with_their_completed_share`      | les deux compteurs de tâches                                   |
+| `test_a_multi_day_event_counts_on_every_day_it_spans`            | l'événement à cheval, le cas qui interdit un GROUP BY          |
+| `test_an_event_without_an_end_date_counts_only_on_its_start_day` | `end_date` est `null=True`                                     |
+| `test_events_outside_the_range_are_ignored`                      | le préfiltre ne doit pas élargir le comptage                   |
+| `test_another_users_data_is_not_counted`                         | le cloisonnement, qui passe ici par `context`, pas par une vue |
+| `test_a_missing_parameter_is_a_400`                              | `TypeError` → `ParseError`                                     |
+| `test_an_invalid_date_is_a_400`                                  | `ValueError` → `ParseError`                                    |
+
+⚠️ `DailyTask.date` est en `auto_now_add` : pour poser une daily task sur un jour passé, il faut
+`DailyTask.objects.filter(pk=…).update(date=…)`. Une fixture qui l'ignore mesure tout sur
+aujourd'hui et rend la moitié de ces tests vides de sens.
+
+#### La contrainte que l'esquisse avait manquée
+
+**L'intervalle demandé par le front est toujours décroissant.** `DailySummary.vue:30` appelle
+`retrieveDailySummaryList(today, today - (daysPerPage - 1))`, et `loadNextPage()` (`:83`)
+demande `start = dernière date - 1 jour`, `end = dernière date - daysPerPage`. Dans les deux cas
+`start_date > end_date`. C'est délibéré : `daterange()` (`utils/date.py:8`) détecte le sens et
+itère à rebours, ce qui donne au front une liste déjà triée du plus récent au plus ancien —
+`dailySummaryList.concat(response)` puis `.at(-1)` en dépendent.
+
+Or `date__range=(start, end)` de l'esquisse est un `BETWEEN` SQL : avec des bornes inversées il
+ne renvoie **rien**. Vérifié à l'exécution :
+
+```
+date__range(start > end) renvoie : []
 ```
 
-**Cette section est délibérément esquissée et non finalisée** : contrairement aux précédentes,
-elle demande de restructurer la vue, pas seulement le queryset, et l'agrégation des événements
-sur un intervalle (un événement à cheval compte pour plusieurs jours) n'a pas d'équivalent
-direct en une seule requête groupée. À concevoir au moment de l'écrire, avec ses propres tests
-de caractérisation sur `daily-task/summary/`.
+Autrement dit, l'esquisse aurait servi des compteurs à zéro sur **100 % des appels réels**, sans
+lever la moindre erreur. D'où la règle ci-dessous : normaliser les bornes pour la requête, et ne
+garder l'ordre demandé que pour la sortie.
+
+#### Pourquoi les événements ne se groupent pas en SQL
+
+Les daily tasks se groupent : une daily task appartient à une date, `values('date').annotate(…)`
+suffit. Les événements, non — un événement à cheval appartient à plusieurs jours, donc aucun
+`GROUP BY` ne produit la bonne ligne. `generate_series` de PostgreSQL le ferait, au prix d'un
+`RawSQL` non portable, pour compter au plus quelques dizaines de lignes.
+
+Le prédicat actuel, à reproduire exactement, est
+`Q(start_date=date) | Q(start_date__lte=date, end_date__gte=date)`. Déplié, l'ensemble des dates
+d'un événement vaut :
+
+| Cas                                                         | Dates comptées                                       |
+| ----------------------------------------------------------- | ---------------------------------------------------- |
+| `end_date` renseigné et `>= start_date`                     | `[start_date, end_date]`                             |
+| `end_date` nul (`null=True`)                                | `{start_date}`                                       |
+| `end_date` < `start_date` (anomalie que le modèle autorise) | `{start_date}` — la seconde clause est insatisfiable |
+
+Deux requêtes suffisent donc : une agrégation groupée pour les tâches, et **une seule** requête
+qui rapatrie les bornes des événements recoupant l'intervalle, balayées ensuite en Python.
+
+#### Ce qui change
+
+`tout_doux/queries.py` — le module posé en §2 accueille cette fonction : c'est de l'accès aux
+données qui ne tient pas dans une vue, et l'y mettre garde `summary()` lisible.
+
+```python
+from collections import Counter
+from datetime import timedelta
+
+from django.db.models import Count, IntegerField, Q, Subquery
+from django.db.models.functions import Coalesce
+
+from tout_doux.models import DailyTask, Event
+
+
+def daily_summary_counts(user, dates):
+    """Compte tâches et événements pour chaque date, en deux requêtes quel que soit l'intervalle.
+
+    Les événements ne se groupent pas par date en SQL : un événement à cheval appartient à
+    plusieurs jours. On rapatrie donc les bornes de ceux qui recoupent l'intervalle et on
+    balaie en Python. `dates` peut être décroissant — c'est le cas de tous les appels du
+    front — d'où les bornes normalisées par `min`/`max` avant d'interroger la base.
+    """
+    first, last = min(dates), max(dates)
+
+    tasks = {
+        row['date']: row
+        for row in DailyTask.objects.filter(user=user, date__gte=first, date__lte=last)
+        .values('date')
+        .annotate(total=Count('pk'), completed=Count('pk', filter=Q(completed=True)))
+    }
+
+    spans = Event.objects.filter(user=user).filter(
+        Q(start_date__gte=first, start_date__lte=last)
+        | Q(start_date__lte=last, end_date__gte=first)
+    ).values_list('start_date', 'end_date')
+
+    events = Counter()
+    for start, end in spans:
+        # `end_date` est facultatif, et rien n'impose `end_date >= start_date` : dans ces deux
+        # cas l'événement ne vaut que pour son jour de début, comme aujourd'hui.
+        day, stop = max(start, first), min(end if end and end >= start else start, last)
+        while day <= stop:
+            events[day] += 1
+            day += timedelta(days=1)
+
+    return [
+        {
+            'date': day,
+            'total_task': tasks.get(day, {}).get('total', 0),
+            'total_task_completed': tasks.get(day, {}).get('completed', 0),
+            'total_event': events[day],
+        }
+        for day in dates
+    ]
+```
+
+`tout_doux/serializers/daily_task/daily_summary.py` — le sérialiseur cesse d'interroger la base
+et n'a plus besoin de `context` :
+
+```python
+# AVANT — 3 SerializerMethodField, 3 méthodes, l'utilisateur passé par le contexte
+from django.db.models import Q
+from rest_framework import serializers
+
+from tout_doux.models import DailyTask, Event
+from tout_doux.serializers.common import ReadOnlySerializer
+
+
+class DailySummarySerializer(ReadOnlySerializer):
+    date = serializers.DateField()
+    totalTask = serializers.SerializerMethodField(method_name='get_total_task')
+    # … 3 méthodes de 3 à 5 lignes
+
+# APRÈS — le fichier entier
+from rest_framework import serializers
+
+from tout_doux.serializers.common import ReadOnlySerializer
+
+
+class DailySummarySerializer(ReadOnlySerializer):
+    date = serializers.DateField()
+    totalTask = serializers.IntegerField(source='total_task')
+    totalTaskCompleted = serializers.IntegerField(source='total_task_completed')
+    totalEvent = serializers.IntegerField(source='total_event')
+```
+
+`tout_doux/views/daily_task.py` — `summary()`, dernières lignes :
+
+```python
+# AVANT
+        summary_range = [{'date': d} for d in daterange(start_date, end_date)]
+        data = DailySummarySerializer(summary_range, many=True, context={'user': request.user}).data
+
+        return Response(data)
+
+# APRÈS
+        summary_range = daily_summary_counts(request.user, list(daterange(start_date, end_date)))
+        data = DailySummarySerializer(summary_range, many=True).data
+
+        return Response(data)
+```
+
+avec `from tout_doux.queries import daily_summary_counts` en tête de module.
+
+**Vérification** — les douze tests de §9.0 doivent rester verts **et inchangés**, plus un test de
+constance et un budget à ajouter à `test_query_counts.py` :
+
+```python
+BUDGETS = {…, 'daily_task-summary': 4}
+```
+
+```python
+    def test_it_does_not_grow_with_the_length_of_the_range(self):
+        """Le cœur de §9 : 10 jours et 42 jours doivent coûter le même nombre de requêtes."""
+        self.assertEqual(self.count_summary(days=10), self.count_summary(days=42))
+```
+
+Cible : **2 requêtes** de données, quel que soit l'intervalle, contre 30 / 63 / 126 aujourd'hui.
+
+**Pièges**
+
+- ⚠️ **Ne pas utiliser `date__range`** — bornes inversées, voir plus haut. `date__gte=first` +
+  `date__lte=last` sur des bornes normalisées par `min`/`max`, jamais sur `start_date` et
+  `end_date` tels que reçus.
+- ⚠️ **L'ordre de sortie est celui de `dates`, pas celui de la base.** La compréhension de liste
+  finale itère sur `dates` : c'est ce qui préserve le tri décroissant dont le front dépend. Ne
+  pas la remplacer par une itération sur le résultat de la requête.
+- ⚠️ **`Counter[day]` renvoie `0`** pour une clé absente, sans l'insérer. C'est ce qui remplace
+  le `Coalesce` de §2 ; un `dict` nu lèverait une `KeyError` sur le premier jour vide.
+- ⚠️ **Le préfiltre des événements sur-collecte volontairement** : sa seconde clause attrape
+  aussi les événements dont `end_date < start_date`. Le balayage les ramène à leur seul jour de
+  début, donc le résultat reste juste — mais ne pas « resserrer » ce filtre sans refaire la
+  table des cas ci-dessus.
+- ⚠️ **Le cloisonnement change de place.** Il vit aujourd'hui dans le sérialiseur, via
+  `context={'user': …}` ; il passera dans `daily_summary_counts(user, …)`. Le `filter(user=…)`
+  doit être présent sur **les deux** requêtes — c'est le troisième geste obligatoire de
+  `CLAUDE.md`, et `test_another_users_data_is_not_counted` est ce qui le prouve.
+- ⚠️ **`daterange()` renvoie un générateur.** `min`/`max` le consommeraient : d'où le `list(...)`
+  dans la vue, et non un passage direct.
+
+**Hors périmètre, à inscrire en §11** — l'endpoint **ne borne pas l'intervalle demandé**. Un
+`start_date=2000-01-01&end_date=2026-01-01` fait aujourd'hui plus de 28 000 requêtes ; après §9
+il en fera 2, mais construira toujours une liste de 9 500 dates en mémoire. §9 rend le défaut
+supportable, il ne le corrige pas. C'est un risque surveillé, pas un correctif de ce chantier :
+le borner changerait le contrat de l'API.
 
 ---
 
@@ -1313,7 +1538,7 @@ check`, ni à la relecture — seul un compteur de requêtes le révèle. C'est 
 | §6    | §0        | Oui                                                                      |
 | §7    | §0        | Oui                                                                      |
 | §8    | —         | Oui                                                                      |
-| §9    | §0        | Optionnelle, à concevoir                                                 |
+| §9    | §0        | Optionnelle, et pose d'abord son propre filet (§9.0)                     |
 | §11   | tout      | Non                                                                      |
 
 Après chaque étape :
