@@ -12,9 +12,9 @@ Date : 2026-08-27.
 > couvre les deux, et rien n'y est encore engagé. Il sera affiné, puis scindé en procédures
 > dans les `docs/workflows/` de chaque dépôt au moment de passer à l'exécution.
 >
-> **La partie 1 est déjà sortie de ce document** : elle fait l'objet d'une procédure dédiée,
-> `backend/docs/workflows/n-plus-one-optimization.md`. Elle reste listée ici pour que
-> l'enchaînement des sept parties se lise d'un bloc.
+> **La partie 1 est faite.** Ce qu'elle a laissé de durable vit dans
+> `backend/docs/patterns/query-optimization.md`. Elle reste décrite ici pour que l'enchaînement
+> des sept parties se lise d'un bloc.
 
 ---
 
@@ -93,7 +93,7 @@ Les considérations sont typées :
 
 ### Partie 1 — Tuer le N+1
 
-**Backend · contrat inchangé** — _traitée dans `backend/docs/workflows/n-plus-one-optimization.md`_
+**Backend · contrat inchangé** — _faite : voir `backend/docs/patterns/query-optimization.md`_
 
 **Livrable** : le daily update devient nettement plus rapide sans qu'une seule ligne de front ne
 bouge. Plus fort rendement du chantier.
@@ -109,7 +109,7 @@ bouge. Plus fort rendement du chantier.
 'task__collection', 'common_task')` + `prefetch_related('tags', 'task__tags')`.
 - `EventViewSet` : `select_related('project').prefetch_related('project__tags')`.
 - Doc : suppression de `W8`, mise à jour de `serializers.md`, nouveau
-  `docs/patterns/counting-without-n-plus-one.md`.
+  `docs/patterns/query-optimization.md`.
 
 **Considérations**
 
@@ -415,7 +415,7 @@ Deux réductions de risque possibles sans transformer le chantier :
 
 ## Voir aussi
 
-- `backend/docs/workflows/n-plus-one-optimization.md` — la procédure de la partie 1
+- `backend/docs/patterns/query-optimization.md` — ce que la partie 1 a laissé de durable
 - `backend/docs/quality/watched-risks.md` — `W8` (N+1), `W11` (`event/` non paginé)
 - `backend/docs/architecture/api-surface.md` — la table des endpoints, référence unique
 - `frontend/docs/architecture/api-layer.md` — la chaîne de récupération côté client

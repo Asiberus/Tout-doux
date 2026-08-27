@@ -1,5 +1,5 @@
 """
-Mesure et non-régression de performance (docs/workflows/n-plus-one-optimization.md).
+Mesure et non-régression de performance (docs/patterns/query-optimization.md).
 
 Contrairement à test_api_contract.py, ces tests DOIVENT échouer avant le chantier : c'est ce
 qu'ils mesurent. Après, ils empêchent qu'un SerializerMethodField réintroduise le N+1 en
@@ -29,6 +29,7 @@ BUDGETS = {
     'list-list': 6,
     'list-detailed': 8,
     'daily_task-list': 10,
+    'daily_task-summary': 4,
     'event-list': 5,
 }
 
@@ -166,3 +167,42 @@ class EventQueryCountTest(QueryCountTestCase):
 
     def test_stays_within_budget(self):
         self.assert_within_budget('event-list', {})
+
+
+class DailySummaryQueryCountTest(QueryCountTestCase):
+    """`summary/` boucle sur des dates, pas sur des objets : son coût suit la largeur d'écran
+    du visiteur (10, 21 ou 42 jours selon DailySummary.vue)."""
+
+    def setUp(self):
+        super().setUp()
+        self.plan(Task.objects.filter(section=self.section, completed=False))
+        Event.objects.create(
+            user=self.user, name='À cheval', project=self.project,
+            start_date=timezone.localdate() - timedelta(days=3),
+            end_date=timezone.localdate() + timedelta(days=3),
+        )
+
+    def plan(self, tasks):
+        for task in tasks:
+            response = self.client.post(
+                reverse('daily_task-list'), {'taskId': task.pk}, format='json'
+            )
+            self.assertEqual(response.status_code, 201, response.data)
+
+    def range_of(self, days):
+        end = timezone.localdate()
+        # Sens décroissant : c'est celui qu'envoie le front.
+        return {
+            'start_date': end.isoformat(),
+            'end_date': (end - timedelta(days=days - 1)).isoformat(),
+        }
+
+    def test_it_does_not_grow_with_the_length_of_the_range(self):
+        """Le cœur de §9 : 10 jours et 42 jours doivent coûter le même nombre de requêtes."""
+        self.assertEqual(
+            self.count_queries('daily_task-summary', self.range_of(10)),
+            self.count_queries('daily_task-summary', self.range_of(42)),
+        )
+
+    def test_stays_within_budget(self):
+        self.assert_within_budget('daily_task-summary', self.range_of(42))

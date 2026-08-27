@@ -8,7 +8,7 @@ C'est un fait, pas une omission de cette doc :
 
 | Outil                 | État                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **44 tests de non-régression** posés par le chantier N+1 : `test_api_contract.py` (30, forme et valeurs des réponses) et `test_query_counts.py` (14, nombre de requêtes SQL). **Toujours aucun test métier** |
+| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **58 tests de non-régression** posés par le chantier N+1 : `test_api_contract.py` (42, forme et valeurs des réponses) et `test_query_counts.py` (16, nombre de requêtes SQL). **Toujours aucun test métier** |
 | Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                                                                                                                                                                                                                                                                                  |
 | Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                                                                                                                                                                                                                                                                                                |
 | Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                                                                                                                                                                                                                                                                                       |
@@ -38,6 +38,19 @@ docker exec tout_doux_backend python manage.py show_urls | grep <ta-ressource>
 # 5. Le serveur redémarre sans erreur
 docker logs --tail 30 tout_doux_backend
 ```
+
+Les trois fichiers de tests se lancent séparément quand on veut cibler :
+
+```bash
+docker exec tout_doux_backend python manage.py test tout_doux.tests            # plomberie
+docker exec tout_doux_backend python manage.py test tout_doux.test_api_contract  # contrat
+docker exec tout_doux_backend python manage.py test tout_doux.test_query_counts  # requêtes SQL
+```
+
+⚠️ **`test_api_contract.py` doit rester vert ET non modifié.** C'est la seule chose qui prouve
+qu'une optimisation n'a rien changé d'observable ; l'ajuster pour le faire passer supprime la
+garantie. Le modifier n'est légitime que pour un changement de contrat assumé, documenté dans
+[../architecture/api-surface.md](../architecture/api-surface.md) au même commit.
 
 Les étapes 1 et 2 attrapent la majorité des régressions bêtes : import cassé, sérialiseur
 référençant un champ inexistant, `Meta.fields` désynchronisé, migration oubliée. L'étape 3

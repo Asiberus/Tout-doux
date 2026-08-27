@@ -40,6 +40,8 @@ Un fichier par action. Le minimum est `<nom>.py` (lecture) + une forme d'écritu
   [ownership-and-scoping.md](ownership-and-scoping.md).
 - Si l'entité dépend d'un projet ou d'une collection : les trois gardes d'archivage —
   [archive-guards.md](archive-guards.md).
+- **Aucun `SerializerMethodField` ne fait de requête** : compteurs et relations imbriquées
+  viennent du `get_queryset()` de la vue — [query-optimization.md](query-optimization.md).
 
 Exporter dans `serializers/<nom>/__init__.py`. ⚠️ **L'ordre des lignes de ce barrel compte** si
 le nouveau sérialiseur importe un sérialiseur d'une autre ressource : lister d'abord les modules
@@ -122,3 +124,4 @@ plus rapide. Procédure dans [../workflows/verification.md](../workflows/verific
 
 - [../architecture/serializers.md](../architecture/serializers.md) — les conventions en détail
 - [ownership-and-scoping.md](ownership-and-scoping.md), [archive-guards.md](archive-guards.md)
+- [query-optimization.md](query-optimization.md) — compter et précharger depuis la vue

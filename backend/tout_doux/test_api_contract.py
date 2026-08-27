@@ -1,5 +1,5 @@
 """
-Filet de caractérisation posé avant le chantier N+1 (docs/workflows/n-plus-one-optimization.md).
+Filet de caractérisation du contrat d'API (docs/patterns/query-optimization.md).
 
 Ces tests décrivent le comportement OBSERVABLE ACTUEL, y compris ses bizarreries. Ils passent
 sur le code d'avant comme sur celui d'après, sans être modifiés entre les deux : c'est leur
@@ -16,7 +16,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from tout_doux.models import Collection, Event, Project, Section, Tag, Task, User
+from tout_doux.models import Collection, DailyTask, Event, Project, Section, Tag, Task, User
 
 PASSWORD = 'Sm0ke!Test'
 
@@ -370,3 +370,134 @@ class EventContractTest(DataFixtureTestCase):
     def test_the_nested_project_carries_its_tags(self):
         response = self.client.get(reverse('event-list'))
         self.assertEqual([tag['name'] for tag in response.data[0]['project']['tags']], ['urgent'])
+
+
+class DailySummaryContractTest(DataFixtureTestCase):
+    """`daily-task/summary/` n'était couvert par aucun test avant §9 du chantier.
+
+    Le jeu de données isole chaque cas d'événement : un à cheval sur trois jours, un sans date
+    de fin, un hors de toute fenêtre interrogée.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.today = timezone.localdate()
+
+        Event.objects.create(
+            user=self.user, name='À cheval', project=self.project,
+            start_date=self.day(-3), end_date=self.day(-1),
+        )
+        Event.objects.create(user=self.user, name='Sans fin', start_date=self.day(-5))
+        Event.objects.create(user=self.user, name='Lointain', start_date=self.day(-30))
+
+        planned = self.plan(self.make_tasks(3, completed=0, section=self.section))
+        DailyTask.objects.filter(pk=planned[0]).update(completed=True)
+        DailyTask.objects.filter(pk=planned[2]).update(date=self.day(-1))
+
+    def day(self, offset):
+        return self.today + timedelta(days=offset)
+
+    def plan(self, tasks):
+        identifiers = []
+        for task in tasks:
+            response = self.client.post(
+                reverse('daily_task-list'), {'taskId': task.pk}, format='json'
+            )
+            self.assertEqual(response.status_code, 201, response.data)
+            identifiers.append(response.data['id'])
+        return identifiers
+
+    def summary(self, start, end):
+        response = self.client.get(
+            reverse('daily_task-summary'),
+            {'start_date': start.isoformat(), 'end_date': end.isoformat()},
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        return response.data
+
+    def by_date(self, start, end):
+        return {row['date']: row for row in self.summary(start, end)}
+
+    def test_the_response_keys_are_unchanged(self):
+        self.assertEqual(
+            set(self.summary(self.today, self.today)[0]),
+            {'date', 'totalTask', 'totalTaskCompleted', 'totalEvent'},
+        )
+
+    def test_a_descending_range_is_served_newest_first(self):
+        """Le SEUL mode appelé par le front : DailySummary.vue demande toujours start > end,
+        et sa pagination par défilement dépend de cet ordre."""
+        rows = self.summary(self.today, self.day(-5))
+        self.assertEqual(len(rows), 6)
+        self.assertEqual(rows[0]['date'], self.today.isoformat())
+        self.assertEqual(rows[-1]['date'], self.day(-5).isoformat())
+
+    def test_an_ascending_range_is_served_oldest_first(self):
+        rows = self.summary(self.day(-5), self.today)
+        self.assertEqual(len(rows), 6)
+        self.assertEqual(rows[0]['date'], self.day(-5).isoformat())
+        self.assertEqual(rows[-1]['date'], self.today.isoformat())
+
+    def test_a_single_day_range_returns_one_row(self):
+        rows = self.summary(self.today, self.today)
+        self.assertEqual([row['date'] for row in rows], [self.today.isoformat()])
+
+    def test_a_day_without_anything_reports_zeros(self):
+        row = self.by_date(self.today, self.day(-5))[self.day(-4).isoformat()]
+        self.assertEqual(row['totalTask'], 0)
+        self.assertEqual(row['totalTaskCompleted'], 0)
+        self.assertEqual(row['totalEvent'], 0)
+
+    def test_tasks_are_counted_per_day_with_their_completed_share(self):
+        rows = self.by_date(self.today, self.day(-5))
+        self.assertEqual(rows[self.today.isoformat()]['totalTask'], 2)
+        self.assertEqual(rows[self.today.isoformat()]['totalTaskCompleted'], 1)
+        self.assertEqual(rows[self.day(-1).isoformat()]['totalTask'], 1)
+        self.assertEqual(rows[self.day(-1).isoformat()]['totalTaskCompleted'], 0)
+
+    def test_a_multi_day_event_counts_on_every_day_it_spans(self):
+        rows = self.by_date(self.today, self.day(-3))
+        self.assertEqual(
+            [rows[self.day(offset).isoformat()]['totalEvent'] for offset in (-3, -2, -1, 0)],
+            [1, 1, 1, 0],
+        )
+
+    def test_an_event_without_an_end_date_counts_only_on_its_start_day(self):
+        rows = self.by_date(self.day(-4), self.day(-6))
+        self.assertEqual(
+            [rows[self.day(offset).isoformat()]['totalEvent'] for offset in (-4, -5, -6)],
+            [0, 1, 0],
+        )
+
+    def test_events_outside_the_range_are_ignored(self):
+        inside = self.by_date(self.today, self.day(-5))
+        self.assertEqual(sum(row['totalEvent'] for row in inside.values()), 4)
+        self.assertNotIn(self.day(-30).isoformat(), inside)
+
+        around = self.by_date(self.day(-29), self.day(-31))
+        self.assertEqual(around[self.day(-30).isoformat()]['totalEvent'], 1)
+
+    def test_another_users_data_is_not_counted(self):
+        Event.objects.create(user=self.other, name='Autrui', start_date=self.today)
+        DailyTask.objects.create(user=self.other, name='Autrui')
+
+        row = self.by_date(self.today, self.today)[self.today.isoformat()]
+        self.assertEqual(row['totalTask'], 2)
+        self.assertEqual(row['totalTaskCompleted'], 1)
+        self.assertEqual(row['totalEvent'], 0)
+
+    def test_a_missing_parameter_is_a_400(self):
+        response = self.client.get(reverse('daily_task-summary'))
+        self.assertEqual(response.status_code, 400, response.data)
+
+        response = self.client.get(
+            reverse('daily_task-summary'), {'start_date': self.today.isoformat()}
+        )
+        self.assertEqual(response.status_code, 400, response.data)
+
+    def test_an_invalid_date_is_a_400(self):
+        response = self.client.get(
+            reverse('daily_task-summary'),
+            {'start_date': 'pas-une-date', 'end_date': self.today.isoformat()},
+        )
+        self.assertEqual(response.status_code, 400, response.data)

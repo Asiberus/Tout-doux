@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied, ParseError
 from rest_framework.response import Response
 
 from tout_doux.pagination import ExtendedPageNumberPagination
+from tout_doux.queries import daily_summary_counts
 from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer, \
     DailySummarySerializer
 from tout_doux.utils.date import daterange
@@ -56,7 +57,7 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
         except ValueError:
             raise ParseError('Date not valid.')
 
-        summary_range = [{'date': d} for d in daterange(start_date, end_date)]
-        data = DailySummarySerializer(summary_range, many=True, context={'user': request.user}).data
+        summary_range = daily_summary_counts(request.user, list(daterange(start_date, end_date)))
+        data = DailySummarySerializer(summary_range, many=True).data
 
         return Response(data)

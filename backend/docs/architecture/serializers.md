@@ -93,10 +93,13 @@ Les deux premières lignes sont des patterns à part entière :
 
 ## Contraintes non évidentes
 
-- **`ProjectListSerializer` fait 3 requêtes par projet** (`get_task_count`,
-  `get_completed_task_count`, `get_events_to_come`), sans `annotate` ni `prefetch`. Idem pour
-  `CollectionList` (2) et `DailySummary` (3 par jour de l'intervalle demandé). Volumétrie
-  surveillée : [../quality/watched-risks.md](../quality/watched-risks.md) W8.
+- **Les sérialiseurs `*List` sont couplés à l'annotation de leur vue.** `ProjectListSerializer`
+  et `CollectionListSerializer` déclarent leurs compteurs en `IntegerField(source=…)` : ils
+  lèvent une `AttributeError` sur une instance non annotée. Même chose pour
+  `DailySummarySerializer`, qui lit un dictionnaire préparé par `daily_summary_counts`. C'est
+  volontaire — aucun `SerializerMethodField` du projet ne doit faire de requête — et c'est ce
+  qui impose de ne les instancier que depuis leur vue.
+  Recette : [../patterns/query-optimization.md](../patterns/query-optimization.md).
 - **`UserRegisterSerializer.create` (`user_register.py:28`) construit l'utilisateur avec le mot
   de passe en clair dans `validated_data`**, puis appelle `set_password()` avant `save()`. Le
   résultat est correct aujourd'hui, mais l'ordre des trois lignes est la seule chose qui empêche
@@ -108,8 +111,9 @@ Les deux premières lignes sont des patterns à part entière :
   (`task_patch.py:28`) parce que le champ est `editable=False` et donc invisible du sérialiseur.
   Même mécanisme pour la propagation de complétion dans `DailyTaskPatchSerializer.update`.
 - **`CollectionListSerializer` n'expose pas `itemName`** alors que `CollectionSerializer` et
-  `CollectionDetailSerializer` le font. Écart assumé ou oubli — non tranché, à vérifier côté
-  front avant de « corriger ».
+  `CollectionDetailSerializer` le font, et que le type front `CollectionList` le déclare. Aucun
+  composant ne le lit sur une liste aujourd'hui :
+  [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R13.
 - **`FeedbackSerializer` est le seul à ne pas utiliser `HiddenField(CurrentUserDefault())`** :
   il injecte l'utilisateur dans `create()` (`feedback/feedback.py:22`). Voir
   [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md).
@@ -129,6 +133,8 @@ Les deux premières lignes sont des patterns à part entière :
 
 ## Voir aussi
 
+- [../patterns/query-optimization.md](../patterns/query-optimization.md) — compter et précharger
+  depuis la vue, et pourquoi
 - [api-surface.md](api-surface.md) — quel sérialiseur est appelé par quel endpoint
 - [../patterns/adding-an-endpoint.md](../patterns/adding-an-endpoint.md) — la recette complète
 - [../domain/events.md](../domain/events.md) — la validation la plus dense du projet
