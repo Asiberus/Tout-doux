@@ -8,7 +8,7 @@ et rendu des templates d'e-mail.
 from unittest.mock import patch
 
 from django.core import mail
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import Resolver404, resolve, reverse
 from rest_framework.test import APIClient
 
@@ -132,11 +132,26 @@ class ProjectApiTest(AuthenticatedTestCase):
         self.assertEqual([p['name'] for p in response.data['content']], ['Archivé'])
 
 
+# `corsheaders.conf.Settings` relit chaque réglage par propriété à chaque requête :
+# `override_settings` atteint donc bien le middleware, et ces tests ne dépendent pas de la valeur
+# de SERVER_URL dans l'environnement où ils tournent.
+@override_settings(CORS_ALLOWED_ORIGINS=['https://tout-doux.example'])
 class CorsTest(TestCase):
-    def test_the_middleware_still_answers(self):
-        """§1.3 — le renommage de CORS_ORIGIN_ALLOW_ALL casse ce header en silence."""
-        response = self.client.get('/project/', HTTP_ORIGIN='http://localhost:8080')
-        self.assertIn('Access-Control-Allow-Origin', response)
+    def test_an_allowed_origin_gets_the_header(self):
+        """§1.3 — le renommage de CORS_ORIGIN_ALLOW_ALL casse ce header en silence.
+        La réponse est un 401 : le middleware doit répondre avant l'authentification."""
+        response = self.client.get('/project/', HTTP_ORIGIN='https://tout-doux.example')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(
+            response.headers.get('Access-Control-Allow-Origin'), 'https://tout-doux.example'
+        )
+
+    def test_an_unknown_origin_gets_no_header(self):
+        """`CORS_ALLOWED_ORIGINS` a remplacé `CORS_ALLOW_ALL_ORIGINS` (migration §4.4) : le refus
+        est le comportement attendu, pas un effet de bord. Sans ce test, un retour à l'ouverture
+        totale passerait inaperçu."""
+        response = self.client.get('/project/', HTTP_ORIGIN='https://ailleurs.example')
+        self.assertNotIn('Access-Control-Allow-Origin', response)
 
 
 class EmailTest(TestCase):

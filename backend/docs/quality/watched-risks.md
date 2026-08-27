@@ -21,7 +21,6 @@ raison est indiquée pour chaque item.
 | W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base                  |
 | W8  | Requêtes N+1 sur les listes et le résumé journalier           | Performance | > 50 projets, ou > 300 ms sur `GET /project/`, ou résumé > 60 jours |
 | W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`               |
-| W10 | `CORS_ALLOW_ALL_ORIGINS = True` en production                 | Sécurité    | Passage à une authentification par cookie                           |
 | W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                                |
 
 ---
@@ -171,22 +170,6 @@ where u.username = 'anonymous';`).
   avant de toucher à ces dix lignes.
 - **Sévérité** : nulle aujourd'hui ; CWE-256 (stockage de mot de passe en clair) si l'ordre est
   rompu.
-
-## W10 — `CORS_ALLOW_ALL_ORIGINS = True`
-
-- **Origine** : `settings.py:83`, sans distinction d'environnement.
-- **Contexte** : n'importe quelle origine peut appeler l'API depuis un navigateur. Le risque
-  habituel — qu'un site tiers agisse au nom de l'utilisateur — ne se matérialise **pas** ici :
-  l'authentification repose sur un en-tête `Authorization: Bearer` lu depuis le `localStorage`
-  du front, et non sur un cookie. Un site tiers ne peut donc pas emprunter la session, et
-  `django-cors-headers` n'ajoute pas `Access-Control-Allow-Credentials`.
-- **Décision** : ne pas agir. Le réglage est large mais inoffensif dans la configuration
-  actuelle, et le restreindre demanderait de faire dépendre `settings.py` de l'hôte du front —
-  une variable d'environnement de plus pour un gain nul.
-- **Déclencheur** : passage à une authentification par cookie, ou ajout de
-  `CORS_ALLOW_CREDENTIALS`. À ce moment, le réglage devient une faille réelle et l'item passe au
-  backlog.
-- **Sévérité** : basse en l'état — CWE-942 (politique inter-domaines permissive).
 
 ## W11 — `event/` sans pagination
 
