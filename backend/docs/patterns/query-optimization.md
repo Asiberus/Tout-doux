@@ -17,10 +17,13 @@ volontaire — voir [../architecture/serializers.md](../architecture/serializers
 
 ### 1. Choisir entre `Count` et une sous-requête
 
-> **Plusieurs relations vers-plusieurs, ou un queryset destiné à être paginé pour de vrai →
-> sous-requête. Une seule relation et un comptage occasionnel → `Count`, plus lisible.**
+> **Tout compteur servi par un endpoint de liste → sous-requête scalaire (`scalar_count`).** > `Count` ne reste acceptable que pour un agrégat ponctuel, hors d'un queryset trié ou paginé.
 
-Deux coûts cachés motivent ce critère, tous deux mesurés :
+Le critère a été durci le 28/08/2026, après une régression en production : `Count` avait été
+retenu pour `CollectionViewSet` au nom de la lisibilité, en n'acceptant qu'un seul des trois
+coûts ci-dessous. Le troisième s'est vu à l'écran.
+
+**Trois coûts cachés**, tous mesurés :
 
 **Le produit cartésien.** Deux `Count` sur deux relations vers-plusieurs différentes joignent
 deux fois : sur un projet à 3 tâches directes et 4 tâches en section, les deux compteurs
@@ -37,6 +40,21 @@ dès qu'une annotation contient un agrégat (`sql/query.py`, `has_existing_aggre
 
 Une sous-requête scalaire a `contains_aggregate = False`, donc Django élide entièrement
 l'annotation du comptage.
+
+**La perte de `Meta.ordering`** — c'est le plus dangereux, parce qu'il se voit à l'écran et
+nulle part ailleurs. Dès qu'un `GROUP BY` est produit, Django **supprime** le tri par défaut du
+modèle, sans erreur ni avertissement (`sql/compiler.py`) :
+
+```python
+result.append("GROUP BY %s" % ", ".join(grouping))
+if self._meta_ordering:
+    order_by = None
+```
+
+`_meta_ordering` n'est renseigné que si le tri vient de `Meta.ordering` : un `order_by()`
+explicite, lui, survit. Une sous-requête scalaire ne produit aucun `GROUP BY` et ne pose donc
+jamais la question. Le filet est
+`test_the_list_is_ordered_like_the_model`, dans `test_api_contract.py`.
 
 ### 2. Écrire la sous-requête avec `scalar_count`
 
@@ -111,7 +129,7 @@ Liste maintenue à la main.
 | --------------------- | -------------------------------------------------------------------------------------------------- |
 | `queries.py`          | `scalar_count`, `daily_summary_counts`                                                             |
 | `views/project.py`    | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`             |
-| `views/collection.py` | 2 `Count` ; `Exists` ; `tasks__tags`                                                               |
+| `views/collection.py` | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                        |
 | `views/daily_task.py` | 4 `select_related`, 5 `prefetch_related`, hors `destroy` ; `daily_summary_counts` dans `summary()` |
 | `views/event.py`      | `select_related('project')`, `prefetch_related('project__tags')`                                   |
 
@@ -137,9 +155,6 @@ réponses.
 
 ## Écarts assumés
 
-- **`CollectionViewSet` utilise `Count` et paie l'enveloppement du `COUNT(*)` de pagination.**
-  Choix de lisibilité, avec ses déclencheurs de bascule :
-  [../quality/watched-risks.md](../quality/watched-risks.md) W12.
 - **`daily-task/summary/` ne borne pas l'intervalle demandé.** Le coût est passé de linéaire en
   nombre de jours à constant, mais la liste construite en mémoire, elle, reste linéaire : W13.
 

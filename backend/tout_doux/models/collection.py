@@ -14,4 +14,4 @@ class Collection(UserRelatedModel):
         return self.name
 
     class Meta:
-        ordering = ('-pk',)
+        ordering = ('-created_on', '-pk')

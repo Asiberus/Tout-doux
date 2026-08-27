@@ -1,9 +1,10 @@
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Exists, OuterRef
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from tout_doux.models import Task
 from tout_doux.pagination import ExtendedPageNumberPagination
+from tout_doux.queries import scalar_count
 from tout_doux.serializers.collection import CollectionListSerializer, CollectionDetailSerializer, CollectionSerializer, \
     CollectionPostOrPatchSerializer
 
@@ -16,10 +17,13 @@ class CollectionViewSet(viewsets.ModelViewSet):
         queryset = self.request.user.collections.all()
 
         if self.action == 'list':
-            # Une seule relation vers-plusieurs jointe : pas de produit cartésien possible.
             queryset = queryset.annotate(
-                task_count=Count('tasks'),
-                completed_task_count=Count('tasks', filter=Q(tasks__completed=True)),
+                task_count=scalar_count(
+                    Task.objects.filter(collection=OuterRef('pk')), 'collection'
+                ),
+                completed_task_count=scalar_count(
+                    Task.objects.filter(collection=OuterRef('pk'), completed=True), 'collection'
+                ),
             )
 
         if self.action in ('detailed', 'retrieve'):
