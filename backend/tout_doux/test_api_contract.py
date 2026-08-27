@@ -134,6 +134,27 @@ class ProjectListContractTest(DataFixtureTestCase):
         self.assertEqual(payload['taskCount'], 2)
         self.assertEqual(payload['completedTaskCount'], 1)
 
+    def test_the_list_is_ordered_like_the_model(self):
+        """Un `GROUP BY` d'agrégat annoté fait perdre `Meta.ordering` en silence — ni erreur ni
+        avertissement (Django, `sql/compiler.py`, `_meta_ordering`). Seul ce test le voit."""
+        response = self.client.get(reverse('project-list'), {'size': 0})
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            [item['id'] for item in response.data['content']],
+            list(Project.objects.filter(user=self.user).values_list('pk', flat=True)),
+        )
+
+    def test_the_most_recently_created_project_comes_first(self):
+        """`created_on` prime sur le `pk`. Le vérifier demande d'antidater : sous `auto_now_add`
+        les deux critères concordent toujours, et le test serait vide de sens sans ça."""
+        Project.objects.filter(pk=self.empty_project.pk).update(
+            created_on=timezone.localdate() - timedelta(days=1)
+        )
+        response = self.client.get(reverse('project-list'), {'size': 0})
+        identifiers = [item['id'] for item in response.data['content']]
+        self.assertEqual(identifiers[-1], self.empty_project.pk)
+        self.assertEqual(identifiers[0], self.sections_only.pk)
+
     def test_a_project_without_task_counts_zero_not_null(self):
         """Une sous-requête agrégée sans Coalesce renvoie NULL quand elle ne matche rien.
         Le front calcule completedTaskCount / taskCount : un null produirait un NaN dans la
@@ -310,6 +331,24 @@ class CollectionContractTest(DataFixtureTestCase):
         Collection.objects.create(user=self.other, name='Pas à moi', description='')
         response = self.client.get(reverse('list-list'), {'size': 0})
         self.assertNotIn('Pas à moi', [item['name'] for item in response.data['content']])
+
+    def test_the_list_is_ordered_like_the_model(self):
+        """La régression du 27/08/2026 : `Count('tasks')` avait fait passer cette liste du plus
+        récent au plus ancien à l'inverse, sans qu'aucun test ne le voie."""
+        response = self.client.get(reverse('list-list'), {'size': 0})
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(
+            [item['id'] for item in response.data['content']],
+            list(Collection.objects.filter(user=self.user).values_list('pk', flat=True)),
+        )
+
+    def test_the_most_recently_created_collection_comes_first(self):
+        Collection.objects.filter(pk=self.empty_collection.pk).update(
+            created_on=timezone.localdate() - timedelta(days=1)
+        )
+        response = self.client.get(reverse('list-list'), {'size': 0})
+        identifiers = [item['id'] for item in response.data['content']]
+        self.assertEqual(identifiers, [self.collection.pk, self.empty_collection.pk])
 
 
 class DailyTaskContractTest(DataFixtureTestCase):

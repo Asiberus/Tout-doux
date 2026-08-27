@@ -10,19 +10,18 @@ raison est indiquée pour chaque item.
 > **Cycle de vie** : si un déclencheur est atteint, **déplacer l'item vers le backlog**. Si un
 > item est résolu, **supprimer sa ligne et sa section**.
 
-| ID  | Titre                                                          | Nature      | Déclencheur                                                         |
-| --- | -------------------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
-| W1  | Aucun test automatisé                                          | Fiabilité   | > 1 développeur, ou 2 régressions sur un même endpoint              |
-| W2  | Aucun linter, formateur ni CI sur le backend                   | Fiabilité   | Une contribution à relire par un tiers                              |
-| W3  | E-mails envoyés sans reprise ni trace                          | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour         |
-| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque      | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh`         |
-| W5  | Pas de limitation de débit, et énumération d'e-mails possible  | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/`         |
-| W6  | Ports backend et base publiés sur l'hôte en production         | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte                      |
-| W7  | Utilisateur `anonymous` créé automatiquement                   | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base                  |
-| W9  | Mot de passe en clair dans `validated_data` à l'inscription    | Sécurité    | Toute modification de `UserRegisterSerializer.create`               |
-| W11 | `event/` renvoie tous les événements sans pagination           | Performance | > 500 événements pour un utilisateur                                |
-| W12 | `GET /collection/` : le `COUNT(*)` de pagination est enveloppé | Performance | Pagination réelle **et** > 100 ms, ou une collection > 5 000 tâches |
-| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle     | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                        |
+| ID  | Titre                                                         | Nature      | Déclencheur                                                 |
+| --- | ------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
+| W1  | Aucun test automatisé                                         | Fiabilité   | > 1 développeur, ou 2 régressions sur un même endpoint      |
+| W2  | Aucun linter, formateur ni CI sur le backend                  | Fiabilité   | Une contribution à relire par un tiers                      |
+| W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour |
+| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh` |
+| W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/` |
+| W6  | Ports backend et base publiés sur l'hôte en production        | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte              |
+| W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base          |
+| W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`       |
+| W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                        |
+| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle    | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                |
 
 ---
 
@@ -166,23 +165,6 @@ where u.username = 'anonymous';`).
   problème qui n'existe pas encore.
 - **Déclencheur** : plus de 500 événements pour un utilisateur, ou un appel non filtré ajouté au
   client.
-
-## W12 — Le `COUNT(*)` de pagination de `GET /collection/` est enveloppé
-
-- **Origine** : `views/collection.py:19` — `Count('tasks')` et
-  `Count('tasks', filter=Q(tasks__completed=True))`.
-- **Contexte** : Django enveloppe le comptage de pagination dans une sous-requête groupée dès
-  qu'une annotation contient un agrégat. Vérifié sur le SQL généré :
-  `SELECT COUNT(*) FROM (SELECT collection.id FROM collection LEFT OUTER JOIN task … GROUP BY 1)
-subquery`. Il était plat avant. `ProjectViewSet` n'a pas ce coût : ses sous-requêtes scalaires
-  sont élidées du comptage.
-- **Décision** : ne pas agir. `Count` est ici plus lisible et idiomatique — les deux compteurs
-  portent sur la **même** relation, donc aucun produit cartésien n'est possible et une
-  sous-requête serait une complication gratuite. Joindre et grouper quelques milliers de lignes
-  coûte une fraction de milliseconde au volume actuel.
-- **Déclencheur** : la pagination réelle est introduite **et** `GET /collection/` dépasse 100 ms
-  — ce comptage est alors refait à chaque page ; ou une collection dépasse quelques milliers de
-  tâches. Le remède est d'une ligne : `scalar_count`, même signature qu'en `views/project.py`.
 
 ## W13 — `daily-task/summary/` n'impose aucune borne à l'intervalle demandé
 
