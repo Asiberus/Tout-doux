@@ -19,6 +19,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | R7  | `openapi.yaml` : stub mort à la racine du monorepo                       | basse     | Laisse croire à un contrat maintenu                           |
 | R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`                | basse     | Configuration morte                                           |
 | R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé          | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
+| R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API   | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
 
 ---
 
@@ -167,3 +168,18 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
   `AlterModelOptions`, sans SQL.
 - **Portée réelle** : faible tant qu'un utilisateur a moins de 20 tags (la taille de page par
   défaut) — le défaut ne se manifeste qu'à partir de la deuxième page.
+
+## R13 — `itemName` déclaré côté front, absent de la réponse de `GET /collection/`
+
+- **Origine** : `serializers/collection/collection_list.py:12` et
+  `frontend/src/models/collection.model.ts:19`.
+- **Contexte** : `CollectionList extends Collection` déclare `itemName`, que
+  `CollectionListSerializer.Meta.fields` n'expose pas. Rien ne casse aujourd'hui : aucun
+  composant ne lit ce champ sur un `CollectionList` — les seuls lecteurs
+  (`CollectionGeneral.vue`, `CollectionSettings.vue`) partent de `CollectionDetail`, qui
+  l'expose. Le premier qui s'y fiera lira `undefined` sans erreur.
+- **Décision** : agir — ajouter `itemName = serializers.CharField(source='item_name')` au
+  sérialiseur. L'ajout est purement additif, mais il **change le contrat** :
+  `CollectionContractTest.test_list_response_keys_are_unchanged` et
+  [../architecture/api-surface.md](../architecture/api-surface.md) sont à mettre à jour dans le
+  même commit.

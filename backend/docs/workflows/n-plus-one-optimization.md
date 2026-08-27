@@ -16,14 +16,14 @@ nombre d'objets renvoyés. Le critère est celui-là, pas une durée : c'est lui
 **Mesuré** le 27/08/2026 par `test_query_counts.py` sur le code d'avant chantier — ce ne sont pas
 des estimations. La colonne « croissance » est ce qui compte : c'est elle qui doit tomber à zéro.
 
-| Endpoint                    | Avant | Croissance mesurée               | Cible | Après       |
-| --------------------------- | ----- | -------------------------------- | ----- | ----------- |
-| `GET /project/`             | 58    | **+4 par projet**                | 3     | _à remplir_ |
-| `GET /project/detailed/`    | 131   | **+10 par projet, +1 par tâche** | 9     | _à remplir_ |
-| `GET /collection/`          | 26    | +2 par collection                | 3     | _à remplir_ |
-| `GET /collection/detailed/` | 59    | **+1 par tâche**                 | 4     | _à remplir_ |
-| `GET /daily-task/`          | 74    | **+6 par daily task**            | 7     | _à remplir_ |
-| `GET /event/`               | 27    | +2 par événement                 | 2     | _à remplir_ |
+| Endpoint                    | Avant | Croissance mesurée               | Cible | Après    |
+| --------------------------- | ----- | -------------------------------- | ----- | -------- |
+| `GET /project/`             | 58    | **+4 par projet**                | 3     | **3** ✅ |
+| `GET /project/detailed/`    | 131   | **+10 par projet, +1 par tâche** | 9     | **9** ✅ |
+| `GET /collection/`          | 26    | +2 par collection                | 3     | **2** ✅ |
+| `GET /collection/detailed/` | 59    | **+1 par tâche**                 | 4     | **4** ✅ |
+| `GET /daily-task/`          | 74    | **+6 par daily task**            | 7     | **5** ✅ |
+| `GET /event/`               | 27    | +2 par événement                 | 2     | **2** ✅ |
 
 Les valeurs « avant » sont celles du jeu de test après ajout de 10 objets ; seule la croissance
 est intrinsèque. Le chiffre le plus parlant : `project/detailed/` passe de **31 à 81** quand on
@@ -770,6 +770,12 @@ même comportement côté collection.
   `retrieve` et à `get_object()`. Vérifié : sans `distinct()`, un `GET /project/5/` reste
   identique — il n'y a plus de jointure à dédupliquer.
 
+> ✅ **§1 est fait** — SQL généré vérifié sur les deux vues : plus de `DISTINCT`, aucune
+> jointure dans la requête externe, `LIMIT 1` dans la sous-requête corrélée.
+> Suite : **58 tests, 14 échecs**, tous dans `test_query_counts` — la référence est tenue.
+> ℹ️ Aucun compteur ne baisse ici : c'était déjà une requête unique. Le gain est de forme,
+> et il conditionne §2 (c'est le `DISTINCT` qui aurait ramené le produit cartésien).
+
 ---
 
 ### §2 — Compteurs de `ProjectListSerializer` : trois requêtes par projet → zéro
@@ -930,6 +936,14 @@ futur, à cheval, démarrant aujourd'hui). `ProjectQueryCountTest.test_list_*`.
   peut pas produire une telle ligne — mais le modèle, lui, l'autorise. Un test épingle ce garde
   (`test_the_api_refuses_a_task_on_both_a_project_and_a_section`) ; s'il tombe un jour, cette
   équivalence tombe avec lui.
+  > ✅ **§2 est fait** — et **§4 avec lui** : les `prefetch_related` étaient déjà dans le
+  > `get_queryset()` de cette section, §4 n'en reste que la justification et la vérification.
+  > Mesuré : `GET /project/` **58 → 3** requêtes, `GET /project/detailed/` **131 → 9**, les deux
+  > constantes (cible atteinte). SQL vérifié : aucune jointure dans la requête externe, et le
+  > `COUNT(*)` de pagination reste plat — `SELECT COUNT(*) FROM tout_doux_project`, annotations
+  > élidées, exactement le comportement prévu par la table ci-dessus.
+  > Suite : **58 tests, 8 échecs** — les 6 de `ProjectQueryCountTest` sont passés au vert,
+  > `test_api_contract` reste 30/30 et non modifié.
 
 ---
 
@@ -1010,6 +1024,16 @@ from tout_doux.models import Task
 - ⚠️ `Count` sur une relation vide renvoie `0`, pas `NULL` : pas de `Coalesce` nécessaire ici.
   C'est une différence réelle avec §2, et le test de la collection vide la couvre.
 
+> ✅ **§3 est fait** — et **§5 avec lui**, le `prefetch_related('tasks__tags')` étant dans le
+> même `get_queryset()`. Mesuré : `GET /collection/` **26 → 2** requêtes (mieux que la cible de
+> 3 : cette liste ne sert pas de tags), `GET /collection/detailed/` **59 → 4**, les deux
+> constantes.
+> **Le prix annoncé est bien réel**, vérifié sur le SQL généré :
+> `SELECT COUNT(*) FROM (SELECT collection.id FROM collection LEFT OUTER JOIN task ON … GROUP BY 1) subquery`.
+> C'est la contrepartie assumée ci-dessus, à inscrire dans `watched-risks.md` en §11 avec ses
+> deux déclencheurs.
+> Suite : **58 tests, 4 échecs** — les 4 de `CollectionQueryCountTest` sont passés au vert.
+
 ---
 
 ### §4 — Préchargement des relations : `ProjectViewSet`
@@ -1045,6 +1069,10 @@ par tâche a disparu. C'est la paire la plus importante du chantier.
   (`query.py:1920`). Vérifié, parce que c'est le mode utilisé par presque toutes les listes du
   front — si ça n'avait pas été le cas, tout le chantier n'aurait servi à rien.
 
+> ✅ **§4 est fait**, livré avec §2 : les quatre lookups du tableau ci-dessus sont en place.
+> `test_detailed_does_not_grow_with_the_number_of_tasks` est vert — +50 tâches n'ajoutent plus
+> aucune requête, contre +50 avant. `GET /project/detailed/` : **131 → 9**, constant.
+
 ---
 
 ### §5 — Préchargement des relations : `CollectionViewSet`
@@ -1057,6 +1085,10 @@ par tâche. Sur les « très grandes collections » signalées, c'est le coût d
 
 **Vérification** — `CollectionContractTest.test_detail_carries_tasks_with_their_tags` et
 `CollectionQueryCountTest.test_detailed_does_not_grow_with_the_number_of_tasks`.
+
+> ✅ **§5 est fait**, livré avec §3. +50 tâches dans une collection n'ajoutent plus aucune
+> requête, contre +50 avant : `GET /collection/detailed/` **59 → 4**, constant. C'est le cas des
+> « très grandes collections » signalé au départ.
 
 ---
 
@@ -1097,6 +1129,20 @@ les quatre niveaux, y compris les tags du projet atteint via la section.
 - ⚠️ `DailyTask.date` est en `auto_now_add` : impossible à fixer à la création. Les tests qui
   ont besoin d'une autre date passent par `DailyTask.objects.filter(pk=…).update(date=…)`.
 
+> ✅ **§6 est fait** — `GET /daily-task/` **74 → 5** requêtes, constant (cible 7, dépassée).
+> Les neuf lookups correspondent un pour un à l'arbre de sérialisation, vérifié :
+> `DailyTaskSerializer.tags`, `task__tags`, `task__project__tags`,
+> `task__section__project__tags`, `common_task__tags` en préchargement ; `task__project`,
+> `task__section__project`, `task__collection`, `common_task` en jointure. `CollectionSerializer`
+> ne sert pas de tags — `Collection` n'a pas cette relation — donc rien à précharger de ce côté.
+> **Restriction d'action, tranchée par la mesure** — ici le critère de §4 ne s'applique pas tel
+> quel : `DailyTaskPostSerializer` et `DailyTaskPatchSerializer` répondent tous deux avec
+> `DailyTaskSerializer` via `to_representation`, donc une écriture sert la chaîne imbriquée
+> complète et **profite** des lookups. Mesuré sur `PATCH` : **7** requêtes en les gardant, **9**
+> en les restreignant aux actions de lecture. Seul `destroy` est du gaspillage pur — il ne lit
+> que `date` : **6 → 3** requêtes en l'excluant. D'où `if self.action != 'destroy'`, et non la
+> liste blanche de §4.
+
 ---
 
 ### §7 — Préchargement des relations : `EventViewSet`
@@ -1126,6 +1172,9 @@ compris : deux requêtes par événement. `event/` **n'est pas paginé** et renv
   appeler sans `size` et attendre une `list`.
 - ✅ `select_related('project')` bénéficie aussi à `destroy()`, qui lit
   `instance.project.archived`.
+
+> ✅ **§7 est fait** — `GET /event/` **27 → 2** requêtes, constant, exactement la cible.
+> L'endpoint n'étant pas paginé, c'est celui où la croissance par objet coûtait le plus cher.
 
 ---
 
@@ -1199,42 +1248,6 @@ de caractérisation sur `daily-task/summary/`.
 
 ---
 
-### §10 — `itemName` absent de `CollectionListSerializer` (optionnel)
-
-**Statut : le seul changement de contrat de ce chantier.** À déplacer en partie 2 du plan si
-l'on tient à l'invariant « aucune clé de réponse ne change ».
-
-**Pourquoi** — `CollectionListSerializer.Meta.fields` omet `itemName`, alors que le type front
-`CollectionList extends Collection` le déclare (`frontend/src/models/collection.model.ts:19`).
-C'est un mensonge de type, pas un bug visible.
-
-**Impact front : nul, vérifié.** Aucun composant ne lit `itemName` sur un `CollectionList` —
-`CollectionCard.vue` et `CollectionList.vue` ne l'utilisent pas ; les seuls lecteurs
-(`CollectionGeneral.vue`, `CollectionSettings.vue`) partent de `CollectionDetail`, qui l'expose
-déjà. L'ajout est purement additif.
-
-**Ce qui change**
-
-```python
-# tout_doux/serializers/collection/collection_list.py
-    itemName = serializers.CharField(source='item_name')
-
-    class Meta:
-        fields = ('id', 'name', 'description', 'itemName', 'archived', 'createdOn',
-                  'taskCount', 'completedTaskCount')
-```
-
-**Vérification** — `CollectionContractTest.test_list_response_keys_are_unchanged` doit être mis
-à jour dans **le même commit**, en y ajoutant `'itemName'`. C'est le **seul** test de
-caractérisation que ce chantier autorise à modifier, et le commentaire du test le dit déjà.
-
-**Pièges**
-
-- ⚠️ Contrat d'API modifié → `architecture/api-surface.md` et `architecture/serializers.md`
-  dans le même commit.
-
----
-
 ### §11 — Documentation, extraction, clôture
 
 **Pourquoi** — ce fichier est supprimé à la fin. Ce qui doit survivre doit être déplacé avant,
@@ -1301,7 +1314,6 @@ check`, ni à la relecture — seul un compteur de requêtes le révèle. C'est 
 | §7    | §0        | Oui                                                                      |
 | §8    | —         | Oui                                                                      |
 | §9    | §0        | Optionnelle, à concevoir                                                 |
-| §10   | §0        | Optionnelle, change le contrat                                           |
 | §11   | tout      | Non                                                                      |
 
 Après chaque étape :
@@ -1312,7 +1324,7 @@ docker exec tout_doux_backend python manage.py makemigrations --check --dry-run
 docker exec tout_doux_backend python manage.py test tout_doux -v 2
 ```
 
-`test_api_contract` doit rester **vert et inchangé** à chaque étape (sauf §10). C'est la seule
+`test_api_contract` doit rester **vert et inchangé** à chaque étape. C'est la seule
 chose qui prouve que rien n'est cassé.
 
 ## Voir aussi

@@ -16,7 +16,19 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     filterset_fields = ('date',)
 
     def get_queryset(self):
-        return self.request.user.dailytasks.all()
+        queryset = self.request.user.dailytasks.all()
+
+        # `destroy` ne lit que `date` ; les autres actions répondent toutes avec la chaîne
+        # imbriquée complète, y compris les écritures via `to_representation`.
+        if self.action != 'destroy':
+            queryset = queryset.select_related(
+                'task__project', 'task__section__project', 'task__collection', 'common_task',
+            ).prefetch_related(
+                'tags', 'task__tags', 'task__project__tags', 'task__section__project__tags',
+                'common_task__tags',
+            )
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'create':

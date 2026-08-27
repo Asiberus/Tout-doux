@@ -1,6 +1,8 @@
+from django.db.models import Count, Exists, OuterRef, Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
+from tout_doux.models import Task
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.serializers.collection import CollectionListSerializer, CollectionDetailSerializer, CollectionSerializer, \
     CollectionPostOrPatchSerializer
@@ -12,8 +14,21 @@ class CollectionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.request.user.collections.all()
+
+        if self.action == 'list':
+            # Une seule relation vers-plusieurs jointe : pas de produit cartésien possible.
+            queryset = queryset.annotate(
+                task_count=Count('tasks'),
+                completed_task_count=Count('tasks', filter=Q(tasks__completed=True)),
+            )
+
+        if self.action in ('detailed', 'retrieve'):
+            queryset = queryset.prefetch_related('tasks__tags')
+
         if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
-            queryset = queryset.filter(tasks__completed=False).distinct()
+            queryset = queryset.filter(
+                Exists(Task.objects.filter(collection=OuterRef('pk'), completed=False))
+            )
 
         return queryset
 

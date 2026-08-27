@@ -282,7 +282,7 @@ class HasUncompletedTaskFilterTest(DataFixtureTestCase):
 class CollectionContractTest(DataFixtureTestCase):
     def test_list_response_keys_are_unchanged(self):
         """`itemName` est ABSENT aujourd'hui alors que le type front CollectionList le déclare.
-        §10 le corrige ; c'est la seule étape qui modifie ce test, et elle est optionnelle."""
+        Voir docs/quality/refactoring-backlog.md R13 : le corriger modifiera ce test."""
         self.assertEqual(
             set(self.collection_payload()),
             {'id', 'name', 'description', 'archived', 'createdOn',
