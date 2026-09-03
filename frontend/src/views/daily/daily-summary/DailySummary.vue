@@ -100,6 +100,11 @@ function updateDailyTaskCompleted(date: string, numberOfDailyTaskCompleted: numb
   if (dailyTaskSummary) dailyTaskSummary.totalTaskCompleted = numberOfDailyTaskCompleted
 }
 
+function incrementDailyTaskTotal(date: string): void {
+  const dailyTaskSummary = dailySummaryList.value.find(d => d.date === date)
+  if (dailyTaskSummary) dailyTaskSummary.totalTask++
+}
+
 function setDateParam(date: string): void {
   router.push({ name: 'daily-summary', params: { date } })
 }
@@ -143,7 +148,8 @@ function removeDateParam(options: { push?: boolean } = {}): void {
       v-model="dailyDetailDialog"
       :date="dateSelected"
       @update:model-value="dailyDetailDialogInput($event)"
-      @daily-task-completed="updateDailyTaskCompleted">
+      @daily-task-completed="updateDailyTaskCompleted"
+      @daily-task-created="incrementDailyTaskTotal">
     </DailyDetail>
   </div>
 </template>

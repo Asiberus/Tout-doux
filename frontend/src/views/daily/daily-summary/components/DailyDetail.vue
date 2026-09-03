@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DailyTask } from '@/models/daily-task.model'
+import { DailyTask, DailyTaskPost } from '@/models/daily-task.model'
 import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
@@ -21,6 +21,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'daily-task-completed': [date: string, numberOfDailyTaskCompleted: number]
+  'daily-task-created': [date: string]
 }>()
 
 const dialogState = ref(false)
@@ -108,6 +109,16 @@ function toggleDailyTask(dailyTask: DailyTask): void {
   )
 }
 
+function createDailyTask(data: DailyTaskPost): void {
+  dailyTaskApi.createDailyTask(data).then(
+    response => {
+      dailyTaskList.value.push(response)
+      emit('daily-task-created', props.date)
+    },
+    error => console.error(error)
+  )
+}
+
 function emitDailyTaskCompletedEvent(): void {
   emit('daily-task-completed', props.date, numberOfDailyTaskCompleted.value)
 }
@@ -177,7 +188,8 @@ function emitDailyTaskCompletedEvent(): void {
               <DailyDetailTaskTimeline
                 :daily-task-list="dailyTaskList"
                 :date
-                @toggle-daily-task="toggleDailyTask($event)" />
+                @toggle-daily-task="toggleDailyTask($event)"
+                @create-daily-task="createDailyTask($event)" />
             </v-tabs-window-item>
             <v-tabs-window-item value="event">
               <DailyDetailEventTimeline :events :date />
@@ -190,7 +202,8 @@ function emitDailyTaskCompletedEvent(): void {
             <DailyDetailTaskTimeline
               :daily-task-list="dailyTaskList"
               :date
-              @toggle-daily-task="toggleDailyTask($event)" />
+              @toggle-daily-task="toggleDailyTask($event)"
+              @create-daily-task="createDailyTask($event)" />
           </div>
         </template>
         <template v-else-if="events.length > 0">
@@ -206,7 +219,8 @@ function emitDailyTaskCompletedEvent(): void {
               <DailyDetailTaskTimeline
                 :daily-task-list="dailyTaskList"
                 :date
-                @toggle-daily-task="toggleDailyTask($event)" />
+                @toggle-daily-task="toggleDailyTask($event)"
+                @create-daily-task="createDailyTask($event)" />
             </v-col>
 
             <v-col v-if="events.length > 0" :cols="dailyTaskList.length > 0 ? 5 : 8">

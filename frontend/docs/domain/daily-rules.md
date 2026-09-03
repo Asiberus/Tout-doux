@@ -12,11 +12,11 @@ Deux écrans : le **wizard** (`daily-update`, préparer la journée) et le **ré
 
 Un `DailyTask` provient de l'une de ces trois sources, **exclusivement** :
 
-| Origine                             | Corps envoyé               | Déclenché depuis                                                                                           |
-| ----------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Une **Task** (projet ou collection) | `{ taskId }`               | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47`, `TaskCard.vue` (context menu) |
-| Un **CommonTask**                   | `{ commonTaskId }`         | `DailyUpdateCommonTask.vue:19`                                                                             |
-| **Libre** (ad hoc)                  | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue`                                                          |
+| Origine                             | Corps envoyé               | Déclenché depuis                                                                                                              |
+| ----------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Une **Task** (projet ou collection) | `{ taskId }`               | `DailyUpdateProjectListItem.vue:85`, `DailyUpdateCollectionListItem.vue:47`, `TaskCard.vue` (context menu)                    |
+| Un **CommonTask**                   | `{ commonTaskId }`         | `DailyUpdateCommonTask.vue:19`                                                                                                |
+| **Libre** (ad hoc)                  | `{ name, tagIds, action }` | `DailyTaskForm.vue` via `DailyUpdateTaskList.vue` (wizard) ou `DailyDetailTaskTimeline.vue` (résumé, jour courant uniquement) |
 
 ⚠️ **Aucune validation n'existe.** `DailyTaskPost` a ses champs **tous optionnels** : un corps
 vide passe le typage, et un DailyTask sans origine rendrait un titre vide. L'invariant est
@@ -35,7 +35,9 @@ Logique dupliquée à l'identique dans `DailyTaskCard.vue:19` et `DailyTaskFormC
 | `date`           | ❌                                            | absent de `DailyTaskPatch` — un DailyTask ne peut pas changer de jour |
 
 **Règle de séparation des écrans** : on **prépare** dans le wizard, on **exécute** dans le
-résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wizard.
+résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wizard. La seule brèche
+dans l'autre sens est la création d'un DailyTask libre depuis le résumé, limitée au jour courant
+(voir règle 2 ci-dessous).
 
 ### `DailyTaskAction`
 
@@ -61,7 +63,9 @@ crée ou modifie des DailyTasks.**
    celle du jour. **Ce guard est structurel, pas cosmétique** : `DailyTaskPost` **n'a pas de
    champ `date`** — le backend écrit implicitement sur « maintenant ». Sans le guard, ouvrir
    `/daily/2026-01-01/update/task` afficherait les tâches du 1ᵉʳ janvier tout en créant les
-   nouvelles sur aujourd'hui : l'écran et les données divergeraient silencieusement.
+   nouvelles sur aujourd'hui : l'écran et les données divergeraient silencieusement. Pour la même
+   raison, l'élément d'ajout de `DailyDetailTaskTimeline` n'est rendu que si la date du dialog est
+   celle du jour.
 3. **Pas de doublon dans une journée** — une même Task ou CommonTask ne peut pas être ajoutée
    deux fois. Dans le wizard, vérifié par `isTaskSelected` / `isCommonTaskSelected`, qui rendent
    la carte inerte. ⚠️ **Le context menu de `TaskCard` n'a pas cet état** : il ne connaît pas le
@@ -110,7 +114,12 @@ autre valeur.
 - Le **dialog de détail est piloté par l'URL** (param `:date`), pas par un état local : le bouton
   retour du navigateur le ferme. Voir [../patterns/dialogs.md](../patterns/dialogs.md).
 - Après avoir coché une tâche, le compteur de la carte est patché **en place** (pas de refetch) ;
-  `totalTask` / `totalEvent` ne sont jamais rafraîchis après un passage dans le wizard.
+  de même `totalTask` après une création depuis la timeline. Ni l'un ni l'autre n'est rafraîchi
+  après un passage dans le wizard.
+- La timeline des tâches du dialog offre, **pour le jour courant seulement**, un dernier élément
+  grisé qui se transforme en `DailyTaskForm` au clic. Il n'apparaît qu'au bas d'une timeline non
+  vide : une journée sans tâche ne rend pas la timeline du tout, donc l'amorçage d'une journée
+  reste réservé au wizard.
 - Layout du détail : en `mdAndUp` deux colonnes (tâches 7 / événements 5) ; en `mdAndDown` des
   onglets, mais **seulement si les deux listes sont non vides** — sinon la liste unique s'affiche
   sans onglets. Le glissement horizontal change d'onglet, le glissement vers le bas ferme le

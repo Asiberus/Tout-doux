@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
-import { DailyTask } from '@/models/daily-task.model'
+import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
+import { DailyTask, DailyTaskPost } from '@/models/daily-task.model'
 import moment from 'moment/moment'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 const { xs } = useDisplay()
@@ -14,7 +15,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'toggle-daily-task': [dailyTask: DailyTask]
+  'create-daily-task': [data: DailyTaskPost]
 }>()
+
+const createFormDisplayed = ref(false)
+const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const addTaskCardVariant = computed<'elevated' | 'outlined'>(() =>
+  createFormDisplayed.value ? 'elevated' : 'outlined'
+)
+
+watch(
+  () => props.date,
+  () => (createFormDisplayed.value = false)
+)
 
 const numberOfDailyTaskCompleted = computed<number>(
   () => props.dailyTaskList.filter(({ completed }) => completed).length
@@ -23,7 +36,7 @@ const numberOfDailyTaskUncompleted = computed<number>(
   () => props.dailyTaskList.filter(({ completed }) => !completed).length
 )
 const taskText = computed<string>(() => {
-  if (moment().isSame(props.date, 'day')) {
+  if (isToday.value) {
     if (numberOfDailyTaskUncompleted.value > 0)
       return `You have ${numberOfDailyTaskUncompleted.value} ${
         numberOfDailyTaskUncompleted.value > 1 ? 'tasks' : 'task'
@@ -40,6 +53,11 @@ const taskText = computed<string>(() => {
 
 function toggleDailyTask(dailyTask: DailyTask): void {
   emit('toggle-daily-task', dailyTask)
+}
+
+function createDailyTask(data: DailyTaskPost): void {
+  createFormDisplayed.value = false
+  emit('create-daily-task', data)
 }
 </script>
 
@@ -72,13 +90,52 @@ function toggleDailyTask(dailyTask: DailyTask): void {
         </template>
         <DailyTaskCard :daily-task="dailyTask" caret @toggle="toggleDailyTask(dailyTask)" />
       </v-timeline-item>
+
+      <v-timeline-item
+        v-if="isToday"
+        :size="xs ? 'small' : 'default'"
+        :line-inset="2"
+        class="add-task-item"
+        :class="{ 'add-task-item--editing': createFormDisplayed }">
+        <template #icon>
+          <v-icon icon="mdi-plus" :size="xs ? 'small' : 'default'" class="add-task-icon" />
+        </template>
+
+        <v-card
+          :variant="addTaskCardVariant"
+          :link="!createFormDisplayed"
+          :ripple="false"
+          class="add-task-card rounded-lg pa-3 pa-sm-4"
+          :class="{ 'add-task-card--idle': !createFormDisplayed }"
+          @click="createFormDisplayed = true">
+          <span
+            v-if="!createFormDisplayed"
+            class="text-body-medium text-sm-body-large font-weight-medium">
+            Add a task
+          </span>
+          <DailyTaskForm
+            v-else
+            @click.stop
+            @submit="createDailyTask($event)"
+            @close="createFormDisplayed = false" />
+        </v-card>
+      </v-timeline-item>
     </v-timeline>
   </div>
 </template>
 
 <style scoped lang="scss">
 @use 'sass:map';
+@use 'vuetify/lib/styles/settings/colors';
 @use '@/styles/breakpoints' as variables;
+
+$add-task-color-idle: map.get(colors.$grey, 'darken-4');
+$add-task-color-active: map.get(colors.$grey, 'darken-1');
+$add-task-transition: all 0.2s ease-in-out;
+
+$rail-color: rgba(var(--v-border-color), var(--v-border-opacity));
+$rail-dash: 3px;
+$rail-period: 6px;
 
 .v-timeline {
   padding-top: 0;
@@ -121,6 +178,73 @@ function toggleDailyTask(dailyTask: DailyTask): void {
     & :deep(.v-timeline-divider) {
       min-width: var(--divider-width);
       justify-content: var(--divider-justify-content);
+    }
+  }
+
+  .add-task-item {
+    --add-task-color: #{$add-task-color-idle};
+    --add-task-dot-color: var(--add-task-color);
+    --add-task-icon-color: var(--add-task-color);
+
+    color: var(--add-task-color);
+
+    &--editing {
+      --add-task-color: #{$add-task-color-active};
+    }
+
+    & :deep(.v-timeline-divider__dot),
+    & :deep(.v-timeline-divider__inner-dot) {
+      background: transparent;
+    }
+
+    & :deep(.v-timeline-divider__dot) {
+      border: thin dashed var(--add-task-dot-color);
+      transition: $add-task-transition;
+    }
+
+    // Le rail est une div remplie en `background`, pas une bordure : `dashed` n'y ferait rien
+    & :deep(.v-timeline-divider__before) {
+      background-color: transparent;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        $rail-color 0 $rail-dash,
+        transparent $rail-dash $rail-period
+      );
+    }
+  }
+
+  // Le segment qui mène au dot fantôme est fait de deux div : ce `__after` en couvre la moitié
+  // haute, jusqu'au milieu du `row-gap`. Son motif part de la jonction (`to top`) et commence par
+  // un vide, pour que le pointillé reste régulier à la rencontre des deux segments
+  .v-timeline-item:has(+ .add-task-item) :deep(.v-timeline-divider__after) {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(
+      to top,
+      transparent 0 $rail-dash,
+      $rail-color $rail-dash $rail-period
+    );
+  }
+
+  // La carte est la même dans les deux états : recréée, elle n'aurait aucune valeur de départ à
+  // animer et atteindrait sa couleur finale avant le dot, qui lui survit au basculement
+  .add-task-card {
+    transition: $add-task-transition;
+
+    &--idle {
+      border-style: dashed;
+    }
+  }
+
+  .add-task-icon {
+    color: var(--add-task-icon-color);
+    transition: $add-task-transition;
+  }
+
+  // L'icône vit dans le divider, rendu avant le corps qui porte la carte : aucun sélecteur de
+  // voisinage ne peut remonter de la carte survolée jusqu'à elle
+  @media (hover: hover) {
+    .add-task-item:has(.add-task-card--idle:hover) {
+      --add-task-color: #{$add-task-color-active};
     }
   }
 
