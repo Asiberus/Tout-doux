@@ -212,7 +212,7 @@ function nextMonth(): void {
         :event-margin-bottom="2"
         :event-ripple="false"
         color="accent"
-        class="calendar"
+        :class="['calendar', { 'calendar--other-month': !isCurrentMonthSelected }]"
         @click:day="handleClickOnDay">
         <template #day-label="{ day, present }">
           <v-hover v-slot="{ isHovering, props }">
@@ -301,6 +301,13 @@ function nextMonth(): void {
     &.v-outside {
       background-color: rgb(var(--v-theme-background));
     }
+  }
+
+  // Vuetify surligne toujours le jour de semaine "réel" du jour courant dans
+  // l'en-tête, même en dehors du mois courant (VCalendarWeekly se base sur
+  // todayWeek, pas sur le mois affiché) : on neutralise ce surlignage ici.
+  &.calendar--other-month :deep(.v-calendar-weekly__head-weekday.v-present) {
+    color: unset;
   }
 
   :deep(.v-calendar-weekly__day) {
