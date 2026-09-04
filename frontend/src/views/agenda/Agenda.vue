@@ -182,15 +182,17 @@ function nextMonth(): void {
         </v-btn>
       </div>
 
+      <h4 class="text-body-large text-sm-headline-small">{{ monthSelected }}</h4>
+
       <v-btn
-        :disabled="isCurrentMonthSelected"
+        v-if="!isCurrentMonthSelected"
         :size="xs ? 'small' : 'default'"
         class="mr-1"
         @click="setCalendarToNow()">
         now
       </v-btn>
 
-      <h4 class="text-body-large text-sm-headline-small flex-grow-1">{{ monthSelected }}</h4>
+      <v-spacer />
 
       <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
         <v-icon icon="mdi-plus" start />
