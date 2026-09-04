@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { DailyTask } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPost } from '@/models/task.model'
 import TaskCard from '@/views/components/task/TaskCard.vue'
+import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
+import { useDialogWidth } from '@/composables/useDialogWidth'
 import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { computed, ref, watch } from 'vue'
+
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const selected = defineModel<boolean>('selected')
 
@@ -22,9 +26,12 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'select-task': [data: { taskId: number }]
+  'create-task': [data: { task: TaskPost; projectId: number }]
 }>()
 
 const sectionTab = ref(0)
+const taskDialog = ref(false)
+const taskDialogSectionId = ref(0)
 
 const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(() => {
   const sections = props.project.sections
@@ -78,6 +85,22 @@ function selectTask(task: Task): void {
   if (isTaskSelected(task)) return
 
   emit('select-task', { taskId: task.id })
+}
+
+function openCreateTaskDialog(sectionId: number): void {
+  taskDialogSectionId.value = sectionId
+  taskDialog.value = true
+}
+
+function createTask(data: TaskPost): void {
+  taskDialog.value = false
+  // `taskDialogSectionId === 0` est la sentinelle « General tasks » : la tâche part directement
+  // sur le projet, pas sur une section
+  const task: TaskPost = taskDialogSectionId.value
+    ? { ...data, sectionId: taskDialogSectionId.value }
+    : { ...data, projectId: props.project.id }
+
+  emit('create-task', { task, projectId: props.project.id })
 }
 </script>
 
@@ -195,9 +218,28 @@ function selectTask(task: Task): void {
                   color="grey-darken-4"
                   @click="selectTask(task)">
                 </TaskCard>
+
+                <v-card
+                  variant="outlined"
+                  ripple
+                  class="create-task-card"
+                  @click="openCreateTaskDialog(section.id)">
+                  <v-card-text class="d-flex align-center justify-center gap-2">
+                    <span class="text-body-medium text-sm-body-large font-weight-medium">
+                      Create a task
+                    </span>
+                  </v-card-text>
+                </v-card>
               </div>
             </v-tabs-window-item>
           </v-tabs-window>
+
+          <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
+            <TaskDialog
+              :is-dialog-open="taskDialog"
+              @create="createTask($event)"
+              @close="taskDialog = false" />
+          </v-dialog>
         </template>
       </v-card-text>
     </v-card>
@@ -206,6 +248,7 @@ function selectTask(task: Task): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
+@use 'vuetify/lib/styles/settings/colors';
 @use '@/styles/breakpoints' as variables;
 
 .project-card {
@@ -267,6 +310,22 @@ function selectTask(task: Task): void {
         grid-template-columns: repeat(auto-fill, minmax(max(260px, calc((100% - 8px) / 2)), 1fr));
         gap: 8px;
       }
+    }
+  }
+}
+
+.create-task-card {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  color: map.get(colors.$grey, 'darken-3');
+  transition: color 0.2s ease-in-out;
+
+  @media (hover: hover) {
+    &:hover {
+      color: map.get(colors.$grey, 'darken-1');
     }
   }
 }

@@ -9,12 +9,13 @@ import {
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
+import { TaskPost } from '@/models/task.model'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
 import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
-import { CommonTask } from '@/models/common-task.model'
-import { collectionApi, commonTaskApi, dailyTaskApi, projectApi } from '@/api'
+import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
+import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { computed, onBeforeMount, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -102,6 +103,42 @@ function createDailyTask(data: DailyTaskPost): void {
       emit('daily-task-count', dailyTaskList.value.length)
     })
     .catch(error => console.error(error))
+}
+
+function createProjectTask(event: { task: TaskPost; projectId: number }): void {
+  const { task, projectId } = event
+
+  taskApi.createTask(task).then(
+    response => {
+      const project = projectList.value.find(({ content }) => content.id === projectId)
+      if (!project) return
+
+      if (task.sectionId) {
+        const section = project.content.sections.find(({ id }) => id === task.sectionId)
+        if (section) section.tasks.push(response)
+      } else project.content.tasks.push(response)
+    },
+    error => console.error(error)
+  )
+}
+
+function createCollectionTask(event: { task: TaskPost; collectionId: number }): void {
+  const { task, collectionId } = event
+
+  taskApi.createTask(task).then(
+    response => {
+      const collection = collectionList.value.find(({ content }) => content.id === collectionId)
+      if (collection) collection.content.tasks.push(response)
+    },
+    error => console.error(error)
+  )
+}
+
+function createCommonTask(data: CommonTaskForm): void {
+  commonTaskApi.createCommonTask(data).then(
+    response => commonTaskList.value.push(response),
+    error => console.error(error)
+  )
 }
 
 function updateDailyTask(event: { id: number; data: DailyTaskPatch }): void {
@@ -213,7 +250,8 @@ function resetSelectedItem(): void {
                 :project="project.content"
                 :daily-task-list="dailyTaskList"
                 :section-selected="projectSectionSelected"
-                @select-task="createDailyTask($event)" />
+                @select-task="createDailyTask($event)"
+                @create-task="createProjectTask($event)" />
             </div>
           </template>
           <template v-else>
@@ -253,7 +291,8 @@ function resetSelectedItem(): void {
                 v-model:selected="collection.selected"
                 :collection="collection.content"
                 :daily-task-list="dailyTaskList"
-                @select-task="createDailyTask($event)" />
+                @select-task="createDailyTask($event)"
+                @create-task="createCollectionTask($event)" />
             </div>
           </template>
           <template v-else>
@@ -286,7 +325,8 @@ function resetSelectedItem(): void {
           <DailyUpdateCommonTask
             :common-task-list="commonTaskList"
             :daily-task-list="dailyTaskList"
-            @select-common-task="createDailyTask($event)" />
+            @select-common-task="createDailyTask($event)"
+            @create-common-task="createCommonTask($event)" />
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item :value="3" :transition="false" :reverse-transition="false">
