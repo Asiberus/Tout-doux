@@ -49,11 +49,16 @@ function sortEventList(): void {
 
 function retrieveEvents(): void {
   events.value = []
-  const month = moment(value.value).month() + 1 // Month count start at 0
-  const year = moment(value.value).year()
-  eventApi.getEvents({ month, year }).then(
-    response => {
-      events.value = response
+
+  const months = [-1, 0, 1].map(offset => {
+    const date = moment(value.value).add(offset, 'month')
+    return { month: date.month() + 1, year: date.year() } // Month count start at 0
+  })
+
+  Promise.all(months.map(({ month, year }) => eventApi.getEvents({ month, year }))).then(
+    responses => {
+      const eventsById = new Map(responses.flat().map(event => [event.id, event]))
+      events.value = Array.from(eventsById.values())
       sortEventList()
     },
     error => console.error(error)
@@ -187,7 +192,7 @@ function nextMonth(): void {
       <v-btn
         v-if="!isCurrentMonthSelected"
         :size="xs ? 'small' : 'default'"
-        class="mr-1"
+        class="ml-1"
         @click="setCalendarToNow()">
         now
       </v-btn>
