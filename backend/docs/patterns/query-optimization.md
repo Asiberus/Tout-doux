@@ -166,13 +166,13 @@ de liste et de ne biaiser que le premier résultat de l'autocomplete — celui q
 
 Liste maintenue à la main.
 
-| Emplacement           | Ce qui y est appliqué                                                                              |
-| --------------------- | -------------------------------------------------------------------------------------------------- |
-| `queries.py`          | `scalar_count`, `daily_summary_counts`                                                             |
-| `views/project.py`    | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`             |
-| `views/collection.py` | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                        |
-| `views/daily_task.py` | 4 `select_related`, 5 `prefetch_related`, hors `destroy` ; `daily_summary_counts` dans `summary()` |
-| `views/event.py`      | `select_related('project')`, `prefetch_related('project__tags')`                                   |
+| Emplacement           | Ce qui y est appliqué                                                                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `queries.py`          | `scalar_count`, `daily_summary_counts`, `daily_carry_over_candidates`                                                                                                                                        |
+| `views/project.py`    | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`                                                                                                                       |
+| `views/collection.py` | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                                                                                                                                  |
+| `views/daily_task.py` | 4 `select_related`, 5 `prefetch_related`, hors `destroy` ; `daily_summary_counts` dans `summary()` ; `bulk_create` sur la table et sur la liaison des tags, puis relecture par `pk__in`, dans `carry_over()` |
+| `views/event.py`      | `select_related('project')`, `prefetch_related('project__tags')`                                                                                                                                             |
 
 ## Comment on le vérifie
 

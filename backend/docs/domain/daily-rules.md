@@ -75,13 +75,42 @@ laisse ses daily tasks inchangés.
 
 ## La suppression
 
-- **Un daily task ne peut être supprimé que le jour même** (`views/daily_task.py:29`, 403
+- **Un daily task ne peut être supprimé que le jour même** (`views/daily_task.py:63`, 403
   `The daily task is not related to the current day`).
 - **Supprimer la tâche source ne supprime pas la ligne du daily.** Un signal `pre_delete`
   (`models/task.py:53` et `models/common_task.py:24`) recopie d'abord le nom et les tags dans
   chaque `DailyTask` concerné ; la FK est ensuite mise à `NULL` (`on_delete=SET_NULL`). La ligne
   **devient une ligne libre** portant l'ancien libellé, et redevient donc modifiable — mais
   seulement si elle date du jour.
+
+## Le report de la veille — `daily-task/carry-over…`
+
+Deux endpoints, sans corps ni paramètre : `carry-over-candidates/` (GET) dit ce qui serait
+copié, `carry-over/` (POST) crée les copies et les renvoie en **201**. La sélection est faite
+par `queries.py:daily_carry_over_candidates`, la copie par `views/daily_task.py`, dans une
+`transaction.atomic()`.
+
+Une ligne de la veille est copiable si elle n'est **pas cochée**, et selon son origine :
+
+- **`task`** — refusée si la tâche est terminée, si son projet, le projet de sa section ou sa
+  collection est archivé, ou si elle est déjà planifiée aujourd'hui.
+- **`common_task`** — refusée seulement si elle est déjà planifiée aujourd'hui.
+- **Saisie libre** — jamais refusée : aucune contrainte d'unicité ne couvre les lignes libres.
+
+**L'état de la tâche source est lu à l'appel, pas à la veille.** Une tâche cochée depuis un
+projet dans la journée d'hier au soir n'est donc pas reportée. C'est la raison d'être du GET :
+le client ne peut pas trancher lui-même sans rejouer ces règles.
+
+**Le POST n'est pas idempotent pour les lignes libres.** Les origines liées sont protégées par
+les contraintes d'unicité et par l'exclusion ci-dessus ; deux appels successifs recréent en
+revanche les lignes libres en double. Le client s'en prémunit en verrouillant son bouton
+pendant la requête, rien côté serveur ne le fait.
+
+L'`action` du jour (`TH` / `WO` / `FI`) est recopiée telle quelle. Les copies conservent l'ordre
+de la veille (`Meta.ordering = ('pk',)`).
+
+⚠️ La veille est calculée comme `date.today() - 1 jour`, donc en UTC — voir la section sur les
+fuseaux en fin de fichier.
 
 ## Le résumé — `daily-task/summary/`
 

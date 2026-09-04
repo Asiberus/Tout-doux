@@ -82,16 +82,16 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 
 ## R4 — « Aujourd'hui » calculé en UTC
 
-- **Origine** : `views/daily_task.py:31`, `serializers/daily_task/daily_task_patch.py:57`,
-  et `DailyTask.date` (`auto_now_add`).
-- **Contexte** : ces trois points utilisent `datetime.date.today()`, qui lit l'horloge système.
+- **Origine** : `views/daily_task.py:63`, `serializers/daily_task/daily_task_patch.py:57`,
+  `queries.py:daily_carry_over_candidates` et `DailyTask.date` (`auto_now_add`).
+- **Contexte** : ces points utilisent `datetime.date.today()`, qui lit l'horloge système.
   Vérifié : le conteneur est en **UTC** (`time.tzname` → `('UTC','UTC')`, pas de variable `TZ`),
   alors que `settings.TIME_ZONE` vaut `Europe/Paris`. Entre 00:00 et 02:00 heure de Paris (01:00
   en hiver), le serveur est encore la veille : l'utilisateur ne peut pas supprimer une ligne du
   jour affiché, ne peut plus en modifier le nom, et les lignes qu'il crée sont datées de la
   veille.
 - **Décision** : agir. `django.utils.timezone.localdate()` respecte `TIME_ZONE` et corrige les
-  trois points. Pour `auto_now_add`, il faut remplacer le champ par un `default=` appelable —
+  points en Python. Pour `auto_now_add`, il faut remplacer le champ par un `default=` appelable —
   `DateField.pre_save` utilise `date.today()` en dur.
 
 ## R8 — Cycle d'imports entre les barrels de `serializers/`
