@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { hideScroll, showScroll } from '@/utils/document.utils'
-import { watch } from 'vue'
+import { onUnmounted, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 const { width } = useDisplay()
@@ -10,6 +10,10 @@ const show = defineModel<boolean>()
 watch(show, value => {
   if (value) hideScroll()
   else showScroll()
+})
+
+onUnmounted(() => {
+  if (show.value) showScroll()
 })
 </script>
 
