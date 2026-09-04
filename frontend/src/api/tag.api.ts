@@ -12,8 +12,8 @@ export interface IsTagNameUniqueParams {
 
 interface TagListParams extends PaginationParams {
   type: TagType
+  sort?: 'name'
   search?: string
-  exclude_ids?: string
 }
 
 export function getTagList(params: TagListParams): Promise<Pagination<Tag[]>> {

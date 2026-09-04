@@ -100,6 +100,17 @@ Où écrire un style : [../patterns/styling.md](../patterns/styling.md).
   [../patterns/dialogs.md](../patterns/dialogs.md).
 - **Icônes MDI et police Roboto chargées depuis des CDN** (`index.html:12-17`), pas bundlées :
   l'app se dégrade hors ligne / derrière un proxy filtrant.
+- **`TagSearch` charge sa liste en entier au montage** (`sort=name`, `size=200`), puis filtre
+  côté client — il ne vit que dans des dialogs montées paresseusement, donc « monté » vaut
+  « ouvert ». Deux subtilités Vuetify sont derrière son code : `useFilter` est alimenté par
+  `isPristine ? '' : search` (`VAutocomplete.js:95`), ce qui affiche **tous** les items au clic
+  sans code ; et **Cmd/Ctrl+Entrée** valide le formulaire porteur, intercepté en **phase de
+  capture** avec `stopPropagation()` parce que le `onKeydown` de Vuetify ne regarde aucun
+  modificateur et sélectionnerait le premier item au passage. `Entrée` seule reste au composant,
+  qui ouvre le menu. Refermer ce menu après une sélection demande aussi un `v-model:menu` :
+  en `multiple`, Vuetify ne le fait jamais et n'expose aucune prop pour ça.
+  Quand l'utilisateur n'a aucun tag du type demandé, `hide-no-data` laisse le menu vide : un lien
+  prend le relais et pointe vers `settings-tags` avec `query.type`, donc sur le bon onglet.
 
 ## Notifier l'utilisateur
 

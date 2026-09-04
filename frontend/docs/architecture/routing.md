@@ -27,7 +27,7 @@ Elle sert aussi de **carte des features** (voir [../README.md](../README.md#feat
 | `/agenda`                                | `agenda`                     | `views/agenga/Agenda.vue` ⚠️ dossier mal orthographié | —                                             |
 | `/settings`                              | `settings-preferences`       | `SettingsPreferences.vue`                             | —                                             |
 | `/settings/common-tasks`                 | `settings-common-tasks`      | `SettingsCommonTasks.vue`                             | —                                             |
-| `/settings/tags`                         | `settings-tags`              | `SettingsTags.vue`                                    | —                                             |
+| `/settings/tags`                         | `settings-tags`              | `SettingsTags.vue`                                    | `type` (`query.type === 'task' ? … : …`)      |
 | `/profile`                               | `profile-user`               | `ProfileUser.vue`                                     | —                                             |
 | `/profile/email`                         | `profile-email`              | `ProfileEmail.vue`                                    | —                                             |
 | `/profile/password`                      | `profile-password`           | `ProfilePassword.vue`                                 | —                                             |

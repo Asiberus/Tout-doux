@@ -58,7 +58,7 @@ Sauf mention contraire : accès **connecté**, réponse de liste **paginée** (v
 | `daily-task/{pk}/`            | GET, PUT, PATCH, DELETE | `DailyTask` / `DailyTaskPatch`               |                                                              | DELETE refusé hors du jour courant                             |
 | `event/`                      | GET, POST               | `EventExtended` / `EventPostOrPatch`         | `date`, ou `month`+`year`                                    | **non paginé**                                                 |
 | `event/{pk}/`                 | GET, PUT, PATCH, DELETE | `EventExtended` / `EventPostOrPatch`         | `extended` (forme de la réponse d'écriture)                  |                                                                |
-| `tag/`                        | GET, POST               | `Tag`                                        | `type`, `search`, `exclude_ids`                              |                                                                |
+| `tag/`                        | GET, POST               | `Tag`                                        | `type`, `search`, `sort` (`name`)                            |                                                                |
 | `tag/is-name-unique/`         | GET                     | —                                            | `name` **obligatoire**, `type` **obligatoire**, `exclude_id` | `{unique: bool}`                                               |
 | `tag/{pk}/`                   | GET, PUT, PATCH, DELETE | `Tag`                                        |                                                              |                                                                |
 | `common-task/`                | GET, POST               | `CommonTask`                                 |                                                              |                                                                |
@@ -126,9 +126,10 @@ délèguent à `list()` : ils **sont** paginés, comme les listes ordinaires.
 - **PUT est routé partout, et jamais appelé.** Les sérialiseurs `*Patch` sont écrits pour PATCH
   (plusieurs portent le commentaire « only used in a PATCH context ») ; en PUT, `partial=False`
   rend leurs champs obligatoires. Comportement non vérifié — ne pas s'en servir sans le tester.
-- **Les query params inconnus sont ignorés en silence.** `has_uncompleted_task`, `exclude_ids`,
-  `extended` sont lus à la main dans `get_queryset()` / `to_representation()` ; une faute de
-  frappe ne produit aucune erreur, juste un filtre non appliqué.
+- **Les query params inconnus sont ignorés en silence.** `has_uncompleted_task`, `extended` sont
+  lus à la main dans `get_queryset()` / `to_representation()` ; une faute de frappe ne produit
+  aucune erreur, juste un filtre non appliqué. Seul `sort` de `tag/` fait exception : une valeur
+  hors de `TagViewSet.SORTS` renvoie un 400.
 - **`FeedbackViewSet` déclare `SearchFilter` sans `search_fields`** (`views/feedback.py:15`) :
   configuration morte, `?search=` n'a aucun effet —
   [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R9.

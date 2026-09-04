@@ -1,3 +1,4 @@
+from django.db.models.functions import Lower
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
@@ -10,6 +11,10 @@ from tout_doux.serializers.tag import TagSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
+    SORTS = {
+        'name': (Lower('name'), 'pk'),
+    }
+
     serializer_class = TagSerializer
     pagination_class = ExtendedPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -19,9 +24,11 @@ class TagViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.request.user.tags.all()
 
-        if 'exclude_ids' in self.request.query_params:
-            exclude_ids = map(lambda x: int(x), self.request.query_params.get('exclude_ids').split(','))
-            queryset = queryset.exclude(id__in=exclude_ids)
+        sort = self.request.query_params.get('sort')
+        if sort:
+            if sort not in self.SORTS:
+                raise ParseError(f'Sort must be one of {", ".join(self.SORTS)}')
+            queryset = queryset.order_by(*self.SORTS[sort])
 
         return queryset
 

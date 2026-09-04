@@ -2,7 +2,7 @@
 import { Tag, TagType } from '@/models/tag.model'
 import { tagApi } from '@/api'
 import TagChip from '@/views/components/tag/TagChip.vue'
-import { ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const selectedTags = defineModel<Tag[]>({ required: true })
 
@@ -13,51 +13,40 @@ const props = defineProps<{
 
 const tagList = ref<Tag[]>([])
 const search = ref<string>()
+const menu = ref(false)
 const isLoading = ref(false)
-let searchTimer: ReturnType<typeof setTimeout> | undefined = undefined
 
-watch(search, (value: string | undefined) => {
-  clearTimeout(searchTimer)
-
-  if (!value) {
-    cleanTagList()
-    return
-  }
-
+onMounted(() => {
   isLoading.value = true
-  searchTimer = setTimeout(() => searchTags(value), 200)
-})
-
-function searchTags(value: string): void {
-  const excludedId = selectedTags.value.map(({ id }) => id).join(',')
   tagApi
-    .getTagList({
-      type: props.type,
-      search: value,
-      size: 0,
-      exclude_ids: excludedId || undefined,
-    })
+    .getTagList({ type: props.type, sort: 'name', size: 200 })
     .then(response => (tagList.value = response.content))
     .catch(error => console.error(error))
     .finally(() => (isLoading.value = false))
-}
+})
 
 function updateSelectedTags(tags: Tag[]): void {
   selectedTags.value = [...tags]
-  cleanTagList()
+  menu.value = false
 }
 
-function cleanTagList(): void {
-  tagList.value = []
-  search.value = undefined
-  isLoading.value = false
+// Entrée seule reste au composant : Vuetify ouvre le menu. Cmd/Ctrl+Entrée valide le formulaire
+// porteur — et doit être interceptée en capture, car le `onKeydown` de Vuetify ne regarde aucun
+// modificateur et sélectionnerait le premier item au passage.
+function submitParentForm(event: KeyboardEvent): void {
+  if (!event.metaKey && !event.ctrlKey) return
+
+  event.preventDefault()
+  event.stopPropagation()
+  ;(event.target as HTMLElement).closest('form')?.requestSubmit()
 }
 </script>
 
 <template>
-  <div>
+  <div @keydown.enter.capture="submitParentForm($event)">
     <v-autocomplete
       v-model:search="search"
+      v-model:menu="menu"
       :model-value="selectedTags"
       :disabled
       :items="tagList"
@@ -67,7 +56,8 @@ function cleanTagList(): void {
       :menu-props="{ contentClass: 'background-elevation' }"
       multiple
       return-object
-      no-filter
+      hide-selected
+      clear-on-select
       hide-no-data
       hide-details
       density="compact"
@@ -83,5 +73,13 @@ function cleanTagList(): void {
         <!-- Empty to remove search when a tag is selected -->
       </template>
     </v-autocomplete>
+
+    <div v-if="!isLoading && !tagList.length" class="mt-1">
+      <router-link
+        :to="{ name: 'settings-tags', query: { type } }"
+        class="text-link text-body-medium text-green-lighten-1">
+        You currently have no {{ type }} tags. Click here to create your first tag !
+      </router-link>
+    </div>
   </div>
 </template>

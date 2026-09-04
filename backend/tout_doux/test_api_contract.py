@@ -5,6 +5,10 @@ Ces tests décrivent le comportement OBSERVABLE ACTUEL, y compris ses bizarrerie
 sur le code d'avant comme sur celui d'après, sans être modifiés entre les deux : c'est leur
 seule raison d'être. Un test qui échoue avant le chantier signale une attente fausse.
 
+Cette contrainte vaut pour une REFACTORISATION, dont ces tests sont le filet. Elle ne s'applique
+pas aux tests qui accompagnent une FONCTIONNALITE : ceux-là gèlent un contrat qui n'existait pas,
+et échouent donc légitimement sur le code d'avant.
+
 Ils utilisent force_authenticate : knox est en AUTO_REFRESH, donc une requête authentifiée peut
 écrire en base. Ce n'est pas gênant ici, mais test_query_counts.py en dépend, et les deux
 fichiers partagent cette classe de base.
@@ -539,4 +543,33 @@ class DailySummaryContractTest(DataFixtureTestCase):
             reverse('daily_task-summary'),
             {'start_date': 'pas-une-date', 'end_date': self.today.isoformat()},
         )
+        self.assertEqual(response.status_code, 400, response.data)
+
+
+class TagListContractTest(DataFixtureTestCase):
+    """La fixture crée `urgent` (project) puis `rapide` (task) : les pk suivent l'ordre de
+    création, ce qui rend l'ordre par défaut vérifiable sans antidater."""
+
+    def setUp(self):
+        super().setUp()
+        for name in ('Zebra', 'apple', 'Banana'):
+            Tag.objects.create(
+                user=self.user, type=Tag.Type.TASK, name=name, color=Tag.Color.BLUE
+            )
+
+    def tag_names(self, **params):
+        response = self.client.get(reverse('tag-list'), {'type': Tag.Type.TASK, **params})
+        self.assertEqual(response.status_code, 200, response.data)
+        return [item['name'] for item in response.data['content']]
+
+    def test_the_list_is_ordered_like_the_model(self):
+        self.assertEqual(self.tag_names(), ['rapide', 'Zebra', 'apple', 'Banana'])
+
+    def test_sort_by_name_is_alphabetical_whatever_the_case(self):
+        """`ORDER BY name` placerait Banana et Zebra avant apple et rapide sous la collation de
+        la base : le tri passe donc par `Lower('name')`."""
+        self.assertEqual(self.tag_names(sort='name'), ['apple', 'Banana', 'rapide', 'Zebra'])
+
+    def test_an_unknown_sort_is_rejected(self):
+        response = self.client.get(reverse('tag-list'), {'sort': 'color'})
         self.assertEqual(response.status_code, 400, response.data)

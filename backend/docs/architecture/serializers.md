@@ -74,7 +74,7 @@ tagIds    = serializers.PrimaryKeyRelatedField(source='tags', queryset=..., many
 ```
 
 Oublier la redéclaration expose le nom `snake_case` sans que rien ne le signale. Les query
-params, eux, n'ont pas été uniformisés : `start_date`, `exclude_ids` cohabitent avec
+params, eux, n'ont pas été uniformisés : `start_date`, `has_uncompleted_task` cohabitent avec
 `excludeId`.
 
 ## Où va quelle validation

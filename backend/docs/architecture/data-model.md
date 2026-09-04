@@ -65,15 +65,16 @@ voulu peuvent coexister le même jour. C'est le comportement souhaité, pas un t
 
 ## Ordonnancements par défaut
 
-| Modèle                             | `ordering`                                          | Effet               |
-| ---------------------------------- | --------------------------------------------------- | ------------------- |
-| `Project`, `Collection`, `Section` | `('-pk',)`                                          | plus récent d'abord |
-| `CommonTask`, `DailyTask`          | `('pk',)`                                           | ordre de création   |
-| `Feedback`                         | `('-date',)`                                        |                     |
-| `User`                             | `('date_joined',)`                                  |                     |
-| `Event`                            | `('start_date','end_date','start_time','end_time')` |                     |
-| `Task`                             | `('-completed_at','-pk')`                           | **voir ci-dessous** |
-| `Tag`, `Preferences`               | **aucun**                                           | **voir ci-dessous** |
+| Modèle                           | `ordering`                                          | Effet               |
+| -------------------------------- | --------------------------------------------------- | ------------------- |
+| `Project`, `Collection`          | `('-created_on', '-pk')`                            | plus récent d'abord |
+| `Section`                        | `('-pk',)`                                          | plus récent d'abord |
+| `CommonTask`, `DailyTask`, `Tag` | `('pk',)`                                           | ordre de création   |
+| `Feedback`                       | `('-date',)`                                        |                     |
+| `User`                           | `('date_joined',)`                                  |                     |
+| `Event`                          | `('start_date','end_date','start_time','end_time')` |                     |
+| `Task`                           | `('-completed_at','-pk')`                           | **voir ci-dessous** |
+| `Preferences`                    | **aucun**                                           |                     |
 
 **`Task` — l'ordre dépend du moteur.** `completed_at` est `NULL` tant que la tâche n'est pas
 faite, et PostgreSQL trie les `NULL` **en premier** en ordre décroissant (vérifié sur la base du
@@ -81,10 +82,21 @@ projet). Résultat : les tâches à faire remontent, puis les tâches faites de 
 plus ancienne. C'est le comportement voulu par l'UI, mais il **repose sur un défaut PostgreSQL**,
 pas sur une intention écrite. Un changement de moteur inverserait la liste.
 
-**`Tag` et `Preferences` n'ont pas d'ordre.** `TagViewSet` étant paginé, Django émet un
-`UnorderedObjectListWarning` et la pagination n'est pas déterministe. Sans effet visible
-aujourd'hui car le front demande `size=0` (tout d'un coup) — voir
-[api-surface.md](api-surface.md).
+**`Tag` trie par `pk`, faute d'horodatage.** Le modèle n'a ni `created_on` ni `created_at` :
+« ordre de création » s'écrit donc sur la clé primaire. Ce tri fixe aussi l'ordre des tags
+**imbriqués** dans les payloads projet et tâche — il correspond à ce que PostgreSQL renvoyait
+déjà en pratique, mais rien ne le garantissait. Il rend enfin la pagination de `TagViewSet`
+déterministe, ce qui devient nécessaire : le front demande une page réelle (`size=200`) et non
+plus `size=0`.
+
+**Le tri alphabétique est une option de la vue, pas du modèle** : `?sort=name` mappe sur
+`(Lower('name'), 'pk')` dans `TagViewSet.SORTS`. `Lower` n'est pas un raffinement — sous la
+collation de la base du projet (`en_US.utf8`, PostgreSQL 16), `ORDER BY name` place **toutes** les
+majuscules avant toutes les minuscules : mesuré, `('banana', 'Apple', 'cherry', 'Zebra')` ressort
+`Apple, Zebra, banana, cherry`. Les noms de tags étant saisis à la main, la casse est irrégulière.
+Les caractères accentués, eux, restent après `z` : les intercaler demanderait une collation ICU.
+
+**`Preferences` n'a pas d'ordre** — sans effet, l'endpoint ne sert qu'un objet unique.
 
 ## `limit_choices_to` ne protège rien ici
 

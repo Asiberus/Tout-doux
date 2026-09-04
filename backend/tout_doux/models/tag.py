@@ -35,6 +35,7 @@ class Tag(UserRelatedModel):
     color = models.CharField(choices=Color.choices, max_length=7)
 
     class Meta:
+        ordering = ('pk',)
         constraints = (
             models.UniqueConstraint(fields=('user', 'name', 'type'), name='unique_name_for_user_and_type'),
         )

@@ -121,6 +121,47 @@ Un `GROUP BY` suppose qu'une ligne appartient à un seul groupe. Ce n'est pas to
 les **bornes** en une requête et de balayer en Python — voir `daily_summary_counts` dans
 `tout_doux/queries.py`.
 
+## Étudié, non implémenté : trier les tags par nombre d'usages
+
+Étudié le 04/09/2026, **non retenu**. Consigné parce que la forme naïve n'est pas seulement
+lente, elle est **fausse**.
+
+`Tag` porte **quatre** relations inverses vers-plusieurs, que `Tag.Type` partitionne : un tag
+`project` n'est utilisé que par `projects`, un tag `task` par `tasks`, `daily_tasks` **et**
+`common_tasks`. Le compteur est donc une **somme sur trois ou quatre relations**, ce qui déclenche
+les trois coûts ci-dessus à la fois — le premier de façon rédhibitoire :
+`Count('tasks') + Count('daily_tasks') + Count('common_tasks')` multiplie les cardinalités entre
+elles et ne renvoie pas un compte trop lent, il renvoie un compte faux.
+
+La forme correcte :
+
+```python
+usage_count=(
+    scalar_count(Project.objects.filter(tags=OuterRef('pk')), 'tags')
+    + scalar_count(Task.objects.filter(tags=OuterRef('pk')), 'tags')
+    + scalar_count(DailyTask.objects.filter(tags=OuterRef('pk')), 'tags')
+    + scalar_count(CommonTask.objects.filter(tags=OuterRef('pk')), 'tags')
+)
+```
+
+Trois points à respecter le jour où on le fait :
+
+- **Ne pas sérialiser le compteur** s'il ne sert qu'à trier — on évite le couplage
+  sérialiseur ↔ annotation de [../architecture/serializers.md](../architecture/serializers.md).
+- **Le brancher comme une entrée de `TagViewSet.SORTS`**
+  (`'usage': ('-usage_count', Lower('name'))`), jamais comme `Meta.ordering` : un `order_by()`
+  explicite survit à un `GROUP BY`, `Meta.ordering` non.
+- **N'annoter que quand ce tri est demandé**, pour ne pas faire payer quatre sous-requêtes aux
+  autres appels.
+
+L'alternative dénormalisée — un champ `usage_count` maintenu par `m2m_changed` — coûterait zéro
+requête, mais demande quatre signaux (`add`, `remove`, `clear`, `post_clear`), une migration, un
+backfill, et introduit une dérive silencieuse. Disproportionné au volume actuel.
+
+Réserve indépendante de la technique : trier par usage rend l'ordre **instable dans le temps**,
+là où l'alphabétique est prévisible. Le compromis courant est de garder l'alphabétique comme ordre
+de liste et de ne biaiser que le premier résultat de l'autocomplete — celui qu'`Entrée` choisit.
+
 ## Sites d'application
 
 Liste maintenue à la main.
