@@ -44,13 +44,14 @@ Recette complète pour ajouter un endpoint :
 ## Contraintes non évidentes
 
 - **Enveloppe de pagination** — `Pagination<Data>` (`src/models/pagination.model.ts:1`) =
-  `{ count, page, size, first, last, content }`. 9 endpoints de liste la renvoient, **2 non**
-  (`getDailySummary`, `getEvents` renvoient un tableau nu). Le générique est instancié avec le
-  **tableau** (`Pagination<Tag[]>`), donc `content` est la liste. Chaque appelant fait
-  `response.content` à la main ; `count`/`page`/`first`/`last` ne sont **jamais lus** et 5
-  endpoints forcent `size: 0` pour désactiver la pagination — il n'y a aucune pagination dans
-  l'UI. Seule exception : `TagSearch` demande `size: 200`, un plafond franc et non paginé ;
-  au-delà, les tags surnuméraires sont **silencieusement absents** (W14).
+  `{ count, page, size, first, last, content }`. 9 endpoints de liste la renvoient, **3 non**
+  (`getDailySummary`, `getEvents` et `getCarryOverCandidates` renvoient un tableau nu, comme la
+  réponse du POST `carryOverPreviousDay`). Le générique est instancié avec le **tableau**
+  (`Pagination<Tag[]>`), donc `content` est la liste. Chaque appelant fait `response.content` à la
+  main ; `count`/`page`/`first`/`last` ne sont **jamais lus** et 5 endpoints forcent `size: 0`
+  pour désactiver la pagination — il n'y a aucune pagination dans l'UI. Seule exception :
+  `TagSearch` demande `size: 200`, un plafond franc et non paginé ; au-delà, les tags
+  surnuméraires sont **silencieusement absents** (W14).
 - **Gestion d'erreur = `console.error`.** Aucun modèle d'erreur typé (pas d'`ApiError`, pas de
   forme DRF `{detail}` / `{champ: string[]}`), aucun toast global. Les erreurs de validation sont
   consommées en `AxiosError.response.data` non typé, au cas par cas.

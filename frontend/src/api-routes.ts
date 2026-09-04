@@ -24,6 +24,8 @@ export const apiRoutes = {
   collectionById: 'collection/:collectionId/',
   dailyTask: 'daily-task/',
   dailyTaskSummary: 'daily-task/summary/',
+  dailyTaskCarryOverCandidates: 'daily-task/carry-over-candidates/',
+  dailyTaskCarryOver: 'daily-task/carry-over/',
   dailyTaskById: 'daily-task/:dailyTaskId/',
   tag: 'tag/',
   tagUnique: 'tag/is-name-unique/',

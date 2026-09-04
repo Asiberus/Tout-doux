@@ -16,6 +16,7 @@ import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/component
 import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
+import { useNotificationStore } from '@/store'
 import { computed, onBeforeMount, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -23,6 +24,7 @@ import { useDisplay } from 'vuetify'
 // Todo : add btn to create collection in no collection svg
 
 const { mdAndUp, smAndDown } = useDisplay()
+const notificationStore = useNotificationStore()
 
 const props = defineProps<{
   date: string
@@ -43,6 +45,8 @@ const dailyTaskList = ref<DailyTask[]>([])
 const projectList = ref<DailyTaskDisplayWrapper<ProjectDetail>[]>([])
 const collectionList = ref<DailyTaskDisplayWrapper<CollectionDetail>[]>([])
 const commonTaskList = ref<CommonTask[]>([])
+const carryOverCandidates = ref<DailyTask[]>([])
+const carryOverInProgress = ref(false)
 
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
@@ -60,8 +64,46 @@ function retrieveDailyTaskList(): void {
     .then(response => {
       dailyTaskList.value = response.content
       emit('daily-task-count', dailyTaskList.value.length)
+      if (dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
     })
     .catch(error => console.error(error))
+}
+
+function retrieveCarryOverCandidates(): void {
+  dailyTaskApi
+    .getCarryOverCandidates()
+    .then(response => (carryOverCandidates.value = response))
+    .catch(error => console.error(error))
+}
+
+function carryOverPreviousDay(): void {
+  if (carryOverInProgress.value) return
+
+  carryOverInProgress.value = true
+
+  dailyTaskApi
+    .carryOverPreviousDay()
+    .then(response => {
+      carryOverCandidates.value = []
+
+      if (response.length === 0) {
+        notificationStore.notifySuccess('Nothing left to copy from yesterday')
+        return
+      }
+
+      dailyTaskList.value.push(...response)
+      emit('daily-task-count', dailyTaskList.value.length)
+      notificationStore.notifySuccess(
+        response.length === 1
+          ? '1 task copied from yesterday'
+          : `${response.length} tasks copied from yesterday`
+      )
+    })
+    .catch(error => {
+      console.error(error)
+      notificationStore.notifyError("Could not copy yesterday's tasks")
+    })
+    .finally(() => (carryOverInProgress.value = false))
 }
 
 function retrieveProjectList(): void {
@@ -161,6 +203,7 @@ function deleteDailyTask(id: number): void {
       if (index !== -1) {
         dailyTaskList.value.splice(index, 1)
         emit('daily-task-count', dailyTaskList.value.length)
+        if (dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
       }
     })
     .catch(error => console.error(error))
@@ -339,11 +382,14 @@ function resetSelectedItem(): void {
 
     <DailyUpdateTaskList
       :daily-task-list="dailyTaskList"
+      :carry-over-candidates="carryOverCandidates"
+      :carry-over-in-progress="carryOverInProgress"
       class="daily-update-task__list"
       @create="createDailyTask($event)"
       @update="updateDailyTask($event)"
       @delete="deleteDailyTask($event)"
-      @select="select($event)" />
+      @select="select($event)"
+      @carry-over="carryOverPreviousDay()" />
   </div>
 </template>
 
