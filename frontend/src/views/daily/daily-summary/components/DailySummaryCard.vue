@@ -35,6 +35,10 @@ const backgroundColor = computed<string | undefined>(() => {
 
 const variant = computed<'tonal' | 'elevated'>(() => (props.upcoming ? 'tonal' : 'elevated'))
 
+const isClickable = computed<boolean>(
+  () => props.upcoming || props.dailySummary.totalTask > 0 || props.dailySummary.totalEvent > 0
+)
+
 function openDailyDetailDialog(): void {
   emit('open-daily-detail')
 }
@@ -46,17 +50,17 @@ function openDailyDetailDialog(): void {
     :ripple="false"
     class="rounded-lg"
     :variant
-    v-on="
-      upcoming || dailySummary.totalTask || dailySummary.totalEvent
-        ? { click: () => openDailyDetailDialog() }
-        : {}
-    ">
+    v-on="isClickable ? { click: () => openDailyDetailDialog() } : {}">
     <v-card-text class="daily-summary-card d-flex flex-row" :class="{ upcoming }">
       <div class="flex-grow-1">
-        <h1 class="text-headline-small font-weight-medium text-white mb-0">
+        <h1
+          class="text-headline-small font-weight-medium mb-0"
+          :class="{ 'text-white': isClickable, 'text-grey-darken-2': !isClickable }">
           {{ dateFormat(dailySummary.date, 'dddd') }}
         </h1>
-        <p class="text-title-small text-md-body-large mb-0">
+        <p
+          class="text-title-small text-md-body-large mb-0"
+          :class="{ 'text-grey-darken-2': !isClickable }">
           {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
         </p>
       </div>
