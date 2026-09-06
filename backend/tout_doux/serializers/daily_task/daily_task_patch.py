@@ -54,8 +54,12 @@ class DailyTaskPatchSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # This serializer is only used in a PATCH context, self.instance is always defined
-        if self.instance.date != date.today() and list(data) != ['completed']:
+        today = date.today()
+        if self.instance.date < today and list(data) != ['completed']:
             raise serializers.ValidationError('You can\'t edit a closed daily task')
+        if self.instance.date > today and 'completed' in data:
+            raise serializers.ValidationError(
+                'You can\'t complete a daily task planned for a future day')
 
         if self.instance.task or self.instance.common_task:
             # Only completed and action fields can be modified for a task/common_task related daily task

@@ -117,6 +117,11 @@ Les deux premières lignes sont des patterns à part entière :
 - **`FeedbackSerializer` est le seul à ne pas utiliser `HiddenField(CurrentUserDefault())`** :
   il injecte l'utilisateur dans `create()` (`feedback/feedback.py:22`). Voir
   [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md).
+- **`DailyTaskPostSerializer` neutralise ses validateurs dérivés** (`Meta.validators = ()`).
+  `date` étant un champ écrivable, DRF dérive un `UniqueTogetherValidator` de chacune des deux
+  `UniqueConstraint` de `DailyTask` ; ils rendraient `taskId` et `commonTaskId` obligatoires, et
+  un POST de ligne libre repartirait en 400. L'unicité est tenue à la main dans `validate()`, qui
+  répond 409. Unique dans le projet — ne pas reproduire sans cette raison.
 - **Deux classes n'ont pas le suffixe `Serializer`** : `UserAccountState` et
   `UserChangePassword`. Écart de nommage, pas de conséquence technique.
 

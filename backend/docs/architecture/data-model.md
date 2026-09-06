@@ -56,7 +56,7 @@ Voir [../domain/glossary.md](../domain/glossary.md).
 | `User`            | `email` unique (max 100)                                                | `models/user.py:11`             |
 | `Tag`             | `UniqueConstraint(user, name, type)`                                    | `models/tag.py:39`              |
 | `CommonTask`      | `UniqueConstraint(name, user)`                                          | `models/common_task.py:20`      |
-| `DailyTask`       | `UniqueConstraint(date, task)` et `UniqueConstraint(date, common_task)` | `models/daily_task.py:57`       |
+| `DailyTask`       | `UniqueConstraint(date, task)` et `UniqueConstraint(date, common_task)` | `models/daily_task.py:59`       |
 | `UserEmailChange` | `token` en clé primaire, table forcée à `tout_doux_user_email_change`   | `models/user_email_change.py:9` |
 
 ⚠️ **Les deux contraintes de `DailyTask` ne mordent pas sur les tâches libres.** PostgreSQL

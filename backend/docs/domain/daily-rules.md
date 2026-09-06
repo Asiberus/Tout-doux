@@ -20,16 +20,19 @@ Une ligne du plan vient de l'une des trois, **jamais de deux** :
 
 | Règle                                                       | Ligne  | Message                                                                           |
 | ----------------------------------------------------------- | ------ | --------------------------------------------------------------------------------- |
-| Pas de `taskId` **et** de `commonTaskId` ensemble           | 76     | `You can't create a daily task related to a task and a common task`               |
-| Une origine liée interdit `name` et `tags`                  | 78     | `You can't create a daily task related to a task/common task with a name or tags` |
-| Il faut au moins une origine                                | 82     | `You must provide a name or a task id or a common task id to create a daily task` |
-| La tâche source ne doit pas être déjà terminée              | 49     | `You can't link a completed task to a daily task`                                 |
-| Ni appartenir à un projet ou une collection archivé         | 51, 54 | voir [archive-guards](../patterns/archive-guards.md)                              |
-| La tâche / tâche récurrente doit appartenir à l'utilisateur | 45, 62 | `Invalid pk …`                                                                    |
+| `date` ne peut pas être dans le passé                       | 57     | `You can't plan a daily task on a past day`                                       |
+| `date` ne peut pas dépasser l'horizon d'un an               | 60     | `You can't plan a daily task more than a year ahead`                              |
+| Pas de `taskId` **et** de `commonTaskId` ensemble           | 98     | `You can't create a daily task related to a task and a common task`               |
+| Une origine liée interdit `name` et `tags`                  | 101    | `You can't create a daily task related to a task/common task with a name or tags` |
+| Il faut au moins une origine                                | 105    | `You must provide a name or a task id or a common task id to create a daily task` |
+| La tâche source ne doit pas être déjà terminée              | 71     | `You can't link a completed task to a daily task`                                 |
+| Ni appartenir à un projet ou une collection archivé         | 74, 77 | voir [archive-guards](../patterns/archive-guards.md)                              |
+| La tâche / tâche récurrente doit appartenir à l'utilisateur | 67, 84 | `Invalid pk …`                                                                    |
 
-**`date` n'est pas saisissable.** Le champ est `auto_now_add` : une ligne est toujours créée
-pour « aujourd'hui ». Il est donc impossible de planifier à l'avance ou de compléter un jour
-passé par l'API.
+**`date` est saisissable, et facultative.** Le champ porte `default=datetime.date.today` :
+l'omettre crée la ligne pour « aujourd'hui », comme avant. La fournir permet de **planifier à
+l'avance**, jusqu'à `MAX_PLANNING_HORIZON` — un an, constante du module. Le passé reste fermé
+à la création.
 
 **La même tâche ne peut pas être tirée deux fois le même jour** : contraintes
 `UniqueConstraint(date, task)` et `(date, common_task)`. En revanche, autant de lignes libres
@@ -37,22 +40,25 @@ que voulu — les `NULL` n'entrent pas en conflit. Voir
 [../architecture/data-model.md](../architecture/data-model.md).
 
 Le doublon est refusé par une garde écrite à la main dans `validate()`, qui répond **409**
-(`AlreadyInDailyError`, `exceptions.py`). Elle est nécessaire parce que `date` est en
-`auto_now_add` : le champ est hors du sérialiseur, DRF ne peut donc pas dériver la contrainte
-d'unicité, et l'insertion remontait auparavant en **500**. Deux POST simultanés peuvent encore
-passer la garde et lever un `IntegrityError`.
+(`AlreadyInDailyError`, `exceptions.py`), et qui porte sur la **date visée**, pas sur
+aujourd'hui. DRF saurait désormais dériver ces contraintes — `date` est un champ du sérialiseur —
+mais elles sont **délibérément désactivées** (`Meta.validators = ()`) : les
+`UniqueTogetherValidator` ainsi produits rendraient `taskId` et `commonTaskId` obligatoires, et
+un POST de ligne libre repartirait en 400 « This field is required ». Deux POST simultanés
+peuvent encore passer la garde et lever un `IntegrityError`.
 
 ## À la modification — `serializers/daily_task/daily_task_patch.py`
 
 | Règle                                                              | Ligne | Message                                                          |
 | ------------------------------------------------------------------ | ----- | ---------------------------------------------------------------- |
-| Un jour passé n'accepte **que** `completed`                        | 57    | `You can't edit a closed daily task`                             |
-| Une ligne d'origine liée n'accepte **que** `completed` et `action` | 62    | `You can't edit a daily task related to a task or a common task` |
+| Un jour **passé** n'accepte **que** `completed`                    | 59    | `You can't edit a closed daily task`                             |
+| Un jour **futur** accepte tout **sauf** `completed`                | 62    | `You can't complete a daily task planned for a future day`       |
+| Une ligne d'origine liée n'accepte **que** `completed` et `action` | 67    | `You can't edit a daily task related to a task or a common task` |
 
-Corollaire : `name` et `tags` ne sont modifiables que sur une ligne **libre**, et **le jour
-même**.
+Corollaire : `name` et `tags` ne sont modifiables que sur une ligne **libre**, et **pas sur un
+jour passé**. Une journée à venir se remanie librement ; elle ne se coche pas.
 
-> La troisième branche (`elif 'task' in data or 'common_task' in data`, ligne 64) est **du code
+> La troisième branche (`elif 'task' in data or 'common_task' in data`, ligne 68) est **du code
 > mort** : `Meta.fields` ne contient ni `task` ni `common_task`, donc ces clés ne peuvent jamais
 > apparaître dans `data`. Inoffensif, mais ne pas le prendre pour une protection active.
 
@@ -70,18 +76,21 @@ source, sous **quatre** conditions simultanées (`daily_task_patch.py:31`) :
 Si une seule condition manque, la ligne du daily est cochée **et la tâche source reste
 ouverte**. C'est voulu : « j'ai travaillé dessus aujourd'hui » n'est pas « c'est fini ».
 
+Une ligne datée d'un jour à venir n'entre jamais dans cette mécanique : `completed` y est refusé
+en amont, dans `validate()`. Aucune garde n'est donc posée dans `update()`.
+
 Dans le sens inverse, il n'y a **aucune** propagation : terminer une tâche via `task/{pk}/`
 laisse ses daily tasks inchangés.
 
 ## La suppression
 
-- **Un daily task ne peut être supprimé que le jour même** (`views/daily_task.py:63`, 403
-  `The daily task is not related to the current day`).
+- **Un daily task ne peut être supprimé que le jour même ou sur un jour à venir**
+  (`views/daily_task.py:83`, 403 `The daily task is related to a past day`).
 - **Supprimer la tâche source ne supprime pas la ligne du daily.** Un signal `pre_delete`
   (`models/task.py:53` et `models/common_task.py:24`) recopie d'abord le nom et les tags dans
   chaque `DailyTask` concerné ; la FK est ensuite mise à `NULL` (`on_delete=SET_NULL`). La ligne
   **devient une ligne libre** portant l'ancien libellé, et redevient donc modifiable — mais
-  seulement si elle date du jour.
+  pas si elle date d'un jour passé.
 
 ## Le report de la veille — `daily-task/carry-over…`
 
@@ -122,11 +131,16 @@ imposée à l'étendue demandée — voir [../quality/watched-risks.md](../quali
 
 ## ⚠️ « Aujourd'hui » est calculé en UTC
 
-`date.today()` (garde de suppression, garde de modification) et `auto_now_add` s'appuient sur
-l'horloge du conteneur, qui est en **UTC**, alors que `TIME_ZONE` vaut `Europe/Paris`. Entre
-minuit et 2 h du matin heure de Paris (1 h en hiver), le serveur est encore la veille :
-l'utilisateur voit le plan du nouveau jour côté client, mais le serveur refuse d'y supprimer une
-ligne et en crée de nouvelles datées de la veille.
+`date.today()` — gardes de suppression et de modification, validation de `date`, `default` du
+champ — s'appuie sur l'horloge du conteneur, qui est en **UTC**, alors que `TIME_ZONE` vaut
+`Europe/Paris`. Entre minuit et 2 h du matin heure de Paris (1 h en hiver), le serveur est
+encore la veille. Une ligne créée sans `date` explicite y est datée de la veille.
+
+Depuis l'ouverture de la planification, le **sens** de l'écart compte : la date UTC étant
+toujours ≤ la date parisienne, une `date` envoyée par le client n'est jamais refusée à tort. Le
+défaut est devenu permissif — pendant cette fenêtre, **la veille passe encore pour un jour non
+passé** : elle peut être créée, modifiée en entier et supprimée. Le blocage du passé a un trou
+de 1 à 2 h par nuit, assumé tant que R4 n'est pas traité.
 [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R4.
 
 ## Voir aussi

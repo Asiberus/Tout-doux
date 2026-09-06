@@ -20,8 +20,8 @@ def copy_daily_tasks_to_today(daily_tasks):
     Attend des lignes dont `tags` est préchargé — sinon la lecture des tags repart en une
     requête par ligne.
 
-    `date` n'est pas passée : `auto_now_add` la pose, y compris via `bulk_create`. PostgreSQL
-    renvoie les clés dans l'ordre soumis, d'où le `zip`.
+    `date` n'est pas passée : le `default` du champ la pose à la construction de l'instance, y
+    compris via `bulk_create`. PostgreSQL renvoie les clés dans l'ordre soumis, d'où le `zip`.
 
     Seules les colonnes de clé étrangère sont lues. Passer par `daily_task.user` n'est gratuit
     que tant que la vue part du manager de relation de l'utilisateur, qui pré-remplit le cache :
@@ -80,8 +80,8 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.date != date.today():
-            raise PermissionDenied('The daily task is not related to the current day')
+        if instance.date < date.today():
+            raise PermissionDenied('The daily task is related to a past day')
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

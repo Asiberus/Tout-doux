@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 
 from tout_doux.models.common_task import CommonTask
@@ -16,7 +18,7 @@ class DailyTask(UserRelatedModel):
         (FINISH, 'Finir'),
     )
 
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=datetime.date.today)
     task = models.ForeignKey(
         Task,
         on_delete=models.SET_NULL,
