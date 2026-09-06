@@ -20,3 +20,6 @@ export const TAG_COLOR_OPTIONS: string[] = [
   '#B71C1C',
   '#794948',
 ]
+
+// Miroir de MAX_PLANNING_HORIZON (backend, daily_task_post.py) : au-delà, le POST repart en 400.
+export const MAX_PLANNING_HORIZON_DAYS = 365

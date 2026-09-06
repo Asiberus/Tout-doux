@@ -5,7 +5,7 @@ import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import { eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
 
@@ -24,6 +24,15 @@ const eventList = ref<EventExtendedModel[]>([])
 const eventDialog = ref(false)
 
 onBeforeMount(() => retrieveEventList())
+
+watch(
+  () => props.date,
+  () => {
+    eventList.value = []
+    emit('daily-event-count', 0)
+    retrieveEventList()
+  }
+)
 
 function retrieveEventList(): void {
   eventApi

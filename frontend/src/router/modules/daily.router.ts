@@ -8,7 +8,7 @@ export const dailyRoutes: RouteRecordRaw[] = [
     path: '/daily/:date?',
     name: 'daily-summary',
     component: DailySummaryComponent,
-    props: ({ params }) => ({ date: params.date }),
+    props: ({ params, query }) => ({ date: params.date, upcoming: query.upcoming === 'true' }),
   },
   {
     path: '/daily/:date/update/:step(task|event)',

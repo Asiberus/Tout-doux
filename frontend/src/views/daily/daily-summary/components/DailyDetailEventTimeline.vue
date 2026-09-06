@@ -14,10 +14,13 @@ const props = defineProps<{
 }>()
 
 const eventText = computed<string>(() => {
-  if (moment().isSame(props.date, 'day'))
-    return `You have ${props.events.length} ${props.events.length > 1 ? 'events' : 'event'} today !`
-  else
-    return `You had ${props.events.length} ${props.events.length > 1 ? 'events' : 'event'} that day !`
+  const count = props.events.length
+  const plural = count > 1 ? 'events' : 'event'
+
+  if (moment(props.date).isAfter(moment(), 'day'))
+    return `You have ${count} ${plural} planned that day !`
+  if (moment().isSame(props.date, 'day')) return `You have ${count} ${plural} today !`
+  return `You had ${count} ${plural} that day !`
 })
 </script>
 

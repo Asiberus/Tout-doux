@@ -10,6 +10,7 @@ export enum DailyTaskAction {
 }
 
 export interface DailyTaskPost {
+  date: string
   name?: string
   tagIds?: number[]
   taskId?: number
@@ -17,6 +18,10 @@ export interface DailyTaskPost {
   // `null` = aucune action : c'est la valeur par défaut de DailyTaskForm, partagé avec l'édition
   action?: DailyTaskAction | null
 }
+
+// Ce qu'émet un composant qui compose une ligne sans savoir sur quel jour elle atterrira. Le
+// jour est ajouté par l'écran qui appelle l'API, seul à le connaître.
+export type DailyTaskDraft = Omit<DailyTaskPost, 'date'>
 
 export interface DailyTaskPatch {
   name?: string

@@ -4,8 +4,8 @@ import { CollectionDetail } from '@/models/collection.model'
 import {
   DailyTask,
   DailyTaskDisplayWrapper,
+  DailyTaskDraft,
   DailyTaskPatch,
-  DailyTaskPost,
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
@@ -17,7 +17,8 @@ import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/compone
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { useNotificationStore } from '@/store'
-import { computed, onBeforeMount, ref } from 'vue'
+import moment from 'moment'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 // Todo : add btn to create project in no project svg
@@ -51,11 +52,26 @@ const carryOverInProgress = ref(false)
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
 
+const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
 const areSomeProjectSelected = computed<boolean>(() =>
   projectList.value.some(({ selected }) => selected)
 )
 const areSomeCollectionSelected = computed<boolean>(() =>
   collectionList.value.some(({ selected }) => selected)
+)
+
+watch(
+  () => props.date,
+  () => {
+    // Les listes sont vidées avant le fetch : sans ça celles de la veille resteraient affichées
+    // sous l'en-tête du nouveau jour le temps de l'aller-retour.
+    dailyTaskList.value = []
+    emit('daily-task-count', 0)
+    carryOverCandidates.value = []
+    projectSectionSelected.value = 0
+    resetSelectedItem()
+    retrieveDailyTaskList()
+  }
 )
 
 function retrieveDailyTaskList(): void {
@@ -64,7 +80,10 @@ function retrieveDailyTaskList(): void {
     .then(response => {
       dailyTaskList.value = response.content
       emit('daily-task-count', dailyTaskList.value.length)
-      if (dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
+      // Les deux endpoints de report sont codés « veille → aujourd'hui », sans paramètre. Ne pas
+      // interroger les candidats hors du jour courant est ce qui empêche le bouton d'apparaître
+      // sur un jour à venir, où il écrirait dans aujourd'hui sans le dire.
+      if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
     })
     .catch(error => console.error(error))
 }
@@ -137,9 +156,9 @@ function fetchCommonTaskList(): void {
     .catch(error => console.error(error))
 }
 
-function createDailyTask(data: DailyTaskPost): void {
+function createDailyTask(data: DailyTaskDraft): void {
   dailyTaskApi
-    .createDailyTask(data)
+    .createDailyTask({ ...data, date: props.date })
     .then(response => {
       dailyTaskList.value.push(response)
       emit('daily-task-count', dailyTaskList.value.length)
@@ -203,7 +222,7 @@ function deleteDailyTask(id: number): void {
       if (index !== -1) {
         dailyTaskList.value.splice(index, 1)
         emit('daily-task-count', dailyTaskList.value.length)
-        if (dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
+        if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
       }
     })
     .catch(error => console.error(error))
@@ -381,6 +400,7 @@ function resetSelectedItem(): void {
     </v-tabs-window>
 
     <DailyUpdateTaskList
+      :date
       :daily-task-list="dailyTaskList"
       :carry-over-candidates="carryOverCandidates"
       :carry-over-in-progress="carryOverInProgress"

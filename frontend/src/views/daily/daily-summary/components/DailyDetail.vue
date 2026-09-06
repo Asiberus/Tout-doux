@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DailyTask, DailyTaskPost } from '@/models/daily-task.model'
+import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
 import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
@@ -7,6 +7,8 @@ import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/Dail
 import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
+import moment from 'moment'
 import { computed, ref, watch } from 'vue'
 import { dailyTaskApi, eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
@@ -22,6 +24,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'daily-task-completed': [date: string, numberOfDailyTaskCompleted: number]
   'daily-task-created': [date: string]
+  navigate: [date: string]
 }>()
 
 const dialogState = ref(false)
@@ -34,9 +37,15 @@ const isScrollingOnContent = ref(false)
 const numberOfDailyTaskCompleted = computed<number>(
   () => dailyTaskList.value.filter(({ completed }) => completed).length
 )
-const editBtnSize = computed<'large' | 'small' | 'default'>(() => {
+// Pas de borne vers l'arrière : un jour passé sans rien affiche simplement l'état vide.
+const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const isPassed = computed<boolean>(() => moment(props.date).isBefore(moment(), 'day'))
+const canGoForward = computed<boolean>(
+  () => moment(props.date).diff(moment().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+)
+const actionBtnSize = computed<'large' | 'small' | 'default'>(() => {
   if (smAndUp.value) return 'large'
-  else if (xs.value) return 'small'
+  else if (xs.value) return 'default'
   else return 'default'
 })
 
@@ -94,6 +103,14 @@ function switchTab(direction: 'right' | 'left'): void {
   else if (direction === 'left') tab.value = 'event'
 }
 
+function shiftDay(offset: number): void {
+  emit('navigate', moment(props.date).add(offset, 'day').format('YYYY-MM-DD'))
+}
+
+function goToToday(): void {
+  emit('navigate', moment().format('YYYY-MM-DD'))
+}
+
 function setDialogStateTo(value: boolean): void {
   dialogState.value = value
   show.value = value
@@ -109,8 +126,8 @@ function toggleDailyTask(dailyTask: DailyTask): void {
   )
 }
 
-function createDailyTask(data: DailyTaskPost): void {
-  dailyTaskApi.createDailyTask(data).then(
+function createDailyTask(data: DailyTaskDraft): void {
+  dailyTaskApi.createDailyTask({ ...data, date: props.date }).then(
     response => {
       dailyTaskList.value.push(response)
       emit('daily-task-created', props.date)
@@ -146,20 +163,60 @@ function emitDailyTaskCompletedEvent(): void {
         </v-btn>
       </div>
 
-      <div class="d-flex align-center gap-2 mb-2 mb-sm-3 mb-md-5 mb-lg-10">
-        <h1 class="text-headline-large text-sm-display-medium text-md-display-large">
+      <div
+        class="d-flex flex-column flex-sm-row align-center flex-wrap gap-1 mb-2 mb-sm-3 mb-md-5 mb-lg-10">
+        <h1
+          class="text-headline-large text-sm-display-medium text-md-display-large text-center text-sm-start">
           {{ dateFormat(date, 'dddd DD MMMM Y') }}
         </h1>
-        <v-btn
-          :to="{ name: 'daily-update', params: { date, step: 'task' } }"
-          icon
-          variant="text"
-          density="comfortable"
-          :size="editBtnSize"
-          class="ml-1"
-          title="Edit day">
-          <v-icon icon="mdi-pencil" />
-        </v-btn>
+
+        <div class="d-flex align-center gap-2 ml-0 ml-sm-auto">
+          <v-btn
+            v-if="xs || !isToday"
+            icon
+            :disabled="xs && isToday"
+            variant="text"
+            density="comfortable"
+            class="today-btn"
+            :size="actionBtnSize"
+            title="Today"
+            @click="goToToday()">
+            <v-icon icon="mdi-calendar-heart" />
+          </v-btn>
+          <v-btn
+            icon
+            variant="text"
+            density="comfortable"
+            :size="actionBtnSize"
+            title="Previous day"
+            class="previous-day-btn"
+            @click="shiftDay(-1)">
+            <v-icon icon="mdi-calendar-end" />
+          </v-btn>
+          <v-btn
+            icon
+            variant="text"
+            density="comfortable"
+            :size="actionBtnSize"
+            :disabled="!canGoForward"
+            title="Next day"
+            class="next-day-btn"
+            @click="shiftDay(1)">
+            <v-icon icon="mdi-calendar-end" />
+          </v-btn>
+
+          <v-btn
+            :to="{ name: 'daily-update', params: { date, step: 'task' } }"
+            :disabled="isPassed"
+            icon
+            variant="text"
+            density="comfortable"
+            :size="actionBtnSize"
+            title="Edit day"
+            class="edit-btn">
+            <v-icon icon="mdi-pencil" />
+          </v-btn>
+        </div>
       </div>
 
       <template v-if="dailyTaskList.length === 0 && events.length === 0">
@@ -171,6 +228,12 @@ function emitDailyTaskCompletedEvent(): void {
               src="../../../../assets/empty-daily-detail.svg"
               alt="empty daily detail"
               class="empty-list-display__img" />
+          </template>
+          <template v-if="!isPassed" #action>
+            <v-btn>
+              <v-icon icon="mdi-calendar-edit" start />
+              Prepare the day
+            </v-btn>
           </template>
         </EmptyListDisplay>
       </template>
@@ -255,11 +318,23 @@ function emitDailyTaskCompletedEvent(): void {
   }
 }
 
+// Dupliqué depuis DailyUpdate.vue, qui a le même en-tête de navigation. À la troisième
+// occurrence, monter la règle dans global.scss.
+.previous-day-btn .v-icon {
+  transform: scaleX(-1);
+}
+
+.actions-group {
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
+    margin-left: 0;
+  }
+}
+
 .empty-list-display {
   flex-grow: 1;
 
   &__img {
-    width: clamp(200px, 25%, 400px);
+    width: clamp(200px, 25%, 300px);
   }
 }
 </style>

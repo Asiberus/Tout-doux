@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
   DailyTask,
+  DailyTaskDraft,
   DailyTaskPatch,
-  DailyTaskPost,
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
@@ -13,13 +13,14 @@ import { computed, ref, watch } from 'vue'
 // todo : maybe change v-hover on daily task card
 
 const props = defineProps<{
+  date: string
   dailyTaskList: DailyTask[]
   carryOverCandidates: DailyTask[]
   carryOverInProgress: boolean
 }>()
 
 const emit = defineEmits<{
-  create: [data: DailyTaskPost]
+  create: [data: DailyTaskDraft]
   update: [event: { id: number; data: DailyTaskPatch }]
   delete: [id: number]
   select: [event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }]
@@ -54,7 +55,15 @@ watch(selectedDailyTask, (value: number | null) => {
   if (value !== null) createDailyTaskDisplayed.value = false
 })
 
-function createDailyTask(data: DailyTaskPost): void {
+watch(
+  () => props.date,
+  () => {
+    selectedDailyTask.value = null
+    createDailyTaskDisplayed.value = false
+  }
+)
+
+function createDailyTask(data: DailyTaskDraft): void {
   createDailyTaskDisplayed.value = false
   emit('create', data)
 }

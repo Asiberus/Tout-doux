@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
-import { DailyTask, DailyTaskPost } from '@/models/daily-task.model'
+import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
 import moment from 'moment/moment'
 import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -15,11 +15,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'toggle-daily-task': [dailyTask: DailyTask]
-  'create-daily-task': [data: DailyTaskPost]
+  'create-daily-task': [data: DailyTaskDraft]
 }>()
 
 const createFormDisplayed = ref(false)
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const isPast = computed<boolean>(() => moment(props.date).isBefore(moment(), 'day'))
+const isFuture = computed<boolean>(() => moment(props.date).isAfter(moment(), 'day'))
+const isToday = computed<boolean>(() => !isPast.value && !isFuture.value)
 const addTaskCardVariant = computed<'elevated' | 'outlined'>(() =>
   createFormDisplayed.value ? 'elevated' : 'outlined'
 )
@@ -36,6 +38,12 @@ const numberOfDailyTaskUncompleted = computed<number>(
   () => props.dailyTaskList.filter(({ completed }) => !completed).length
 )
 const taskText = computed<string>(() => {
+  if (isFuture.value) {
+    return props.dailyTaskList.length > 1
+      ? `${props.dailyTaskList.length} tasks planned for that day`
+      : '1 task planned for that day'
+  }
+
   if (isToday.value) {
     if (numberOfDailyTaskUncompleted.value > 0)
       return `You have ${numberOfDailyTaskUncompleted.value} ${
@@ -52,10 +60,12 @@ const taskText = computed<string>(() => {
 })
 
 function toggleDailyTask(dailyTask: DailyTask): void {
+  // Le serveur refuse `completed` sur un jour à venir : ne pas laisser la carte en donner l'air.
+  if (isFuture.value) return
   emit('toggle-daily-task', dailyTask)
 }
 
-function createDailyTask(data: DailyTaskPost): void {
+function createDailyTask(data: DailyTaskDraft): void {
   createFormDisplayed.value = false
   emit('create-daily-task', data)
 }
@@ -83,16 +93,24 @@ function createDailyTask(data: DailyTaskPost): void {
         :size="xs ? 'small' : 'default'"
         :dot-color="dailyTask.completed ? 'green-darken-2' : 'surface'">
         <template #icon>
-          <div v-ripple class="icon-wrapper" @click="toggleDailyTask(dailyTask)">
+          <div
+            v-ripple="!isFuture"
+            class="icon-wrapper"
+            :class="{ 'icon-wrapper--inert': isFuture }"
+            @click="toggleDailyTask(dailyTask)">
             <v-icon v-if="dailyTask.completed" icon="mdi-check" :size="xs ? 'small' : 'default'" />
             <v-icon v-else icon="mdi-trophy" :size="xs ? 'small' : 'default'" />
           </div>
         </template>
-        <DailyTaskCard :daily-task="dailyTask" caret @toggle="toggleDailyTask(dailyTask)" />
+        <DailyTaskCard
+          :daily-task="dailyTask"
+          caret
+          :toggleable="!isFuture"
+          @toggle="toggleDailyTask(dailyTask)" />
       </v-timeline-item>
 
       <v-timeline-item
-        v-if="isToday"
+        v-if="!isPast"
         :size="xs ? 'small' : 'default'"
         :line-inset="2"
         class="add-task-item"
@@ -256,6 +274,10 @@ $rail-period: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    &--inert {
+      cursor: default;
+    }
   }
 }
 </style>
