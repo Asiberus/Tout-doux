@@ -261,9 +261,16 @@ function emitDailyTaskCompletedEvent(): void {
               <v-stepper-item
                 value="event"
                 editable
-                :color="tab === 'event' ? 'accent' : 'stepperInactive'"
-                icon="mdi-calendar-clock"
-                edit-icon="mdi-calendar-clock">
+                :color="tab === 'event' ? 'accent' : 'stepperInactive'">
+                <template #icon>
+                  <v-badge
+                    :model-value="events.length > 0"
+                    :content="events.length"
+                    color="warning"
+                    floating>
+                    <v-icon icon="mdi-calendar-clock" />
+                  </v-badge>
+                </template>
                 <template #title>Events</template>
               </v-stepper-item>
               <v-divider />
@@ -375,6 +382,8 @@ function emitDailyTaskCompletedEvent(): void {
   :deep(.v-stepper-item__avatar.v-avatar) {
     width: var(--stepper-avatar-size) !important;
     height: var(--stepper-avatar-size) !important;
+    // Sans ça le badge d'événements de l'étape Events est rogné par le cercle de l'avatar
+    overflow: visible;
 
     .v-icon {
       font-size: var(--stepper-icon-size);

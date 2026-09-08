@@ -9,7 +9,7 @@ import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
-const { xs } = useDisplay()
+const { xs, mdAndDown } = useDisplay()
 const router = useRouter()
 
 const props = defineProps<{
@@ -135,9 +135,16 @@ watch(dailyStepper, index => {
         <v-stepper-item
           :value="2"
           editable
-          :color="dailyStepper === 2 ? 'accent' : 'stepperInactive'"
-          icon="mdi-calendar-clock"
-          edit-icon="mdi-calendar-clock">
+          :color="dailyStepper === 2 ? 'accent' : 'stepperInactive'">
+          <template #icon>
+            <v-badge
+              :model-value="mdAndDown && dailyEventCount > 0"
+              :content="dailyEventCount"
+              color="warning"
+              floating>
+              <v-icon icon="mdi-calendar-clock" />
+            </v-badge>
+          </template>
           <template #title>
             Event
             <template v-if="dailyEventCount > 0">({{ dailyEventCount }})</template>
@@ -206,6 +213,8 @@ watch(dailyStepper, index => {
   :deep(.v-stepper-item__avatar.v-avatar) {
     width: var(--stepper-avatar-size) !important;
     height: var(--stepper-avatar-size) !important;
+    // Sans ça le badge d'événements de l'étape Event est rogné par le cercle de l'avatar
+    overflow: visible;
 
     .v-icon {
       font-size: var(--stepper-icon-size);
