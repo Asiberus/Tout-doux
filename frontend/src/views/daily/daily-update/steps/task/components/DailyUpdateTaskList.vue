@@ -8,7 +8,10 @@ import {
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
-import { computed, ref, watch } from 'vue'
+import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useDisplay } from 'vuetify'
+
+const { smAndDown, smAndUp } = useDisplay()
 
 // todo : maybe change v-hover on daily task card
 
@@ -28,8 +31,11 @@ const emit = defineEmits<{
 }>()
 
 const selectedDailyTask = ref<number | null>(null)
-const createDailyTaskDisplayed = ref(false)
+// Exposé au parent : sur mobile l'en-tête reste visible quand la feuille est repliée, et le « + »
+// doit alors la dérouler sur le formulaire déjà ouvert
+const createDailyTaskDisplayed = defineModel<boolean>('createDisplayed', { default: false })
 const carryOverHovered = ref(false)
+const createCard = useTemplateRef<ComponentPublicInstance>('createCard')
 
 const carryOverDisplayed = computed<boolean>(
   () => props.dailyTaskList.length === 0 && props.carryOverCandidates.length > 0
@@ -47,8 +53,14 @@ const carryOverTitle = computed<string>(() =>
     : `Copy ${props.carryOverCandidates.length} unfinished tasks from yesterday`
 )
 
-watch(createDailyTaskDisplayed, (value: boolean) => {
-  if (value) selectedDailyTask.value = null
+watch(createDailyTaskDisplayed, async (value: boolean) => {
+  if (!value) return
+
+  selectedDailyTask.value = null
+
+  // Le formulaire naît en fin de liste, donc sous le bord du défileur ; `end` l'aligne sur ce bord
+  await nextTick()
+  createCard.value?.$el.scrollIntoView({ behavior: 'smooth', block: 'end' })
 })
 
 watch(selectedDailyTask, (value: number | null) => {
@@ -91,9 +103,15 @@ function carryOver(): void {
 
 <template>
   <div class="d-flex flex-column">
-    <div class="d-flex align-center mb-3">
-      <h2 class="text-headline-small mr-2">Tasks of the day</h2>
-      <v-chip v-if="dailyTaskList.length > 0" size="small">
+    <div class="daily-task-list__header task-sheet__drag-zone d-flex align-center">
+      <h2 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
+        Tasks of the day
+      </h2>
+      <v-chip
+        v-if="dailyTaskList.length > 0"
+        :key="dailyTaskList.length"
+        size="small"
+        class="daily-task-list__counter">
         {{ dailyTaskList.length }}
       </v-chip>
       <v-spacer />
@@ -110,8 +128,8 @@ function carryOver(): void {
           :loading="carryOverInProgress"
           :disabled="carryOverInProgress"
           @click="carryOver()">
-          <v-icon start icon="mdi-history" />
-          Copy tasks from yesterday
+          <v-icon :start="smAndUp" icon="mdi-history" />
+          <template v-if="smAndUp">Copy tasks from yesterday</template>
         </v-btn>
       </v-hover>
       <v-btn
@@ -149,7 +167,10 @@ function carryOver(): void {
           </div>
         </template>
         <template v-if="createDailyTaskDisplayed">
-          <v-card class="rounded-lg pa-4">
+          <v-card
+            ref="createCard"
+            :color="smAndDown ? 'surface-container-highest' : undefined"
+            class="rounded-lg pa-4">
             <DailyTaskForm
               @submit="createDailyTask($event)"
               @close="createDailyTaskDisplayed = false" />
@@ -174,6 +195,36 @@ function carryOver(): void {
 <style scoped lang="scss">
 @use 'sass:map';
 @use '@/styles/breakpoints' as variables;
+
+.daily-task-list__header {
+  margin-bottom: 12px;
+}
+
+// Le `key` du chip le fait remonter à chaque valeur, ce qui rejoue l'animation — au chargement
+// du jour comprise
+.daily-task-list__counter {
+  animation: counter-pop 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes counter-pop {
+  40% {
+    transform: scale(1.3);
+  }
+}
+
+@media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
+  // En feuille, l'en-tête reste au-dessus du défilement. Le `padding` remplace la marge, sinon
+  // le contenu défilerait dans l'interstice laissé sous un en-tête collant
+  .daily-task-list__header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    background: rgb(var(--v-theme-surface-container-high));
+    cursor: pointer;
+  }
+}
 
 .daily-task-wrapper {
   overflow-y: auto;

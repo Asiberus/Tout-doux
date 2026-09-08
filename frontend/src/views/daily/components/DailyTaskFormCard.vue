@@ -7,6 +7,9 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { computed } from 'vue'
+import { useDisplay } from 'vuetify'
+
+const { smAndDown } = useDisplay()
 
 const props = defineProps<{
   dailyTask: DailyTask
@@ -49,7 +52,9 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 </script>
 
 <template>
-  <v-card class="daily-task-form-card rounded-lg">
+  <v-card
+    :color="smAndDown ? 'surface-container-highest' : undefined"
+    class="daily-task-form-card rounded-lg">
     <template v-if="!editMode && dailyTask">
       <div class="daily-task-form-card__content">
         <div class="daily-task-form-card__actions">

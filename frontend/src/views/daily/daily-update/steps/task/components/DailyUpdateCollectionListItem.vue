@@ -120,8 +120,7 @@ function createTask(data: TaskPost): void {
               :small="true"
               :completable="false"
               :display-options="false"
-              :elevation="3"
-              color="grey-darken-4"
+              color="surface-container-high"
               @click="selectTask(task)">
             </TaskCard>
 
@@ -195,7 +194,9 @@ function createTask(data: TaskPost): void {
 }
 
 .create-task-card {
-  min-height: 100%;
+  // `min-height: 100%` se résout à zéro dans une grille : la carte s'écrasait à 2px (projet) ou
+  // 46px (collection). Valeur alignée sur le minimum d'une `TaskCard` `small`
+  min-height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;

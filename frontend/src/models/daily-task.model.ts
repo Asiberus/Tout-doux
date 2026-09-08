@@ -57,3 +57,9 @@ export enum DailyUpdateTaskTab {
   'Collection',
   'CommonTask',
 }
+
+export enum DailyTaskSheetDetent {
+  Collapsed,
+  Half,
+  Full,
+}
