@@ -106,7 +106,7 @@ function isCommonTaskSelected(id: number): boolean {
   align-items: center;
   justify-content: center;
   border-style: dashed;
-  color: map.get(colors.$grey, 'darken-4');
+  color: map.get(colors.$grey, 'darken-3');
   transition: color 0.2s ease-in-out;
 
   @media (hover: hover) {

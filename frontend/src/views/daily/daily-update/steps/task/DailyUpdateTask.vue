@@ -134,6 +134,10 @@ function carryOverPreviousDay(): void {
 
       dailyTaskList.value.push(...response)
       emit('daily-task-count', dailyTaskList.value.length)
+      taskSheetDetent.value =
+        response.length > SHEET_FULL_TASK_COUNT
+          ? DailyTaskSheetDetent.Full
+          : DailyTaskSheetDetent.Half
       notificationStore.notifySuccess(
         response.length === 1
           ? '1 task copied from yesterday'

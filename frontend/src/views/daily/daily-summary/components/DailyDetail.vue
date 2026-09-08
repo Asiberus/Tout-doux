@@ -156,7 +156,7 @@ function emitDailyTaskCompletedEvent(): void {
         right: () => switchTab('right'),
         down: scrollDownEvent,
       }"
-      class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-8">
+      class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-4 pr-sm-6 pr-md-8">
       <div class="actions-wrapper">
         <v-btn icon variant="text" density="comfortable" @click="setDialogStateTo(false)">
           <v-icon icon="mdi-close" />
@@ -240,11 +240,35 @@ function emitDailyTaskCompletedEvent(): void {
 
       <template v-if="mdAndDown">
         <template v-if="dailyTaskList.length > 0 && events.length > 0">
-          <!-- Tabs -->
-          <v-tabs v-model="tab" bg-color="transparent" color="accent" grow class="flex-grow-0">
-            <v-tab value="task">Tasks</v-tab>
-            <v-tab value="event">Events</v-tab>
-          </v-tabs>
+          <!-- Stepper (même composant que DailyUpdate.vue) -->
+          <v-stepper
+            v-model="tab"
+            non-linear
+            alt-labels
+            mobile-breakpoint="lg"
+            class="daily-detail-stepper flex-grow-0">
+            <v-stepper-header>
+              <v-divider />
+              <v-stepper-item
+                value="task"
+                editable
+                :color="tab === 'task' ? 'accent' : 'stepperInactive'"
+                icon="mdi-trophy"
+                edit-icon="mdi-trophy">
+                <template #title>Tasks</template>
+              </v-stepper-item>
+              <v-divider />
+              <v-stepper-item
+                value="event"
+                editable
+                :color="tab === 'event' ? 'accent' : 'stepperInactive'"
+                icon="mdi-calendar-clock"
+                edit-icon="mdi-calendar-clock">
+                <template #title>Events</template>
+              </v-stepper-item>
+              <v-divider />
+            </v-stepper-header>
+          </v-stepper>
 
           <v-tabs-window v-model="tab" :touch="false" class="bg-transparent py-2 pa-sm-2 pa-md-4">
             <v-tabs-window-item value="task">
@@ -335,6 +359,71 @@ function emitDailyTaskCompletedEvent(): void {
 
   &__img {
     width: clamp(200px, 25%, 300px);
+  }
+}
+
+// Dupliqué depuis DailyUpdate.vue (2ᵉ occurrence, cf. règle .previous-day-btn plus haut) : à la
+// prochaine, monter dans global.scss.
+.daily-detail-stepper {
+  box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+
+  --stepper-avatar-size: 35px;
+  --stepper-icon-size: 18px;
+
+  :deep(.v-stepper-item__avatar.v-avatar) {
+    width: var(--stepper-avatar-size) !important;
+    height: var(--stepper-avatar-size) !important;
+
+    .v-icon {
+      font-size: var(--stepper-icon-size);
+    }
+  }
+
+  :deep(.v-stepper-header) {
+    box-shadow: none !important;
+    margin-bottom: 4px;
+
+    .v-divider:first-child {
+      margin-inline-start: 0;
+    }
+
+    .v-divider:last-child {
+      margin-inline-end: 0;
+    }
+  }
+
+  :deep(.v-stepper-item) {
+    border-radius: 8px;
+  }
+
+  @media #{map.get(variables.$display-breakpoints, 'xs')} {
+    :deep(.v-stepper-item) {
+      padding: 8px;
+      flex: 1 1 0;
+      border-radius: 8px;
+    }
+
+    :deep(.v-stepper-item__avatar.v-avatar) {
+      margin-bottom: 0;
+    }
+
+    :deep(.v-stepper-header) {
+      .v-divider {
+        display: none;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(var(--v-border-color), var(--v-border-opacity));
+      }
+    }
   }
 }
 </style>

@@ -147,7 +147,7 @@ function createDailyTask(data: DailyTaskDraft): void {
 @use 'vuetify/lib/styles/settings/colors';
 @use '@/styles/breakpoints' as variables;
 
-$add-task-color-idle: map.get(colors.$grey, 'darken-4');
+$add-task-color-idle: map.get(colors.$grey, 'darken-3');
 $add-task-color-active: map.get(colors.$grey, 'darken-1');
 $add-task-transition: all 0.2s ease-in-out;
 
@@ -165,18 +165,20 @@ $rail-period: 6px;
   @media #{map.get(variables.$display-breakpoints, 'xs')} {
     --bar-left: 11px;
     --divider-width: 40px;
-    --divider-justify-content: flex-start;
   }
 
   @media #{map.get(variables.$display-breakpoints, 'sm')} {
     --bar-left: 18px;
     --divider-width: 55px;
-    --divider-justify-content: flex-start;
   }
 
   // Le modificateur est nécessaire pour égaler la spécificité du sélecteur Vuetify qui pose ces 24px
   &.v-timeline--side-end .v-timeline-item :deep(.v-timeline-item__body) {
     padding-inline-start: 0;
+
+    @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
+      padding-inline-start: 8px;
+    }
   }
 
   .v-timeline-item {
@@ -190,7 +192,6 @@ $rail-period: 6px;
 
     & :deep(.v-timeline-item__body) {
       width: 100%;
-      max-width: calc(100% - var(--divider-width));
     }
 
     & :deep(.v-timeline-divider) {

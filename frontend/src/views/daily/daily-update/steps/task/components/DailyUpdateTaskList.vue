@@ -11,7 +11,7 @@ import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const { smAndDown, smAndUp } = useDisplay()
+const { smAndDown, mdAndDown, lgAndUp } = useDisplay()
 
 // todo : maybe change v-hover on daily task card
 
@@ -124,12 +124,13 @@ function carryOver(): void {
           v-bind="hoverProps"
           size="small"
           class="mr-1"
+          :variant="mdAndDown ? 'text' : undefined"
           :title="carryOverTitle"
           :loading="carryOverInProgress"
           :disabled="carryOverInProgress"
           @click="carryOver()">
-          <v-icon :start="smAndUp" icon="mdi-history" />
-          <template v-if="smAndUp">Copy tasks from yesterday</template>
+          <v-icon :start="lgAndUp" icon="mdi-history" />
+          <template v-if="lgAndUp">Copy from yesterday</template>
         </v-btn>
       </v-hover>
       <v-btn
