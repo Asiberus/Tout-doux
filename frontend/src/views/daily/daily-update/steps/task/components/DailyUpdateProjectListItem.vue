@@ -295,6 +295,7 @@ function createTask(data: TaskPost): void {
     .v-card-text {
       .section-wrapper {
         flex-grow: 0;
+        flex-shrink: 0;
       }
 
       .tab-item-wrapper {
