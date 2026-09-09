@@ -12,6 +12,9 @@ defineProps<{
     <div class="img-description">
       <slot name="message">{{ message }}</slot>
     </div>
+    <div class="action">
+      <slot name="action"></slot>
+    </div>
   </div>
 </template>
 
@@ -25,6 +28,10 @@ defineProps<{
   .img-description {
     margin-top: 1.5rem;
     text-align: center;
+  }
+
+  .action {
+    margin-top: 1rem;
   }
 }
 </style>

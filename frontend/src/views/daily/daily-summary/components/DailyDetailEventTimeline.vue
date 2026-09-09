@@ -14,10 +14,13 @@ const props = defineProps<{
 }>()
 
 const eventText = computed<string>(() => {
-  if (moment().isSame(props.date, 'day'))
-    return `You have ${props.events.length} ${props.events.length > 1 ? 'events' : 'event'} today !`
-  else
-    return `You had ${props.events.length} ${props.events.length > 1 ? 'events' : 'event'} that day !`
+  const count = props.events.length
+  const plural = count > 1 ? 'events' : 'event'
+
+  if (moment(props.date).isAfter(moment(), 'day'))
+    return `You have ${count} ${plural} planned that day !`
+  if (moment().isSame(props.date, 'day')) return `You have ${count} ${plural} today !`
+  return `You had ${count} ${plural} that day !`
 })
 </script>
 
@@ -67,18 +70,20 @@ const eventText = computed<string>(() => {
   @media #{map.get(variables.$display-breakpoints, 'xs')} {
     --bar-left: 11px;
     --divider-width: 40px;
-    --divider-justify-content: flex-start;
   }
 
   @media #{map.get(variables.$display-breakpoints, 'sm')} {
     --bar-left: 18px;
     --divider-width: 55px;
-    --divider-justify-content: flex-start;
   }
 
   // Le modificateur est nécessaire pour égaler la spécificité du sélecteur Vuetify qui pose ces 24px
   &.v-timeline--side-end .v-timeline-item :deep(.v-timeline-item__body) {
     padding-inline-start: 0;
+
+    @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
+      padding-inline-start: 8px;
+    }
   }
 
   .v-timeline-item {

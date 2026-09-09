@@ -2,12 +2,22 @@
 import { TagType } from '@/models/tag.model'
 import SettingsTagList from '@/views/settings/components/SettingsTagList.vue'
 import TertiaryTitle from '@/components/TertiaryTitle.vue'
-import { ref, useTemplateRef } from 'vue'
+import { useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
 
 const settingsTagListComponent = useTemplateRef<InstanceType<typeof SettingsTagList>>('tagList')
 
-const tab = ref<TagType>('project')
+defineProps<{
+  type: TagType
+}>()
+
+const router = useRouter()
+
 const tagTypes: TagType[] = ['project', 'task']
+
+function changeType(type: TagType): void {
+  router.replace({ query: { type } })
+}
 
 function openTagDialog(): void {
   settingsTagListComponent.value?.openTagDialog()
@@ -23,14 +33,18 @@ function openTagDialog(): void {
     </p>
 
     <div class="d-flex justify-space-between align-center mb-1">
-      <v-chip-group v-model="tab" mandatory selected-class="active">
+      <v-chip-group
+        :model-value="type"
+        mandatory
+        selected-class="active"
+        @update:model-value="changeType($event)">
         <v-chip
-          v-for="type of tagTypes"
-          :key="type"
-          :value="type"
+          v-for="tagType of tagTypes"
+          :key="tagType"
+          :value="tagType"
           :ripple="false"
           class="text-label-medium outlined px-2 px-sm-6 py-3">
-          {{ type }}
+          {{ tagType }}
         </v-chip>
       </v-chip-group>
 
@@ -40,7 +54,7 @@ function openTagDialog(): void {
       </v-btn>
     </div>
 
-    <SettingsTagList ref="tagList" :type="tab" />
+    <SettingsTagList ref="tagList" :type="type" />
   </div>
 </template>
 

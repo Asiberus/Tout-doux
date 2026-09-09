@@ -44,12 +44,14 @@ Recette complète pour ajouter un endpoint :
 ## Contraintes non évidentes
 
 - **Enveloppe de pagination** — `Pagination<Data>` (`src/models/pagination.model.ts:1`) =
-  `{ count, page, size, first, last, content }`. 9 endpoints de liste la renvoient, **2 non**
-  (`getDailySummary`, `getEvents` renvoient un tableau nu). Le générique est instancié avec le
-  **tableau** (`Pagination<Tag[]>`), donc `content` est la liste. Chaque appelant fait
-  `response.content` à la main ; `count`/`page`/`first`/`last` ne sont **jamais lus** et 5
-  endpoints forcent `size: 0` pour désactiver la pagination — il n'y a aucune pagination dans
-  l'UI.
+  `{ count, page, size, first, last, content }`. 9 endpoints de liste la renvoient, **3 non**
+  (`getDailySummary`, `getEvents` et `getCarryOverCandidates` renvoient un tableau nu, comme la
+  réponse du POST `carryOverPreviousDay`). Le générique est instancié avec le **tableau**
+  (`Pagination<Tag[]>`), donc `content` est la liste. Chaque appelant fait `response.content` à la
+  main ; `count`/`page`/`first`/`last` ne sont **jamais lus** et 5 endpoints forcent `size: 0`
+  pour désactiver la pagination — il n'y a aucune pagination dans l'UI. Seule exception :
+  `TagSearch` demande `size: 200`, un plafond franc et non paginé ; au-delà, les tags
+  surnuméraires sont **silencieusement absents** (W14).
 - **Gestion d'erreur = `console.error`.** Aucun modèle d'erreur typé (pas d'`ApiError`, pas de
   forme DRF `{detail}` / `{champ: string[]}`), aucun toast global. Les erreurs de validation sont
   consommées en `AxiosError.response.data` non typé, au cas par cas.
@@ -58,7 +60,7 @@ Recette complète pour ajouter un endpoint :
 - **Le 401 est inconditionnel** — il s'applique aussi aux endpoints d'authentification
   (`auth/login/`, `auth/check-password/`). Un mot de passe erroné renvoyé en 401 déclenche donc
   purge du token + `appStore.exit()` + redirection, y compris au milieu d'un formulaire.
-- **Casse des query params incohérente** : `snake_case` (`exclude_ids`, `start_date`) et
+- **Casse des query params incohérente** : `snake_case` (`has_uncompleted_task`, `start_date`) et
   `camelCase` (`excludeId`) coexistent selon l'endpoint. Aucun sérialiseur ne normalise : un nom
   erroné est **silencieusement ignoré** par le backend.
 - **Variantes de modèle** — convention dominante `XPost` / `XPatch` / `X` / `XList` / `XDetail`.

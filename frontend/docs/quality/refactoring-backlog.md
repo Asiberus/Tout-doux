@@ -7,13 +7,14 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > **Cycle de vie** : quand un item est résolu, **supprimer sa ligne et sa section**. Ne pas le
 > marquer « Fait » — `git log` est déjà le registre du corrigé.
 
-| ID  | Titre                                                              | Priorité  | Raison de la priorité                                      |
-| --- | ------------------------------------------------------------------ | --------- | ---------------------------------------------------------- |
-| R1  | Dockerfile de production cassé (`package-lock.json` inexistant)    | **haute** | Le build de prod ne peut pas aboutir                       |
-| R2  | Intercepteur 401 : `error.response` déréférencé sans garde         | **haute** | Masque toute erreur réseau par un `TypeError`              |
-| R5  | Dérive doc↔code des fichiers d'instruction                        | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige |
-| R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion           |
-| R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                |
+| ID  | Titre                                                              | Priorité  | Raison de la priorité                                                 |
+| --- | ------------------------------------------------------------------ | --------- | --------------------------------------------------------------------- |
+| R1  | Dockerfile de production cassé (`package-lock.json` inexistant)    | **haute** | Le build de prod ne peut pas aboutir                                  |
+| R2  | Intercepteur 401 : `error.response` déréférencé sans garde         | **haute** | Masque toute erreur réseau par un `TypeError`                         |
+| R5  | Dérive doc↔code des fichiers d'instruction                        | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige            |
+| R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion                      |
+| R12 | « Aujourd'hui » figé au rendu dans tout le domaine daily           | moyenne   | Une page ouverte au passage de minuit laisse écrire sur un jour passé |
+| R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                           |
 
 > **Items transférés au tracker de migration.** Sept items relevant du chantier Vuetify 4 ont été
 > déplacés vers [../workflows/vuetify-4-migration.md](../workflows/vuetify-4-migration.md), qui est
@@ -84,6 +85,39 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
   l'import du même nom venant du service.
 - **Décision** : agir — supprimer le fichier et son export. Aucun appelant, aucun risque.
   Voir [../adr/0002-pinia-stores-scope.md](../adr/0002-pinia-stores-scope.md).
+
+## R12 — « Aujourd'hui » figé au rendu dans tout le domaine daily
+
+- **Origine** : `DailyUpdate.vue` (`isToday`, `canGoForward`), `DailyUpdateTask.vue` (`isToday`),
+  `DailyDetail.vue` (`canGoForward`), `DailyDetailTaskTimeline.vue` (`isPast`, `isFuture`,
+  `isToday`), `DailyDetailEventTimeline.vue` (`eventText`), et `DailySummary.vue:31` — où `today`
+  et `upcomingCeiling` ne sont même pas des `computed` mais des constantes évaluées une fois dans
+  le `setup`.
+- **Contexte** : ces valeurs appellent `moment()` au rendu. Rien ne demande à Vue de les
+  réévaluer quand l'horloge franchit minuit, et l'écran n'est pas remonté pour autant. Le
+  symptôme n'est pas cosmétique depuis l'ouverture de la planification :
+
+  On prépare mardi à 23 h 55 depuis le wizard. À 00 h 05 on est mardi, mais `isToday` croit
+  encore qu'on est lundi. **La flèche gauche est donc active** et mène à lundi — un jour
+  désormais passé. `dailyUpdateGuard` ne rejouant pas sur un changement de param, rien ne
+  redresse la navigation : l'utilisateur crée et édite des lignes sur un jour passé. Le serveur
+  les accepte tant que son horloge UTC est encore à lundi, puis les refuse par un **400** que
+  l'interface ne sait pas expliquer.
+
+  Corollaires du même figement : le bouton « prepare the day » du résumé continue de pointer sur
+  la veille, l'élément « Add a task » du détail se trompe de jour, et le bouton de report
+  apparaît ou disparaît à contretemps.
+
+- **Cause racine** : il n'existe **aucune source unique de « aujourd'hui »** côté client.
+  `moment()` est appelé au fil de l'eau dans une dizaine de fichiers. Les deux endroits corrects
+  le sont par accident : `dailyUpdateGuard` recalcule à chaque navigation, et `useAddTaskToDaily`
+  au moment du clic.
+- **Décision** : agir. Un composable `useToday()` exposant un `ref` réactif, rafraîchi sur
+  `visibilitychange` et sur un intervalle de faible fréquence, consommé par les écrans du daily.
+  ⚠️ Le corriger côté client **ne suffit pas** : le serveur calcule son « aujourd'hui » en UTC
+  alors que `TIME_ZONE` vaut `Europe/Paris`, les deux horloges divergent donc déjà de 1 à 2 h
+  chaque nuit. À traiter avec
+  [R4 du backlog backend](../../../backend/docs/quality/refactoring-backlog.md).
 
 ## R10 — `README.md` obsolète
 

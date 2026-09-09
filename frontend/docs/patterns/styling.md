@@ -62,7 +62,15 @@ Sans le `@layer`, cette règle gagnait sur `mb-3` et rendait toutes les classes 
 inopérantes sur les titres.
 
 À l'inverse, un override qui doit **gagner** contre Vuetify se place hors layer (c'est le cas des
-31 `!important` de `global.scss`, qui fonctionnent précisément pour cette raison).
+`!important` de `global.scss`, qui fonctionnent précisément pour cette raison).
+
+Un cas où le `!important` n'est pas une facilité mais la seule voie : les `z-index` du **layout**
+(barre d'application, tiroir de navigation et son voile) sont posés en **style inline** par
+`useLayoutItem`, donc aucun sélecteur, layer ou pas, ne les atteint — seule une déclaration
+`!important` d'auteur bat un style inline normal. C'est ce qui remonte le tiroir au-dessus de la
+feuille de tâches dans `global.scss`. Leurs valeurs suivent la formule `1000 + n × 2 − i × 2` avec
+`n` le nombre d'éléments de layout, le voile d'un élément valant son `z-index` moins un : elles
+**se décalent** dès qu'on ajoute un pied de page ou une seconde barre.
 
 Ordre des layers Vuetify 4 : `vuetify-core` → `vuetify-components` → `vuetify-overrides` →
 `vuetify-utilities` → `vuetify-final`.
@@ -137,6 +145,13 @@ Vuetify 4 a renommé toutes les classes typographiques (MD2 → MD3). Les ancien
 
 Les variantes responsive suivent la même convention (`text-sm-headline-large`). Pour les titres,
 préférer les composants `MainTitle` / `SecondaryTitle` / `TertiaryTitle`.
+
+⚠️ Seules les **tailles** se déclinent par breakpoint : `font-weight-*` n'a aucune variante
+responsive. Un poids qui ne vaut que sous une largeur donnée demande donc une classe à écrire, et
+`global.scss` en porte une, `font-weight-bold-sm-and-down` (titres de sous-section de
+`daily-update`). Son nom ne suit **pas** la convention Vuetify à dessein : un `-sm-` s'y lit
+« à partir de `sm` », soit l'inverse. Comme les utilitaires du fichier, elle est hors `@layer` et
+bat donc le poids porté par `text-title-medium` sans `!important`.
 
 ## Écarts assumés / code mort
 

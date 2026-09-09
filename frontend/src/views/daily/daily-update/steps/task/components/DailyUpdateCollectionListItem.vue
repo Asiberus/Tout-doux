@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { DailyTask } from '@/models/daily-task.model'
-import { Task } from '@/models/task.model'
+import { Task, TaskPost } from '@/models/task.model'
 import { CollectionDetail } from '@/models/collection.model'
 import TaskCard from '@/views/components/task/TaskCard.vue'
+import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
-import { computed } from 'vue'
+import { useDialogWidth } from '@/composables/useDialogWidth'
+import { computed, ref } from 'vue'
+
+const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const selected = defineModel<boolean>('selected')
 
@@ -15,7 +19,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'select-task': [data: { taskId: number }]
+  'create-task': [data: { task: TaskPost; collectionId: number }]
 }>()
+
+const taskDialog = ref(false)
 
 const tasksCompleted = computed<Task[]>(() =>
   props.collection.tasks.filter(({ completed }) => completed)
@@ -45,6 +52,14 @@ function selectTask(task: Task): void {
   if (isTaskSelected(task)) return
 
   emit('select-task', { taskId: task.id })
+}
+
+function createTask(data: TaskPost): void {
+  taskDialog.value = false
+  emit('create-task', {
+    task: { ...data, collectionId: props.collection.id },
+    collectionId: props.collection.id,
+  })
 }
 </script>
 
@@ -105,10 +120,25 @@ function selectTask(task: Task): void {
               :small="true"
               :completable="false"
               :display-options="false"
-              :elevation="3"
-              color="grey-darken-4"
+              color="surface-container-high"
               @click="selectTask(task)">
             </TaskCard>
+
+            <v-card variant="outlined" ripple class="create-task-card" @click="taskDialog = true">
+              <v-card-text class="d-flex align-center justify-center gap-2">
+                <span class="text-body-medium text-sm-body-large font-weight-medium">
+                  Create a {{ collection.itemName }}
+                </span>
+              </v-card-text>
+            </v-card>
+
+            <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
+              <TaskDialog
+                :is-dialog-open="taskDialog"
+                :item-name="collection.itemName"
+                @create="createTask($event)"
+                @close="taskDialog = false" />
+            </v-dialog>
           </div>
         </template>
       </v-card-text>
@@ -118,6 +148,7 @@ function selectTask(task: Task): void {
 
 <style scoped lang="scss">
 @use 'sass:map';
+@use 'vuetify/lib/styles/settings/colors';
 @use '@/styles/breakpoints' as variables;
 
 .selected {
@@ -160,5 +191,23 @@ function selectTask(task: Task): void {
 
 .collection-card-wrapper:not(.selected) .v-card-text {
   padding: 16px;
+}
+
+.create-task-card {
+  // `min-height: 100%` se résout à zéro dans une grille : la carte s'écrasait à 2px (projet) ou
+  // 46px (collection). Valeur alignée sur le minimum d'une `TaskCard` `small`
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  color: map.get(colors.$grey, 'darken-3');
+  transition: color 0.2s ease-in-out;
+
+  @media (hover: hover) {
+    &:hover {
+      color: map.get(colors.$grey, 'darken-1');
+    }
+  }
 }
 </style>

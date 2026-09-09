@@ -6,6 +6,7 @@ import { computed } from 'vue'
 
 const props = defineProps<{
   dailySummary: DailySummary
+  upcoming?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,11 +24,20 @@ const colorOfTaskCompleted = computed<string>(() => {
 })
 
 const backgroundColor = computed<string | undefined>(() => {
+  // Un jour à venir n'a rien à encoder : ni progression, ni « journée vide » — il n'a pas encore
+  // eu lieu. Il garde le fond par défaut et se distingue par sa bordure.
+  if (props.upcoming) return 'accent'
   if (!props.dailySummary.totalTask && !props.dailySummary.totalEvent) return '#151515'
   else if (!props.dailySummary.totalTaskCompleted) return undefined
 
   return colorOfTaskCompleted.value
 })
+
+const variant = computed<'tonal' | 'elevated'>(() => (props.upcoming ? 'tonal' : 'elevated'))
+
+const isClickable = computed<boolean>(
+  () => props.upcoming || props.dailySummary.totalTask > 0 || props.dailySummary.totalEvent > 0
+)
 
 function openDailyDetailDialog(): void {
   emit('open-daily-detail')
@@ -39,17 +49,18 @@ function openDailyDetailDialog(): void {
     :color="backgroundColor"
     :ripple="false"
     class="rounded-lg"
-    v-on="
-      dailySummary.totalTask || dailySummary.totalEvent
-        ? { click: () => openDailyDetailDialog() }
-        : {}
-    ">
-    <v-card-text class="daily-summary-card d-flex flex-row">
+    :variant
+    v-on="isClickable ? { click: () => openDailyDetailDialog() } : {}">
+    <v-card-text class="daily-summary-card d-flex flex-row" :class="{ upcoming }">
       <div class="flex-grow-1">
-        <h1 class="text-headline-small font-weight-medium text-white mb-0">
+        <h1
+          class="text-headline-small font-weight-medium mb-0"
+          :class="{ 'text-white': isClickable, 'text-grey-darken-2': !isClickable }">
           {{ dateFormat(dailySummary.date, 'dddd') }}
         </h1>
-        <p class="text-title-small text-md-body-large mb-0">
+        <p
+          class="text-title-small text-md-body-large mb-0"
+          :class="{ 'text-grey-darken-2': !isClickable }">
           {{ dateFormat(dailySummary.date, 'DD MMMM Y') }}
         </p>
       </div>
@@ -65,7 +76,7 @@ function openDailyDetailDialog(): void {
 
         <div v-if="dailySummary.totalEvent > 0" class="flex-shrink-0 d-flex gap-1">
           <span class="daily-event">{{ dailySummary.totalEvent }}</span>
-          <v-icon icon="mdi-calendar-clock" size="large" />
+          <v-icon icon="mdi-calendar-clock" size="large" color="white" />
         </div>
       </div>
     </v-card-text>
@@ -75,9 +86,14 @@ function openDailyDetailDialog(): void {
 <style scoped lang="scss">
 @use 'sass:map';
 @use '@/styles/breakpoints' as variables;
+@use 'vuetify/lib/styles/settings/_colors';
 
 .daily-summary-card {
   min-height: 96px;
+
+  &.upcoming .daily-event {
+    color: #{map.get(colors.$grey, 'lighten-2')};
+  }
 
   .daily-event {
     font-size: 1.5rem;

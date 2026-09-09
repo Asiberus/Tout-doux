@@ -23,6 +23,7 @@ export const settingsRoutes: RouteRecordRaw[] = [
         path: 'tags',
         name: 'settings-tags',
         component: SettingsTags,
+        props: route => ({ type: route.query.type === 'task' ? 'task' : 'project' }),
       },
     ],
   },

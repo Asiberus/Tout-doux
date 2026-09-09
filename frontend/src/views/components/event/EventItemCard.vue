@@ -137,18 +137,18 @@ function isDateEqual(date1: string, date2: string): boolean {
               </template>
 
               <template v-if="!event.takesWholeDay">
-                <span title="Start date" :class="[getTextColor('date')]">
+                <div title="Start date" :class="[getTextColor('date')]">
                   <template
                     v-if="
                       !daySelected ||
                       (event.endDate && !isDateEqual(event.startDate, event.endDate))
                     ">
-                    {{ dateFormat(event.startDate, 'DD/MM/YY') }}
+                    <span>{{ dateFormat(event.startDate, 'DD/MM/YY') }}</span>
                   </template>
                   <template v-if="event.startTime">
-                    {{ event.startTime }}
+                    <span class="ml-1">{{ event.startTime }}</span>
                   </template>
-                </span>
+                </div>
 
                 <template v-if="event.endDate">
                   <v-icon
@@ -156,14 +156,16 @@ function isDateEqual(date1: string, date2: string): boolean {
                     :class="[getTextColor('date')]"
                     size="small"
                     class="mx-1" />
-                  <span title="End date" :class="[getTextColor('date')]">
+                  <div title="End date" :class="[getTextColor('date')]">
                     <template v-if="!isDateEqual(event.startDate, event.endDate)">
-                      {{ dateFormat(event.endDate, 'DD/MM/YY') }}
+                      <span>{{ dateFormat(event.endDate, 'DD/MM/YY') }}</span>
                     </template>
                     <template v-if="event.endTime">
-                      {{ event.endTime }}
+                      <span :class="{ 'ml-1': !isDateEqual(event.startDate, event.endDate) }">{{
+                        event.endTime
+                      }}</span>
                     </template>
-                  </span>
+                  </div>
                 </template>
               </template>
             </div>

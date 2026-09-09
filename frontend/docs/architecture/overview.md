@@ -73,7 +73,8 @@ vérifie — ni au commit, ni en CI. Voir [../workflows/verification.md](../work
 - **Pas de génération de types depuis le backend** — voir
   [../adr/0003-hand-written-api-models.md](../adr/0003-hand-written-api-models.md).
 - **Pas de normalisation snake_case ↔ camelCase.** Les corps de requête/réponse sont en
-  camelCase, mais certains _query params_ sont en snake_case (`exclude_ids`, `start_date`).
+  camelCase, mais certains _query params_ sont en snake_case (`has_uncompleted_task`,
+  `start_date`).
   C'est le contrat backend tel quel, assumé sans couche de transformation.
 - **Pas de lazy loading de routes** — voir [routing.md](routing.md).
 

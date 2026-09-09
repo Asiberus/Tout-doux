@@ -4,24 +4,34 @@ import { CollectionDetail } from '@/models/collection.model'
 import {
   DailyTask,
   DailyTaskDisplayWrapper,
+  DailyTaskDraft,
   DailyTaskPatch,
-  DailyTaskPost,
+  DailyTaskSheetDetent,
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
+import { TaskPost } from '@/models/task.model'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
+import DailyTaskBottomSheet from '@/views/daily/daily-update/steps/task/components/DailyTaskBottomSheet.vue'
 import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
-import { CommonTask } from '@/models/common-task.model'
-import { collectionApi, commonTaskApi, dailyTaskApi, projectApi } from '@/api'
-import { computed, onBeforeMount, ref } from 'vue'
+import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
+import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
+import { useNotificationStore } from '@/store'
+import moment from 'moment'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 // Todo : add btn to create project in no project svg
 // Todo : add btn to create collection in no collection svg
 
+// Au-delà de ce nombre de tâches, le « + » déroule la feuille en grand : à mi-hauteur le
+// formulaire naîtrait trop loin sous le bord du défileur
+const SHEET_FULL_TASK_COUNT = 5
+
 const { mdAndUp, smAndDown } = useDisplay()
+const notificationStore = useNotificationStore()
 
 const props = defineProps<{
   date: string
@@ -42,15 +52,48 @@ const dailyTaskList = ref<DailyTask[]>([])
 const projectList = ref<DailyTaskDisplayWrapper<ProjectDetail>[]>([])
 const collectionList = ref<DailyTaskDisplayWrapper<CollectionDetail>[]>([])
 const commonTaskList = ref<CommonTask[]>([])
+const carryOverCandidates = ref<DailyTask[]>([])
+const carryOverInProgress = ref(false)
 
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
 
+const taskSheetDetent = ref<DailyTaskSheetDetent>(DailyTaskSheetDetent.Collapsed)
+const createTaskDisplayed = ref(false)
+
+watch(createTaskDisplayed, value => {
+  if (!value || taskSheetDetent.value !== DailyTaskSheetDetent.Collapsed) return
+
+  taskSheetDetent.value =
+    dailyTaskList.value.length > SHEET_FULL_TASK_COUNT
+      ? DailyTaskSheetDetent.Full
+      : DailyTaskSheetDetent.Half
+})
+
+watch(taskSheetDetent, value => {
+  if (smAndDown.value && value === DailyTaskSheetDetent.Collapsed) createTaskDisplayed.value = false
+})
+
+const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
 const areSomeProjectSelected = computed<boolean>(() =>
   projectList.value.some(({ selected }) => selected)
 )
 const areSomeCollectionSelected = computed<boolean>(() =>
   collectionList.value.some(({ selected }) => selected)
+)
+
+watch(
+  () => props.date,
+  () => {
+    // Les listes sont vidées avant le fetch : sans ça celles de la veille resteraient affichées
+    // sous l'en-tête du nouveau jour le temps de l'aller-retour.
+    dailyTaskList.value = []
+    emit('daily-task-count', 0)
+    carryOverCandidates.value = []
+    projectSectionSelected.value = 0
+    resetSelectedItem()
+    retrieveDailyTaskList()
+  }
 )
 
 function retrieveDailyTaskList(): void {
@@ -59,8 +102,53 @@ function retrieveDailyTaskList(): void {
     .then(response => {
       dailyTaskList.value = response.content
       emit('daily-task-count', dailyTaskList.value.length)
+      // Les deux endpoints de report sont codés « veille → aujourd'hui », sans paramètre. Ne pas
+      // interroger les candidats hors du jour courant est ce qui empêche le bouton d'apparaître
+      // sur un jour à venir, où il écrirait dans aujourd'hui sans le dire.
+      if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
     })
     .catch(error => console.error(error))
+}
+
+function retrieveCarryOverCandidates(): void {
+  dailyTaskApi
+    .getCarryOverCandidates()
+    .then(response => (carryOverCandidates.value = response))
+    .catch(error => console.error(error))
+}
+
+function carryOverPreviousDay(): void {
+  if (carryOverInProgress.value) return
+
+  carryOverInProgress.value = true
+
+  dailyTaskApi
+    .carryOverPreviousDay()
+    .then(response => {
+      carryOverCandidates.value = []
+
+      if (response.length === 0) {
+        notificationStore.notifySuccess('Nothing left to copy from yesterday')
+        return
+      }
+
+      dailyTaskList.value.push(...response)
+      emit('daily-task-count', dailyTaskList.value.length)
+      taskSheetDetent.value =
+        response.length > SHEET_FULL_TASK_COUNT
+          ? DailyTaskSheetDetent.Full
+          : DailyTaskSheetDetent.Half
+      notificationStore.notifySuccess(
+        response.length === 1
+          ? '1 task copied from yesterday'
+          : `${response.length} tasks copied from yesterday`
+      )
+    })
+    .catch(error => {
+      console.error(error)
+      notificationStore.notifyError("Could not copy yesterday's tasks")
+    })
+    .finally(() => (carryOverInProgress.value = false))
 }
 
 function retrieveProjectList(): void {
@@ -94,14 +182,50 @@ function fetchCommonTaskList(): void {
     .catch(error => console.error(error))
 }
 
-function createDailyTask(data: DailyTaskPost): void {
+function createDailyTask(data: DailyTaskDraft): void {
   dailyTaskApi
-    .createDailyTask(data)
+    .createDailyTask({ ...data, date: props.date })
     .then(response => {
       dailyTaskList.value.push(response)
       emit('daily-task-count', dailyTaskList.value.length)
     })
     .catch(error => console.error(error))
+}
+
+function createProjectTask(event: { task: TaskPost; projectId: number }): void {
+  const { task, projectId } = event
+
+  taskApi.createTask(task).then(
+    response => {
+      const project = projectList.value.find(({ content }) => content.id === projectId)
+      if (!project) return
+
+      if (task.sectionId) {
+        const section = project.content.sections.find(({ id }) => id === task.sectionId)
+        if (section) section.tasks.push(response)
+      } else project.content.tasks.push(response)
+    },
+    error => console.error(error)
+  )
+}
+
+function createCollectionTask(event: { task: TaskPost; collectionId: number }): void {
+  const { task, collectionId } = event
+
+  taskApi.createTask(task).then(
+    response => {
+      const collection = collectionList.value.find(({ content }) => content.id === collectionId)
+      if (collection) collection.content.tasks.push(response)
+    },
+    error => console.error(error)
+  )
+}
+
+function createCommonTask(data: CommonTaskForm): void {
+  commonTaskApi.createCommonTask(data).then(
+    response => commonTaskList.value.push(response),
+    error => console.error(error)
+  )
 }
 
 function updateDailyTask(event: { id: number; data: DailyTaskPatch }): void {
@@ -124,6 +248,7 @@ function deleteDailyTask(id: number): void {
       if (index !== -1) {
         dailyTaskList.value.splice(index, 1)
         emit('daily-task-count', dailyTaskList.value.length)
+        if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
       }
     })
     .catch(error => console.error(error))
@@ -131,6 +256,9 @@ function deleteDailyTask(id: number): void {
 
 function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }): void {
   const { tab, id, sectionId } = event
+
+  // La sélection se joue dans les onglets, derrière la feuille : elle se replie pour les découvrir
+  if (smAndDown.value) taskSheetDetent.value = DailyTaskSheetDetent.Collapsed
 
   taskTab.value = tab
   resetSelectedItem()
@@ -187,9 +315,14 @@ function resetSelectedItem(): void {
       v-model="taskTab"
       :touch="false"
       class="daily-update-task__tabs-items bg-transparent">
-      <v-tabs-window-item :value="0" :transition="false" :reverse-transition="false">
+      <v-tabs-window-item
+        :value="0"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-headline-small mr-2">Project</h5>
+          <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
+            Project
+          </h5>
           <v-btn
             :to="{ name: 'project-list' }"
             icon
@@ -213,7 +346,8 @@ function resetSelectedItem(): void {
                 :project="project.content"
                 :daily-task-list="dailyTaskList"
                 :section-selected="projectSectionSelected"
-                @select-task="createDailyTask($event)" />
+                @select-task="createDailyTask($event)"
+                @create-task="createProjectTask($event)" />
             </div>
           </template>
           <template v-else>
@@ -228,9 +362,14 @@ function resetSelectedItem(): void {
           </template>
         </div>
       </v-tabs-window-item>
-      <v-tabs-window-item :value="1" :transition="false" :reverse-transition="false">
+      <v-tabs-window-item
+        :value="1"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-headline-small mr-2">Collection</h5>
+          <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
+            Collection
+          </h5>
           <v-btn
             :to="{ name: 'collection-list' }"
             icon
@@ -253,7 +392,8 @@ function resetSelectedItem(): void {
                 v-model:selected="collection.selected"
                 :collection="collection.content"
                 :daily-task-list="dailyTaskList"
-                @select-task="createDailyTask($event)" />
+                @select-task="createDailyTask($event)"
+                @create-task="createCollectionTask($event)" />
             </div>
           </template>
           <template v-else>
@@ -268,9 +408,14 @@ function resetSelectedItem(): void {
           </template>
         </div>
       </v-tabs-window-item>
-      <v-tabs-window-item :value="2" :transition="false" :reverse-transition="false">
+      <v-tabs-window-item
+        :value="2"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
-          <h5 class="text-headline-small mr-2">Common task</h5>
+          <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
+            Common task
+          </h5>
           <v-btn
             :to="{ name: 'settings-common-tasks' }"
             icon
@@ -286,24 +431,42 @@ function resetSelectedItem(): void {
           <DailyUpdateCommonTask
             :common-task-list="commonTaskList"
             :daily-task-list="dailyTaskList"
-            @select-common-task="createDailyTask($event)" />
+            @select-common-task="createDailyTask($event)"
+            @create-common-task="createCommonTask($event)" />
         </div>
       </v-tabs-window-item>
-      <v-tabs-window-item :value="3" :transition="false" :reverse-transition="false">
-        <h5 class="text-headline-small mb-3">Weekly task</h5>
+      <v-tabs-window-item
+        :value="3"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
+        <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mb-3">
+          Weekly task
+        </h5>
       </v-tabs-window-item>
-      <v-tabs-window-item :value="4" :transition="false" :reverse-transition="false">
-        <h5 class="text-headline-small mb-3">Monthly task</h5>
+      <v-tabs-window-item
+        :value="4"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
+        <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mb-3">
+          Monthly task
+        </h5>
       </v-tabs-window-item>
     </v-tabs-window>
 
-    <DailyUpdateTaskList
-      :daily-task-list="dailyTaskList"
-      class="daily-update-task__list"
-      @create="createDailyTask($event)"
-      @update="updateDailyTask($event)"
-      @delete="deleteDailyTask($event)"
-      @select="select($event)" />
+    <DailyTaskBottomSheet v-model="taskSheetDetent">
+      <DailyUpdateTaskList
+        v-model:create-displayed="createTaskDisplayed"
+        :date
+        :daily-task-list="dailyTaskList"
+        :carry-over-candidates="carryOverCandidates"
+        :carry-over-in-progress="carryOverInProgress"
+        class="daily-update-task__list"
+        @create="createDailyTask($event)"
+        @update="updateDailyTask($event)"
+        @delete="deleteDailyTask($event)"
+        @select="select($event)"
+        @carry-over="carryOverPreviousDay()" />
+    </DailyTaskBottomSheet>
   </div>
 </template>
 
@@ -314,12 +477,11 @@ function resetSelectedItem(): void {
 .daily-update-task {
   height: 100%;
   display: flex;
-  gap: 16px;
+  gap: 8px;
 
   &__tabs {
     flex: 0 0 auto;
 
-    // V4 : VTab force `justify-content: start` en direction verticale
     &.v-slide-group--vertical .v-tab {
       justify-content: center;
     }
@@ -374,6 +536,14 @@ function resetSelectedItem(): void {
   }
 }
 
+@media #{map.get(variables.$display-breakpoints, 'lg-and-up')} {
+  .daily-update-task__tabs {
+    .v-tab {
+      min-width: initial;
+    }
+  }
+}
+
 @media #{map.get(variables.$display-breakpoints, 'md-and-down')} {
   .daily-update-task__tabs {
     .v-tab {
@@ -395,11 +565,28 @@ function resetSelectedItem(): void {
     }
 
     &__tabs-items {
-      flex: 0 1 auto;
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+
+      // La chaîne est rendue extensible jusqu'au conteneur défilant : sans ça une carte ouverte,
+      // en `position: absolute; height: 100%`, résout ce 100 % sur la hauteur du contenu replié
+      > :deep(.v-window__container) {
+        flex: 1 1 0;
+        min-height: 0;
+
+        > .v-window-item {
+          flex: 1 1 0;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+        }
+      }
 
       &__content {
-        flex-grow: 0;
-        height: 50svh;
+        flex: 1 1 0;
+        min-height: 0;
       }
     }
 

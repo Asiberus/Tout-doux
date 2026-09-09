@@ -81,7 +81,7 @@
 | `*Form` unique pour create+update           | `tag.model.ts:10`, `common-task.model.ts:9`                 | `*Post` + `*Patch` séparés                                                      |
 | Corps construit depuis un primitif          | `feedback.api.ts:14` (`setFeedbackReadProperty`)            | Un `FeedbackPatch`                                                              |
 | PATCH envoyant le modèle de lecture complet | `preferences.api.ts:9`                                      | Un `PreferencesPatch`                                                           |
-| Params en `snake_case` vs `camelCase`       | `exclude_ids` (tag) vs `excludeId` (user)                   | Suivre le backend, mais vérifier : un nom erroné est ignoré **silencieusement** |
+| Params en `snake_case` vs `camelCase`       | `has_uncompleted_task` (project) vs `excludeId` (user)      | Suivre le backend, mais vérifier : un nom erroné est ignoré **silencieusement** |
 | Import profond au lieu du barrel            | `CommonTaskDialog.vue:5`, `TagDialog.vue:5`                 | `from '@/api'`                                                                  |
 
 Nommage : `updateTaskById` / `updateEventById` cohabitent avec `updateProject` / `updateTag`

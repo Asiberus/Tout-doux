@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, timedelta
 
 from rest_framework import serializers
 
 from tout_doux.exceptions import AlreadyInDailyError
 from tout_doux.models import CommonTask, DailyTask, Tag, Task
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
+
+MAX_PLANNING_HORIZON = timedelta(days=365)
 
 
 class DailyTaskPostSerializer(serializers.ModelSerializer):
@@ -32,6 +34,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyTask
         fields = (
+            'date',
             'taskId',
             'commonTaskId',
             'name',
@@ -39,9 +42,24 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
             'action',
             'user',
         )
+        # `date` écrivable fait dériver à DRF un UniqueTogetherValidator par UniqueConstraint du
+        # modèle. Ils rendraient `taskId` et `commonTaskId` obligatoires — vérifié : un POST
+        # `{name: ...}` repart alors en 400 « This field is required ». L'unicité reste tenue par
+        # la garde de `validate()`, qui répond 409.
+        validators = ()
 
     def to_representation(self, instance):
         return DailyTaskSerializer(instance).data
+
+    def validate_date(self, value):
+        today = date.today()
+        if value < today:
+            raise serializers.ValidationError('You can\'t plan a daily task on a past day')
+        if value > today + MAX_PLANNING_HORIZON:
+            raise serializers.ValidationError(
+                'You can\'t plan a daily task more than a year ahead')
+
+        return value
 
     def validate_taskId(self, task):
         current_user = self.context.get('request').user
@@ -86,15 +104,16 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'You must provide a name or a task id or a common task id to create a daily task')
 
-        # Les contraintes (date, task) et (date, common_task) ne sont pas dérivables par DRF :
-        # `date` est en `auto_now_add`, donc hors des champs du sérialiseur. Sans cette garde le
-        # doublon remonte en IntegrityError, soit un 500. Un 409 plutôt qu'un 400 pour que le
-        # client distingue « déjà planifié » d'un refus de validation sans lire le message.
-        today = date.today()
-        if data.get('task') and DailyTask.objects.filter(date=today, task=data['task']).exists():
+        # Les validateurs d'unicité dérivés par DRF sont désactivés (voir Meta.validators) :
+        # cette garde les remplace. Sans elle le doublon remonte en IntegrityError, soit un 500.
+        # Un 409 plutôt qu'un 400 pour que le client distingue « déjà planifié » d'un refus de
+        # validation sans lire le message.
+        target_date = data.get('date', date.today())
+        if data.get('task') and DailyTask.objects.filter(
+                date=target_date, task=data['task']).exists():
             raise AlreadyInDailyError()
         if data.get('common_task') and DailyTask.objects.filter(
-                date=today, common_task=data['common_task']).exists():
-            raise AlreadyInDailyError('This common task is already in today\'s daily')
+                date=target_date, common_task=data['common_task']).exists():
+            raise AlreadyInDailyError('This common task is already planned for that day')
 
         return data

@@ -10,6 +10,7 @@ import { computed } from 'vue'
 const props = defineProps<{
   dailyTask: DailyTask
   caret?: boolean
+  toggleable?: boolean
 }>()
 
 defineEmits<{
@@ -29,9 +30,9 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
   <v-card
     :color="cardColor"
     class="daily-task-card rounded-lg pa-3 pa-sm-4"
-    ripple
+    :ripple="toggleable"
     :class="{ caret }"
-    @click="$emit('toggle')">
+    v-on="toggleable ? { click: () => $emit('toggle') } : {}">
     <div class="daily-task-card__header">
       <div class="flex-grow-1 d-flex align-center gap-2">
         <DailyTaskActionChip

@@ -5,7 +5,7 @@ import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import { eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
 
@@ -24,6 +24,15 @@ const eventList = ref<EventExtendedModel[]>([])
 const eventDialog = ref(false)
 
 onBeforeMount(() => retrieveEventList())
+
+watch(
+  () => props.date,
+  () => {
+    eventList.value = []
+    emit('daily-event-count', 0)
+    retrieveEventList()
+  }
+)
 
 function retrieveEventList(): void {
   eventApi
@@ -93,7 +102,9 @@ function deleteEvent(id: number): void {
   <div class="d-flex flex-column h-100">
     <div class="d-flex align-center flex-wrap gap-2 mb-3">
       <div class="flex-grow-1 d-flex align-center gap-2">
-        <h5 class="text-headline-small">Events of the day</h5>
+        <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down">
+          Events of the day
+        </h5>
         <v-chip v-if="eventList.length > 0" size="small">{{ eventList.length }}</v-chip>
       </div>
 

@@ -44,7 +44,8 @@ vraisemblablement paru supérieur au bénéfice.
     `null` et on relit `undefined` ;
   - `Task.completedAt: string` est non-optionnel alors qu'une tâche non complétée n'en a pas ;
   - `EventExtendedModel.project` est non-optionnel alors qu'un événement peut n'avoir aucun projet ;
-  - `DailyTaskPost` a **tous ses champs optionnels**, ce qui autorise un corps vide.
+  - `DailyTaskPost` n'a que `date` de requis : ses quatre champs d'origine restent optionnels,
+    donc `{ date }` seul passe le typage alors que le serveur le refuse.
 - ⚠️ **Les états invalides sont représentables** : `TaskPost` expose trois identifiants de parent
   en optionnel (projet / section / collection) sans union discriminée ; l'exclusivité n'est tenue
   que par les sites d'appel.

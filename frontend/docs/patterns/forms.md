@@ -135,7 +135,8 @@ et redirige — voir [../quality/watched-risks.md](../quality/watched-risks.md).
 - **`Form<T>.rules` est typé avec `any`** (`common.model.ts:5`) — seul `any` de la couche
   modèles, nécessaire pour accepter tous les types de valeur de champ.
 - **`Form<T>` vit dans `src/models/`** alors que c'est un type de présentation, pas un contrat
-  d'API. Idem pour `DailyUpdateTaskTab` (`daily-task.model.ts:49`).
+  d'API. Idem pour `DailyUpdateTaskTab` (`daily-task.model.ts:55`) et `DailyTaskSheetDetent`
+  (`daily-task.model.ts:61`), qui décrit les crans de `DailyTaskBottomSheet`.
 - **Pas de Vuelidate ni de librairie de schéma** : décision de non-adoption, voir
   [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) pour l'état de la
   question.

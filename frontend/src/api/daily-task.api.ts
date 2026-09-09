@@ -14,6 +14,14 @@ export function getDailyTasksByDate(date: string): Promise<Pagination<DailyTask[
   return http.get<Pagination<DailyTask[]>>(apiRoutes.dailyTask, { params })
 }
 
+export function getCarryOverCandidates(): Promise<DailyTask[]> {
+  return http.get<DailyTask[]>(apiRoutes.dailyTaskCarryOverCandidates)
+}
+
+export function carryOverPreviousDay(): Promise<DailyTask[]> {
+  return http.post<DailyTask[]>(apiRoutes.dailyTaskCarryOver)
+}
+
 export function createDailyTask(dailyTaskForm: DailyTaskPost): Promise<DailyTask> {
   return http.post<DailyTask>(apiRoutes.dailyTask, dailyTaskForm)
 }

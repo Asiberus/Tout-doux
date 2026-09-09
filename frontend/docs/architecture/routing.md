@@ -11,30 +11,30 @@ Elle sert aussi de **carte des features** (voir [../README.md](../README.md#feat
 
 ### Arbre authentifié — `src/router/index.ts:22`, modules dans `src/router/modules/`
 
-| Chemin                                   | Nom                          | Vue                                                   | Props depuis la route                         |
-| ---------------------------------------- | ---------------------------- | ----------------------------------------------------- | --------------------------------------------- |
-| `/`                                      | `home`                       | _(redirect → `daily-summary`)_                        | —                                             |
-| `/daily/:date?`                          | `daily-summary`              | `DailySummary.vue`                                    | `date`                                        |
-| `/daily/:date/update/:step(task\|event)` | `daily-update`               | `DailyUpdate.vue`                                     | `date`, `step` — **guard** `dailyUpdateGuard` |
-| `/project`                               | `project-list`               | `ProjectList.vue`                                     | `archived` (`query.archived === 'true'`)      |
-| `/project/:id`                           | `project-detail`             | `ProjectDescription.vue`                              | `projectId` (`parseInt`)                      |
-| `/project/:id/section/:sectionId?`       | `project-detail-section`     | `ProjectSection.vue`                                  | `sectionId` (`parseInt`)                      |
-| `/project/:id/event`                     | `project-detail-event`       | `ProjectEvent.vue`                                    | —                                             |
-| `/project/:id/settings`                  | `project-detail-settings`    | `ProjectSettings.vue`                                 | —                                             |
-| `/collection`                            | `collection-list`            | `CollectionList.vue`                                  | `archived`                                    |
-| `/collection/:id`                        | `collection-detail`          | `CollectionGeneral.vue`                               | `collectionId` (`parseInt`)                   |
-| `/collection/:id/settings`               | `collection-detail-settings` | `CollectionSettings.vue`                              | —                                             |
-| `/agenda`                                | `agenda`                     | `views/agenga/Agenda.vue` ⚠️ dossier mal orthographié | —                                             |
-| `/settings`                              | `settings-preferences`       | `SettingsPreferences.vue`                             | —                                             |
-| `/settings/common-tasks`                 | `settings-common-tasks`      | `SettingsCommonTasks.vue`                             | —                                             |
-| `/settings/tags`                         | `settings-tags`              | `SettingsTags.vue`                                    | —                                             |
-| `/profile`                               | `profile-user`               | `ProfileUser.vue`                                     | —                                             |
-| `/profile/email`                         | `profile-email`              | `ProfileEmail.vue`                                    | —                                             |
-| `/profile/password`                      | `profile-password`           | `ProfilePassword.vue`                                 | —                                             |
-| `/profile/account`                       | `profile-account`            | `ProfileAccount.vue`                                  | —                                             |
-| `/administration/user-list`              | `administration-user-list`   | `AdministrationUser.vue`                              | — **guard** `adminGuard` (sur le parent)      |
-| `/administration/feedback`               | `administration-feedback`    | `AdministrationFeedback.vue`                          | — **guard** `adminGuard`                      |
-| `/feedback`                              | `feedback`                   | `views/feedback/Feedback.vue`                         | —                                             |
+| Chemin                                   | Nom                          | Vue                                                   | Props depuis la route                            |
+| ---------------------------------------- | ---------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| `/`                                      | `home`                       | _(redirect → `daily-summary`)_                        | —                                                |
+| `/daily/:date?`                          | `daily-summary`              | `DailySummary.vue`                                    | `date`, `upcoming` (`query.upcoming === 'true'`) |
+| `/daily/:date/update/:step(task\|event)` | `daily-update`               | `DailyUpdate.vue`                                     | `date`, `step` — **guard** `dailyUpdateGuard`    |
+| `/project`                               | `project-list`               | `ProjectList.vue`                                     | `archived` (`query.archived === 'true'`)         |
+| `/project/:id`                           | `project-detail`             | `ProjectDescription.vue`                              | `projectId` (`parseInt`)                         |
+| `/project/:id/section/:sectionId?`       | `project-detail-section`     | `ProjectSection.vue`                                  | `sectionId` (`parseInt`)                         |
+| `/project/:id/event`                     | `project-detail-event`       | `ProjectEvent.vue`                                    | —                                                |
+| `/project/:id/settings`                  | `project-detail-settings`    | `ProjectSettings.vue`                                 | —                                                |
+| `/collection`                            | `collection-list`            | `CollectionList.vue`                                  | `archived`                                       |
+| `/collection/:id`                        | `collection-detail`          | `CollectionGeneral.vue`                               | `collectionId` (`parseInt`)                      |
+| `/collection/:id/settings`               | `collection-detail-settings` | `CollectionSettings.vue`                              | —                                                |
+| `/agenda`                                | `agenda`                     | `views/agenga/Agenda.vue` ⚠️ dossier mal orthographié | —                                                |
+| `/settings`                              | `settings-preferences`       | `SettingsPreferences.vue`                             | —                                                |
+| `/settings/common-tasks`                 | `settings-common-tasks`      | `SettingsCommonTasks.vue`                             | —                                                |
+| `/settings/tags`                         | `settings-tags`              | `SettingsTags.vue`                                    | `type` (`query.type === 'task' ? … : …`)         |
+| `/profile`                               | `profile-user`               | `ProfileUser.vue`                                     | —                                                |
+| `/profile/email`                         | `profile-email`              | `ProfileEmail.vue`                                    | —                                                |
+| `/profile/password`                      | `profile-password`           | `ProfilePassword.vue`                                 | —                                                |
+| `/profile/account`                       | `profile-account`            | `ProfileAccount.vue`                                  | —                                                |
+| `/administration/user-list`              | `administration-user-list`   | `AdministrationUser.vue`                              | — **guard** `adminGuard` (sur le parent)         |
+| `/administration/feedback`               | `administration-feedback`    | `AdministrationFeedback.vue`                          | — **guard** `adminGuard`                         |
+| `/feedback`                              | `feedback`                   | `views/feedback/Feedback.vue`                         | —                                                |
 
 ### Arbre non authentifié — `src/router/modules/nonAuth.router.ts`
 
@@ -58,12 +58,18 @@ valeur (`undefined` pour continuer, un objet de route pour rediriger), aucun n'a
 | `authGuard`        | global `beforeEach` **n°2** (`index.ts:62`)   | non authentifié + route hors liste blanche → `login` avec `?next=`        |
 | `loginGuard`       | `beforeEnter` sur 3 routes                    | déjà authentifié → `home`                                                 |
 | `adminGuard`       | `beforeEnter` sur le parent `/administration` | `!user.isStaff` → `home`                                                  |
-| `dailyUpdateGuard` | `beforeEnter` sur `daily-update`              | date ≠ aujourd'hui → même route avec la date du jour                      |
+| `dailyUpdateGuard` | `beforeEnter` sur `daily-update`              | date illisible, passée, ou > 1 an → même route avec la date du jour       |
 
 **L'ordre des deux guards globaux est porteur.** Le n°1 est le seul endroit où `userStore.user`
 est peuplé au chargement à froid, et il **`await`**. Or `adminGuard` lit `userStore.user` : il
 n'est correct que parce que le n°1 a déjà résolu. Inverser l'ordre, ou retirer l'`await`, ferait
 rebondir tout accès direct à `/administration/*` vers `home`.
+
+⚠️ **`dailyUpdateGuard` ne rejoue pas sur un changement de param.** `extractChangingRecords`
+(vue-router 5.2) classe un record dont seuls les params changent dans `updatingRecords`, et
+`beforeEnter` ne parcourt que `enteringRecords`. Naviguer de `/daily/2026-09-10/update/task` à
+`/daily/2026-09-08/update/task` ne repasse donc **pas** par le guard : toute borne appliquée à
+une navigation jour à jour doit être tenue par le composant.
 
 Le guard n°1 ne s'exécute **qu'une fois par chargement de page** (`from === START_LOCATION`) :
 après un logout puis login dans la même session SPA il ne se redéclenche pas, d'où l'appel
@@ -127,6 +133,6 @@ vérité serveur restant `adminGuard`.
 ## Voir aussi
 
 - [state.md](state.md) — ce que `appStore.init()` charge
-- [../domain/daily-rules.md](../domain/daily-rules.md) — pourquoi `dailyUpdateGuard` est
-  indispensable et pas cosmétique
+- [../domain/daily-rules.md](../domain/daily-rules.md) — ce que `dailyUpdateGuard` borne, et
+  pourquoi le typage a pris le relais
 - [ui-layer.md](ui-layer.md) — les layouts et le chrome applicatif

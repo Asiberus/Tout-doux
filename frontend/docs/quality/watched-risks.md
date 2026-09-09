@@ -24,6 +24,7 @@ raison est indiquée pour chaque item.
 | W10 | Aucune route 404                               | UX            | Un signalement de page blanche                                   |
 | W12 | Polices et icônes chargées depuis des CDN      | Robustesse    | Besoin de fonctionnement hors ligne ou d'un déploiement intranet |
 | W13 | Cycles d'imports entre axios, services, router | Architecture  | Une erreur d'initialisation de module                            |
+| W14 | `TagSearch` plafonne la liste des tags à 200   | UX            | > 150 tags pour un utilisateur                                   |
 
 ---
 
@@ -187,3 +188,22 @@ raison est indiquée pour chaque item.
 - **Déclencheur** : une erreur d'initialisation de module au démarrage (`Cannot access '…' before
 initialization`, import résolvant `undefined`), typiquement après une montée de version de Vite
   ou un changement de format de bundle.
+
+## W14 — `TagSearch` plafonne la liste des tags à 200
+
+- **Origine** : `src/views/components/tag/TagSearch.vue` — `getTagList({ sort: 'name', size: 200 })`.
+- **Contexte** : la liste complète est chargée au montage puis filtrée côté client. Au-delà de
+  200 tags, la page 2 n'est jamais demandée et les tags surnuméraires deviennent
+  **introuvables**, sans message. Le tri étant alphabétique, la troncature emporte la fin de
+  l'alphabet — pas les tags les moins utiles. Le DOM, lui, ne pose pas de problème :
+  `VAutocomplete` monte un `VVirtualScroll` en interne (`VSelect.js:481`).
+- **Décision** : ne pas agir. Une poignée de tags existent. Vuetify ne fournit **aucune**
+  pagination serveur dans l'autocomplete : `VVirtualScroll` ne fenêtre qu'un tableau déjà en
+  mémoire et n'émet aucun événement de fin de défilement (il écoute `scroll`/`scrollend` sans les
+  réémettre), et `VInfiniteScroll` est un conteneur à défilement propre, non insérable comme
+  liste d'items.
+- **Déclencheur** : plus de 150 tags pour un utilisateur. La reprise passe par le slot
+  **`append-item`**, rendu dans le même conteneur de défilement que la liste (`VSelect.js:549`,
+  le `VVirtualScroll` étant `renderless`) : une sentinelle `v-intersect` y atteint réellement le
+  bas du menu. ⚠️ Paginer impose de **revenir à la recherche serveur** avec `no-filter` — un
+  filtre client ne filtre que les pages chargées. Les deux ne se cumulent pas.

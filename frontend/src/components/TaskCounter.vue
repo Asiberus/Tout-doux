@@ -14,7 +14,7 @@ withDefaults(
     <span class="value">{{ value }}</span>
     <span class="separator">/</span>
     <span class="max">{{ max }}</span>
-    <v-icon v-if="showIcon" icon="mdi-trophy" size="x-large" />
+    <v-icon v-if="showIcon" icon="mdi-trophy" size="x-large" color="white" />
   </div>
 </template>
 

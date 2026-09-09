@@ -49,11 +49,16 @@ function sortEventList(): void {
 
 function retrieveEvents(): void {
   events.value = []
-  const month = moment(value.value).month() + 1 // Month count start at 0
-  const year = moment(value.value).year()
-  eventApi.getEvents({ month, year }).then(
-    response => {
-      events.value = response
+
+  const months = [-1, 0, 1].map(offset => {
+    const date = moment(value.value).add(offset, 'month')
+    return { month: date.month() + 1, year: date.year() } // Month count start at 0
+  })
+
+  Promise.all(months.map(({ month, year }) => eventApi.getEvents({ month, year }))).then(
+    responses => {
+      const eventsById = new Map(responses.flat().map(event => [event.id, event]))
+      events.value = Array.from(eventsById.values())
       sortEventList()
     },
     error => console.error(error)
@@ -182,15 +187,17 @@ function nextMonth(): void {
         </v-btn>
       </div>
 
+      <h4 class="text-body-large text-sm-headline-small">{{ monthSelected }}</h4>
+
       <v-btn
-        :disabled="isCurrentMonthSelected"
+        v-if="!isCurrentMonthSelected"
         :size="xs ? 'small' : 'default'"
-        class="mr-1"
+        class="ml-1"
         @click="setCalendarToNow()">
         now
       </v-btn>
 
-      <h4 class="text-body-large text-sm-headline-small flex-grow-1">{{ monthSelected }}</h4>
+      <v-spacer />
 
       <v-btn :size="xs ? 'small' : 'default'" @click="openEventDialog()">
         <v-icon icon="mdi-plus" start />
@@ -210,7 +217,7 @@ function nextMonth(): void {
         :event-margin-bottom="2"
         :event-ripple="false"
         color="accent"
-        class="calendar"
+        :class="['calendar', { 'calendar--other-month': !isCurrentMonthSelected }]"
         @click:day="handleClickOnDay">
         <template #day-label="{ day, present }">
           <v-hover v-slot="{ isHovering, props }">
@@ -299,6 +306,13 @@ function nextMonth(): void {
     &.v-outside {
       background-color: rgb(var(--v-theme-background));
     }
+  }
+
+  // Vuetify surligne toujours le jour de semaine "réel" du jour courant dans
+  // l'en-tête, même en dehors du mois courant (VCalendarWeekly se base sur
+  // todayWeek, pas sur le mois affiché) : on neutralise ce surlignage ici.
+  &.calendar--other-month :deep(.v-calendar-weekly__head-weekday.v-present) {
+    color: unset;
   }
 
   :deep(.v-calendar-weekly__day) {

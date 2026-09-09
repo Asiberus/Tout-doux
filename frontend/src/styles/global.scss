@@ -205,6 +205,19 @@ input:-webkit-autofill:active {
   min-height: 100svh !important; // take in consideration of the mobile browser navbar
 }
 
+// La feuille de tâches de daily-update passe au-dessus de la barre d'application (1004) pour que
+// son voile la couvre et la neutralise. Le tiroir doit repasser devant la feuille : ses `z-index`
+// viennent de la formule de layout de Vuetify (`1000 + n × 2 − i × 2`, voile à `z − 1`) et sont
+// posés en style inline, d'où le `!important`. Recalculer ces valeurs si un élément de layout est
+// ajouté : chacun décale la formule de deux
+.v-navigation-drawer {
+  z-index: 1012 !important;
+}
+
+.v-navigation-drawer__scrim {
+  z-index: 1011 !important;
+}
+
 .v-autocomplete__content.background-elevation {
   // Correspond to vuetify elevation-8
   box-shadow:
@@ -220,7 +233,7 @@ input:-webkit-autofill:active {
   flex-direction: column;
 }
 
-// Remove hover for btn, chip and tab on mobile
+// Remove hover for btn, chip, tab and stepper item on mobile
 @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
   .v-btn:hover .v-btn__overlay {
     opacity: 0 !important;
@@ -230,6 +243,17 @@ input:-webkit-autofill:active {
   .v-chip:focus .v-chip__overlay,
   .v-chip:hover .v-chip__overlay {
     opacity: 0 !important;
+  }
+
+  .v-stepper-item:focus .v-stepper-item__overlay,
+  .v-stepper-item:hover .v-stepper-item__overlay {
+    opacity: 0 !important;
+  }
+
+  // Vuetify ne décline pas `font-weight-*` par breakpoint, et sa convention `-sm-` se lit
+  // « à partir de sm », l'inverse de ce qu'on veut ici — d'où le nom explicite
+  .font-weight-bold-sm-and-down {
+    font-weight: 700;
   }
 }
 

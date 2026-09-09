@@ -5,11 +5,15 @@ Ces tests décrivent le comportement OBSERVABLE ACTUEL, y compris ses bizarrerie
 sur le code d'avant comme sur celui d'après, sans être modifiés entre les deux : c'est leur
 seule raison d'être. Un test qui échoue avant le chantier signale une attente fausse.
 
+Cette contrainte vaut pour une REFACTORISATION, dont ces tests sont le filet. Elle ne s'applique
+pas aux tests qui accompagnent une FONCTIONNALITE : ceux-là gèlent un contrat qui n'existait pas,
+et échouent donc légitimement sur le code d'avant.
+
 Ils utilisent force_authenticate : knox est en AUTO_REFRESH, donc une requête authentifiée peut
 écrire en base. Ce n'est pas gênant ici, mais test_query_counts.py en dépend, et les deux
 fichiers partagent cette classe de base.
 """
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.urls import reverse
 from django.test import TestCase
@@ -388,6 +392,111 @@ class DailyTaskContractTest(DataFixtureTestCase):
         )
 
 
+class DailyTaskPlanningContractTest(DataFixtureTestCase):
+    """Planification sur un jour futur, et fermeture des jours passés.
+
+    « Aujourd'hui » est ici `date.today()`, l'horloge du conteneur, et non `timezone.localdate()`
+    comme ailleurs dans ce fichier : c'est celle que lisent les gardes du sérialiseur et de la
+    vue. R4 n'étant pas corrigé, s'en remettre au fuseau rendrait ces tests instables entre
+    00 h et 02 h heure de Paris.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.today = date.today()
+        self.plannable = list(Task.objects.filter(user=self.user, completed=False).order_by('pk'))
+
+    def day(self, offset):
+        return (self.today + timedelta(days=offset)).isoformat()
+
+    def plan(self, **payload):
+        return self.client.post(reverse('daily_task-list'), payload, format='json')
+
+    def edit(self, identifier, **payload):
+        return self.client.patch(
+            reverse('daily_task-detail', args=[identifier]), payload, format='json'
+        )
+
+    def remove(self, identifier):
+        return self.client.delete(reverse('daily_task-detail', args=[identifier]))
+
+    def antedate(self, identifier, offset):
+        DailyTask.objects.filter(pk=identifier).update(date=self.today + timedelta(days=offset))
+
+    def test_a_free_line_still_needs_no_date(self):
+        """LE test du lot. `date` écrivable fait dériver à DRF un UniqueTogetherValidator par
+        UniqueConstraint du modèle, qui rendraient `taskId` et `commonTaskId` obligatoires :
+        sans `Meta.validators = ()`, ce POST repart en 400 « This field is required »."""
+        response = self.plan(name='libre')
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data['date'], self.today.isoformat())
+
+    def test_a_line_can_be_planned_on_a_future_day(self):
+        response = self.plan(name='demain', date=self.day(1))
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data['date'], self.day(1))
+
+    def test_a_past_day_is_refused(self):
+        response = self.plan(name='hier', date=self.day(-1))
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn('date', response.data)
+
+    def test_the_planning_horizon_is_a_year(self):
+        self.assertEqual(self.plan(name='limite', date=self.day(365)).status_code, 201)
+
+        response = self.plan(name='au-dela', date=self.day(366))
+        self.assertEqual(response.status_code, 400, response.data)
+        self.assertIn('date', response.data)
+
+    def test_the_same_task_twice_on_a_day_is_a_409_but_not_across_days(self):
+        """La garde anti-doublon lisait `date.today()` en dur : sur un jour futur elle ne voyait
+        rien et la contrainte SQL remontait en 500."""
+        task = self.plannable.pop()
+        self.assertEqual(self.plan(taskId=task.pk, date=self.day(1)).status_code, 201)
+        self.assertEqual(self.plan(taskId=task.pk, date=self.day(1)).status_code, 409)
+        self.assertEqual(self.plan(taskId=task.pk, date=self.day(2)).status_code, 201)
+
+    def test_a_future_day_stays_editable(self):
+        created = self.plan(name='demain', date=self.day(2)).data
+        response = self.edit(created['id'], name='renomme')
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data['name'], 'renomme')
+
+    def test_a_future_day_cannot_be_completed(self):
+        created = self.plan(name='demain', date=self.day(1)).data
+        self.assertEqual(self.edit(created['id'], completed=True).status_code, 400)
+
+    def test_a_future_line_cannot_close_its_source_task(self):
+        """Le refus de `completed` au futur est ce qui met la propagation vers la Task source
+        hors de portée : aucune garde n'est posée dans `update()`."""
+        task = self.plannable.pop()
+        created = self.plan(taskId=task.pk, date=self.day(1)).data
+        self.assertEqual(self.edit(created['id'], completed=True).status_code, 400)
+
+        task.refresh_from_db()
+        self.assertFalse(task.completed)
+
+    def test_a_past_day_accepts_only_completed(self):
+        created = self.plan(name='veille').data
+        self.antedate(created['id'], -1)
+        self.assertEqual(self.edit(created['id'], name='renomme').status_code, 400)
+        self.assertEqual(self.edit(created['id'], completed=True).status_code, 200)
+
+    def test_a_future_line_is_deletable_but_not_a_past_one(self):
+        future = self.plan(name='futur', date=self.day(3)).data
+        self.assertEqual(self.remove(future['id']).status_code, 204)
+
+        past = self.plan(name='passe').data
+        self.antedate(past['id'], -1)
+        self.assertEqual(self.remove(past['id']).status_code, 403)
+
+    def test_today_is_unchanged(self):
+        created = self.plan(name='aujourd\'hui').data
+        self.assertEqual(created['date'], self.today.isoformat())
+        self.assertEqual(self.edit(created['id'], completed=True).status_code, 200)
+        self.assertEqual(self.remove(created['id']).status_code, 204)
+
+
 class EventContractTest(DataFixtureTestCase):
     def setUp(self):
         super().setUp()
@@ -539,4 +648,33 @@ class DailySummaryContractTest(DataFixtureTestCase):
             reverse('daily_task-summary'),
             {'start_date': 'pas-une-date', 'end_date': self.today.isoformat()},
         )
+        self.assertEqual(response.status_code, 400, response.data)
+
+
+class TagListContractTest(DataFixtureTestCase):
+    """La fixture crée `urgent` (project) puis `rapide` (task) : les pk suivent l'ordre de
+    création, ce qui rend l'ordre par défaut vérifiable sans antidater."""
+
+    def setUp(self):
+        super().setUp()
+        for name in ('Zebra', 'apple', 'Banana'):
+            Tag.objects.create(
+                user=self.user, type=Tag.Type.TASK, name=name, color=Tag.Color.BLUE
+            )
+
+    def tag_names(self, **params):
+        response = self.client.get(reverse('tag-list'), {'type': Tag.Type.TASK, **params})
+        self.assertEqual(response.status_code, 200, response.data)
+        return [item['name'] for item in response.data['content']]
+
+    def test_the_list_is_ordered_like_the_model(self):
+        self.assertEqual(self.tag_names(), ['rapide', 'Zebra', 'apple', 'Banana'])
+
+    def test_sort_by_name_is_alphabetical_whatever_the_case(self):
+        """`ORDER BY name` placerait Banana et Zebra avant apple et rapide sous la collation de
+        la base : le tri passe donc par `Lower('name')`."""
+        self.assertEqual(self.tag_names(sort='name'), ['apple', 'Banana', 'rapide', 'Zebra'])
+
+    def test_an_unknown_sort_is_rejected(self):
+        response = self.client.get(reverse('tag-list'), {'sort': 'color'})
         self.assertEqual(response.status_code, 400, response.data)
