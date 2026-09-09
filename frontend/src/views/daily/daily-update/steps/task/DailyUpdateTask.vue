@@ -482,7 +482,6 @@ function resetSelectedItem(): void {
   &__tabs {
     flex: 0 0 auto;
 
-    // V4 : VTab force `justify-content: start` en direction verticale
     &.v-slide-group--vertical .v-tab {
       justify-content: center;
     }
@@ -534,6 +533,14 @@ function resetSelectedItem(): void {
   &__list {
     flex: 0 0 33%;
     width: 33%;
+  }
+}
+
+@media #{map.get(variables.$display-breakpoints, 'lg-and-up')} {
+  .daily-update-task__tabs {
+    .v-tab {
+      min-width: initial;
+    }
   }
 }
 
