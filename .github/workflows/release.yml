@@ -6,14 +6,14 @@ on:
     branches: [master]
 
 jobs:
-  tag:
-    name: Tag and publish release
+  parse:
+    name: Parse and validate version
     if: >-
       github.event.pull_request.merged == true &&
       startsWith(github.event.pull_request.title, 'Release')
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     outputs:
       version: ${{ steps.parse.outputs.version }}
       tag: ${{ steps.parse.outputs.tag }}
@@ -39,15 +39,34 @@ jobs:
           echo "version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-      - name: Create GitHub release
+  build:
+    name: Build images
+    needs: parse
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/build-images.yml
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      version: ${{ needs.parse.outputs.version }}
+
+  release:
+    name: Tag and publish release
+    needs: [parse, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create tag and GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.parse.outputs.tag }}
+          TAG: ${{ needs.parse.outputs.tag }}
           TITLE: ${{ github.event.pull_request.title }}
           BODY: ${{ github.event.pull_request.body }}
           SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
           gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --target "$SHA" \
             --title "$TITLE" \
             --notes "$BODY"

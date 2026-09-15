@@ -530,88 +530,32 @@ développement se fera sous Linux, via un `ARG UID` passé au build.
 | `.conf/production/conf.env` n'existe pas sur cette machine : `./td.sh edit prod` ferait un `grep` sur un fichier absent, sans message clair (voir Q1, la condition ligne 214 masque l'erreur).   | —                                           | Exécuté |
 | `run.sh:3` — `BACKEND_PORT=${BACKEND_PORT}` est une réassignation sans effet ; `set -e` ligne 4 gagnerait à être placé en tête.                                                                  | `.conf/production/backend/run.sh`           | Lu      |
 
-### Q9 — Le numéro de version est dupliqué à la main à quatre endroits
+### Q9 — ~~Le numéro de version est dupliqué à la main à quatre endroits~~ ✅ résolu
 
-**Fichiers** : `frontend/package.json`, `td.sh:2`, `frontend/index.html:7`, `.conf/production/conf.env` (sur le serveur, non versionné)
-**Preuve** : **Lu** (les trois premiers), **Déduit** (le comportement du quatrième)
+**Fichiers** : `frontend/package.json`, `td.sh:2`, `frontend/index.html:7`,
+`.conf/production/conf.env` (sur le serveur, non versionné)
 
-`td.sh:2` porte lui-même le commentaire « Must match package.json version number » — l'intention a
-toujours été que `package.json` soit la source de référence, mais rien ne l'impose. Quatre
-endroits doivent être maintenus synchronisés à la main à chaque release :
+Les quatre emplacements devaient être synchronisés à la main ; rien ne le vérifiait. La preuve que
+le défaut était réel : les deux `conf.tpl.env` sont restés à `0.4.1` pendant que le reste du dépôt
+passait à `0.7.0`, sans que personne ne s'en aperçoive.
 
-1. `frontend/package.json` (champ `version`).
-2. `td.sh:2` (`vers="..."`), une valeur littérale, jamais comparée à `package.json`.
-3. `frontend/index.html:7` (`<meta property="VERSION" content="...">`) — valeur par défaut
-   committée, visible uniquement en `yarn dev` local (en build de production, `setup-config.sh`
-   la réécrit à la volée dans l'image).
-4. `.conf/production/conf.env` **sur le serveur** — absent de Git, édité en SSH à la main. C'est
-   pourtant cette valeur qui alimente réellement `ARG_VERSION` au build Docker de production via
-   `docker-compose.prod.yml`. `td.sh update prod` ne la régénère jamais : seul `td.sh install
-prod` l'écrit, une fois, à l'installation initiale — toute nouvelle version déployée depuis
-   nécessite une édition manuelle distante.
+**Décision retenue** — le tag git est la source, pas `package.json`. Deux affirmations distinctes,
+deux supports :
 
-Oublier un seul de ces quatre points désynchronise silencieusement la version affichée de la
-version réellement déployée — aucune erreur ne le signale.
+| Affirmation                         | Support                                                            | Écrit par                       |
+| ----------------------------------- | ------------------------------------------------------------------ | ------------------------------- |
+| « cette image _est_ la 0.8.0 »      | `<meta VERSION>` et label OCI, gravés au build                     | la CI, depuis le titre de la PR |
+| « c'est la 0.8.0 qui tourne _ici_ » | `VERSION=` du `conf.env` de production, qui épingle le tag d'image | `td.sh autoupdate`              |
 
-**Correctif** (trois volets, `package.json` comme unique source) :
+Les fichiers du dépôt cessent d'être autoritatifs : `package.json` passe à `0.0.0`, `index.html` à
+`dev`, `td.sh` dérive `vers` de `git describe`, et la ligne `VERSION=` disparaît du gabarit de
+développement. Le correctif proposé ici auparavant — `package.json` comme source unique, avec un
+hook Vite et une fonction `syncVersion` — est abandonné : il synchronisait quatre fichiers au lieu
+d'en supprimer trois. Détail et alternatives écartées :
+[ADR 0006](frontend/docs/adr/0006-version-from-git-tag.md).
 
-1. Faire lire `td.sh` dans `package.json` plutôt que de coder `vers` en dur :
-
-   ```diff
-    #!/usr/bin/env bash
-   -vers="0.5.0" # Must match package.json version number
-    basedir=$(dirname "${0}")
-   +vers=$(grep -m1 '"version"' "${basedir}/frontend/package.json" | sed -E 's/.*"version": *"([^"]*)".*/\1/')
-   ```
-
-2. Ajouter une fonction qui réécrit `VERSION=` dans le `conf.env` déjà en place (dev ou prod) à
-   chaque build, pour supprimer l'édition SSH manuelle du point 4 :
-
-   ```sh
-   function syncVersion(){
-     if [ "${1}" = "dev" ]; then
-       envFile="${basedir}/.conf/development/conf.env"
-     elif [ "${1}" = "prod" ]; then
-       envFile="${basedir}/.conf/production/conf.env"
-     fi
-     if [ -f "${envFile}" ]; then
-       sed -i.bak "s/^VERSION=.*/VERSION=${vers}/" "${envFile}" && rm -f "${envFile}.bak"
-     fi
-   }
-   ```
-
-   Appelée en tête de `buildApp()` (`td.sh:238`), elle couvre `build` et `update` (`updateApp`
-   enchaîne `quitApp` → `buildApp` → `startApp`). `sed -i.bak` est la syntaxe portable identique
-   en BSD/macOS et Linux — évite le piège déjà noté en Q1 avec `sed -i ''`.
-
-3. Injecter la version dans `frontend/index.html` à la volée (dev **et** build) depuis
-   `package.json`, via un hook Vite, pour ne plus committer de valeur par défaut (point 3) :
-
-   ```ts
-   // frontend/vite.config.ts
-   import fs from 'fs'
-   const { version } = JSON.parse(
-     fs.readFileSync(path.resolve(import.meta.dirname, './package.json'), 'utf-8'),
-   )
-   // dans plugins: [...]
-   {
-     name: 'inject-version',
-     transformIndexHtml: (html) =>
-       html.replace(/<meta property="VERSION" content=".*?" \/>/, `<meta property="VERSION" content="${version}" />`),
-   }
-   ```
-
-   Le mécanisme existant (`setup-config.sh` qui patch `index.html` dans l'image de production via
-   `ARG_VERSION`) continue de fonctionner sans conflit en parallèle : les deux dérivent désormais
-   de la même source et écrivent toujours la même valeur. Sa suppression complète (`ARG_VERSION`,
-   `ENV VERSION`, la ligne `sed` correspondante dans `setup-config.sh`) est une simplification
-   possible mais séparée, qui touche aussi `docker-compose.prod.yml` et l'équivalent en
-   développement.
-
-Avec ces trois volets, un seul geste (éditer `package.json`, ou `yarn version`) suffit pour
-toute release — plus aucune édition manuelle ailleurs, y compris sur le serveur.
-
----
+**Reste à faire** — `VERSION=` du `conf.env` de production n'est réellement écrite par
+`td.sh autoupdate` qu'une fois `docker-compose.prod.yml` basculé de `build:` vers `image:`.
 
 ## 6. Ce qui est correct
 

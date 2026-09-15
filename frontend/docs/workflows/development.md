@@ -30,7 +30,7 @@ La config **n'est pas** injectée par `import.meta.env`. Elle est lue depuis des
 de `index.html` :
 
 ```html
-<meta property="VERSION" content="0.4.1" />
+<meta property="VERSION" content="dev" />
 <meta property="API_URL" content="http://localhost:8000/" />
 ```
 
@@ -39,16 +39,18 @@ de `index.html` :
 
 En Docker, `.conf/{development,production}/frontend/setup-config.sh` réécrit ces balises par
 `sed` à partir des variables d'environnement `VERSION` / `API_URL` fournies par
-`docker-compose*.yml`. Le pourquoi :
-[../adr/0001-config-via-meta-tags.md](../adr/0001-config-via-meta-tags.md).
+`docker-compose*.yml`. `VERSION` n'est saisie nulle part : `td.sh` la dérive du dernier tag git et
+l'exporte. Le pourquoi : [../adr/0001-config-via-meta-tags.md](../adr/0001-config-via-meta-tags.md)
+et [../adr/0006-version-from-git-tag.md](../adr/0006-version-from-git-tag.md).
 
 ## Pièges
 
 - **Une valeur de config manquante est silencieuse** : `getConfigValue` renvoie `undefined`, sans
   erreur ni avertissement. Un `API_URL` absent donne `baseURL: undefined`, donc des requêtes
   relatives à l'origine de l'app → des 404 en HTML au lieu d'une erreur de configuration claire.
-- **`VERSION` est dupliqué à la main** entre `package.json:3` et `index.html:7`. Aucun script ne
-  les synchronise : penser aux deux lors d'un bump de version.
+- **Ne pas « corriger » `package.json:3` ni `index.html:7`** : `0.0.0` et `dev` sont des valeurs
+  neutres, délibérées. La version réelle vient du tag git — voir
+  [../adr/0006-version-from-git-tag.md](../adr/0006-version-from-git-tag.md).
 - **`yarn build` ne typecheck pas** (`vite build` transpile via esbuild). Lancer
   `yarn type-check` séparément.
 - **Aucun test** n'est configuré (pas de script `test`), malgré ce que suggèrent

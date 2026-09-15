@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-vers="0.7.0" # Must match package.json version number
 basedir=$(dirname "${0}")
+vers=$(git -C "${basedir}" describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+vers=${vers#v}
+
+# In dev the image is built locally, so the version comes from the repository: keeping it in
+# conf.env would freeze it to the install date. In prod VERSION pins the image tag pulled from
+# GHCR and must stay whatever conf.env holds - do not export it here.
+if [ "${2}" = "dev" ]; then
+  export VERSION="${vers}"
+fi
 unset backendsecretkey
 unset serverhost
 unset apihost
@@ -88,9 +96,7 @@ updateVariables() {
 # development .env file creation method
 devInstall() {
   touch "${basedir}"/.conf/development/conf.env
-  { echo "VERSION=$vers"
-    echo ""
-    echo "# FRONTEND"
+  { echo "# FRONTEND"
     echo "FRONTEND_NAME=tout_doux_frontend"
     echo "FRONTEND_PORT=8080"
     echo ""
@@ -124,7 +130,9 @@ devInstall() {
 # production .env file creation method
 prodInstall() {
   touch "${basedir}"/.conf/production/conf.env
-  { echo "VERSION=$vers"
+  { echo "IMAGE_PREFIX=ghcr.io/asiberus/tout-doux"
+    echo "VERSION="
+    echo "PINNED=false"
     echo ""
     echo "# FRONTEND/PROXY"
     echo "FRONTEND_NAME=tout_doux_frontend"
