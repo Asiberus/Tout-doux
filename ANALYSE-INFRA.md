@@ -628,3 +628,11 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
   premier plan.
 - La suppression de `python3 make g++` de l'étape de build de production (Q8) demande un build
   d'essai pour confirmer qu'aucune dépendance ne réclame node-gyp.
+- **La sauvegarde est un `dumpdata`, pas un `pg_dump` — à reprendre.** Le script appelé par
+  `td.sh autoupdate` produit des _fixtures_ via `manage.py backupdb`. Les recharger suppose une
+  base vide **au même état de migration**. Or ce script sert précisément de filet avant des
+  migrations : si l'une d'elles abîme les données, le fichier d'avant ne se recharge pas dans le
+  schéma d'après sans reconstruire manuellement la base à l'ancienne révision. Un
+  `docker exec tout_doux_db pg_dump` restaurerait schéma et données en une commande, pour une
+  ligne de plus dans le script. Reporté volontairement : cela change la nature de ce qui est
+  archivé, et la restauration devra être testée avant d'être considérée comme acquise.
