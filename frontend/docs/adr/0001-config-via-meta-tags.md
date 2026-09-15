@@ -1,6 +1,7 @@
 # 0001 — Configuration runtime par balises `<meta>`
 
-- **Statut** : accepté
+- **Statut** : accepté — conséquences amendées par [0006](0006-version-from-git-tag.md) et
+  [0007](0007-runtime-config-at-container-start.md)
 - **Date** : 2022-03 (déduite des commits `1c89dc1` « build: configure docker for local and prod »
   et `05133e2` « refactor: set version in env file »)
 

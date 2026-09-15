@@ -32,6 +32,10 @@ function usage(){
   echo -e "                     Start Tout Doux application\n"
   echo -e "  u, update   [\e[33mdev\e[39m/\e[33mprod\e[39m] – \e[33mMandatory\e[39m"
   echo -e "                     Quit, pull, build and start aplication\n"
+  echo -e "  a, autoupdate [\e[33mprod\e[39m] – \e[33mMandatory\e[39m"
+  echo -e "                     Deploy a new release if one was published. Meant to be run from cron\n"
+  echo -e "     rollback [\e[33mprod\e[39m] [\e[33mX.Y.Z\e[39m] – \e[33mMandatory\e[39m"
+  echo -e "                     Pin production to a given version and freeze automatic updates\n"
   echo -e "  q, quit     [\e[33mdev\e[39m/\e[33mprod\e[39m] – \e[33mMandatory\e[39m"
   echo -e "                     Stop any running Tout Doux application\n"
   echo -e "  r, reset    [\e[33mdev\e[39m/\e[33mprod\e[39m] – \e[33mMandatory\e[39m | [\e[32m-i\e[39m/\e[32m--images\e[39m] – \e[32mOptional\e[39m | [\e[32m-v\e[39m/\e[32m--volumes\e[39m] – \e[32mOptional\e[39m"
@@ -133,6 +137,7 @@ prodInstall() {
   { echo "IMAGE_PREFIX=ghcr.io/asiberus/tout-doux"
     echo "VERSION="
     echo "PINNED=false"
+    echo "BACKUP_SCRIPT="
     echo ""
     echo "# FRONTEND/PROXY"
     echo "FRONTEND_NAME=tout_doux_frontend"
@@ -248,8 +253,8 @@ function buildApp(){
     echo -e "Building Tout Doux for development environment"
     eval "docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env build"
   elif [ "${1}" = "prod" ]; then
-    echo -e "Building Tout Doux for production environment"
-    eval "docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env build"
+    echo -e "Pulling Tout Doux production images"
+    eval "docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env pull"
   fi
 
   echo -e "\n\e[32mSUCCESS\e[39m Tout Doux is built successfully!"
@@ -260,6 +265,11 @@ function startApp(){
     echo -e "Starting Tout Doux in development environment"
     eval "docker compose --file ${basedir}/docker-compose.yml --env-file ${basedir}/.conf/development/conf.env up -d"
   elif [ "${1}" = "prod" ]; then
+    if ! grep -q '^VERSION=[0-9]' "${basedir}"/.conf/production/conf.env; then
+      echo -e "\e[31mERROR\e[39m No image version is pinned in conf.env"
+      echo -e "      Run ./td.sh autoupdate prod first, it resolves and pins the current release"
+      exit 1
+    fi
     echo -e "Starting Tout Doux in production environment"
     eval "docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${basedir}/.conf/production/conf.env up -d"
   fi
@@ -344,14 +354,86 @@ function updateApp(){
   echo -e "\e[32mSUCCESS\e[39m Tout Doux updated!"
 }
 
-# Script header
-echo # Line break
-echo -e "  ## ---------------------------------- ##"
-echo -e "  ##              \e[92mTout Doux\e[39m             ##"
-echo -e "  ##              2022/2023             ##"
-echo -e "  ##               v${vers}               ##"
-echo -e "  ## ---------------------------------- ##"
-echo # Line break
+function autoUpdateApp(){
+  envFile="${basedir}/.conf/production/conf.env"
+
+  imagePrefix=$(grep '^IMAGE_PREFIX=' "${envFile}" | cut -d= -f2-)
+  current=$(grep '^VERSION=' "${envFile}" | cut -d= -f2-)
+  pinned=$(grep '^PINNED=' "${envFile}" | cut -d= -f2-)
+  backupScript=$(grep '^BACKUP_SCRIPT=' "${envFile}" | cut -d= -f2-)
+
+  # A rollback sets PINNED=true. Without this guard the cron would reinstall within ten
+  # minutes the very release the rollback moved away from.
+  if [ "${pinned}" = "true" ]; then
+    exit 0
+  fi
+
+  git -C "${basedir}" pull --ff-only --quiet
+  docker pull -q "${imagePrefix}-frontend:latest" > /dev/null
+
+  new=$(docker image inspect \
+    --format '{{index .Config.Labels "org.opencontainers.image.version"}}' \
+    "${imagePrefix}-frontend:latest")
+
+  if [ -z "${new}" ]; then
+    echo "$(date -Iseconds) ERROR version label missing on ${imagePrefix}-frontend:latest"
+    exit 1
+  fi
+
+  if [ "${new}" = "${current}" ]; then
+    exit 0
+  fi
+
+  echo "$(date -Iseconds) ${current:-none} -> ${new}"
+
+  if [ -z "${backupScript}" ]; then
+    echo "$(date -Iseconds) ERROR BACKUP_SCRIPT is not set in conf.env, deployment cancelled"
+    exit 1
+  fi
+
+  # td.sh does not enable set -e: without this test a failing backup would be ignored and
+  # the migrations would run against a backup that was never written.
+  if ! "${backupScript}"; then
+    echo "$(date -Iseconds) ERROR backup failed, deployment cancelled"
+    exit 1
+  fi
+
+  sed -i.bak "s/^VERSION=.*/VERSION=${new}/" "${envFile}" && rm -f "${envFile}.bak"
+
+  compose="docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${envFile}"
+  eval "${compose} pull -q"
+  eval "${compose} up -d"
+
+  docker image prune -f \
+    --filter "label=org.opencontainers.image.source=https://github.com/Asiberus/Tout-doux" > /dev/null
+
+  echo "$(date -Iseconds) deployed ${new}"
+}
+
+function rollbackApp(){
+  envFile="${basedir}/.conf/production/conf.env"
+
+  sed -i.bak "s/^VERSION=.*/VERSION=${1}/" "${envFile}"
+  sed -i.bak "s/^PINNED=.*/PINNED=true/" "${envFile}"
+  rm -f "${envFile}.bak"
+
+  eval "docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${envFile} up -d"
+
+  echo -e "\n\e[32mSUCCESS\e[39m Tout Doux pinned to ${1}"
+  echo -e "      Automatic updates are frozen. Set PINNED=false in conf.env to resume."
+}
+
+# Script header - skipped for autoupdate, which runs from cron and must print nothing
+# when there is no new release to deploy
+if [[ ! ${1} == @(a|-a|autoupdate|--autoupdate) ]]; then
+  echo # Line break
+  echo -e "  ## ---------------------------------- ##"
+  echo -e "  ##              \e[92mTout Doux\e[39m             ##"
+  echo -e "  ##              2022/2023             ##"
+  echo -e "  ##               v${vers}               ##"
+  echo -e "  ## ---------------------------------- ##"
+  echo # Line break
+fi
 
 # First of all, test if user has send an argument
 if [ $# -eq 0 ]; then
@@ -421,6 +503,24 @@ do
       fi
       quitApp ${2}
       shift
+    ;;
+    -a|a|--autoupdate|autoupdate)
+      if [[ ! ${2} == "prod" ]]; then
+        echo -e "\e[31mERROR\e[39m \"${2}\" is not a supported argument to autoupdate Tout Doux."
+        echo -e "      Only the production environment can be updated automatically"
+        exit 1
+      fi
+      autoUpdateApp
+      exit 0
+    ;;
+    --rollback|rollback)
+      if [[ ! ${2} == "prod" || -z ${3} ]]; then
+        echo -e "\e[31mERROR\e[39m Missing or invalid argument to roll Tout Doux back."
+        echo -e "      Usage: ./td.sh rollback prod X.Y.Z"
+        exit 1
+      fi
+      rollbackApp ${3}
+      exit 0
     ;;
     -r|r|--reset|reset)
       if [[ ! ${2} == @(dev|prod) ]]; then

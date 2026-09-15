@@ -1,8 +1,9 @@
 # Analyse de l'infrastructure Docker, de `.conf/` et de `td.sh`
 
 Périmètre : `docker-compose.yml`, `docker-compose.prod.yml`, `.dockerignore`, l'arborescence
-`.conf/` (Dockerfiles dev et prod, `setup-config.sh`, `run.sh`, `default.conf.tpl`,
-`uwsgi_params`, templates d'environnement) et `td.sh`.
+`.conf/` (Dockerfiles dev et prod, `setup-config.sh` en dev, `set-meta-at-build.sh` et
+`set-meta-at-run.sh` en prod, `run.sh`, `default.conf.tpl`, `uwsgi_params`, templates
+d'environnement) et `td.sh`.
 
 Version analysée : `0.4.1` — branche `develop`, commit `b3afec9`.
 Date : 2026-08-16.
@@ -318,7 +319,7 @@ RUN mkdir -p /var/log/nginx/front /var/log/nginx/api && \
     ln -sf /dev/stderr /var/log/nginx/api/error.log
 ```
 
-### F3 — Course au démarrage entre nginx et le backend
+### F3 — ~~Course au démarrage entre nginx et le backend~~ ✅ résolu
 
 **Fichier** : `docker-compose.prod.yml:2-19`
 **Preuve** : **Déduit**
@@ -331,8 +332,11 @@ de Docker, nginx échoue au démarrage avec `host not found in upstream`.
 Le `restart: always` (`docker-compose.prod.yml:4`) finit par rattraper la situation, mais au prix
 de plusieurs redémarrages et d'une indisponibilité au lancement de la stack.
 
-**Correctif** : ajouter `depends_on: [backend]` au service `frontend`. Pour une robustesse
-complète, on peut aussi passer par une variable et un `resolver`, mais `depends_on` suffit ici.
+**Correctif appliqué** : sondes de vitalité sur les trois services et `depends_on: condition:
+service_healthy` en cascade — `frontend` attend `backend`, qui attend `db`. Plus strict que le
+`depends_on: [backend]` envisagé ici : nginx ne démarre plus tant que le port uwsgi n'est pas
+ouvert. Contrepartie assumée — un backend qui ne devient jamais sain rend le site totalement
+indisponible, au lieu de le laisser debout avec une API cassée.
 
 ### F4 — Le bind-mount masque le travail de l'image en développement
 
@@ -351,8 +355,9 @@ qui a deux effets non évidents :
    `@rollup/rollup-linux-arm64-musl`, est le symptôme direct de ce problème.
 2. L'`index.html` patché par `setup-config.sh` au build (`Dockerfile:32`) est remplacé par celui
    de l'hôte. Les balises `VERSION` et `API_URL` servies en dev sont donc celles versionnées dans
-   `frontend/index.html:7-8`. Cela fonctionne aujourd'hui uniquement parce que ces valeurs
-   coïncident avec la configuration (`0.4.1` et `http://localhost:8000/`).
+   `frontend/index.html:7-8`. Depuis que la version vient du tag git, la valeur commitée est le
+   repli `dev` : c'est donc `dev` qui s'affiche en développement conteneurisé, et non le numéro de
+   version. `API_URL` reste juste, `http://localhost:8000/` coïncidant avec la configuration.
 
 **Correctif** : superposer un volume anonyme pour préserver les `node_modules` de l'image.
 
@@ -433,8 +438,9 @@ suit la documentation redéploie donc le code déjà présent en croyant récup�
 version. (À noter également, la coquille « aplication », ainsi que « Stoping » aux lignes 262
 et 265.)
 
-**Correctif** : soit ajouter le `git pull`, soit corriger le texte d'aide. La seconde option est
-plus prudente : un `pull` implicite sur un dépôt de production peut surprendre.
+**Correctif** : corriger le texte d'aide d'`update`. Le `git pull` existe désormais, mais dans
+`autoupdate` seulement — le seul verbe où un `pull` implicite est assumé, puisqu'il est appelé par
+cron. `update` reste un quit + pull d'images + start.
 
 ### Q4 — `isInstalled` signale les erreurs comme des succès
 
@@ -522,7 +528,6 @@ développement se fera sous Linux, via un `ARG UID` passé au build.
 | `image: adminer` sans tag de version — seule image non épinglée, alors que `postgres`, `node` et `nginx` le sont.                                                                                | `docker-compose.yml:56`                     | Lu      |
 | `FROM … as …` en minuscules : BuildKit émet `FromAsCasing` aux lignes 1 et 27 (warnings observés pendant le build de vérification).                                                              | `.conf/production/frontend/Dockerfile:1,27` | Exécuté |
 | `python3 make g++` installés dans l'étape de build de production pour node-gyp ; probablement inutiles aujourd'hui, à valider par un build d'essai.                                              | `.conf/production/frontend/Dockerfile:16`   | Déduit  |
-| Aucun `HEALTHCHECK` sur les trois services de production.                                                                                                                                        | `docker-compose.prod.yml`                   | Lu      |
 | Pas de `SECURE_PROXY_SSL_HEADER` : nginx transmet la requête en clair à uwsgi, donc `request.is_secure()` est toujours faux derrière le proxy, alors que le trafic externe est en HTTPS.         | `backend/backend/settings.py`               | Lu      |
 | nginx tourne en root dans l'image de production (comportement par défaut de l'image officielle).                                                                                                 | `.conf/production/frontend/Dockerfile`      | Déduit  |
 | `td.sh` n'active ni `set -e` ni `set -u` ; plusieurs variables sont déréférencées sans guillemets (`td.sh:50,55,60,66`), ce qui provoque `too many arguments` si une saisie contient une espace. | `td.sh`                                     | Lu      |
@@ -554,8 +559,8 @@ hook Vite et une fonction `syncVersion` — est abandonné : il synchronisait qu
 d'en supprimer trois. Détail et alternatives écartées :
 [ADR 0006](frontend/docs/adr/0006-version-from-git-tag.md).
 
-**Reste à faire** — `VERSION=` du `conf.env` de production n'est réellement écrite par
-`td.sh autoupdate` qu'une fois `docker-compose.prod.yml` basculé de `build:` vers `image:`.
+`docker-compose.prod.yml` est basculé de `build:` vers `image:` et `td.sh autoupdate` écrit
+`VERSION=` à chaque déploiement : le dernier maillon manuel a disparu.
 
 ## 6. Ce qui est correct
 
@@ -602,16 +607,17 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
 4. **B3** — aligner les trois sources du port frontend (`conf.tpl.env`, `td.sh`, `vite.config.ts`).
    N'affecte que le développement conteneurisé : la production utilise `SERVER_PORT` de façon
    cohérente sur les trois fichiers équivalents, donc **aucun impact en production**.
-5. **F1, F2, F3** — arrêt propre d'uwsgi, journaux sur la sortie standard, `depends_on` sur le
-   frontend. Trois correctifs courts qui améliorent nettement l'exploitabilité.
+5. **F1, F2** — arrêt propre d'uwsgi, journaux sur la sortie standard. ~~**F3**~~ ✅ fait —
+   sondes de vitalité sur les trois services et `depends_on: condition: service_healthy`.
 6. ~~**S2, S3**~~ ✅ fait — CORS restreint à `SERVER_URL` (`CORS_ALLOWED_ORIGINS`), saisie des
    secrets masquée dans `td.sh` (`read -rs`).
 7. ~~**S5**~~ ✅ fait — `.conf/*/conf.env` ajouté à `.dockerignore` : les fichiers contenant les
    vrais secrets ne transitent plus dans le contexte de build Docker.
 8. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
-9. **Q9** — unifier le numéro de version sur `package.json` comme seule source (`td.sh` la lit,
-   `conf.env` du serveur est resynchronisé automatiquement à chaque build, `index.html` l'injecte
-   via Vite). Supprime l'édition manuelle SSH du `conf.env` de production à chaque release.
+9. ~~**Q9**~~ ✅ fait — le tag git est devenu la source unique, et non `package.json` : la CI
+   grave la version dans l'image, `td.sh autoupdate` écrit `VERSION=` dans le `conf.env` du
+   serveur. L'édition manuelle SSH à chaque release disparaît. Voir
+   [ADR 0006](frontend/docs/adr/0006-version-from-git-tag.md).
 10. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
 
 ## 8. Points ouverts

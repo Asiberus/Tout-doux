@@ -2,27 +2,34 @@ services:
   frontend:
     container_name: ${FRONTEND_NAME}
     restart: always
-    build:
-      context: .
-      dockerfile: .conf/production/frontend/Dockerfile
-      args:
-        ARG_VERSION: ${VERSION}
-        ARG_API_URL: ${SERVER_PROTOCOL}://${API_HOST}/
+    image: ${IMAGE_PREFIX}-frontend:${VERSION}
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     environment:
       SERVER_HOST: ${SERVER_HOST}
       SERVER_PORT: ${SERVER_PORT}
       API_HOST: ${API_HOST}
+      API_URL: ${SERVER_PROTOCOL}://${API_HOST}/
       BACKEND_PROXY: ${BACKEND_NAME}:${BACKEND_PORT}
     volumes:
       - td_static_files:/vol/static
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:${SERVER_PORT}/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      backend:
+        condition: service_healthy
   backend:
     container_name: ${BACKEND_NAME}
     restart: always
-    build:
-      context: .
-      dockerfile: ./.conf/production/backend/Dockerfile
+    image: ${IMAGE_PREFIX}-backend:${VERSION}
     environment:
       SERVER_URL: ${SERVER_PROTOCOL}://${SERVER_HOST}/
       BACKEND_PORT: ${BACKEND_PORT}
@@ -39,8 +46,15 @@ services:
       MAILJET_API_SECRET: ${MAILJET_API_SECRET}
     volumes:
       - td_static_files:/vol/web
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${BACKEND_PORT} || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   db:
     image: postgres:${DB_POSTGRES_VERSION}
     container_name: ${DB_HOST}
@@ -52,6 +66,11 @@ services:
       PGPORT: ${DB_PORT}
     volumes:
       - td_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
   td_db:
     name: td_db

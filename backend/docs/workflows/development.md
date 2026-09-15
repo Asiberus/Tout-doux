@@ -21,7 +21,8 @@ docker exec -it tout_doux_backend python manage.py createsuperuser   # 1er déma
 ```
 
 `td.sh` est à la racine du monorepo ; ses autres verbes : `edit`, `update` (quit + build +
-start), `quit`, `reset [-i|--images] [-v|--volumes]`, `help`.
+start), `quit`, `reset [-i|--images] [-v|--volumes]`, `help`. Deux verbes sont réservés à la
+production : `autoupdate prod`, appelé par cron, et `rollback prod X.Y.Z`.
 
 Quatre conteneurs :
 

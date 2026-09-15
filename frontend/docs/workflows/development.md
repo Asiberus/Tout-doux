@@ -37,11 +37,14 @@ de `index.html` :
 `src/config/config.loader.ts` les lit au chargement du module, `src/config/index.ts` les expose.
 **Deux valeurs seulement.** Pour changer l'URL de l'API en local, éditer `index.html`.
 
-En Docker, `.conf/{development,production}/frontend/setup-config.sh` réécrit ces balises par
-`sed` à partir des variables d'environnement `VERSION` / `API_URL` fournies par
-`docker-compose*.yml`. `VERSION` n'est saisie nulle part : `td.sh` la dérive du dernier tag git et
-l'exporte. Le pourquoi : [../adr/0001-config-via-meta-tags.md](../adr/0001-config-via-meta-tags.md)
-et [../adr/0006-version-from-git-tag.md](../adr/0006-version-from-git-tag.md).
+En dev, `.conf/development/frontend/setup-config.sh` réécrit les deux balises par `sed` au
+build, depuis les variables fournies par `docker-compose.yml` ; `VERSION` n'est saisie nulle part,
+`td.sh` la dérive du dernier tag git et l'exporte. En production les deux valeurs sont séparées :
+`set-meta-at-build.sh` grave `VERSION` dans l'image, `set-meta-at-run.sh` injecte `API_URL` au
+démarrage du conteneur. Le pourquoi :
+[../adr/0001-config-via-meta-tags.md](../adr/0001-config-via-meta-tags.md),
+[../adr/0006-version-from-git-tag.md](../adr/0006-version-from-git-tag.md) et
+[../adr/0007-runtime-config-at-container-start.md](../adr/0007-runtime-config-at-container-start.md).
 
 ## Pièges
 
