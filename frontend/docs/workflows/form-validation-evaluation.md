@@ -29,7 +29,7 @@ Personne ne doit adopter une librairie en croyant réparer ça.
 | Règles non typées             | `ValidationRule = (value: any)` côté Vuetify, d'où le seul `any` de la couche modèles (`common.model.ts:9`), écart déjà assumé dans `patterns/forms.md`                                                      |
 | Cross-field bricolé           | `validatePasswordMatch()` passe par un `setTimeout` de 300 ms alors qu'aucun appel réseau n'est en jeu                                                                                                       |
 | Aucune règle réutilisable     | 18 blocs `rules:` recopiés dans 19 SFC ; « required » et « max 100 caractères » sont réécrits à l'identique une dizaine de fois                                                                              |
-| Rien n'est testable isolément | Les règles sont des closures anonymes dans un `ref` de composant. Le projet n'a par ailleurs aucun test (cf. [../quality/watched-risks.md](../quality/watched-risks.md), W1)                                 |
+| Rien n'est testable isolément | Les règles sont des closures anonymes dans un `ref` de composant. Les composants ne sont par ailleurs pas encore couverts (cf. [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md), R13)  |
 
 ## 2. Le périmètre à couvrir
 
@@ -304,8 +304,8 @@ formulaires et d'un style qui jure avec le reste du projet.
 est atténué par le fait que Regle est _headless_ — la sortie de secours consiste à revenir aux
 `:rules` de Vuetify, champ par champ, sans toucher aux templates ni aux modèles.
 
-**Condition d'abandon de tout le lot** : ce projet n'a **aucun test automatisé**
-([../quality/watched-risks.md](../quality/watched-risks.md), W1). Migrer la validation de 19
+**Condition d'abandon de tout le lot** : **aucun composant n'est couvert par un test**
+([../quality/refactoring-backlog.md](../quality/refactoring-backlog.md), R13). Migrer la validation de 19
 formulaires sans filet est le risque dominant de l'opération, devant le choix de la librairie
 lui-même. Si les deux étapes ci-dessus ne sont pas menées écran par écran avec une QA manuelle à
 chaque étape, mieux vaut s'en tenir à l'option 0.

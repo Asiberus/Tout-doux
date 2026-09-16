@@ -39,8 +39,9 @@ volume : pas de rebuild sauf si `requirements.txt` change.
 non-régression** gèlent le contrat d'API et le nombre de requêtes SQL (`test_api_contract.py`,
 `test_query_counts.py` — voir
 [docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)).
-**Toujours aucun test métier, aucun linter, aucun formateur, aucune CI.** Le reste passe par la
-procédure manuelle de [docs/workflows/verification.md](docs/workflows/verification.md).
+**Toujours aucun test métier, aucun linter, aucun formateur.** Une CI les lance à chaque PR
+(`.github/workflows/ci.yml`) ; le reste passe par la procédure manuelle de
+[docs/workflows/verification.md](docs/workflows/verification.md).
 
 ## Règles à respecter en écrivant du code
 

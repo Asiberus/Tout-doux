@@ -7,14 +7,15 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > **Cycle de vie** : quand un item est résolu, **supprimer sa ligne et sa section**. Ne pas le
 > marquer « Fait » — `git log` est déjà le registre du corrigé.
 
-| ID  | Titre                                                              | Priorité  | Raison de la priorité                                                 |
-| --- | ------------------------------------------------------------------ | --------- | --------------------------------------------------------------------- |
-| R1  | Dockerfile de production cassé (`package-lock.json` inexistant)    | **haute** | Le build de prod ne peut pas aboutir                                  |
-| R2  | Intercepteur 401 : `error.response` déréférencé sans garde         | **haute** | Masque toute erreur réseau par un `TypeError`                         |
-| R5  | Dérive doc↔code des fichiers d'instruction                        | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige            |
-| R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion                      |
-| R12 | « Aujourd'hui » figé au rendu dans tout le domaine daily           | moyenne   | Une page ouverte au passage de minuit laisse écrire sur un jour passé |
-| R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                           |
+| ID  | Titre                                                              | Priorité  | Raison de la priorité                                                  |
+| --- | ------------------------------------------------------------------ | --------- | ---------------------------------------------------------------------- |
+| R1  | Dockerfile de production cassé (`package-lock.json` inexistant)    | **haute** | Le build de prod ne peut pas aboutir                                   |
+| R2  | Intercepteur 401 : `error.response` déréférencé sans garde         | **haute** | Masque toute erreur réseau par un `TypeError`                          |
+| R5  | Dérive doc↔code des fichiers d'instruction                        | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige             |
+| R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion                       |
+| R13 | Couverture partielle : composants, stores, composables, guards     | moyenne   | Les règles daily ne vivent que dans l'UI et ne sont couvertes par rien |
+| R12 | « Aujourd'hui » figé au rendu dans tout le domaine daily           | moyenne   | Une page ouverte au passage de minuit laisse écrire sur un jour passé  |
+| R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                            |
 
 > **Items transférés au tracker de migration.** Sept items relevant du chantier Vuetify 4 ont été
 > déplacés vers [../workflows/vuetify-4-migration.md](../workflows/vuetify-4-migration.md), qui est
@@ -85,6 +86,24 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
   l'import du même nom venant du service.
 - **Décision** : agir — supprimer le fichier et son export. Aucun appelant, aucun risque.
   Voir [../adr/0002-pinia-stores-scope.md](../adr/0002-pinia-stores-scope.md).
+
+## R13 — Couverture partielle : composants, stores, composables, guards
+
+- **Origine** : suite Vitest installée au même commit que `ci.yml`. `yarn test:ci` publie le taux.
+- **Contexte** : 62 tests couvrent `utils/`, `pipes/`, la couche `api/` (substitution des routes
+  à paramètre, params par défaut) et `axios/` (intercepteurs, comportement du 401). Taux de
+  départ : **22,88 %** des instructions. Restent découverts, par ordre de risque décroissant :
+  le domaine daily, dont les règles métier sont appliquées **par l'UI seulement**
+  ([../domain/daily-rules.md](../domain/daily-rules.md)) via `utils/daily-task.utils.ts` et
+  `composables/useAddTaskToDaily.ts` ; les stores Pinia, dont `project.store.ts` (283 lignes) ;
+  et le guard d'authentification — une route publique oubliée dans `nonAuthRoutes` est protégée
+  **en silence** ([../architecture/routing.md](../architecture/routing.md)).
+- **Décision** : agir par lots, dans cet ordre. Pas de seuil de couverture en porte de CI :
+  côté front la couverture reste la **carte** de ce qui n'est pas visité, pas le critère. Un
+  seuil récompenserait les tests triviaux sur les barrels et les modèles.
+- **Hors périmètre assumé** : `views/`, `layout/`, les barrels `index.ts`, et le markup rendu.
+  Aucun snapshot de DOM — le rendu d'un composant Vuetify est à 90 % la structure de Vuetify, un
+  snapshot casserait à chaque montée de version sans jamais signaler de régression.
 
 ## R12 — « Aujourd'hui » figé au rendu dans tout le domaine daily
 

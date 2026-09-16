@@ -12,8 +12,7 @@ raison est indiquée pour chaque item.
 
 | ID  | Titre                                                         | Nature      | Déclencheur                                                 |
 | --- | ------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
-| W1  | Aucun test automatisé                                         | Fiabilité   | > 1 développeur, ou 2 régressions sur un même endpoint      |
-| W2  | Aucun linter, formateur ni CI sur le backend                  | Fiabilité   | Une contribution à relire par un tiers                      |
+| W2  | Aucun linter ni formateur sur le backend                      | Fiabilité   | Une contribution à relire par un tiers                      |
 | W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour |
 | W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh` |
 | W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/` |
@@ -25,33 +24,19 @@ raison est indiquée pour chaque item.
 
 ---
 
-## W1 — Aucun test automatisé
-
-- **Origine** : `tout_doux/tests.py` — squelette de `startapp`, jamais rempli. Aucun autre
-  fichier de test dans `backend/`.
-- **Contexte** : la logique métier est concentrée dans les sérialiseurs, sous forme de
-  conditions croisées (47 lignes pour `event_post_or_patch.validate`, 4 conditions simultanées
-  pour la propagation d'achèvement d'un daily task). C'est exactement ce qu'un test unitaire
-  couvre bien et qu'une vérification manuelle couvre mal.
-- **Décision** : ne pas agir. Un développeur unique, qui est aussi l'utilisateur, détecte les
-  régressions à l'usage. Le coût d'écriture d'une base de tests dépasse aujourd'hui le coût des
-  régressions constatées.
-- **Déclencheur** : un second contributeur, ou deux régressions successives sur le même
-  endpoint. Le premier test à écrire est celui de la propagation d'achèvement
-  ([../domain/daily-rules.md](../domain/daily-rules.md)) — c'est la règle la plus subtile et la
-  plus coûteuse à vérifier à la main.
-
-## W2 — Aucun linter, formateur ni CI sur le backend
+## W2 — Aucun linter ni formateur sur le backend
 
 - **Origine** : absence de `setup.cfg`, `pyproject.toml`, `.flake8`, `tox.ini` ;
-  `.github/workflows/deployment.yml` ne fait que construire et relancer les images.
+  `.github/workflows/ci.yml` lance les tests mais n'exécute aucun linter.
 - **Contexte** : rien ne relit le code. C'est ce qui a laissé passer R1 (`is not` au lieu de
   `!=`, que `ruff` signale en `F632`), R2 (`print` résiduel) et R9 (configuration morte). Trois
   des dix items du backlog seraient détectés par un linter standard, sans configuration
   particulière.
 - **Décision** : ne pas agir **en tant que tel** — mais noter que le rapport coût/bénéfice est
-  ici bien meilleur que pour W1 : un `ruff check` en hook `pre-commit` coûte une ligne de
-  configuration. C'est le premier outillage à poser si l'on ne devait en poser qu'un.
+  excellent : un `ruff check` coûte une ligne de configuration, en hook `pre-commit` ou comme
+  étape de `ci.yml`. C'est le prochain outillage à poser. Il n'a pas été ajouté en même temps
+  que la CI pour ne pas cumuler deux chantiers : mettre `ruff` au vert sur tout le dépôt est un
+  travail en soi.
 - **Déclencheur** : une contribution externe à relire, ou la correction de R1 (poser le linter
   au même moment évite la 14ᵉ occurrence).
 
