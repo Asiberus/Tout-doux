@@ -17,7 +17,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -q --spider http://localhost:${SERVER_PORT}/ || exit 1",
+          "wget -q --spider http://127.0.0.1:${SERVER_PORT}/ || exit 1",
         ]
       interval: 30s
       timeout: 5s
@@ -47,7 +47,7 @@ services:
     volumes:
       - td_static_files:/vol/web
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost ${BACKEND_PORT} || exit 1"]
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 ${BACKEND_PORT} || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
