@@ -357,18 +357,30 @@ function updateApp(){
 function autoUpdateApp(){
   envFile="${basedir}/.conf/production/conf.env"
 
+  log() { echo "$(date '+%Y-%m-%d %H:%M:%S') —— $*"; }
+  # Only chatty on a terminal: from cron nothing must be printed when there is nothing
+  # to deploy, otherwise the log grows by a few lines every ten minutes.
+  trace() { if [ -t 1 ]; then log "$@"; fi; }
+
   imagePrefix=$(grep '^IMAGE_PREFIX=' "${envFile}" | cut -d= -f2-)
   current=$(grep '^VERSION=' "${envFile}" | cut -d= -f2-)
   pinned=$(grep '^PINNED=' "${envFile}" | cut -d= -f2-)
   backupScript=$(grep '^BACKUP_SCRIPT=' "${envFile}" | cut -d= -f2-)
 
+  trace "Tout Doux autoupdate starting"
+  trace "deployed version: ${current:-none}"
+
   # A rollback sets PINNED=true. Without this guard the cron would reinstall within ten
   # minutes the very release the rollback moved away from.
   if [ "${pinned}" = "true" ]; then
+    trace "PINNED is true, automatic updates are frozen"
     exit 0
   fi
 
+  trace "pulling the repository"
   git -C "${basedir}" pull --ff-only --quiet
+
+  trace "pulling ${imagePrefix}-frontend:latest"
   docker pull -q "${imagePrefix}-frontend:latest" > /dev/null
 
   new=$(docker image inspect \
@@ -376,38 +388,50 @@ function autoUpdateApp(){
     "${imagePrefix}-frontend:latest")
 
   if [ -z "${new}" ]; then
-    echo "$(date -Iseconds) ERROR version label missing on ${imagePrefix}-frontend:latest"
+    log "ERROR version label missing on ${imagePrefix}-frontend:latest"
     exit 1
   fi
 
+  trace "published version: ${new}"
+
   if [ "${new}" = "${current}" ]; then
+    trace "nothing to deploy"
     exit 0
   fi
 
-  echo "$(date -Iseconds) ${current:-none} -> ${new}"
+  log
+  log "new release detected: ${current:-none} -> ${new}"
 
   if [ -z "${backupScript}" ]; then
-    echo "$(date -Iseconds) ERROR BACKUP_SCRIPT is not set in conf.env, deployment cancelled"
+    log "ERROR BACKUP_SCRIPT is not set in conf.env, deployment cancelled"
     exit 1
   fi
+
+  log "running backup: ${backupScript}"
 
   # td.sh does not enable set -e: without this test a failing backup would be ignored and
   # the migrations would run against a backup that was never written.
   if ! "${backupScript}"; then
-    echo "$(date -Iseconds) ERROR backup failed, deployment cancelled"
+    log "ERROR backup failed, deployment cancelled"
     exit 1
   fi
 
+  log "pinning VERSION=${new} in conf.env"
   sed -i.bak "s/^VERSION=.*/VERSION=${new}/" "${envFile}" && rm -f "${envFile}.bak"
 
   compose="docker compose --file ${basedir}/docker-compose.prod.yml --env-file ${envFile}"
+
+  log "pulling production images"
   eval "${compose} pull -q"
+
+  log "recreating containers"
   eval "${compose} up -d"
 
+  log "pruning obsolete images"
   docker image prune -f \
     --filter "label=org.opencontainers.image.source=https://github.com/Asiberus/Tout-doux" > /dev/null
 
-  echo "$(date -Iseconds) deployed ${new}"
+  log "deployed ${new}"
 }
 
 function rollbackApp(){
