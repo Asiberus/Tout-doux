@@ -557,7 +557,7 @@ Les fichiers du dépôt cessent d'être autoritatifs : `package.json` passe à `
 développement. Le correctif proposé ici auparavant — `package.json` comme source unique, avec un
 hook Vite et une fonction `syncVersion` — est abandonné : il synchronisait quatre fichiers au lieu
 d'en supprimer trois. Détail et alternatives écartées :
-[ADR 0006](frontend/docs/adr/0006-version-from-git-tag.md).
+[ADR 0006](../frontend/docs/adr/0006-version-from-git-tag.md).
 
 `docker-compose.prod.yml` est basculé de `build:` vers `image:` et `td.sh autoupdate` écrit
 `VERSION=` à chaque déploiement : le dernier maillon manuel a disparu.
@@ -617,7 +617,7 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
 9. ~~**Q9**~~ ✅ fait — le tag git est devenu la source unique, et non `package.json` : la CI
    grave la version dans l'image, `td.sh autoupdate` écrit `VERSION=` dans le `conf.env` du
    serveur. L'édition manuelle SSH à chaque release disparaît. Voir
-   [ADR 0006](frontend/docs/adr/0006-version-from-git-tag.md).
+   [ADR 0006](../frontend/docs/adr/0006-version-from-git-tag.md).
 10. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
 
 ## 8. Points ouverts
