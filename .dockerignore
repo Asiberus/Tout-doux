@@ -8,6 +8,8 @@ npm-debug.log
 **/dist
 **/.husky
 **/tests
+**/coverage
+**/*.spec.ts
 
 # Docker
 docker-compose*.yml

@@ -188,9 +188,9 @@ Ces deux tests couvrent la chaîne complète — routeur, knox, DRF, ORM, Postgr
 exactement ce que la migration met en danger. Ils prennent dix minutes à écrire et transforment
 chaque section ci-dessous en « je relance, c'est vert ou c'est rouge ».
 
-> ⚠️ Ce fichier est aujourd'hui le squelette de `startapp` (`tout_doux/tests.py`). Le remplir
-> **rouvre** W1 de [../quality/watched-risks.md](../quality/watched-risks.md) : mettre cette fiche
-> à jour, ou la supprimer si elle devient sans objet.
+> ⚠️ `tout_doux/tests.py` porte désormais 17 tests de fumée, complétés par `test_api_contract.py`
+> et `test_query_counts.py`. Les tests métier restent à écrire :
+> [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R14.
 
 ### 0.4 Vérification après **chaque** section
 
@@ -949,7 +949,7 @@ Les déclencheurs de `../CLAUDE.md` sont atteints par ce chantier. À reprendre 
 | [development.md](development.md)                                       | « Python 3.9 vit dans l'image » ; le tableau des variables d'environnement (numéros de ligne de `settings.py` décalés) ; Mailjet             |
 | [verification.md](verification.md)                                     | `show_urls` si django-extensions est retiré (§2.4) ; le nouveau niveau de référence de `check --deploy` (§3.4) ; l'existence de tests (§0.3) |
 | [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) | **Supprimer** R5 et R6 (lignes du tableau **et** sections)                                                                                   |
-| [../quality/watched-risks.md](../quality/watched-risks.md)             | W1 si §0.3 est fait ; nouvelle fiche si `django-mailjet` est conservé (§1.5)                                                                 |
+| [../quality/watched-risks.md](../quality/watched-risks.md)             | Nouvelle fiche si `django-mailjet` est conservé (§1.5)                                                                                       |
 | [../architecture/auth.md](../architecture/auth.md)                     | Si elle décrit le modèle `AuthToken` de knox (§1.6)                                                                                          |
 | [../architecture/api-surface.md](../architecture/api-surface.md)       | Si sa table mentionne `url()` ou le non-ancrage des routes (§1.1)                                                                            |
 | `../CLAUDE.md`                                                         | Bloc « Contexte » (« Django 3.2 + DRF 3.12 ») ; ligne « Routes » du tableau des pièges                                                       |
@@ -982,7 +982,7 @@ contenter de « il y en a plus qu'avant ».
   à part.
 - **4.3 Outillage** — `ruff` + un hook `pre-commit` sur `backend/`. La migration touche 6 fichiers
   Python et 4 fichiers de configuration ; c'est peu, mais c'est le bon moment pour poser le
-  garde-fou que W1/W2 de [../quality/watched-risks.md](../quality/watched-risks.md) surveillent.
+  garde-fou que W2 de [../quality/watched-risks.md](../quality/watched-risks.md) surveille.
 - **4.4 `CORS_ALLOWED_ORIGINS`** au lieu de `CORS_ALLOW_ALL_ORIGINS` (cf. §1.3).
 - **4.5 `AUTO_REFRESH_MAX_TTL`** de knox (cf. §1.6).
 
@@ -1064,4 +1064,4 @@ DRF, dont la version change. Exercer au minimum, avec deux comptes :
 - [verification.md](verification.md) — la procédure manuelle, et pourquoi elle est le seul filet
 - [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) — R5 et R6, que ce
   chantier clôt
-- [../quality/watched-risks.md](../quality/watched-risks.md) — W1 et W2, l'absence d'outillage
+- [../quality/watched-risks.md](../quality/watched-risks.md) — W2, l'absence de linter

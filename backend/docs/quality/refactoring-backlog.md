@@ -10,6 +10,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | ID  | Titre                                                                    | Priorité  | Raison de la priorité                                         |
 | --- | ------------------------------------------------------------------------ | --------- | ------------------------------------------------------------- |
 | R1  | Contrôle d'appartenance écrit avec `is not` (13 occurrences)             | **haute** | Rend l'application inutilisable pour tout compte d'`id` > 256 |
+| R14 | Aucun test métier ; couverture à porter à 100 %                          | **haute** | Le cloisonnement entre comptes n'est vérifié par rien         |
 | R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`   | **haute** | Atteint tout compte créé hors inscription, dont le superuser  |
 | R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`)  | **haute** | Deux surfaces d'administration mortes, et une doc qui ment    |
 | R4  | « Aujourd'hui » calculé en UTC alors que `TIME_ZONE` vaut `Europe/Paris` | moyenne   | Fenêtre de dysfonctionnement quotidienne de 1 à 2 h           |
@@ -22,6 +23,30 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API   | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
 
 ---
+
+## R14 — Aucun test métier ; couverture à porter à 100 %
+
+- **Origine** : `.coveragerc` posé au même commit que `ci.yml`. Le premier run publie le taux
+  de départ.
+- **Contexte** : les 93 tests couvrent la plomberie, le contrat d'API et le nombre de requêtes
+  SQL — c'est-à-dire ce qui est **observable**, pas ce qui est **garanti**. Quatre invariants que
+  la doc nomme elle-même ne sont vérifiés par rien : le cloisonnement entre comptes (les trois
+  gestes de [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md), qu'aucun
+  linter ne contrôle), les gardes d'archivage (à écrire **trois** fois par ressource), la
+  propagation d'achèvement d'un daily task ([../domain/daily-rules.md](../domain/daily-rules.md)),
+  et l'effacement silencieux des heures par `takesWholeDay`
+  ([../domain/events.md](../domain/events.md)).
+- **Décision** : agir, par paliers. L'ordre est celui du risque, pas celui du chiffre : d'abord
+  le cloisonnement (un test paramétré qui, pour chaque ressource, exige un 404 sur l'`id` d'un
+  autre utilisateur couvre les 12 modèles d'un coup), puis les gardes d'archivage, puis les
+  règles daily. L'objectif est 100 % **par exclusion explicite** : `branch = True`, et chaque
+  ligne réellement inatteignable marquée `# pragma: no cover` avec justification en revue — pas
+  100 % brut, qui pousserait à écrire des tests pour le chiffre.
+- **Cliquet** : `fail_under` réglé sur la valeur mesurée, remonté à chaque palier. Jamais réglé
+  au-dessus de l'existant, sinon la CI est rouge pour une dette qu'on n'a pas encore payée.
+- **Note** : la couverture prouve l'**exécution**, pas l'**assertion**. On peut atteindre 100 %
+  sans aucun test de fuite entre comptes. Le taux est la carte de ce qui n'est pas visité, pas le
+  critère de qualité.
 
 ## R1 — Contrôle d'appartenance écrit avec `is not`
 

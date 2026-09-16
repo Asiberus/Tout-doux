@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master, develop]
+  push:
+    branches: [master]
+
+# Un nouveau push sur une PR rend le run précédent obsolète : l'annuler évite de payer deux fois
+# pour un résultat qu'on jette.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tout_doux
+          POSTGRES_USER: tout_doux
+          POSTGRES_PASSWORD: tout_doux
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: tout_doux
+      DB_USER: tout_doux
+      DB_PASSWORD: tout_doux
+      SECRET_KEY: ci-secret-key
+      DEBUG: 0
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      # `psycopg2` n'est pas la variante `-binary` : il se compile et réclame `pg_config`.
+      - name: Dépendances système
+        run: sudo apt-get update && sudo apt-get install --yes libpq-dev
+
+      - name: Dépendances Python
+        run: pip install --requirement requirements-dev.txt
+
+      - name: Configuration
+        run: python manage.py check
+
+      - name: Migrations à jour
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        run: coverage run manage.py test tout_doux
+
+      - name: Couverture
+        run: coverage report
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.23.1"
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: Dépendances
+        run: yarn install --frozen-lockfile
+
+      - name: ESLint
+        run: yarn lint:check
+
+      - name: Prettier
+        run: yarn format:check
+
+      - name: Tests
+        run: yarn test:ci
