@@ -102,7 +102,7 @@ devInstall() {
   touch "${basedir}"/.conf/development/conf.env
   { echo "# FRONTEND"
     echo "FRONTEND_NAME=tout_doux_frontend"
-    echo "FRONTEND_PORT=8080"
+    echo "FRONTEND_PORT=3000"
     echo ""
     echo "# BACKEND"
     echo "BACKEND_NAME=tout_doux_backend"

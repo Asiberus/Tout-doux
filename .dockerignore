@@ -17,10 +17,8 @@ Dockerfile
 .conf/*/conf.env
 
 # Python
-app/__pycache__/
-app/*/__pycache__/
-app/*/*/__pycache__/
-app/*/*/*/__pycache__/
+**/__pycache__/
+**/*.pyc
 .env/
 .venv/
 venv/

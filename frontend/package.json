@@ -61,25 +61,6 @@
     "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^3.3.8"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-android-arm-eabi": "*",
-    "@rollup/rollup-android-arm64": "*",
-    "@rollup/rollup-darwin-arm64": "*",
-    "@rollup/rollup-darwin-x64": "*",
-    "@rollup/rollup-linux-arm-gnueabihf": "*",
-    "@rollup/rollup-linux-arm-musleabihf": "*",
-    "@rollup/rollup-linux-arm64-gnu": "*",
-    "@rollup/rollup-linux-arm64-musl": "*",
-    "@rollup/rollup-linux-powerpc64le-gnu": "*",
-    "@rollup/rollup-linux-riscv64-gnu": "*",
-    "@rollup/rollup-linux-s390x-gnu": "*",
-    "@rollup/rollup-linux-x64-gnu": "*",
-    "@rollup/rollup-linux-x64-musl": "*"
-  },
-  "os": [
-    "darwin",
-    "linux"
-  ],
   "volta": {
     "node": "22.23.1",
     "yarn": "1.22.19"
