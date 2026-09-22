@@ -2,6 +2,7 @@ import { EventModel, EventPostOrPatch } from '@/models/event.model'
 import { SectionPost, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { isPassed, sortEvents } from '@/utils/event.utils'
+import { useNow } from '@/composables/useNow'
 import { ProjectDetail, ProjectPatch } from '@/models/project.model'
 import {
   filterCompleted,
@@ -79,11 +80,13 @@ export const useProjectStore = defineStore<
     },
     comingEvents(state): EventModel[] {
       if (!state.currentProject) return []
-      return state.currentProject.events.filter(event => !isPassed(event))
+      const { now } = useNow()
+      return state.currentProject.events.filter(event => !isPassed(event, now.value))
     },
     passedEvents(state): EventModel[] {
       if (!state.currentProject) return []
-      return state.currentProject.events.filter(event => isPassed(event)).reverse()
+      const { now } = useNow()
+      return state.currentProject.events.filter(event => isPassed(event, now.value)).reverse()
     },
   },
   actions: {

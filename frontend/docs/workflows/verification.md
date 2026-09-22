@@ -4,18 +4,22 @@
 
 ## Ce qui est réellement contrôlé
 
-| Contrôle                                         | Où                                                          | Bloquant ?                                                              |
-| ------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged`                           | ✅ **oui**                                                              |
-| `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                                                      |
-| Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                                                  |
-| `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — nulle part                                                 |
-| Tests                                            | —                                                           | ❌ **aucun test n'existe**                                              |
-| CI                                               | `.github/workflows/deployment.yml`                          | ❌ déploiement **manuel** (`workflow_dispatch`), aucun contrôle qualité |
+| Contrôle                                         | Où                                                          | Bloquant ?                                     |
+| ------------------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------- |
+| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged`                           | ✅ **oui**                                     |
+| `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                             |
+| Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                         |
+| `yarn lint:check` + `yarn format:check`          | CI, job `Frontend`, à chaque PR                             | ✅ oui — rattrape un `commit --no-verify`      |
+| `yarn test:ci` (62 tests Vitest)                 | CI, job `Frontend` + `yarn test` en local                   | ✅ oui                                         |
+| `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — 28 erreurs préexistantes, hors CI |
 
-**Le hook pre-commit est le seul garde-fou automatique du projet.** Il est fonctionnel (testé),
-même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de husky v8
-(`. "$(dirname "$0")/_/husky.sh"`).
+Le hook `pre-commit` reste le garde-fou **local** ; la CI est le garde-fou **partagé**. Le hook
+est fonctionnel (testé), même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de
+husky v8 (`. "$(dirname "$0")/_/husky.sh"`).
+
+⚠️ **La CI ne bloque un merge que si la protection de branche l'exige** (Settings → Branches sur
+GitHub, pas dans ce dépôt). Sans elle, une PR rouge reste mergeable — et depuis que
+`release.yml` publie `latest` au merge, une release rouge se déploie seule dans les dix minutes.
 
 **Rien ne vérifie les frontières entre couches** : `eslint.config.mjs` ne contient aucune règle
 `no-restricted-imports` ni plugin `import`/`boundaries`. Les règles de
@@ -38,10 +42,14 @@ même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de husky v8
 2. `yarn lint` — attention, ce script applique `--fix`. Le hook, lui, lance `eslint` **sans**
    `--fix` : un problème non auto-corrigeable bloque le commit.
 
-3. **Test manuel de l'écran touché.** C'est le seul filet contre les régressions : il n'y a ni
-   test unitaire, ni e2e, ni test de régression visuelle.
+3. `yarn test` — couvre `utils/`, `pipes/`, `api/` et `axios/`. **Les composants, les stores, les
+   composables et les guards ne sont pas couverts** : voir
+   [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R13.
 
-4. **Mettre à jour la doc** si le changement correspond à un déclencheur de
+4. **Test manuel de l'écran touché.** Toujours nécessaire pour tout ce que la suite ne couvre
+   pas — il n'y a ni e2e, ni test de régression visuelle.
+
+5. **Mettre à jour la doc** si le changement correspond à un déclencheur de
    [../README.md](../README.md) — dans le **même** commit.
 
 ## Pièges

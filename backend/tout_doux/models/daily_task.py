@@ -1,6 +1,5 @@
-import datetime
-
 from django.db import models
+from django.utils import timezone
 
 from tout_doux.models.common_task import CommonTask
 from tout_doux.models.tag import Tag
@@ -18,7 +17,7 @@ class DailyTask(UserRelatedModel):
         (FINISH, 'Finir'),
     )
 
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=timezone.localdate)
     task = models.ForeignKey(
         Task,
         on_delete=models.SET_NULL,

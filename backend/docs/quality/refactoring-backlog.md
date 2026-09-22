@@ -7,21 +7,45 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > **Cycle de vie** : quand un item est résolu, **supprimer sa ligne et sa section**. Ne pas le
 > marquer « Fait » — `git log` est déjà le registre du corrigé.
 
-| ID  | Titre                                                                    | Priorité  | Raison de la priorité                                         |
-| --- | ------------------------------------------------------------------------ | --------- | ------------------------------------------------------------- |
-| R1  | Contrôle d'appartenance écrit avec `is not` (13 occurrences)             | **haute** | Rend l'application inutilisable pour tout compte d'`id` > 256 |
-| R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`   | **haute** | Atteint tout compte créé hors inscription, dont le superuser  |
-| R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`)  | **haute** | Deux surfaces d'administration mortes, et une doc qui ment    |
-| R4  | « Aujourd'hui » calculé en UTC alors que `TIME_ZONE` vaut `Europe/Paris` | moyenne   | Fenêtre de dysfonctionnement quotidienne de 1 à 2 h           |
-| R8  | Cycle d'imports entre les barrels de `serializers/`                      | moyenne   | Un réordonnancement anodin casse le démarrage                 |
-| R10 | Dérive doc↔code des références du monorepo                              | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige    |
-| R2  | `print(request.method)` résiduel dans `CreateOrAdmin`                    | basse     | Correction d'une ligne                                        |
-| R7  | `openapi.yaml` : stub mort à la racine du monorepo                       | basse     | Laisse croire à un contrat maintenu                           |
-| R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`                | basse     | Configuration morte                                           |
-| R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé          | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
-| R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API   | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
+| ID  | Titre                                                                   | Priorité  | Raison de la priorité                                         |
+| --- | ----------------------------------------------------------------------- | --------- | ------------------------------------------------------------- |
+| R1  | Contrôle d'appartenance écrit avec `is not` (13 occurrences)            | **haute** | Rend l'application inutilisable pour tout compte d'`id` > 256 |
+| R14 | Aucun test métier ; couverture à porter à 100 %                         | **haute** | Le cloisonnement entre comptes n'est vérifié par rien         |
+| R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`  | **haute** | Atteint tout compte créé hors inscription, dont le superuser  |
+| R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`) | **haute** | Deux surfaces d'administration mortes, et une doc qui ment    |
+| R8  | Cycle d'imports entre les barrels de `serializers/`                     | moyenne   | Un réordonnancement anodin casse le démarrage                 |
+| R10 | Dérive doc↔code des références du monorepo                             | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige    |
+| R2  | `print(request.method)` résiduel dans `CreateOrAdmin`                   | basse     | Correction d'une ligne                                        |
+| R7  | `openapi.yaml` : stub mort à la racine du monorepo                      | basse     | Laisse croire à un contrat maintenu                           |
+| R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`               | basse     | Configuration morte                                           |
+| R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé         | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
+| R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API  | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
 
 ---
+
+## R14 — Aucun test métier ; couverture à porter à 100 %
+
+- **Origine** : `.coveragerc` posé au même commit que `ci.yml`. Le premier run publie le taux
+  de départ.
+- **Contexte** : les 93 tests couvrent la plomberie, le contrat d'API et le nombre de requêtes
+  SQL — c'est-à-dire ce qui est **observable**, pas ce qui est **garanti**. Quatre invariants que
+  la doc nomme elle-même ne sont vérifiés par rien : le cloisonnement entre comptes (les trois
+  gestes de [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md), qu'aucun
+  linter ne contrôle), les gardes d'archivage (à écrire **trois** fois par ressource), la
+  propagation d'achèvement d'un daily task ([../domain/daily-rules.md](../domain/daily-rules.md)),
+  et l'effacement silencieux des heures par `takesWholeDay`
+  ([../domain/events.md](../domain/events.md)).
+- **Décision** : agir, par paliers. L'ordre est celui du risque, pas celui du chiffre : d'abord
+  le cloisonnement (un test paramétré qui, pour chaque ressource, exige un 404 sur l'`id` d'un
+  autre utilisateur couvre les 12 modèles d'un coup), puis les gardes d'archivage, puis les
+  règles daily. L'objectif est 100 % **par exclusion explicite** : `branch = True`, et chaque
+  ligne réellement inatteignable marquée `# pragma: no cover` avec justification en revue — pas
+  100 % brut, qui pousserait à écrire des tests pour le chiffre.
+- **Cliquet** : `fail_under` réglé sur la valeur mesurée, remonté à chaque palier. Jamais réglé
+  au-dessus de l'existant, sinon la CI est rouge pour une dette qu'on n'a pas encore payée.
+- **Note** : la couverture prouve l'**exécution**, pas l'**assertion**. On peut atteindre 100 %
+  sans aucun test de fuite entre comptes. Le taux est la carte de ce qui n'est pas visité, pas le
+  critère de qualité.
 
 ## R1 — Contrôle d'appartenance écrit avec `is not`
 
@@ -79,23 +103,6 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
   l'authentification par nom d'utilisateur sur **toute** l'application, `/auth/login/` compris.
   C'est un changement de comportement à arbitrer pour lui-même.
 - **Voir aussi** : R3 — les comptes créés par `createsuperuser` sont déjà un angle mort.
-
-## R4 — « Aujourd'hui » calculé en UTC
-
-- **Origine** : `views/daily_task.py:83`, `serializers/daily_task/daily_task_patch.py:57`,
-  `serializers/daily_task/daily_task_post.py:validate_date`,
-  `queries.py:daily_carry_over_candidates` et le `default` de `DailyTask.date`.
-- **Contexte** : ces points utilisent `datetime.date.today()`, qui lit l'horloge système.
-  Vérifié : le conteneur est en **UTC** (`time.tzname` → `('UTC','UTC')`, pas de variable `TZ`),
-  alors que `settings.TIME_ZONE` vaut `Europe/Paris`. Entre 00:00 et 02:00 heure de Paris (01:00
-  en hiver), le serveur est encore la veille. Depuis l'ouverture de la planification sur les
-  jours futurs, les gardes comparent `<` et non `!=` : le symptôme s'est **inversé**. Il n'est
-  plus bloquant mais permissif — pendant cette fenêtre la veille reste modifiable et
-  supprimable, et toute ligne créée sans `date` explicite est datée de la veille.
-- **Décision** : agir. `django.utils.timezone.localdate()` respecte `TIME_ZONE` et corrige les
-  points en Python. La moitié modèle est **déjà faite** : `DailyTask.date` est passé de
-  `auto_now_add` à `default=datetime.date.today` (migration `0009`) pour rendre le champ
-  saisissable — il ne reste qu'à y substituer `timezone.localdate`.
 
 ## R8 — Cycle d'imports entre les barrels de `serializers/`
 

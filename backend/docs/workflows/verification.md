@@ -2,23 +2,24 @@
 
 **Quand** — avant chaque commit sur `backend/`.
 
-## Le garde-fou est minimal
-
-C'est un fait, pas une omission de cette doc :
+## Le garde-fou
 
 | Outil                 | État                                                                                                                                                                                                                                                                                                                                                        |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **62 tests de non-régression** : `test_api_contract.py` (46, forme, valeurs et **ordre** des réponses) et `test_query_counts.py` (16, nombre de requêtes SQL). **Toujours aucun test métier** |
+| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **76 tests de non-régression** : `test_api_contract.py` (60, forme, valeurs et **ordre** des réponses) et `test_query_counts.py` (16, nombre de requêtes SQL). **Toujours aucun test métier** |
+| CI                    | `.github/workflows/ci.yml`, à chaque PR vers `master` ou `develop` : `check`, `makemigrations --check`, les 93 tests, le rapport de couverture. Runner `ubuntu-latest`, Postgres 16 en service, Python 3.14 natif — voir [../adr/0006-ci-python-natif.md](../adr/0006-ci-python-natif.md)                                                                   |
+| Couverture            | mesurée à chaque run (`.coveragerc`, `branch = True`). **Pas encore de `fail_under`** — voir [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R14                                                                                                                                                                                     |
 | Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                                                                                                                                                                                                                                                                   |
 | Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                                                                                                                                                                                                                                                                                 |
 | Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                                                                                                                                                                                                                                                                        |
-| CI                    | **aucune**. `.github/workflows/deployment.yml` déploie, ne vérifie rien, et n'est déclenché qu'à la main                                                                                                                                                                                                                                                    |
 
-Conséquence pratique : **rien n'empêche un commit qui ne démarre même pas.** La seule
-protection est la procédure manuelle ci-dessous.
+⚠️ **La CI ne bloque un merge que si la protection de branche l'exige.** Elle se règle dans
+Settings → Branches sur GitHub, pas dans ce dépôt. Sans elle une PR rouge reste mergeable — et
+depuis que `release.yml` publie `latest` au merge, une release rouge se déploie seule dans les
+dix minutes ([../../../docs/deploiement-continu.md](../../../docs/deploiement-continu.md)).
 
-Suivi de cette absence : [../quality/watched-risks.md](../quality/watched-risks.md) W1 et W2 —
-avec les conditions qui rouvriraient le sujet.
+La procédure manuelle ci-dessous reste utile avant de pousser : elle donne le même verdict sans
+attendre le run.
 
 ## Procédure manuelle
 

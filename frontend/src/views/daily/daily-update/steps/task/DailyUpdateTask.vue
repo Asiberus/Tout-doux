@@ -19,7 +19,7 @@ import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/compone
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { useNotificationStore } from '@/store'
-import moment from 'moment'
+import { useToday } from '@/composables/useToday'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -74,7 +74,8 @@ watch(taskSheetDetent, value => {
   if (smAndDown.value && value === DailyTaskSheetDetent.Collapsed) createTaskDisplayed.value = false
 })
 
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
 const areSomeProjectSelected = computed<boolean>(() =>
   projectList.value.some(({ selected }) => selected)
 )

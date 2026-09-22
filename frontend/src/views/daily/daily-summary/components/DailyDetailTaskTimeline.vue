@@ -2,6 +2,7 @@
 import DailyTaskCard from '@/views/daily/components/DailyTaskCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
+import { useToday } from '@/composables/useToday'
 import moment from 'moment/moment'
 import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -19,8 +20,9 @@ const emit = defineEmits<{
 }>()
 
 const createFormDisplayed = ref(false)
-const isPast = computed<boolean>(() => moment(props.date).isBefore(moment(), 'day'))
-const isFuture = computed<boolean>(() => moment(props.date).isAfter(moment(), 'day'))
+const { today } = useToday()
+const isPast = computed<boolean>(() => moment(props.date).isBefore(today.value, 'day'))
+const isFuture = computed<boolean>(() => moment(props.date).isAfter(today.value, 'day'))
 const isToday = computed<boolean>(() => !isPast.value && !isFuture.value)
 const addTaskCardVariant = computed<'elevated' | 'outlined'>(() =>
   createFormDisplayed.value ? 'elevated' : 'outlined'

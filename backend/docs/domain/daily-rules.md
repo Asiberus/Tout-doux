@@ -118,8 +118,8 @@ pendant la requête, rien côté serveur ne le fait.
 L'`action` du jour (`TH` / `WO` / `FI`) est recopiée telle quelle. Les copies conservent l'ordre
 de la veille (`Meta.ordering = ('pk',)`).
 
-⚠️ La veille est calculée comme `date.today() - 1 jour`, donc en UTC — voir la section sur les
-fuseaux en fin de fichier.
+La veille est calculée comme `timezone.localdate() - 1 jour`, donc dans `TIME_ZONE`
+(`Europe/Paris`) — voir la section sur les fuseaux en fin de fichier.
 
 ## Le résumé — `daily-task/summary/`
 
@@ -129,19 +129,19 @@ start date and an end date` / `Date not valid.`). L'intervalle est inclusif et
 `totalTask`, `totalTaskCompleted`, `totalEvent`. Réponse **non paginée** ; aucune borne n'est
 imposée à l'étendue demandée — voir [../quality/watched-risks.md](../quality/watched-risks.md) W8.
 
-## ⚠️ « Aujourd'hui » est calculé en UTC
+## « Aujourd'hui » suit le fuseau du serveur, pas celui de l'utilisateur
 
-`date.today()` — gardes de suppression et de modification, validation de `date`, `default` du
-champ — s'appuie sur l'horloge du conteneur, qui est en **UTC**, alors que `TIME_ZONE` vaut
-`Europe/Paris`. Entre minuit et 2 h du matin heure de Paris (1 h en hiver), le serveur est
-encore la veille. Une ligne créée sans `date` explicite y est datée de la veille.
+`timezone.localdate()` — gardes de suppression et de modification, validation de `date`,
+`default` du champ, calcul de la veille — respecte `TIME_ZONE` (`Europe/Paris`), et non plus
+l'horloge UTC du conteneur (ancien R4 du backlog de refactoring, corrigé).
 
-Depuis l'ouverture de la planification, le **sens** de l'écart compte : la date UTC étant
-toujours ≤ la date parisienne, une `date` envoyée par le client n'est jamais refusée à tort. Le
-défaut est devenu permissif — pendant cette fenêtre, **la veille passe encore pour un jour non
-passé** : elle peut être créée, modifiée en entier et supprimée. Le blocage du passé a un trou
-de 1 à 2 h par nuit, assumé tant que R4 n'est pas traité.
-[../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R4.
+⚠️ Ce fuseau reste **unique pour tout le serveur**, pas par utilisateur. Pour un compte ouvert
+depuis un autre fuseau (ex. un utilisateur en Asie), le calendrier du serveur peut différer de
+plusieurs heures du calendrier local de cet utilisateur, exactement comme le faisait l'ancien
+écart UTC/Paris — simplement plus large et déplacé sur l'horaire de connexion plutôt que sur la
+nuit. Assumé : cette application est à usage personnel, sur un seul fuseau connu. Un vrai
+support multi-fuseau demanderait un fuseau par utilisateur (stocké sur le profil, activé par
+requête via `timezone.activate()`), pas seulement `TIME_ZONE` en config globale.
 
 ## Voir aussi
 

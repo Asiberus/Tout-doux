@@ -7,6 +7,8 @@ import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/Dail
 import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import { useToday } from '@/composables/useToday'
+import { useNow } from '@/composables/useNow'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
 import { computed, ref, watch } from 'vue'
@@ -29,7 +31,14 @@ const emit = defineEmits<{
 
 const dialogState = ref(false)
 const dailyTaskList = ref<DailyTask[]>([])
-const events = ref<EventExtendedModel[]>([])
+const rawEvents = ref<EventExtendedModel[]>([])
+
+// Même `now` que `DailyDetailEventTimeline` (composable singleton) : l'ordre bascule au même
+// rythme que la couleur « passé » des cartes, jamais l'un sans l'autre.
+const { now } = useNow()
+const events = computed<EventExtendedModel[]>(() =>
+  [...rawEvents.value].sort((a, b) => sortEvents(a, b, { handlePassedEvent: true }, now.value))
+)
 
 const tab = ref<'task' | 'event'>('task')
 const isScrollingOnContent = ref(false)
@@ -38,10 +47,12 @@ const numberOfDailyTaskCompleted = computed<number>(
   () => dailyTaskList.value.filter(({ completed }) => completed).length
 )
 // Pas de borne vers l'arrière : un jour passé sans rien affiche simplement l'état vide.
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
-const isPassed = computed<boolean>(() => moment(props.date).isBefore(moment(), 'day'))
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
+const isPassed = computed<boolean>(() => moment(props.date).isBefore(today.value, 'day'))
 const canGoForward = computed<boolean>(
-  () => moment(props.date).diff(moment().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+  () =>
+    moment(props.date).diff(today.value.clone().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
 )
 const actionBtnSize = computed<'large' | 'small' | 'default'>(() => {
   if (smAndUp.value) return 'large'
@@ -76,10 +87,7 @@ function retrieveDailyTaskList(): void {
 
 function retrieveTodayEvents(): void {
   eventApi.getEvents({ date: props.date }).then(
-    response =>
-      (events.value = response.sort((a: EventExtendedModel, b: EventExtendedModel) =>
-        sortEvents(a, b, { handlePassedEvent: true })
-      )),
+    response => (rawEvents.value = response),
     error => console.error(error)
   )
 }

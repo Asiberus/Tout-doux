@@ -1,8 +1,9 @@
 from collections import Counter
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.db.models import Count, IntegerField, Q, Subquery
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 
 from tout_doux.models import DailyTask, Event
 
@@ -79,9 +80,8 @@ def daily_carry_over_candidates(queryset):
     facultatives (`task.project`, `task.section.project`, `task.collection`), et un `exclude()`
     à travers une relation nulle ne s'exécute pas comme il se lit. Le volume est d'une journée.
 
-    `date.today()` est en UTC comme partout ailleurs dans le domaine — R4 du backlog.
     """
-    today = date.today()
+    today = timezone.localdate()
 
     # `prefetch_related(None)` purge les préchargements héritables de la vue : ils tourneraient
     # sur les tuples de `values_list` et lèveraient une AttributeError.

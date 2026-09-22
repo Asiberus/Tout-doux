@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -54,7 +52,7 @@ class DailyTaskPatchSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # This serializer is only used in a PATCH context, self.instance is always defined
-        today = date.today()
+        today = timezone.localdate()
         if self.instance.date < today and list(data) != ['completed']:
             raise serializers.ValidationError('You can\'t edit a closed daily task')
         if self.instance.date > today and 'completed' in data:

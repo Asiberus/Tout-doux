@@ -6,6 +6,9 @@ Tout passe par Docker. **Il n'existe pas de mode « Python en local »** : ni vi
 `.python-version`, ni instructions pour en créer un. `requirements.txt` n'épingle que 8
 dépendances directes, sans lockfile.
 
+Une seule exception, hors poste de développement : la CI installe Python nativement sur son
+runner — voir [../adr/0006-ci-python-natif.md](../adr/0006-ci-python-natif.md).
+
 ## Prérequis
 
 `docker` et `docker compose`. Rien d'autre — Python 3.14 vit dans l'image
@@ -39,6 +42,9 @@ migrations sont donc jouées automatiquement à chaque démarrage.**
 Le code est monté en volume (`./backend:/backend`) : l'autoreload de `runserver` suffit, pas
 besoin de rebuild pour modifier du Python. **Un rebuild est nécessaire** si `requirements.txt`
 change.
+
+`requirements-dev.txt` (qui inclut `requirements.txt` et ajoute `coverage`) n'est lu **que par
+la CI**. Les images de développement et de production ne l'installent pas.
 
 ## Configuration
 
@@ -140,9 +146,14 @@ Deux différences qui changent le comportement du code :
   un échec d'envoi devient silencieux. **C'est le seul chemin que le développement n'exerce
   jamais** : à tester avec de vraies clés avant tout déploiement.
 
-Le déploiement (`.github/workflows/deployment.yml`) tourne sur un runner auto-hébergé et est en
-**`workflow_dispatch` uniquement** : le déclenchement sur `push` est commenté. **Aucun test,
-aucun lint n'est exécuté** par cette CI, qui ne fait que reconstruire et relancer les images.
+Le déploiement ne passe plus par un runner auto-hébergé. Une PR intitulée `Release vX.Y.Z`
+mergée sur `master` déclenche `.github/workflows/release.yml`, qui construit et publie les deux
+images sur GHCR sous `X.Y.Z` **et** `latest`, puis crée le tag et la release. Le serveur
+surveille `latest` par cron et se met à jour seul dans les dix minutes, après sauvegarde de la
+base. Détail complet : [../../../docs/deploiement-continu.md](../../../docs/deploiement-continu.md).
+
+Les tests, eux, tournent dans `.github/workflows/ci.yml` à l'ouverture de chaque PR —
+[verification.md](verification.md).
 
 ## Pièges
 
@@ -153,9 +164,10 @@ aucun lint n'est exécuté** par cette CI, qui ne fait que reconstruire et relan
   conteneurs démarrent avec des variables vides et `SECRET_KEY` retombe sur `'secret'`.
 - **`backupdb` écrit sur stdout** : `docker exec tout_doux_backend python manage.py backupdb >
 backup.json`, sinon le dump défile dans le terminal.
-- **Le conteneur est en UTC** alors que `TIME_ZONE = 'Europe/Paris'`. Les endpoints qui
-  s'appuient sur `date.today()` (daily task) changent de jour à 00:00 UTC, soit 02:00 à Paris en
-  été — [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R4.
+- **« Aujourd'hui » suit `TIME_ZONE` (`Europe/Paris`), pas le fuseau du client.** Les endpoints
+  daily task (`timezone.localdate()`) changent de jour à minuit heure de Paris, quel que soit le
+  fuseau de l'utilisateur connecté — voir
+  [../domain/daily-rules.md](../domain/daily-rules.md).
 
 ## Voir aussi
 
