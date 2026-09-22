@@ -5,7 +5,8 @@ import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import { showScroll } from '@/utils/document.utils'
 import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
-import moment from 'moment'
+import { useToday } from '@/composables/useToday'
+import moment, { Moment } from 'moment'
 import MainTitle from '@/components/MainTitle.vue'
 import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -28,9 +29,11 @@ const upcomingLoading = ref(false)
 const dailyDetailDialog = ref(false)
 const dateSelected = ref<string>('')
 
-const today = moment().format('YYYY-MM-DD')
-// Le plafond est figé au montage, comme `today` — même limite, suivie en R12.
-const upcomingCeiling = moment().startOf('day').add(MAX_PLANNING_HORIZON_DAYS, 'days')
+const { today: todayMoment } = useToday()
+const today = computed<string>(() => todayMoment.value.format('YYYY-MM-DD'))
+const upcomingCeiling = computed<Moment>(() =>
+  todayMoment.value.clone().startOf('day').add(MAX_PLANNING_HORIZON_DAYS, 'days')
+)
 let daysPerPage = 21
 
 const displayedSummaryList = computed<DailySummary[]>(() =>
@@ -39,7 +42,7 @@ const displayedSummaryList = computed<DailySummary[]>(() =>
 
 const upcomingCeilingReached = computed<boolean>(() => {
   const furthest = upcomingSummaryList.value.at(-1)
-  return !!furthest && !moment(furthest.date).isBefore(upcomingCeiling)
+  return !!furthest && !moment(furthest.date).isBefore(upcomingCeiling.value)
 })
 
 onBeforeMount(() => {
@@ -83,6 +86,9 @@ watch(
   }
 )
 
+// Ne se déclenche que si le jour formaté change réellement, pas à chaque tick de `useToday()`.
+watch(today, newToday => refreshOnDayChange(newToday))
+
 function calculateDaysPerPage(): number {
   if (display.xs.value) return 10
   else if (display.smAndDown.value) return 14
@@ -102,6 +108,20 @@ function retrieveDailySummaryList(startDate: string, endDate: string): void {
 function loadMore(): void {
   if (props.upcoming) loadUpcomingPage()
   else loadPastPage()
+}
+
+function refreshOnDayChange(newToday: string): void {
+  // Le jour qui vient de basculer n'a pas encore de résumé chargé : on va chercher seulement
+  // celui-là, sans recharger les pages déjà affichées.
+  if (!pastSummaryList.value.some(d => d.date === newToday))
+    dailyTaskApi
+      .getDailySummary(newToday, newToday)
+      .then(response => pastSummaryList.value.unshift(...response))
+      .catch(error => console.error(error))
+
+  // Il sort mécaniquement de la liste des jours à venir : il n'y appartient plus.
+  const upcomingIndex = upcomingSummaryList.value.findIndex(d => d.date === newToday)
+  if (upcomingIndex !== -1) upcomingSummaryList.value.splice(upcomingIndex, 1)
 }
 
 function loadPastPage(): void {
@@ -127,7 +147,7 @@ function loadUpcomingPage(): void {
     // prête à être poussée en queue. L'appel du passé, juste au-dessus, fait l'inverse.
     .getDailySummary(
       from.clone().add(1, 'days').format('YYYY-MM-DD'),
-      moment.min(from.clone().add(daysPerPage, 'days'), upcomingCeiling).format('YYYY-MM-DD')
+      moment.min(from.clone().add(daysPerPage, 'days'), upcomingCeiling.value).format('YYYY-MM-DD')
     )
     .then(response => upcomingSummaryList.value.push(...response))
     .catch(error => console.error(error))

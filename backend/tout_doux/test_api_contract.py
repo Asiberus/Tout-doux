@@ -13,7 +13,7 @@ Ils utilisent force_authenticate : knox est en AUTO_REFRESH, donc une requête a
 écrire en base. Ce n'est pas gênant ici, mais test_query_counts.py en dépend, et les deux
 fichiers partagent cette classe de base.
 """
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.urls import reverse
 from django.test import TestCase
@@ -395,15 +395,13 @@ class DailyTaskContractTest(DataFixtureTestCase):
 class DailyTaskPlanningContractTest(DataFixtureTestCase):
     """Planification sur un jour futur, et fermeture des jours passés.
 
-    « Aujourd'hui » est ici `date.today()`, l'horloge du conteneur, et non `timezone.localdate()`
-    comme ailleurs dans ce fichier : c'est celle que lisent les gardes du sérialiseur et de la
-    vue. R4 n'étant pas corrigé, s'en remettre au fuseau rendrait ces tests instables entre
-    00 h et 02 h heure de Paris.
+    « Aujourd'hui » suit `timezone.localdate()`, comme les gardes du sérialiseur et de la vue
+    depuis la correction de R4.
     """
 
     def setUp(self):
         super().setUp()
-        self.today = date.today()
+        self.today = timezone.localdate()
         self.plannable = list(Task.objects.filter(user=self.user, completed=False).order_by('pk'))
 
     def day(self, offset):

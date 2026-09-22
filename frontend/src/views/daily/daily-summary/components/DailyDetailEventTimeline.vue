@@ -2,6 +2,8 @@
 import { EventExtendedModel } from '@/models/event.model'
 import moment from 'moment/moment'
 import { isPassed } from '@/utils/event.utils'
+import { useToday } from '@/composables/useToday'
+import { useNow } from '@/composables/useNow'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -13,13 +15,16 @@ const props = defineProps<{
   date: string
 }>()
 
+const { today } = useToday()
+const { now } = useNow()
+
 const eventText = computed<string>(() => {
   const count = props.events.length
   const plural = count > 1 ? 'events' : 'event'
 
-  if (moment(props.date).isAfter(moment(), 'day'))
+  if (moment(props.date).isAfter(today.value, 'day'))
     return `You have ${count} ${plural} planned that day !`
-  if (moment().isSame(props.date, 'day')) return `You have ${count} ${plural} today !`
+  if (today.value.isSame(props.date, 'day')) return `You have ${count} ${plural} today !`
   return `You had ${count} ${plural} that day !`
 })
 </script>
@@ -35,9 +40,9 @@ const eventText = computed<string>(() => {
       <v-timeline-item
         v-for="event of events"
         :key="`event-${event.id}`"
-        :dot-color="isPassed(event) ? 'passedEvent' : 'event'"
-        :icon="isPassed(event) ? 'mdi-check' : 'mdi-calendar-clock'"
-        :icon-color="isPassed(event) ? 'grey' : 'white'"
+        :dot-color="isPassed(event, now) ? 'passedEvent' : 'event'"
+        :icon="isPassed(event, now) ? 'mdi-check' : 'mdi-calendar-clock'"
+        :icon-color="isPassed(event, now) ? 'grey' : 'white'"
         :size="xs ? 'small' : 'default'"
         fill-dot>
         <EventItemCard

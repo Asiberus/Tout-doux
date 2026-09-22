@@ -3,6 +3,7 @@ import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
 import SecondaryTitle from '@/components/SecondaryTitle.vue'
+import { useToday } from '@/composables/useToday'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
 import { computed, onBeforeMount, ref, watch } from 'vue'
@@ -29,9 +30,11 @@ const dailyEventCount = ref(0)
 // `dailyUpdateGuard` ne rejoue pas sur un changement de param (voir
 // docs/architecture/routing.md) : ces deux bornes sont la seule chose qui empêche d'atteindre
 // un jour passé ou au-delà de l'horizon.
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
 const canGoForward = computed<boolean>(
-  () => moment(props.date).diff(moment().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+  () =>
+    moment(props.date).diff(today.value.clone().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
 )
 
 function goToDate(date: string): void {

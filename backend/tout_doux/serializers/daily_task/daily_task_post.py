@@ -1,5 +1,6 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from tout_doux.exceptions import AlreadyInDailyError
@@ -52,7 +53,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         return DailyTaskSerializer(instance).data
 
     def validate_date(self, value):
-        today = date.today()
+        today = timezone.localdate()
         if value < today:
             raise serializers.ValidationError('You can\'t plan a daily task on a past day')
         if value > today + MAX_PLANNING_HORIZON:
@@ -108,7 +109,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         # cette garde les remplace. Sans elle le doublon remonte en IntegrityError, soit un 500.
         # Un 409 plutôt qu'un 400 pour que le client distingue « déjà planifié » d'un refus de
         # validation sans lire le message.
-        target_date = data.get('date', date.today())
+        target_date = data.get('date', timezone.localdate())
         if data.get('task') and DailyTask.objects.filter(
                 date=target_date, task=data['task']).exists():
             raise AlreadyInDailyError()

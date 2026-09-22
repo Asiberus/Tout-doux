@@ -164,9 +164,10 @@ Les tests, eux, tournent dans `.github/workflows/ci.yml` à l'ouverture de chaqu
   conteneurs démarrent avec des variables vides et `SECRET_KEY` retombe sur `'secret'`.
 - **`backupdb` écrit sur stdout** : `docker exec tout_doux_backend python manage.py backupdb >
 backup.json`, sinon le dump défile dans le terminal.
-- **Le conteneur est en UTC** alors que `TIME_ZONE = 'Europe/Paris'`. Les endpoints qui
-  s'appuient sur `date.today()` (daily task) changent de jour à 00:00 UTC, soit 02:00 à Paris en
-  été — [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R4.
+- **« Aujourd'hui » suit `TIME_ZONE` (`Europe/Paris`), pas le fuseau du client.** Les endpoints
+  daily task (`timezone.localdate()`) changent de jour à minuit heure de Paris, quel que soit le
+  fuseau de l'utilisateur connecté — voir
+  [../domain/daily-rules.md](../domain/daily-rules.md).
 
 ## Voir aussi
 
