@@ -42,6 +42,10 @@ mutations du même fichier.
 
 ## Contraintes non évidentes
 
+- **L'ordre des tâches vient du serveur, aucune action ne trie.** `addTask` insère en tête (le
+  serveur y place la tâche) ; `editTask` ne replace une tâche que si son état coché change
+  (`repositionAfterToggle`) ; `moveTask` applique le déplacement tout de suite puis passe par une
+  file. Au premier échec, la file est vidée et le projet ou la collection est rechargé.
 - **`app.store.init()`** lance `Promise.all([userStore.getUser(), preferencesStore.getPreferences()])`
   — **parallèle**, et ne charge ni projet ni collection. Appelé à deux endroits seulement : le
   premier `beforeEach` du routeur (uniquement si `from === START_LOCATION`) et `Login.vue:41`

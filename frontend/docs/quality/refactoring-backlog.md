@@ -89,12 +89,14 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 ## R13 — Couverture partielle : composants, stores, composables, guards
 
 - **Origine** : suite Vitest installée au même commit que `ci.yml`. `yarn test:ci` publie le taux.
-- **Contexte** : 62 tests couvrent `utils/`, `pipes/`, la couche `api/` (substitution des routes
+- **Contexte** : 93 tests couvrent `utils/`, `pipes/`, la couche `api/` (substitution des routes
   à paramètre, params par défaut) et `axios/` (intercepteurs, comportement du 401). Taux de
   départ : **22,88 %** des instructions. Restent découverts, par ordre de risque décroissant :
   le domaine daily, dont les règles métier sont appliquées **par l'UI seulement**
   ([../domain/daily-rules.md](../domain/daily-rules.md)) via `utils/daily-task.utils.ts` et
-  `composables/useAddTaskToDaily.ts` ; les stores Pinia, dont `project.store.ts` (283 lignes) ;
+  `composables/useAddTaskToDaily.ts` ; le reste des
+  stores Pinia — seules les actions d'ordre de `project` et `collection` (`editTask`, `moveTask`)
+  et `useDailyTaskMove` sont couvertes ;
   et le guard d'authentification — une route publique oubliée dans `nonAuthRoutes` est protégée
   **en silence** ([../architecture/routing.md](../architecture/routing.md)).
 - **Décision** : agir par lots, dans cet ordre. Pas de seuil de couverture en porte de CI :

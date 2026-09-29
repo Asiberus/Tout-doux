@@ -4,14 +4,14 @@
 
 ## Ce qui est réellement contrôlé
 
-| Contrôle                                         | Où                                                          | Bloquant ?                                     |
-| ------------------------------------------------ | ----------------------------------------------------------- | ---------------------------------------------- |
-| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged`                           | ✅ **oui**                                     |
-| `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                             |
-| Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                         |
-| `yarn lint:check` + `yarn format:check`          | CI, job `Frontend`, à chaque PR                             | ✅ oui — rattrape un `commit --no-verify`      |
-| `yarn test:ci` (62 tests Vitest)                 | CI, job `Frontend` + `yarn test` en local                   | ✅ oui                                         |
-| `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — 28 erreurs préexistantes, hors CI |
+| Contrôle                                         | Où                                                          | Bloquant ?                                                        |
+| ------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| `eslint` (sans `--fix`) sur les fichiers indexés | hook `pre-commit` → `lint-staged`                           | ✅ **oui**                                                        |
+| `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                                                |
+| Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                                            |
+| `yarn lint:check` + `yarn format:check`          | CI, job `Frontend`, à chaque PR                             | ✅ oui — rattrape un `commit --no-verify`                         |
+| `yarn test:ci` (93 tests Vitest)                 | CI, job `Frontend` + `yarn test` en local                   | ✅ oui                                                            |
+| `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — 2 erreurs préexistantes (`api/api.spec.ts`), hors CI |
 
 Le hook `pre-commit` reste le garde-fou **local** ; la CI est le garde-fou **partagé**. Le hook
 est fonctionnel (testé), même si `.husky/pre-commit` utilise encore la syntaxe dépréciée de
@@ -28,8 +28,8 @@ GitHub, pas dans ce dépôt). Sans elle, une PR rouge reste mergeable — et dep
 ## Procédure
 
 1. `yarn type-check`
-   **État actuel : 28 erreurs préexistantes.** Ce n'est pas 0, donc le critère utile est
-   _« mon changement n'en ajoute pas »_. Comparer avant/après :
+   **État actuel : 2 erreurs préexistantes** (`api/api.spec.ts`). Ce n'est pas 0, donc le
+   critère utile est _« mon changement n'en ajoute pas »_. Comparer avant/après :
 
    ```sh
    yarn type-check 2>&1 | grep -c "error TS"
@@ -42,8 +42,9 @@ GitHub, pas dans ce dépôt). Sans elle, une PR rouge reste mergeable — et dep
 2. `yarn lint` — attention, ce script applique `--fix`. Le hook, lui, lance `eslint` **sans**
    `--fix` : un problème non auto-corrigeable bloque le commit.
 
-3. `yarn test` — couvre `utils/`, `pipes/`, `api/` et `axios/`. **Les composants, les stores, les
-   composables et les guards ne sont pas couverts** : voir
+3. `yarn test` — couvre `utils/`, `pipes/`, `api/`, `axios/`, l'ordre dans les stores `project` et
+   `collection`, et `useDailyTaskMove`. **Les composants, le reste des stores et des composables,
+   et les guards ne sont pas couverts** : voir
    [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R13.
 
 4. **Test manuel de l'écran touché.** Toujours nécessaire pour tout ce que la suite ne couvre

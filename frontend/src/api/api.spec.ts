@@ -111,6 +111,13 @@ const parameterisedRoutes: Row[] = [
     args: ['task/7/'],
   },
   {
+    label: 'taskApi.moveTask',
+    route: 'taskMove',
+    verb: 'post',
+    run: () => taskApi.moveTask(7, { afterId: 3, beforeId: null }),
+    args: ['task/7/move/', { afterId: 3, beforeId: null }],
+  },
+  {
     label: 'eventApi.updateEventById',
     route: 'eventById',
     verb: 'patch',
@@ -137,6 +144,13 @@ const parameterisedRoutes: Row[] = [
     verb: 'delete',
     run: () => dailyTaskApi.deleteDailyTask(7),
     args: ['daily-task/7/'],
+  },
+  {
+    label: 'dailyTaskApi.moveDailyTask',
+    route: 'dailyTaskMove',
+    verb: 'post',
+    run: () => dailyTaskApi.moveDailyTask(7, { afterId: null, beforeId: 3 }),
+    args: ['daily-task/7/move/', { afterId: null, beforeId: 3 }],
   },
   {
     label: 'tagApi.updateTag',

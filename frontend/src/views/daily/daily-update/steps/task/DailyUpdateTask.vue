@@ -10,7 +10,8 @@ import {
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
-import { TaskPost } from '@/models/task.model'
+import { Task, TaskPost } from '@/models/task.model'
+import { insertByPosition, isStaleListError, moveFailureMessage } from '@/utils/ordering.utils'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
@@ -193,32 +194,55 @@ function createDailyTask(data: DailyTaskDraft): void {
     .catch(error => console.error(error))
 }
 
+function lastOpenTaskId(tasks: Task[]): number | null {
+  return tasks.findLast(({ completed }) => !completed)?.id ?? null
+}
+
+function notifyStaleList(error: unknown): void {
+  notificationStore.notifyError(moveFailureMessage(error))
+}
+
 function createProjectTask(event: { task: TaskPost; projectId: number }): void {
   const { task, projectId } = event
+  const project = projectList.value.find(({ content }) => content.id === projectId)
+  if (!project) return
 
-  taskApi.createTask(task).then(
-    response => {
-      const project = projectList.value.find(({ content }) => content.id === projectId)
-      if (!project) return
+  const tasks = task.sectionId
+    ? project.content.sections.find(({ id }) => id === task.sectionId)?.tasks
+    : project.content.tasks
+  if (!tasks) return
 
-      if (task.sectionId) {
-        const section = project.content.sections.find(({ id }) => id === task.sectionId)
-        if (section) section.tasks.push(response)
-      } else project.content.tasks.push(response)
-    },
-    error => console.error(error)
+  taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
+    response => insertByPosition(tasks, response),
+    error => {
+      console.error(error)
+      if (!isStaleListError(error)) return
+      notifyStaleList(error)
+      projectApi.getProjectById(projectId).then(
+        response => (project.content = response),
+        reloadError => console.error(reloadError)
+      )
+    }
   )
 }
 
 function createCollectionTask(event: { task: TaskPost; collectionId: number }): void {
   const { task, collectionId } = event
+  const collection = collectionList.value.find(({ content }) => content.id === collectionId)
+  if (!collection) return
 
-  taskApi.createTask(task).then(
-    response => {
-      const collection = collectionList.value.find(({ content }) => content.id === collectionId)
-      if (collection) collection.content.tasks.push(response)
-    },
-    error => console.error(error)
+  const { tasks } = collection.content
+  taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
+    response => insertByPosition(tasks, response),
+    error => {
+      console.error(error)
+      if (!isStaleListError(error)) return
+      notifyStaleList(error)
+      collectionApi.getCollectionById(collectionId).then(
+        response => (collection.content = response),
+        reloadError => console.error(reloadError)
+      )
+    }
   )
 }
 

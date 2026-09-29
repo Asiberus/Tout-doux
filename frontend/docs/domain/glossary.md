@@ -98,6 +98,9 @@ protégée par un `ConfirmDialog`.
   section réelle. Voir [daily-rules.md](daily-rules.md).
 - **`EventExtendedModel.project` est typé non-optionnel** mais un Event peut n'avoir aucun projet ;
   l'UI teste défensivement sa présence.
+- **`position` (`Task`, `DailyTask`) est une clé d'ordre calculée par le serveur.** Elle ne se
+  compare qu'avec `<` — `localeCompare` ignore la casse et placerait `a0` avant `Zz` — et ne se
+  fabrique jamais côté front.
 
 ## Rôles utilisateur
 

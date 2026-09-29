@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  filterCompleted,
-  filterUncompleted,
-  flattenProjectTasks,
-  sortByCompletionDate,
-} from '@/utils/task.utils'
+import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { makeProjectDetail, makeSection, makeTask } from '@/test/fixtures'
 
 describe('filterCompleted / filterUncompleted', () => {
@@ -38,35 +33,5 @@ describe('flattenProjectTasks', () => {
 
   it('renvoie un tableau vide pour un projet sans tâche', () => {
     expect(flattenProjectTasks(makeProjectDetail())).toEqual([])
-  })
-})
-
-describe('sortByCompletionDate', () => {
-  it('place la complétion la plus récente en premier', () => {
-    const tasks = [
-      makeTask({ id: 1, completedAt: '2026-03-01T10:00:00' }),
-      makeTask({ id: 2, completedAt: '2026-03-05T10:00:00' }),
-    ]
-
-    expect(sortByCompletionDate(tasks).map(({ id }) => id)).toEqual([2, 1])
-  })
-
-  it('retombe sur la date de création dès qu’une des deux complétions manque', () => {
-    const tasks = [
-      makeTask({ id: 1, createdAt: '2026-01-01T09:00:00', completedAt: '' }),
-      makeTask({ id: 2, createdAt: '2026-01-05T09:00:00', completedAt: '2026-03-05T10:00:00' }),
-    ]
-
-    expect(sortByCompletionDate(tasks).map(({ id }) => id)).toEqual([2, 1])
-  })
-
-  it('trie le tableau reçu sur place au lieu d’en renvoyer une copie', () => {
-    const tasks = [
-      makeTask({ id: 1, completedAt: '2026-03-01T10:00:00' }),
-      makeTask({ id: 2, completedAt: '2026-03-05T10:00:00' }),
-    ]
-
-    expect(sortByCompletionDate(tasks)).toBe(tasks)
-    expect(tasks.map(({ id }) => id)).toEqual([2, 1])
   })
 })

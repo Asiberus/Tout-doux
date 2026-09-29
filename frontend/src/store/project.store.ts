@@ -4,14 +4,17 @@ import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { isPassed, sortEvents } from '@/utils/event.utils'
 import { useNow } from '@/composables/useNow'
 import { ProjectDetail, ProjectPatch } from '@/models/project.model'
-import {
-  filterCompleted,
-  filterUncompleted,
-  flattenProjectTasks,
-  sortByCompletionDate,
-} from '@/utils/task.utils'
+import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { defineStore } from 'pinia'
 import { eventApi, projectApi, sectionApi, taskApi } from '@/api'
+import { MoveAnchors } from '@/models/ordering.model'
+import { useNotificationStore } from '@/store/notification.store'
+import {
+  applyMove,
+  createMoveQueue,
+  moveFailureMessage,
+  repositionAfterToggle,
+} from '@/utils/ordering.utils'
 
 interface ProjectStoreState {
   currentProject?: ProjectDetail
@@ -37,12 +40,23 @@ interface ProjectStoreActions {
   deleteSection(id: number): Promise<void>
   addTask(task: TaskPost): Promise<void>
   editTask(id: number, data: TaskPatch, sectionId?: number): Promise<void>
-  sortTasks(sectionId?: number): void
+  moveTask(taskId: number, anchors: MoveAnchors, sectionId?: number): Promise<void>
   deleteTask(id: number, sectionId?: number): Promise<void>
   addEvent(event: EventPostOrPatch): Promise<void>
   editEvent(id: number, data: EventPostOrPatch): Promise<void>
   deleteEvent(id: number): Promise<void>
 }
+
+function tasksOf(project: ProjectDetail, sectionId?: number): Task[] | undefined {
+  if (sectionId === undefined) return project.tasks
+  return project.sections.find(({ id }) => id === sectionId)?.tasks
+}
+
+const moveQueue = createMoveQueue(error => {
+  const projectStore = useProjectStore()
+  useNotificationStore().notifyError(moveFailureMessage(error))
+  if (projectStore.currentProject) projectStore.retrieveProject(projectStore.currentProject.id)
+})
 
 export const useProjectStore = defineStore<
   'project',
@@ -186,38 +200,34 @@ export const useProjectStore = defineStore<
       )
     },
 
-    // TODO : test that
     async editTask(taskId: number, data: TaskPatch, sectionId?: number): Promise<void> {
       await taskApi.updateTaskById(taskId, data).then(
         (updatedTask: Task) => {
           if (!this.currentProject) return
 
-          if (sectionId) {
-            const section = this.currentProject.sections.find(({ id }) => id === sectionId)
-            if (section) {
-              const taskToUpdate = section.tasks.find(({ id }) => id === updatedTask.id)
-              if (taskToUpdate) Object.assign(taskToUpdate, updatedTask)
-            }
-            this.sortTasks(sectionId)
-          } else {
-            const taskToUpdate = this.currentProject.tasks.find(({ id }) => id === updatedTask.id)
-            if (taskToUpdate) Object.assign(taskToUpdate, updatedTask)
-            this.sortTasks()
-          }
+          const tasks = tasksOf(this.currentProject, sectionId)
+          const taskToUpdate = tasks?.find(task => task.id === updatedTask.id)
+          if (!tasks || !taskToUpdate) return
+
+          const toggled = taskToUpdate.completed !== updatedTask.completed
+          Object.assign(taskToUpdate, updatedTask)
+          if (toggled) repositionAfterToggle(tasks, taskToUpdate)
         },
         error => console.error(error)
       )
     },
 
-    sortTasks(sectionId?: number): void {
-      if (!this.currentProject) return
+    moveTask(taskId: number, anchors: MoveAnchors, sectionId?: number): Promise<void> {
+      const tasks = this.currentProject && tasksOf(this.currentProject, sectionId)
+      if (!tasks) return Promise.resolve()
 
-      if (sectionId) {
-        const section = this.currentProject.sections.find(({ id }) => id === sectionId)
-        if (section) section.tasks = [...sortByCompletionDate(section.tasks)]
-      } else {
-        this.currentProject.tasks = [...sortByCompletionDate(this.currentProject.tasks)]
-      }
+      applyMove(tasks, taskId, anchors)
+      return moveQueue.enqueue(async () => {
+        const { position } = await taskApi.moveTask(taskId, anchors)
+        const project = this.currentProject
+        const task = project && tasksOf(project, sectionId)?.find(({ id }) => id === taskId)
+        if (task) task.position = position
+      })
     },
 
     async deleteTask(id: number, sectionId?: number): Promise<void> {

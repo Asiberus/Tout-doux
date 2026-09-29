@@ -1,6 +1,14 @@
 import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
-import { filterCompleted, filterUncompleted, sortByCompletionDate } from '@/utils/task.utils'
+import { filterCompleted, filterUncompleted } from '@/utils/task.utils'
+import { MoveAnchors } from '@/models/ordering.model'
+import { useNotificationStore } from '@/store/notification.store'
+import {
+  applyMove,
+  createMoveQueue,
+  moveFailureMessage,
+  repositionAfterToggle,
+} from '@/utils/ordering.utils'
 import { defineStore } from 'pinia'
 import { collectionApi, taskApi } from '@/api'
 
@@ -22,8 +30,15 @@ interface CollectionStoreActions {
   addTask(task: TaskPost): Promise<void>
   editTask(id: number, data: TaskPatch): Promise<void>
   deleteTask(id: number): Promise<void>
-  sortTask(): void
+  moveTask(taskId: number, anchors: MoveAnchors): Promise<void>
 }
+
+const moveQueue = createMoveQueue(error => {
+  const collectionStore = useCollectionStore()
+  useNotificationStore().notifyError(moveFailureMessage(error))
+  if (collectionStore.currentCollection)
+    collectionStore.retrieveCollection(collectionStore.currentCollection.id)
+})
 
 export const useCollectionStore = defineStore<
   'collection',
@@ -91,19 +106,30 @@ export const useCollectionStore = defineStore<
 
     async editTask(id: number, data: TaskPatch): Promise<void> {
       await taskApi.updateTaskById(id, data).then(
-        response => {
+        (updatedTask: Task) => {
           if (!this.currentCollection) return
 
-          const task: Task = response
-          const taskToUpdate = this.currentCollection.tasks.find(t => t.id === task.id)
-          if (taskToUpdate) Object.assign(taskToUpdate, task)
+          const { tasks } = this.currentCollection
+          const taskToUpdate = tasks.find(task => task.id === updatedTask.id)
+          if (!taskToUpdate) return
 
-          this.sortTask()
+          const toggled = taskToUpdate.completed !== updatedTask.completed
+          Object.assign(taskToUpdate, updatedTask)
+          if (toggled) repositionAfterToggle(tasks, taskToUpdate)
         },
-        error => {
-          console.error(error)
-        }
+        error => console.error(error)
       )
+    },
+
+    moveTask(taskId: number, anchors: MoveAnchors): Promise<void> {
+      if (!this.currentCollection) return Promise.resolve()
+
+      applyMove(this.currentCollection.tasks, taskId, anchors)
+      return moveQueue.enqueue(async () => {
+        const { position } = await taskApi.moveTask(taskId, anchors)
+        const task = this.currentCollection?.tasks.find(({ id }) => id === taskId)
+        if (task) task.position = position
+      })
     },
 
     async deleteTask(id: number): Promise<void> {
@@ -117,11 +143,6 @@ export const useCollectionStore = defineStore<
           console.error(error)
         }
       )
-    },
-
-    sortTask(): void {
-      if (!this.currentCollection) return
-      this.currentCollection.tasks = [...sortByCompletionDate(this.currentCollection.tasks)]
     },
   },
 })

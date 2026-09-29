@@ -99,6 +99,11 @@ Deux étapes non linéaires (`v-stepper non-linear`, les deux items `editable`) 
 **event**. Le param de route `:step(task|event)` pilote l'étape ; la regex de route rejette toute
 autre valeur.
 
+- **Ordre.** Une tâche créée depuis le wizard est placée **en fin** de la liste affichée, après la
+  dernière tâche à faire, par le serveur ; si la liste a changé ailleurs, la création est refusée
+  et le projet ou la collection est rechargé. Une ligne du jour, créée ou reportée, va **en fin**.
+  Le déplacement d'une ligne, terminée ou non, passe par `useDailyTaskMove` : au moindre échec,
+  le jour est rechargé.
 - La synchronisation est **unidirectionnelle** : le stepper écrit dans la route
   (`router.replace`), mais aucun watcher ne surveille la prop `step`. **Les boutons
   précédent/suivant du navigateur ne déplacent donc pas le stepper.**
