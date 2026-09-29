@@ -6,19 +6,21 @@ qu'il laisse passer**. Le client applique des règles supplémentaires qui ne so
 
 ## Entités
 
-| Terme               | Définition                                                                                                                                    | Rattaché à                         |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| **Project**         | Un chantier durable, décrit, étiquetable, archivable. Contient sections, tâches et événements                                                 | utilisateur                        |
-| **Section**         | Un regroupement nommé de tâches **dans** un projet. Pas d'autre attribut                                                                      | projet                             |
-| **Collection**      | Une liste plate de tâches, sans section ni événement. Son `itemName` (défaut `task`) permet de renommer l'unité affichée                      | utilisateur                        |
-| **Task**            | Une unité de travail, rattachée à **exactement une** cible : projet, section, ou collection                                                   | projet \| section \| collection    |
-| **Tag**             | Une étiquette colorée, **typée** : un tag `project` ne s'applique qu'aux projets, un tag `task` aux tâches, tâches récurrentes et daily tasks | utilisateur                        |
-| **CommonTask**      | Un **modèle** de tâche récurrente : un nom, des tags, aucun état d'achèvement. N'existe que pour être tiré dans un daily                      | utilisateur                        |
-| **DailyTask**       | Une ligne du plan d'un jour. Trois origines exclusives : une `Task`, une `CommonTask`, ou un texte libre                                      | utilisateur                        |
-| **Event**           | Une échéance datée, optionnellement rattachée à un projet                                                                                     | utilisateur, projet _(facultatif)_ |
-| **Preferences**     | Une ligne par utilisateur, un seul réglage aujourd'hui                                                                                        | utilisateur                        |
-| **Feedback**        | Un message de l'utilisateur vers l'administrateur, avec un état « lu »                                                                        | utilisateur                        |
-| **UserEmailChange** | Une demande de changement d'e-mail en attente, jetonnée et datée                                                                              | utilisateur                        |
+| Terme               | Définition                                                                                                                                                     | Rattaché à                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| **Project**         | Un chantier durable, décrit, étiquetable, archivable. Contient sections, tâches et événements                                                                  | utilisateur                             |
+| **Section**         | Un regroupement nommé de tâches **dans** un projet. Pas d'autre attribut                                                                                       | projet                                  |
+| **Collection**      | Une liste plate de tâches, sans section ni événement. Son `itemName` (défaut `task`) permet de renommer l'unité affichée                                       | utilisateur                             |
+| **Task**            | Une unité de travail, rattachée à **exactement une** cible : projet, section, ou collection                                                                    | projet \| section \| collection         |
+| **Liste**           | Les tâches d'un même conteneur (tâches directes d'un projet, d'une section ou d'une collection), ou les daily tasks d'un même jour. Chacune a son propre ordre | projet \| section \| collection \| jour |
+| **Position**        | Clé texte qui fixe l'ordre d'une ligne dans sa liste. Calculée **uniquement** par le serveur ; unique dans la liste                                            | tâche \| daily task                     |
+| **Tag**             | Une étiquette colorée, **typée** : un tag `project` ne s'applique qu'aux projets, un tag `task` aux tâches, tâches récurrentes et daily tasks                  | utilisateur                             |
+| **CommonTask**      | Un **modèle** de tâche récurrente : un nom, des tags, aucun état d'achèvement. N'existe que pour être tiré dans un daily                                       | utilisateur                             |
+| **DailyTask**       | Une ligne du plan d'un jour. Trois origines exclusives : une `Task`, une `CommonTask`, ou un texte libre                                                       | utilisateur                             |
+| **Event**           | Une échéance datée, optionnellement rattachée à un projet                                                                                                      | utilisateur, projet _(facultatif)_      |
+| **Preferences**     | Une ligne par utilisateur, un seul réglage aujourd'hui                                                                                                         | utilisateur                             |
+| **Feedback**        | Un message de l'utilisateur vers l'administrateur, avec un état « lu »                                                                                         | utilisateur                             |
+| **UserEmailChange** | Une demande de changement d'e-mail en attente, jetonnée et datée                                                                                               | utilisateur                             |
 
 **Archivé** — état booléen porté **uniquement** par `Project` et `Collection`. Il gèle en
 lecture seule tout ce qui en dépend : voir [../patterns/archive-guards.md](../patterns/archive-guards.md)
@@ -64,6 +66,7 @@ renvoie **jamais** le libellé :
 | Deux tâches récurrentes de même nom pour un utilisateur                                                        | contrainte base                                            | erreur d'unicité                                                         |
 | Un objet appartenant à un autre utilisateur                                                                    | 13 `validate_<champ>`                                      | `Invalid pk "…" - object does not exist.`                                |
 | Toute écriture sur un projet/collection archivé, ou sur son contenu                                            | 12 sites                                                   | [archive-guards](../patterns/archive-guards.md)                          |
+| Une tâche sans conteneur, ou avec plusieurs, **quel que soit le chemin d'écriture**                            | contrainte base `task_exactly_one_container`               | erreur d'intégrité (500)                                                 |
 | Longueurs : nom de tâche 150, autres noms 50, tag 20, description 500, `itemName` 15, message de feedback 2000 | modèles                                                    | erreur DRF standard                                                      |
 
 ## Ce que le serveur accepte, alors qu'on pourrait croire l'inverse

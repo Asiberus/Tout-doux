@@ -19,6 +19,7 @@ class TaskExtendedSerializer(TaskSerializer):
             'completed',
             'createdAt',
             'completedAt',
+            'position',
             'project',
             'section',
             'collection',

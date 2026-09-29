@@ -10,17 +10,19 @@ raison est indiquée pour chaque item.
 > **Cycle de vie** : si un déclencheur est atteint, **déplacer l'item vers le backlog**. Si un
 > item est résolu, **supprimer sa ligne et sa section**.
 
-| ID  | Titre                                                         | Nature      | Déclencheur                                                 |
-| --- | ------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
-| W2  | Aucun linter ni formateur sur le backend                      | Fiabilité   | Une contribution à relire par un tiers                      |
-| W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour |
-| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh` |
-| W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/` |
-| W6  | Ports backend et base publiés sur l'hôte en production        | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte              |
-| W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base          |
-| W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`       |
-| W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                        |
-| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle    | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                |
+| ID  | Titre                                                         | Nature      | Déclencheur                                                   |
+| --- | ------------------------------------------------------------- | ----------- | ------------------------------------------------------------- |
+| W2  | Aucun linter ni formateur sur le backend                      | Fiabilité   | Une contribution à relire par un tiers                        |
+| W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour   |
+| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh`   |
+| W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/`   |
+| W6  | Ports backend et base publiés sur l'hôte en production        | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte                |
+| W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base            |
+| W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`         |
+| W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                          |
+| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle    | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                  |
+| W14 | Clés d'ordre limitées à 255 caractères                        | Robustesse  | Une `position` de plus de 100 caractères en base              |
+| W15 | Double planification simultanée d'une même tâche : 500        | Robustesse  | Une `IntegrityError` sur `unique_task_for_date` dans les logs |
 
 ---
 
@@ -164,3 +166,26 @@ where u.username = 'anonymous';`).
 - **Déclencheur** : un appel dont l'intervalle dépasse 400 jours, quelle qu'en soit l'origine.
   Le remède est un plafond dans `summary()`, avec un `ParseError` explicite — et sa mise à jour
   dans [../architecture/api-surface.md](../architecture/api-surface.md).
+
+## W14 — Clés d'ordre limitées à 255 caractères
+
+- **Origine** : `models/task.py`, `models/daily_task.py` — `position = CharField(max_length=255)`.
+- **Contexte** : chaque insertion au même endroit coupe l'intervalle en deux ; un caractère base
+  62 porte environ 6 bits, soit un caractère de plus toutes les six insertions consécutives au
+  même point. Au-delà de 255 caractères, l'écriture lève une `DataError` (500).
+- **Décision** : ne pas agir — il faut plus d'un millier d'insertions consécutives au même point.
+  Le remède, régénérer les clés d'une liste avec `generate_n_keys_between`, tient en quelques
+  lignes.
+- **Déclencheur** : `SELECT max(length(position)) FROM tout_doux_task` (ou `tout_doux_dailytask`)
+  dépasse 100.
+
+## W15 — Double planification simultanée d'une même tâche
+
+- **Origine** : `serializers/daily_task/daily_task_post.py`, garde `exists()` de `validate()`.
+- **Contexte** : la garde anti-doublon lit la base **avant** que `DailyTask.save()` ne prenne le
+  verrou du jour. Deux onglets qui planifient la même tâche au même instant passent tous deux la
+  garde ; le second bute sur `unique_task_for_date` et répond 500 au lieu de 409.
+- **Décision** : ne pas agir — il faut deux clics simultanés sur la même tâche, et aucune donnée
+  n'est abîmée.
+- **Déclencheur** : une `IntegrityError` sur `unique_task_for_date` ou
+  `unique_common_task_for_date` dans les logs.

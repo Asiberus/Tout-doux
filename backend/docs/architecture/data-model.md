@@ -1,6 +1,6 @@
 # Modèle de données
 
-12 modèles dans `tout_doux/models/`, un par fichier. Les **7 migrations** de
+12 modèles dans `tout_doux/models/`, un par fichier. Les migrations de
 `tout_doux/migrations/` font foi sur le schéma réel ; `makemigrations --check` est propre
 (vérifié). Le vocabulaire métier est dans [../domain/glossary.md](../domain/glossary.md) — ici
 on ne décrit que la mécanique.
@@ -45,19 +45,23 @@ User ─┬─< Project ─┬─< Section ─< Task
 ```
 
 Une `Task` est rattachée à **exactement une** de ces trois cibles : `project`, `section` ou
-`collection`. Les trois FK sont `null=True` au niveau base ; **l'exclusivité n'est garantie
-que par le sérialiseur** (`serializers/task/task_post.py:87`) et n'est pas revalidée en PATCH.
+`collection`. Les trois FK sont `null=True` au niveau base. L'exclusivité est garantie par la
+base (`task_exactly_one_container`), vérifiée à la fin de chaque instruction : un changement de
+conteneur doit poser la nouvelle FK et vider l'ancienne dans le même `UPDATE`.
 Voir [../domain/glossary.md](../domain/glossary.md).
 
 ## Contraintes et invariants réellement en base
 
-| Modèle            | Contrainte                                                              | Fichier                         |
-| ----------------- | ----------------------------------------------------------------------- | ------------------------------- |
-| `User`            | `email` unique (max 100)                                                | `models/user.py:11`             |
-| `Tag`             | `UniqueConstraint(user, name, type)`                                    | `models/tag.py:39`              |
-| `CommonTask`      | `UniqueConstraint(name, user)`                                          | `models/common_task.py:20`      |
-| `DailyTask`       | `UniqueConstraint(date, task)` et `UniqueConstraint(date, common_task)` | `models/daily_task.py:59`       |
-| `UserEmailChange` | `token` en clé primaire, table forcée à `tout_doux_user_email_change`   | `models/user_email_change.py:9` |
+| Modèle            | Contrainte                                                                                           | Fichier                         |
+| ----------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `User`            | `email` unique (max 100)                                                                             | `models/user.py:11`             |
+| `Tag`             | `UniqueConstraint(user, name, type)`                                                                 | `models/tag.py:39`              |
+| `CommonTask`      | `UniqueConstraint(name, user)`                                                                       | `models/common_task.py:20`      |
+| `DailyTask`       | `UniqueConstraint(date, task)` et `UniqueConstraint(date, common_task)`                              | `models/daily_task.py:59`       |
+| `Task`            | `UniqueConstraint(project, section, collection, position, nulls_distinct=False)` : une clé par liste | `models/task.py`                |
+| `Task`            | `CheckConstraint` : exactement un de `project`, `section`, `collection`                              | `models/task.py`                |
+| `DailyTask`       | `UniqueConstraint(user, date, position)` : une clé par jour                                          | `models/daily_task.py`          |
+| `UserEmailChange` | `token` en clé primaire, table forcée à `tout_doux_user_email_change`                                | `models/user_email_change.py:9` |
 
 ⚠️ **Les deux contraintes de `DailyTask` ne mordent pas sur les tâches libres.** PostgreSQL
 considère deux `NULL` comme distincts : autant de `DailyTask` sans `task` ni `common_task` que
@@ -65,22 +69,25 @@ voulu peuvent coexister le même jour. C'est le comportement souhaité, pas un t
 
 ## Ordonnancements par défaut
 
-| Modèle                           | `ordering`                                          | Effet               |
-| -------------------------------- | --------------------------------------------------- | ------------------- |
-| `Project`, `Collection`          | `('-created_on', '-pk')`                            | plus récent d'abord |
-| `Section`                        | `('-pk',)`                                          | plus récent d'abord |
-| `CommonTask`, `DailyTask`, `Tag` | `('pk',)`                                           | ordre de création   |
-| `Feedback`                       | `('-date',)`                                        |                     |
-| `User`                           | `('date_joined',)`                                  |                     |
-| `Event`                          | `('start_date','end_date','start_time','end_time')` |                     |
-| `Task`                           | `('-completed_at','-pk')`                           | **voir ci-dessous** |
-| `Preferences`                    | **aucun**                                           |                     |
+| Modèle                  | `ordering`                                                                  | Effet                |
+| ----------------------- | --------------------------------------------------------------------------- | -------------------- |
+| `Project`, `Collection` | `('-created_on', '-pk')`                                                    | plus récent d'abord  |
+| `Section`               | `('-pk',)`                                                                  | plus récent d'abord  |
+| `CommonTask`, `Tag`     | `('pk',)`                                                                   | ordre de création    |
+| `DailyTask`             | `('date', 'position')`                                                      | ordre manuel du jour |
+| `Feedback`              | `('-date',)`                                                                |                      |
+| `User`                  | `('date_joined',)`                                                          |                      |
+| `Event`                 | `('start_date','end_date','start_time','end_time')`                         |                      |
+| `Task`                  | `('completed', F('completed_at').desc(nulls_last=True), 'position', '-pk')` | **voir ci-dessous**  |
+| `Preferences`           | **aucun**                                                                   |                      |
 
-**`Task` — l'ordre dépend du moteur.** `completed_at` est `NULL` tant que la tâche n'est pas
-faite, et PostgreSQL trie les `NULL` **en premier** en ordre décroissant (vérifié sur la base du
-projet). Résultat : les tâches à faire remontent, puis les tâches faites de la plus récente à la
-plus ancienne. C'est le comportement voulu par l'UI, mais il **repose sur un défaut PostgreSQL**,
-pas sur une intention écrite. Un changement de moteur inverserait la liste.
+**`Task` et `DailyTask` — l'ordre est manuel.** `position` est une clé de _fractional indexing_
+(base 62, bibliothèque `fractional-indexing`), triée octet par octet grâce à
+`db_collation='C'` : la collation de la base, `en_US.utf8`, mêlerait majuscules et minuscules.
+Les tâches non terminées suivent leur clé ; les terminées, leur date de complétion, `NULL` en
+dernier. Une ligne créée sans clé la reçoit dans `save()`, sous verrou de liste : **en tête**
+pour une tâche (ou entre les ancres `afterId` / `beforeId` du POST), **en fin** pour une daily
+task. `bulk_create` n'appelle pas `save()` : le report de la veille pose ses clés lui-même. Voir [../adr/0007-ordre-par-fractional-indexing.md](../adr/0007-ordre-par-fractional-indexing.md).
 
 **`Tag` trie par `pk`, faute d'horodatage.** Le modèle n'a ni `created_on` ni `created_at` :
 « ordre de création » s'écrit donc sur la clé primaire. Ce tri fixe aussi l'ordre des tags

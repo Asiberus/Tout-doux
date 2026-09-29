@@ -82,8 +82,8 @@ class DataFixtureTestCase(TestCase):
 
     def make_tasks(self, total, completed, **owner):
         """`completed_at` n'est posé que par TaskPatchSerializer.update(). Une tâche créée
-        directement par l'ORM avec completed=True le laisserait à None, et le tri
-        ('-completed_at', '-pk') du modèle ne testerait plus rien."""
+        directement par l'ORM avec completed=True le laisserait à None, et le tri des
+        terminées par date du modèle ne testerait plus rien."""
         now = timezone.now()
         created = []
         for index in range(total):
@@ -375,7 +375,7 @@ class DailyTaskContractTest(DataFixtureTestCase):
     def test_response_keys_are_unchanged(self):
         self.assertEqual(
             set(self.payload()),
-            {'id', 'date', 'task', 'commonTask', 'name', 'tags', 'action', 'completed'},
+            {'id', 'date', 'task', 'commonTask', 'name', 'tags', 'action', 'completed', 'position'},
         )
 
     def test_the_nested_task_carries_its_whole_chain(self):

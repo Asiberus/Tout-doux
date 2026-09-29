@@ -3,7 +3,7 @@
 **Quand** — installer le projet, le lancer, jouer une migration, lire un e-mail envoyé en local.
 
 Tout passe par Docker. **Il n'existe pas de mode « Python en local »** : ni virtualenv, ni
-`.python-version`, ni instructions pour en créer un. `requirements.txt` n'épingle que 8
+`.python-version`, ni instructions pour en créer un. `requirements.txt` n'épingle que 9
 dépendances directes, sans lockfile.
 
 Une seule exception, hors poste de développement : la CI installe Python nativement sur son

@@ -1,17 +1,21 @@
 from datetime import date
 
 from django.db import transaction
+from django.db.models import Max
 from django.utils import timezone
+from fractional_indexing import generate_n_keys_between
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied, ParseError
+from rest_framework.exceptions import PermissionDenied, ParseError, ValidationError
 from rest_framework.response import Response
 
 from tout_doux.models import DailyTask
 from tout_doux.pagination import ExtendedPageNumberPagination
 from tout_doux.queries import daily_carry_over_candidates, daily_summary_counts
+from tout_doux.serializers.move import MoveSerializer
 from tout_doux.serializers.daily_task import DailyTaskSerializer, DailyTaskPostSerializer, DailyTaskPatchSerializer, \
     DailySummarySerializer
+from tout_doux.services import ordering
 from tout_doux.utils.date import daterange
 
 
@@ -30,7 +34,18 @@ def copy_daily_tasks_to_today(daily_tasks):
 
     Les tags passent par la table de liaison directement : `tags.set()` émettrait un SELECT par
     ligne, y compris pour les origines liées dont les tags sont toujours vides.
+
+    Les copies prennent des clés à la suite de la dernière ligne du jour, dans l'ordre reçu :
+    l'appelant tient le verrou du jour et passe les lignes dans l'ordre de la veille.
     """
+    if not daily_tasks:
+        return []
+
+    last = DailyTask.objects.filter(
+        user_id=daily_tasks[0].user_id, date=timezone.localdate()
+    ).aggregate(last=Max('position'))['last']
+    positions = generate_n_keys_between(last, None, len(daily_tasks))
+
     copies = DailyTask.objects.bulk_create([
         DailyTask(
             user_id=daily_task.user_id,
@@ -38,8 +53,9 @@ def copy_daily_tasks_to_today(daily_tasks):
             common_task_id=daily_task.common_task_id,
             name=daily_task.name,
             action=daily_task.action,
+            position=position,
         )
-        for daily_task in daily_tasks
+        for daily_task, position in zip(daily_tasks, positions)
     ])
 
     through = DailyTask.tags.through
@@ -59,9 +75,9 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.request.user.dailytasks.all()
 
-        # `destroy` ne lit que `date` ; les autres actions répondent toutes avec la chaîne
-        # imbriquée complète, y compris les écritures via `to_representation`.
-        if self.action != 'destroy':
+        # `destroy` et `move` ne lisent que la ligne elle-même ; les autres actions répondent toutes
+        # avec la chaîne imbriquée complète, y compris les écritures via `to_representation`.
+        if self.action not in ('destroy', 'move'):
             queryset = queryset.select_related(
                 'task__project', 'task__section__project', 'task__collection', 'common_task',
             ).prefetch_related(
@@ -76,6 +92,8 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             return DailyTaskPostSerializer
         elif self.action in ['partial_update', 'update']:
             return DailyTaskPatchSerializer
+        elif self.action == 'move':
+            return MoveSerializer
         else:
             return DailyTaskSerializer
 
@@ -85,6 +103,25 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
             raise PermissionDenied('The daily task is related to a past day')
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post'])
+    def move(self, request, pk=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        after_id = serializer.validated_data['after_id']
+        before_id = serializer.validated_data['before_id']
+
+        with transaction.atomic():
+            daily_task = self.get_object()
+            if daily_task.pk in (after_id, before_id):
+                raise ValidationError('A daily task cannot be its own anchor')
+            if daily_task.date < timezone.localdate():
+                raise PermissionDenied('The daily task is related to a past day')
+
+            daily_task.lock_list()
+            ordering.move(daily_task, after_id, before_id)
+
+        return Response({'id': daily_task.pk, 'position': daily_task.position})
 
     @action(detail=False)
     def summary(self, request):
@@ -110,6 +147,7 @@ class DailyTaskViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], url_path='carry-over')
     def carry_over(self, request):
         with transaction.atomic():
+            DailyTask.lock_day_list(request.user.pk)
             created = copy_daily_tasks_to_today(daily_carry_over_candidates(self.get_queryset()))
 
         # Les instances tout juste créées n'ont aucun des préchargements de `get_queryset()` :

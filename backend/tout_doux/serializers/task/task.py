@@ -19,4 +19,5 @@ class TaskSerializer(ReadOnlyModelSerializer):
             'completed',
             'createdAt',
             'completedAt',
+            'position',
         )

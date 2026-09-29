@@ -20,6 +20,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`               | basse     | Configuration morte                                           |
 | R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé         | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
 | R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API  | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
+| R15 | Relation à `null` explicite : 500 au lieu de 400 sur 6 champs           | basse     | Aucun corps envoyé par le front n'emprunte ce chemin          |
 
 ---
 
@@ -193,3 +194,21 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
   `CollectionContractTest.test_list_response_keys_are_unchanged` et
   [../architecture/api-surface.md](../architecture/api-surface.md) sont à mettre à jour dans le
   même commit.
+
+## R15 — Relation à `null` explicite : 500 au lieu de 400
+
+- **Origine** : trouvé en concevant le tri des tâches. `serializers/task/task_post.py:57`, `:67`,
+  `:77` ; `serializers/daily_task/daily_task_post.py:65`, `:82` ;
+  `serializers/event/event_post_or_patch.py:63`.
+- **Contexte** : ces six champs sont des `PrimaryKeyRelatedField(required=False,
+allow_null=True)`. DRF appelle `validate_<champ>` **même quand la valeur est `None`**, et chaque
+  méthode lit aussitôt `<objet>.user.pk`. Un corps comme `POST task/ {"name": "x", "projectId":
+null}` lève donc `AttributeError: 'NoneType' object has no attribute 'user'`, qui remonte en 500. Vérifié en validant ces corps via chaque sérialiseur, sans écriture : 500 pour `projectId`,
+  `sectionId`, `collectionId` (tâche), `taskId`, `commonTaskId` (daily task) et `projectId`
+  (événement). `tagIds: null` n'est pas concerné : sur un champ `many=True`, DRF refuse le `null`
+  proprement (400). Aucune ligne n'est écrite, la requête échoue avant.
+- **Décision** : agir, priorité basse — le front n'envoie jamais ces corps. Deux corrections
+  possibles : retirer `allow_null=True` là où `required=False` suffit à dire « facultatif », ou
+  faire retourner chaque `validate_<champ>` dès qu'il reçoit `None`. La première est préférable si
+  aucun client n'envoie `null` ; à vérifier pour `EventPostOrPatchSerializer`, qui sert aussi au
+  PATCH. Les mêmes méthodes portent l'occurrence R1 (`is not`) : les corriger ensemble.
