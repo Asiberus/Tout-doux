@@ -46,6 +46,12 @@ mutations du même fichier.
   serveur y place la tâche) ; `editTask` ne replace une tâche que si son état coché change
   (`repositionAfterToggle`) ; `moveTask` applique le déplacement tout de suite puis passe par une
   file. Au premier échec, la file est vidée et le projet ou la collection est rechargé.
+- **`dragInProgress` (`src/components/sortable/dnd-kit.ts`) est un `ref` de module, hors
+  Pinia.** Écrit par `SortableList` seul, lu par `AuthenticatedLayout`, pour ignorer les
+  balayages de la navbar pendant un glisser, et par `DailyTaskBottomSheet`, pour abandonner le
+  glissé de la feuille : ce n'est pas un état transverse au sens de la
+  règle ci-dessus. Il repasse à `false` une tâche après la fin du glisser, pour que le
+  `touchend` qui suit le `pointerup` le voie encore.
 - **`app.store.init()`** lance `Promise.all([userStore.getUser(), preferencesStore.getPreferences()])`
   — **parallèle**, et ne charge ni projet ni collection. Appelé à deux endroits seulement : le
   premier `beforeEach` du routeur (uniquement si `from === START_LOCATION`) et `Login.vue:41`

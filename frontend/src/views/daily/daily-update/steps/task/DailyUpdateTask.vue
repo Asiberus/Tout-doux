@@ -20,6 +20,7 @@ import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/compone
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { useNotificationStore } from '@/store'
+import { useDailyTaskMove } from '@/composables/useDailyTaskMove'
 import { useToday } from '@/composables/useToday'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
@@ -55,6 +56,7 @@ const collectionList = ref<DailyTaskDisplayWrapper<CollectionDetail>[]>([])
 const commonTaskList = ref<CommonTask[]>([])
 const carryOverCandidates = ref<DailyTask[]>([])
 const carryOverInProgress = ref(false)
+const { moveDailyTask } = useDailyTaskMove(dailyTaskList, retrieveDailyTaskList)
 
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
@@ -490,7 +492,8 @@ function resetSelectedItem(): void {
         @update="updateDailyTask($event)"
         @delete="deleteDailyTask($event)"
         @select="select($event)"
-        @carry-over="carryOverPreviousDay()" />
+        @carry-over="carryOverPreviousDay()"
+        @move="moveDailyTask($event.id, $event.anchors)" />
     </DailyTaskBottomSheet>
   </div>
 </template>

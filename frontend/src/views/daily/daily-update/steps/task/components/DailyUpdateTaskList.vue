@@ -6,6 +6,10 @@ import {
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import SortableList from '@/components/sortable/SortableList.vue'
+import { useToday } from '@/composables/useToday'
+import { MoveAnchors } from '@/models/ordering.model'
+import { dailyTaskName } from '@/utils/daily-task.utils'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -28,7 +32,10 @@ const emit = defineEmits<{
   delete: [id: number]
   select: [event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }]
   'carry-over': []
+  move: [event: { id: number; anchors: MoveAnchors }]
 }>()
+
+const { today } = useToday()
 
 const selectedDailyTask = ref<number | null>(null)
 // Exposé au parent : sur mobile l'en-tête reste visible quand la feuille est repliée, et le « + »
@@ -52,6 +59,8 @@ const carryOverTitle = computed<string>(() =>
     ? "Copy yesterday's unfinished task"
     : `Copy ${props.carryOverCandidates.length} unfinished tasks from yesterday`
 )
+
+const isPastDay = computed<boolean>(() => today.value.isAfter(props.date, 'day'))
 
 watch(createDailyTaskDisplayed, async (value: boolean) => {
   if (!value) return
@@ -87,6 +96,10 @@ function updateDailyTask(id: number, data: DailyTaskPatch): void {
 
 function deleteDailyTask(id: number): void {
   emit('delete', id)
+}
+
+function moveDailyTask(id: number, anchors: MoveAnchors): void {
+  emit('move', { id, anchors })
 }
 
 function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }): void {
@@ -146,16 +159,28 @@ function carryOver(): void {
 
     <template v-if="dailyTaskList.length > 0 || createDailyTaskDisplayed || previewDisplayed">
       <div class="daily-task-wrapper">
-        <template v-for="dailyTask of dailyTaskList" :key="dailyTask.id">
-          <DailyTaskFormCard
-            :daily-task="dailyTask"
-            :edit-mode="selectedDailyTask === dailyTask.id"
-            @show-edit-mode="selectedDailyTask = dailyTask.id"
-            @hide-edit-mode="selectedDailyTask = null"
-            @update="updateDailyTask(dailyTask.id, $event)"
-            @delete="deleteDailyTask(dailyTask.id)"
-            @select="select($event)" />
-        </template>
+        <SortableList
+          v-if="dailyTaskList.length > 0"
+          :items="dailyTaskList"
+          :disabled="isPastDay"
+          :locked-id="selectedDailyTask"
+          :item-label="dailyTaskName"
+          class="d-flex flex-column gap-2"
+          @move="moveDailyTask">
+          <template #item="{ item: dailyTask, index, setHandle, moveToTop }">
+            <DailyTaskFormCard
+              :daily-task="dailyTask"
+              :edit-mode="selectedDailyTask === dailyTask.id"
+              :set-handle
+              :at-top="index === 0"
+              @show-edit-mode="selectedDailyTask = dailyTask.id"
+              @hide-edit-mode="selectedDailyTask = null"
+              @update="updateDailyTask(dailyTask.id, $event)"
+              @delete="deleteDailyTask(dailyTask.id)"
+              @select="select($event)"
+              @move-to-top="moveToTop?.()" />
+          </template>
+        </SortableList>
         <template v-if="previewDisplayed">
           <!-- `inert` sort ces cartes du parcours clavier et de l'arbre d'accessibilité : ce ne
                sont pas encore des tâches -->

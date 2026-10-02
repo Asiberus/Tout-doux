@@ -3,7 +3,9 @@ import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import SortableHandle from '@/components/sortable/SortableHandle.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { SetHandle } from '@/utils/sortable.utils'
 import { computed, ref } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
@@ -19,6 +21,8 @@ const props = withDefaults(
     elevation?: number
     color?: string
     itemName?: string
+    setHandle?: SetHandle
+    atTop?: boolean
   }>(),
   { displayOptions: true, completable: true, elevation: 2, itemName: 'task' }
 )
@@ -28,6 +32,7 @@ const emit = defineEmits<{
   'toggle-state': [id: number, value: boolean]
   update: [id: number, data: TaskPatch]
   delete: [id: number]
+  'move-to-top': [id: number]
 }>()
 
 const taskMenu = ref(false)
@@ -55,6 +60,10 @@ function emitAddToDailyEvent(): void {
   emit('add-to-daily', props.task.id)
 }
 
+function emitMoveToTopEvent(): void {
+  emit('move-to-top', props.task.id)
+}
+
 function emitToggleStateEvent(): void {
   emit('toggle-state', props.task.id, !props.task.completed)
 }
@@ -77,7 +86,12 @@ function emitDeleteEvent(): void {
       :ripple="false"
       :elevation
       class="task-card rounded-lg"
-      :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions, small }">
+      :class="{
+        'pl-3 pt-3': !completable,
+        'cursor-pointer': !displayOptions,
+        'task-card--sortable': setHandle,
+        small,
+      }">
       <template v-if="displayOptions">
         <div class="task-card__actions">
           <v-menu v-model="taskMenu">
@@ -99,6 +113,12 @@ function emitDeleteEvent(): void {
                   Add to daily
                 </v-list-item-title>
               </v-list-item>
+              <v-list-item v-if="setHandle && !atTop" @click="emitMoveToTopEvent()">
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-arrow-collapse-up" size="small" start />
+                  Move to top
+                </v-list-item-title>
+              </v-list-item>
               <v-list-item @click="openEditDialog()">
                 <v-list-item-title class="d-flex align-center">
                   <v-icon icon="mdi-pencil" size="small" start />
@@ -115,6 +135,8 @@ function emitDeleteEvent(): void {
           </v-menu>
         </div>
       </template>
+
+      <SortableHandle v-if="setHandle" :set-handle :label="`Reorder ${task.name}`" />
 
       <div class="task-card__content" :class="{ 'mb-1': small }">
         <template v-if="completable">
@@ -188,6 +210,12 @@ function emitDeleteEvent(): void {
 
   &.small {
     min-height: 62px;
+  }
+
+  &.task-card--sortable {
+    @media (hover: hover) {
+      padding-left: var(--sortable-gutter-width);
+    }
   }
 
   &__actions {

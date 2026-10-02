@@ -1,4 +1,8 @@
-import { DailyTaskAction } from '@/models/daily-task.model'
+import { DailyTask, DailyTaskAction } from '@/models/daily-task.model'
+
+export function dailyTaskName(dailyTask: DailyTask): string {
+  return dailyTask.task?.name ?? dailyTask.commonTask?.name ?? (dailyTask.name as string)
+}
 
 // Todo : define color for dailytask action chip
 export function getLiteralFormOfDailyActionEnum(action: DailyTaskAction): string {

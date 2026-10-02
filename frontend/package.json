@@ -21,6 +21,9 @@
     "docker:prod:up": "docker compose --file ../docker-compose.prod.yml --env-file ../.conf/production/conf.env up"
   },
   "dependencies": {
+    "@dnd-kit/abstract": "0.5.0",
+    "@dnd-kit/dom": "0.5.0",
+    "@dnd-kit/vue": "0.5.0",
     "@vue/devtools-api": "^8.1.5",
     "axios": "^1.18.1",
     "deep-equal": "^2.2.3",

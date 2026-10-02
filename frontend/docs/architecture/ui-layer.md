@@ -5,11 +5,11 @@ placement explicite ; le thème est étendu de couleurs **métier** (pas seuleme
 
 ## Trois niveaux de composants
 
-| Niveau                  | Emplacement                            | Critère                                                                                | Exemples                                                                                                     |
-| ----------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Global**              | `src/components/` (15)                 | Réutilisable **sans connaissance du domaine**, ou chip/avatar d'entité utilisé partout | `ConfirmDialog`, `HalfDialog`, `EmptyListDisplay`, `FilterChip`, `ProgressWheel`, `MainTitle`, `ProjectChip` |
-| **Partagé par domaine** | `src/views/components/<domaine>/` (13) | Lié à une entité, consommé par **≥ 2 features**                                        | `task/TaskCard`, `event/EventDialog`, `tag/TagGroup`, `common-task/CommonTaskCard`                           |
-| **Local à une feature** | `src/views/<feature>/components/`      | Utilisé par une seule feature                                                          | `daily/components/DailyTaskCard`, `project/project-detail/components/ProjectSectionItem`                     |
+| Niveau                  | Emplacement                            | Critère                                                                                | Exemples                                                                                                                              |
+| ----------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Global**              | `src/components/` (18)                 | Réutilisable **sans connaissance du domaine**, ou chip/avatar d'entité utilisé partout | `ConfirmDialog`, `HalfDialog`, `EmptyListDisplay`, `FilterChip`, `ProgressWheel`, `MainTitle`, `ProjectChip`, `sortable/SortableList` |
+| **Partagé par domaine** | `src/views/components/<domaine>/` (13) | Lié à une entité, consommé par **≥ 2 features**                                        | `task/TaskCard`, `event/EventDialog`, `tag/TagGroup`, `common-task/CommonTaskCard`                                                    |
+| **Local à une feature** | `src/views/<feature>/components/`      | Utilisé par une seule feature                                                          | `daily/components/DailyTaskCard`, `project/project-detail/components/ProjectSectionItem`                                              |
 
 > **Nouveau composant** : commencer local. Le promouvoir vers `views/components/<domaine>/` au
 > 2ᵉ consommateur hors de sa feature, vers `src/components/` seulement s'il perd toute
@@ -319,5 +319,5 @@ qu'il vient d'afficher.
 
 ## Voir aussi
 
-- [../patterns/styling.md](../patterns/styling.md) · [../patterns/dialogs.md](../patterns/dialogs.md) · [../patterns/responsive.md](../patterns/responsive.md)
+- [../patterns/styling.md](../patterns/styling.md) · [../patterns/dialogs.md](../patterns/dialogs.md) · [../patterns/responsive.md](../patterns/responsive.md) · [../patterns/sortable.md](../patterns/sortable.md)
 - [routing.md](routing.md) — les layouts et le chrome

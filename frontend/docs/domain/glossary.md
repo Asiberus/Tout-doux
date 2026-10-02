@@ -102,6 +102,19 @@ protégée par un `ConfirmDialog`.
   compare qu'avec `<` — `localeCompare` ignore la casse et placerait `a0` avant `Zz` — et ne se
   fabrique jamais côté front.
 
+## Réordonner
+
+| Terme                | Sens                                                                                                                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Poignée**          | Bande `mdi-drag-vertical` au bord gauche d'une carte, visible au survol ou au focus : prise immédiate à la souris et au clavier. Au toucher, simple repère dans la marge : l'appui long prend la carte |
+| **Appui long**       | 250 ms au doigt ou au stylet, 150 ms à la souris, sur le corps d'une carte, hors de ses contrôles : même prise que la poignée. À la souris, tirer tout de suite sélectionne le texte                   |
+| **Hors de la liste** | Pointeur à plus de 50 px de la liste : elle se referme, et lâcher remet la carte à sa place                                                                                                            |
+| **Move to top**      | Entrée du menu ⋮ qui place la carte en tête de sa liste                                                                                                                                                |
+
+Se réordonnent les tâches à faire d'un projet, d'une section ou d'une collection, et les daily
+tasks d'un jour qui n'est pas passé. Un conteneur archivé, la vue « Completed » et une liste
+d'un seul élément n'ont pas de poignée.
+
 ## Rôles utilisateur
 
 Une seule dimension : `User.isStaff`. Elle ouvre la zone `/administration` (liste des

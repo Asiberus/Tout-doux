@@ -2,7 +2,9 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressWheel from '@/components/ProgressWheel.vue'
+import SortableList from '@/components/sortable/SortableList.vue'
 import { CollectionDetail } from '@/models/collection.model'
+import { MoveAnchors } from '@/models/ordering.model'
 import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCard from '@/views/components/task/TaskCard.vue'
@@ -60,6 +62,10 @@ function updateTask(id: number, data: TaskPatch): void {
 function deleteTask(id: number): void {
   collectionStore.deleteTask(id)
 }
+
+function moveTask(id: number, anchors: MoveAnchors): void {
+  collectionStore.moveTask(id, anchors)
+}
 </script>
 
 <template>
@@ -103,17 +109,26 @@ function deleteTask(id: number): void {
 
       <template v-if="!displayCompletedTask">
         <template v-if="collectionStore.uncompletedTasks.length > 0">
-          <TaskCard
-            v-for="task in collectionStore.uncompletedTasks"
-            :key="task.id"
-            :task="task"
+          <SortableList
+            :items="collectionStore.uncompletedTasks"
             :disabled="collection.archived"
-            :item-name="collection.itemName"
-            class="mb-2"
-            @add-to-daily="addTaskToDaily($event)"
-            @toggle-state="toggleTaskState"
-            @update="updateTask"
-            @delete="deleteTask" />
+            :item-label="task => task.name"
+            class="d-flex flex-column gap-2 mb-2"
+            @move="moveTask">
+            <template #item="{ item: task, index, setHandle, moveToTop }">
+              <TaskCard
+                :task="task"
+                :disabled="collection.archived"
+                :item-name="collection.itemName"
+                :set-handle
+                :at-top="index === 0"
+                @add-to-daily="addTaskToDaily($event)"
+                @toggle-state="toggleTaskState"
+                @update="updateTask"
+                @delete="deleteTask"
+                @move-to-top="moveToTop?.()" />
+            </template>
+          </SortableList>
         </template>
         <template
           v-else-if="
