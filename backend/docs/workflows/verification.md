@@ -96,8 +96,11 @@ personnelles : elle ne passe jamais par le dépôt.
 # Valeurs de DB_HOST et DB_USER : .conf/development/conf.env
 docker exec "$DB_HOST" createdb -U "$DB_USER" tout_doux_rehearsal
 docker cp sauvegarde.json tout_doux_backend:/tmp/rehearsal.json
+# `docker cp` garde le propriétaire et le mode de l'hôte : une sauvegarde en 600 serait illisible
+docker exec -u root tout_doux_backend chown backend /tmp/rehearsal.json
 
-docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate tout_doux 0009
+# 0010 et non 0009 : le code actuel écrit `position` à chaque insertion, la colonne doit exister
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate tout_doux 0010
 docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate admin
 docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py loaddata /tmp/rehearsal.json
 
