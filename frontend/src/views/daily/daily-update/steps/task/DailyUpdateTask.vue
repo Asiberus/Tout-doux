@@ -63,6 +63,7 @@ const projectSectionSelected = ref(0)
 
 const taskSheetDetent = ref<DailyTaskSheetDetent>(DailyTaskSheetDetent.Collapsed)
 const createTaskDisplayed = ref(false)
+const editedTaskId = ref<number | null>(null)
 
 watch(createTaskDisplayed, value => {
   if (!value || taskSheetDetent.value !== DailyTaskSheetDetent.Collapsed) return
@@ -74,7 +75,10 @@ watch(createTaskDisplayed, value => {
 })
 
 watch(taskSheetDetent, value => {
-  if (smAndDown.value && value === DailyTaskSheetDetent.Collapsed) createTaskDisplayed.value = false
+  if (!smAndDown.value || value !== DailyTaskSheetDetent.Collapsed) return
+
+  createTaskDisplayed.value = false
+  editedTaskId.value = null
 })
 
 const { today } = useToday()
@@ -483,6 +487,7 @@ function resetSelectedItem(): void {
     <DailyTaskBottomSheet v-model="taskSheetDetent">
       <DailyUpdateTaskList
         v-model:create-displayed="createTaskDisplayed"
+        v-model:edited-task-id="editedTaskId"
         :date
         :daily-task-list="dailyTaskList"
         :carry-over-candidates="carryOverCandidates"

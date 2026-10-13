@@ -114,7 +114,7 @@ function isDateEqual(date1: string, date2: string): boolean {
           'no-hover-bg': !hoverBackground,
         }"
         @click="onEventCardClick()">
-        <v-card-text class="d-flex align-center pa-3 pa-sm-4">
+        <v-card-text class="d-flex align-center pa-3 pa-sm-4" :class="{ 'ps-5 ps-sm-6': caret }">
           <v-icon
             v-if="showIcon"
             icon="mdi-calendar-clock"
@@ -221,20 +221,10 @@ function isDateEqual(date1: string, date2: string): boolean {
 <style scoped lang="scss">
 @use 'sass:map';
 @use '@/styles/breakpoints' as variables;
+@use '@/styles/caret';
 
-.v-card.caret {
-  overflow: visible;
-}
-
-.caret::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -5px;
-  width: 14px;
-  height: 14px;
-  background-color: inherit;
-  transform: translateY(-50%) rotate(45deg);
+.caret {
+  @include caret.card;
 }
 
 .no-hover-bg :deep(.v-card__overlay) {

@@ -10,6 +10,7 @@ import SortableList from '@/components/sortable/SortableList.vue'
 import { useToday } from '@/composables/useToday'
 import { MoveAnchors } from '@/models/ordering.model'
 import { dailyTaskName } from '@/utils/daily-task.utils'
+import { scrollParent } from '@/utils/document.utils'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -37,7 +38,8 @@ const emit = defineEmits<{
 
 const { today } = useToday()
 
-const selectedDailyTask = ref<number | null>(null)
+// Exposé au parent, qui referme l'édition quand la feuille se replie
+const selectedDailyTask = defineModel<number | null>('editedTaskId', { default: null })
 // Exposé au parent : sur mobile l'en-tête reste visible quand la feuille est repliée, et le « + »
 // doit alors la dérouler sur le formulaire déjà ouvert
 const createDailyTaskDisplayed = defineModel<boolean>('createDisplayed', { default: false })
@@ -67,9 +69,11 @@ watch(createDailyTaskDisplayed, async (value: boolean) => {
 
   selectedDailyTask.value = null
 
-  // Le formulaire naît en fin de liste, donc sous le bord du défileur ; `end` l'aligne sur ce bord
+  // Le formulaire naît en fin de liste : descendre tout en bas du défileur montre aussi sa marge
+  // basse, que `scrollIntoView` laisserait sous le bord
   await nextTick()
-  createCard.value?.$el.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  const scroller = scrollParent(createCard.value?.$el)
+  scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' })
 })
 
 watch(selectedDailyTask, (value: number | null) => {

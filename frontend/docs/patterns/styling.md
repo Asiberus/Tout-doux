@@ -99,6 +99,18 @@ et `filled`). Deux raisons cumulées, vérifiées dans le DOM :
 `outlined` ou `solo` n'a aucun pointillé à l'état désactivé — ni avant ni après cet override.
 Les défauts du projet (`src/plugins/vuetify.ts`) mettent tous les champs en `underlined`.
 
+## Cartes à caret : la pointe est découpée dans la carte
+
+Le caret qui relie une carte au dot d'une timeline passe par `@/styles/caret`, jamais par un
+pseudo-élément posé à côté : un `::after` hors de la carte n'est couvert ni par le ripple ni par
+le voile de survol de Vuetify, qui s'arrêtent à la boîte de la carte.
+
+- `@include caret.card` élargit la carte de `caret.$depth` vers la gauche et la découpe en
+  `clip-path`. **Le padding gauche du contenu doit compenser** ces 8 px (`ps-5 ps-sm-6` à la
+  place des 12 / 16 px de `pa-3 pa-sm-4`), sinon le texte se décale.
+- `@include caret.dashed-outline` retrace le contour d'une carte `outlined` (une bordure ne suit
+  pas le `clip-path`) ; il occupe `::before` et `::after`.
+
 ## Couleurs : deux systèmes coexistent
 
 1. **Tokens de thème** — noms métier déclarés dans `vuetify.ts`, utilisables en prop

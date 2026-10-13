@@ -4,7 +4,7 @@ import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
 import { useToday } from '@/composables/useToday'
 import moment from 'moment/moment'
-import { computed, ref, watch } from 'vue'
+import { ComponentPublicInstance, computed, nextTick, useTemplateRef, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 const { xs } = useDisplay()
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   'create-daily-task': [data: DailyTaskDraft]
 }>()
 
-const createFormDisplayed = ref(false)
+const createFormDisplayed = defineModel<boolean>('createFormDisplayed', { default: false })
 const { today } = useToday()
 const isPast = computed<boolean>(() => moment(props.date).isBefore(today.value, 'day'))
 const isFuture = computed<boolean>(() => moment(props.date).isAfter(today.value, 'day'))
@@ -28,10 +28,29 @@ const addTaskCardVariant = computed<'elevated' | 'outlined'>(() =>
   createFormDisplayed.value ? 'elevated' : 'outlined'
 )
 
+const addTaskCard = useTemplateRef<ComponentPublicInstance>('addTaskCard')
+
 watch(
   () => props.date,
   () => (createFormDisplayed.value = false)
 )
+
+watch(createFormDisplayed, async value => {
+  if (!value) return
+  await nextTick()
+  const card: HTMLElement | undefined = addTaskCard.value?.$el
+  const scroller = card?.closest<HTMLElement>('.v-overlay__content')
+  if (!card || !scroller) return
+
+  // En lg, la colonne des événements peut descendre plus bas que le formulaire : le bas du
+  // conteneur est borné pour ne jamais faire passer le haut du formulaire sous le bord supérieur
+  const formTop =
+    scroller.scrollTop + card.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+  scroller.scrollTo({
+    top: Math.min(scroller.scrollHeight - scroller.clientHeight, formTop),
+    behavior: 'smooth',
+  })
+})
 
 const numberOfDailyTaskCompleted = computed<number>(
   () => props.dailyTaskList.filter(({ completed }) => completed).length
@@ -122,10 +141,11 @@ function createDailyTask(data: DailyTaskDraft): void {
         </template>
 
         <v-card
+          ref="addTaskCard"
           :variant="addTaskCardVariant"
           :link="!createFormDisplayed"
           :ripple="false"
-          class="add-task-card rounded-lg pa-3 pa-sm-4"
+          class="add-task-card rounded-lg pa-3 pa-sm-4 ps-5 ps-sm-6"
           :class="{ 'add-task-card--idle': !createFormDisplayed }"
           @click="createFormDisplayed = true">
           <span
@@ -148,6 +168,7 @@ function createDailyTask(data: DailyTaskDraft): void {
 @use 'sass:map';
 @use 'vuetify/lib/styles/settings/colors';
 @use '@/styles/breakpoints' as variables;
+@use '@/styles/caret';
 
 $add-task-color-idle: map.get(colors.$grey, 'darken-3');
 $add-task-color-active: map.get(colors.$grey, 'darken-1');
@@ -163,35 +184,51 @@ $rail-period: 6px;
   --bar-left: 48px;
   --divider-width: 96px;
   --divider-justify-content: center;
+  // Vuetify fait dépasser chaque segment du rail de 12px en dur, la moitié de son `row-gap` : l'écart
+  // et ce dépassement passent par la même variable pour que les segments restent jointifs
+  --rail-overhang: 12px;
+  row-gap: calc(2 * var(--rail-overhang));
 
   @media #{map.get(variables.$display-breakpoints, 'xs')} {
     --bar-left: 11px;
     --divider-width: 40px;
+    --rail-overhang: 6px;
   }
 
   @media #{map.get(variables.$display-breakpoints, 'sm')} {
     --bar-left: 18px;
     --divider-width: 55px;
+    --rail-overhang: 9px;
   }
 
   // Le modificateur est nécessaire pour égaler la spécificité du sélecteur Vuetify qui pose ces 24px
   &.v-timeline--side-end .v-timeline-item :deep(.v-timeline-item__body) {
     padding-inline-start: 0;
 
-    @media #{map.get(variables.$display-breakpoints, 'sm-and-down')} {
+    @media #{map.get(variables.$display-breakpoints, 'sm')} {
       padding-inline-start: 8px;
+    }
+
+    @media #{map.get(variables.$display-breakpoints, 'xs')} {
+      padding-inline-start: 12px;
     }
   }
 
+  .v-timeline-item :deep(.v-timeline-divider__before) {
+    top: calc(-1 * var(--rail-overhang));
+    height: calc(
+      var(--v-timeline-line-size-base) + var(--rail-overhang) - var(--v-timeline-line-inset)
+    );
+  }
+
+  .v-timeline-item :deep(.v-timeline-divider__after) {
+    bottom: calc(-1 * var(--rail-overhang));
+    height: calc(
+      var(--v-timeline-line-size-base) + var(--rail-overhang) - var(--v-timeline-line-inset)
+    );
+  }
+
   .v-timeline-item {
-    @media #{map.get(variables.$display-breakpoints, 'xs')} {
-      padding-bottom: 16px;
-    }
-
-    &:last-child {
-      padding-bottom: 0;
-    }
-
     & :deep(.v-timeline-item__body) {
       width: 100%;
     }
@@ -249,10 +286,13 @@ $rail-period: 6px;
   // La carte est la même dans les deux états : recréée, elle n'aurait aucune valeur de départ à
   // animer et atteindrait sa couleur finale avant le dot, qui lui survit au basculement
   .add-task-card {
+    @include caret.card;
+    @include caret.dashed-outline;
     transition: $add-task-transition;
 
-    &--idle {
-      border-style: dashed;
+    &:not(.add-task-card--idle)::before,
+    &:not(.add-task-card--idle)::after {
+      border-color: transparent;
     }
   }
 
