@@ -9,6 +9,7 @@ import { ref } from 'vue'
 const props = defineProps<{
   commonTaskList: CommonTask[]
   dailyTaskList: DailyTask[]
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,8 +19,12 @@ const emit = defineEmits<{
 
 const commonTaskDialog = ref(false)
 
+function isCommonTaskSelectable(id: number): boolean {
+  return !props.readonly && !isCommonTaskSelected(id)
+}
+
 function selectCommonTask(id: number): void {
-  if (isCommonTaskSelected(id)) return
+  if (!isCommonTaskSelectable(id)) return
 
   emit('select-common-task', { commonTaskId: id })
 }
@@ -43,11 +48,16 @@ function isCommonTaskSelected(id: number): boolean {
           :key="commonTask.id"
           :common-task="commonTask"
           :selected="isCommonTaskSelected(commonTask.id)"
-          :class="{ 'cursor-pointer': !isCommonTaskSelected(commonTask.id) }"
+          :class="{ 'cursor-pointer': isCommonTaskSelectable(commonTask.id) }"
           :editable="false"
           @click="selectCommonTask(commonTask.id)" />
 
-        <v-card variant="outlined" ripple class="create-task-card" @click="commonTaskDialog = true">
+        <v-card
+          v-if="!readonly"
+          variant="outlined"
+          ripple
+          class="create-task-card"
+          @click="commonTaskDialog = true">
           <v-card-text class="d-flex align-center justify-center gap-2">
             <v-icon icon="mdi-plus" />
             <span class="text-body-medium text-sm-body-large font-weight-medium">

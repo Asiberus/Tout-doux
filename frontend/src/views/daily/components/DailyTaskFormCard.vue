@@ -19,6 +19,7 @@ const props = defineProps<{
   editMode: boolean
   setHandle?: SetHandle
   atTop?: boolean
+  readonly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -65,7 +66,7 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
     <template v-if="!editMode && dailyTask">
       <SortableHandle v-if="setHandle" :set-handle :label="`Reorder ${name}`" />
       <div class="daily-task-form-card__content">
-        <div class="daily-task-form-card__actions">
+        <div v-if="!readonly" class="daily-task-form-card__actions">
           <v-menu>
             <template #activator="{ props: menuProps }">
               <v-btn
@@ -103,8 +104,9 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
         <div class="daily-task-form-card__content__header">
           <DailyTaskActionChip
+            v-if="!readonly || dailyTask.action"
             :action="dailyTask.action"
-            editable
+            :editable="!readonly"
             class="flex-shrink-0"
             @update="updateDailyTask({ action: $event })">
           </DailyTaskActionChip>

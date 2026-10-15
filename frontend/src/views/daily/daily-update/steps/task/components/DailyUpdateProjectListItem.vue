@@ -19,6 +19,7 @@ const props = withDefaults(
   defineProps<{
     project: ProjectDetail
     dailyTaskList: DailyTask[]
+    readonly: boolean
     sectionSelected?: number
   }>(),
   { sectionSelected: 0 }
@@ -81,8 +82,12 @@ function unselectProject(): void {
   selected.value = false
 }
 
+function isTaskSelectable(task: Task): boolean {
+  return !props.readonly && !isTaskSelected(task)
+}
+
 function selectTask(task: Task): void {
-  if (isTaskSelected(task)) return
+  if (!isTaskSelectable(task)) return
 
   emit('select-task', { taskId: task.id })
 }
@@ -210,7 +215,7 @@ function createTask(data: TaskPost): void {
                   :key="`${section.name}-task-${task.id}`"
                   :task="task"
                   :selected="isTaskSelected(task)"
-                  :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+                  :class="{ 'cursor-pointer': isTaskSelectable(task) }"
                   :small="true"
                   :completable="false"
                   :display-options="false"
@@ -219,6 +224,7 @@ function createTask(data: TaskPost): void {
                 </TaskCard>
 
                 <v-card
+                  v-if="!readonly"
                   variant="outlined"
                   ripple
                   class="create-task-card"

@@ -37,6 +37,7 @@ const notificationStore = useNotificationStore()
 
 const props = defineProps<{
   date: string
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{
@@ -376,6 +377,7 @@ function resetSelectedItem(): void {
                 v-model:selected="project.selected"
                 :project="project.content"
                 :daily-task-list="dailyTaskList"
+                :readonly
                 :section-selected="projectSectionSelected"
                 @select-task="createDailyTask($event)"
                 @create-task="createProjectTask($event)" />
@@ -423,6 +425,7 @@ function resetSelectedItem(): void {
                 v-model:selected="collection.selected"
                 :collection="collection.content"
                 :daily-task-list="dailyTaskList"
+                :readonly
                 @select-task="createDailyTask($event)"
                 @create-task="createCollectionTask($event)" />
             </div>
@@ -462,6 +465,7 @@ function resetSelectedItem(): void {
           <DailyUpdateCommonTask
             :common-task-list="commonTaskList"
             :daily-task-list="dailyTaskList"
+            :readonly
             @select-common-task="createDailyTask($event)"
             @create-common-task="createCommonTask($event)" />
         </div>
@@ -490,6 +494,7 @@ function resetSelectedItem(): void {
         v-model:edited-task-id="editedTaskId"
         :date
         :daily-task-list="dailyTaskList"
+        :readonly
         :carry-over-candidates="carryOverCandidates"
         :carry-over-in-progress="carryOverInProgress"
         class="daily-update-task__list"

@@ -7,10 +7,10 @@ import {
 } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import SortableList from '@/components/sortable/SortableList.vue'
-import { useToday } from '@/composables/useToday'
 import { MoveAnchors } from '@/models/ordering.model'
 import { dailyTaskName } from '@/utils/daily-task.utils'
 import { scrollParent } from '@/utils/document.utils'
+import DailyDayStatusChip from '@/views/daily/components/DailyDayStatusChip.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -23,6 +23,7 @@ const { smAndDown, mdAndDown, lgAndUp } = useDisplay()
 const props = defineProps<{
   date: string
   dailyTaskList: DailyTask[]
+  readonly: boolean
   carryOverCandidates: DailyTask[]
   carryOverInProgress: boolean
 }>()
@@ -35,8 +36,6 @@ const emit = defineEmits<{
   'carry-over': []
   move: [event: { id: number; anchors: MoveAnchors }]
 }>()
-
-const { today } = useToday()
 
 // Exposé au parent, qui referme l'édition quand la feuille se replie
 const selectedDailyTask = defineModel<number | null>('editedTaskId', { default: null })
@@ -61,8 +60,6 @@ const carryOverTitle = computed<string>(() =>
     ? "Copy yesterday's unfinished task"
     : `Copy ${props.carryOverCandidates.length} unfinished tasks from yesterday`
 )
-
-const isPastDay = computed<boolean>(() => today.value.isAfter(props.date, 'day'))
 
 watch(createDailyTaskDisplayed, async (value: boolean) => {
   if (!value) return
@@ -121,17 +118,19 @@ function carryOver(): void {
 <template>
   <div class="d-flex flex-column">
     <div class="daily-task-list__header task-sheet__drag-zone d-flex align-center">
-      <h2 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
-        Tasks of the day
-      </h2>
-      <v-chip
-        v-if="dailyTaskList.length > 0"
-        :key="dailyTaskList.length"
-        size="small"
-        class="daily-task-list__counter">
-        {{ dailyTaskList.length }}
-      </v-chip>
-      <v-spacer />
+      <div class="flex-grow-1 d-flex align-center gap-2">
+        <h2 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down">
+          Tasks of the day
+        </h2>
+        <v-chip
+          v-if="dailyTaskList.length > 0"
+          :key="dailyTaskList.length"
+          size="small"
+          class="daily-task-list__counter">
+          {{ dailyTaskList.length }}
+        </v-chip>
+        <DailyDayStatusChip :date />
+      </div>
       <v-hover
         v-if="carryOverDisplayed"
         v-slot="{ props: hoverProps }"
@@ -151,6 +150,7 @@ function carryOver(): void {
         </v-btn>
       </v-hover>
       <v-btn
+        v-if="!readonly"
         icon
         density="comfortable"
         size="small"
@@ -166,7 +166,7 @@ function carryOver(): void {
         <SortableList
           v-if="dailyTaskList.length > 0"
           :items="dailyTaskList"
-          :disabled="isPastDay"
+          :disabled="readonly"
           :locked-id="selectedDailyTask"
           :item-label="dailyTaskName"
           class="d-flex flex-column gap-2"
@@ -174,6 +174,7 @@ function carryOver(): void {
           <template #item="{ item: dailyTask, index, setHandle, moveToTop }">
             <DailyTaskFormCard
               :daily-task="dailyTask"
+              :readonly
               :edit-mode="selectedDailyTask === dailyTask.id"
               :set-handle
               :at-top="index === 0"
@@ -210,7 +211,9 @@ function carryOver(): void {
     </template>
 
     <template v-else>
-      <EmptyListDisplay message="You didn't add any task yet!" class="empty-list-display">
+      <EmptyListDisplay
+        :message="readonly ? 'No task was planned for this day.' : 'You didn\'t add any task yet!'"
+        class="empty-list-display">
         <template #img>
           <img
             src="../../../../../../assets/no_tasks.svg"

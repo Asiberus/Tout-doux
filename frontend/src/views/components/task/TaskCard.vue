@@ -87,8 +87,7 @@ function emitDeleteEvent(): void {
       :elevation
       class="task-card rounded-lg"
       :class="{
-        'pl-3 pt-3': !completable,
-        'cursor-pointer': !displayOptions,
+        'task-card--not-completable': !completable,
         'task-card--sortable': setHandle,
         small,
       }">
@@ -138,7 +137,7 @@ function emitDeleteEvent(): void {
 
       <SortableHandle v-if="setHandle" :set-handle :label="`Reorder ${task.name}`" />
 
-      <div class="task-card__content" :class="{ 'mb-1': small }">
+      <div class="task-card__content">
         <template v-if="completable">
           <template v-if="task.completed">
             <v-btn icon variant="text" density="comfortable" @click="openUncompleteDialog()">
@@ -210,6 +209,11 @@ function emitDeleteEvent(): void {
 
   &.small {
     min-height: 62px;
+    row-gap: 4px;
+  }
+
+  &.task-card--not-completable {
+    padding-left: 12px;
   }
 
   &.task-card--sortable {
@@ -238,6 +242,10 @@ function emitDeleteEvent(): void {
 @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .task-card {
     padding: 8px 24px 8px 8px;
+
+    &.task-card--not-completable {
+      padding-left: 16px;
+    }
   }
 }
 </style>
