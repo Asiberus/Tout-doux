@@ -10,6 +10,7 @@ import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { computed, ref, watch } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
@@ -59,6 +60,14 @@ const allTasksUncompleted = computed<Task[]>(() => filterUncompleted(allTasks.va
 const percentageOfTaskCompleted = computed<number>(
   () => (allTasksCompleted.value.length / allTasks.value.length) * 100
 )
+const projectLocation = computed<RouteLocationRaw>(() => {
+  const sectionId = taskBySection.value[sectionTab.value]?.id
+  if (!sectionId) return { name: 'project-detail', params: { id: props.project.id } }
+  return {
+    name: 'project-detail-section',
+    params: { id: `${props.project.id}`, sectionId: `${sectionId}` },
+  }
+})
 
 watch(
   () => props.sectionSelected,
@@ -147,7 +156,7 @@ function createTask(data: TaskPost): void {
           </template>
           <template v-if="selected">
             <v-btn
-              :to="{ name: 'project-detail', params: { id: project.id } }"
+              :to="projectLocation"
               icon
               variant="text"
               density="comfortable"
