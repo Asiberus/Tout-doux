@@ -7,7 +7,7 @@ import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const { xs, smAndUp, width } = useDisplay()
+const { xs, smAndUp } = useDisplay()
 
 const show = defineModel<boolean>()
 
@@ -33,8 +33,8 @@ function touchStartEvent(): void {
 }
 
 function handleTouchEvent(type: string): void {
-  if (type === 'right' && width.value >= 400) show.value = false
-  else if (type === 'down' && width.value < 400) scrollDownEvent()
+  if (type === 'right' && !xs.value) show.value = false
+  else if (type === 'down' && xs.value) scrollDownEvent()
 }
 
 function scrollDownEvent(): void {
