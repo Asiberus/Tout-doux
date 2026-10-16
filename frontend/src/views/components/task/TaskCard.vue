@@ -6,6 +6,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SortableHandle from '@/components/sortable/SortableHandle.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { SetHandle } from '@/utils/sortable.utils'
+import { dateFormat } from '@/pipes'
 import { computed, ref } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
@@ -23,8 +24,15 @@ const props = withDefaults(
     itemName?: string
     setHandle?: SetHandle
     atTop?: boolean
+    showCompletedAt?: boolean
   }>(),
-  { displayOptions: true, completable: true, elevation: 2, itemName: 'task' }
+  {
+    displayOptions: true,
+    completable: true,
+    elevation: 2,
+    itemName: 'task',
+    showCompletedAt: true,
+  }
 )
 
 const emit = defineEmits<{
@@ -42,6 +50,9 @@ const deleteConfirmDialog = ref(false)
 
 const cardColor = computed<string | undefined>(() =>
   props.task.completed || props.selected ? 'green-darken-2' : props.color
+)
+const displayCompletedAt = computed<boolean>(
+  () => props.showCompletedAt && props.task.completed && !!props.task.completedAt
 )
 
 function openEditDialog(): void {
@@ -159,14 +170,24 @@ function emitDeleteEvent(): void {
         </div>
       </div>
 
-      <template v-if="task.tags.length">
-        <TagGroup
-          :tag-list="task.tags"
-          :small="small"
-          :max-tag="3"
-          :class="{ 'pl-10': completable }">
-        </TagGroup>
-      </template>
+      <TagGroup
+        v-if="task.tags.length"
+        :tag-list="task.tags"
+        :small="small"
+        :max-tag="3"
+        class="task-card__tags"
+        :class="{
+          'pl-10': completable,
+          'task-card__tags--with-completed-at': displayCompletedAt,
+        }" />
+
+      <div
+        v-if="displayCompletedAt"
+        class="task-card__completed-at text-body-small text-white"
+        :title="`Completed on ${dateFormat(task.completedAt, 'D MMMM Y')}`">
+        <v-icon icon="mdi-calendar-check" size="x-small" />
+        {{ dateFormat(task.completedAt, 'D MMM Y') }}
+      </div>
     </v-card>
 
     <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
@@ -236,6 +257,20 @@ function emitDeleteEvent(): void {
     display: flex;
     align-items: center;
     column-gap: 4px;
+  }
+
+  &__tags--with-completed-at {
+    margin-right: 86px; // size of completed at text
+  }
+
+  &__completed-at {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+    opacity: 0.87;
   }
 }
 

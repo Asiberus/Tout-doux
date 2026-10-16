@@ -124,6 +124,7 @@ function createTask(data: TaskPost): void {
               :class="{ 'cursor-pointer': isTaskSelectable(task) }"
               :small="true"
               :completable="false"
+              :show-completed-at="false"
               :display-options="false"
               color="surface-container-high"
               @click="selectTask(task)">
