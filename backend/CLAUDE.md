@@ -10,7 +10,7 @@ ce fichier.
 
 `backend` est l'API de **Tout-Doux** (organisation personnelle : projets, collections,
 planification journalière). **Django 6.1 + DRF 3.18 + Knox 5**, PostgreSQL, une seule application
-`tout_doux` (12 modèles, 41 sérialiseurs, 17 tests de fumée, 76 tests de non-régression, 0 test
+`tout_doux` (12 modèles, 42 sérialiseurs, 17 tests de fumée, 81 tests de non-régression, 48 tests
 métier). Monorepo :
 `../frontend` (SPA Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)),
 `../docker-compose.yml`, `../td.sh`.
@@ -35,12 +35,15 @@ docker exec tout_doux_backend python manage.py show_urls      # django_extension
 Les migrations sont jouées **automatiquement** au démarrage du conteneur. Le code est monté en
 volume : pas de rebuild sauf si `requirements.txt` change.
 
-**17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **76 tests de
+**17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **81 tests de
 non-régression** gèlent le contrat d'API et le nombre de requêtes SQL (`test_api_contract.py`,
 `test_query_counts.py` — voir
-[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)).
-**Toujours aucun test métier, aucun linter, aucun formateur, aucune CI.** Le reste passe par la
-procédure manuelle de [docs/workflows/verification.md](docs/workflows/verification.md).
+[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)). Les **48 premiers
+tests métier** couvrent le tri manuel des listes (`test_ordering.py`) et la reprise des positions
+par la migration 0011 (`test_migrations.py`).
+**Toujours aucun linter, aucun formateur.** Une CI les lance à chaque PR
+(`.github/workflows/ci.yml`) ; le reste passe par la procédure manuelle de
+[docs/workflows/verification.md](docs/workflows/verification.md).
 
 ## Règles à respecter en écrivant du code
 
@@ -63,19 +66,19 @@ par ligne en texte brut, sans tiret ni puce.
 
 **Pièges à connaître avant d'écrire :**
 
-| Sujet                  | Piège                                                                                                                      | Où                                                                         |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Appartenance           | Le code existant écrit `is not` sur des `pk` : **c'est un bug**, écrire `!=`                                               | [R1](docs/quality/refactoring-backlog.md)                                  |
-| Réponse d'écriture     | Un POST/PATCH répond avec **un autre sérialiseur** que ses champs d'entrée (`to_representation`)                           | [docs/architecture/serializers.md](docs/architecture/serializers.md)       |
-| Archivage              | Un projet/collection archivé fige son contenu — garde à écrire **3 fois** : création, modification, suppression            | [docs/patterns/archive-guards.md](docs/patterns/archive-guards.md)         |
-| `limit_choices_to`     | **Ne protège rien** hors admin et `ModelForm`. Ne jamais s'y fier                                                          | [docs/architecture/data-model.md](docs/architecture/data-model.md)         |
-| Sérialiseur de lecture | `ReadOnlyModelSerializer` neutralise `create`/`update` — un `save()` échoue **en silence**                                 | [docs/architecture/serializers.md](docs/architecture/serializers.md)       |
-| Fuseau                 | Le conteneur est en **UTC**, `TIME_ZONE` vaut Europe/Paris. `date.today()` ≠ aujourd'hui la nuit                           | [R4](docs/quality/refactoring-backlog.md)                                  |
-| Daily task             | Cocher un daily ne clôt la tâche source que si l'action est vide ou `FI`                                                   | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)                   |
-| Événements             | `takesWholeDay: true` **efface silencieusement** heures et date de fin ; un projet lié ne peut plus être changé ni détaché | [docs/domain/events.md](docs/domain/events.md)                             |
-| Pagination             | `size=0` renvoie **tout**. `event/` et `daily-task/summary/` ne sont **pas** paginés                                       | [docs/architecture/api-surface.md](docs/architecture/api-surface.md)       |
-| Requêtes               | Un `SerializerMethodField` ne fait **jamais** de requête : compter et précharger depuis la vue                             | [docs/patterns/query-optimization.md](docs/patterns/query-optimization.md) |
-| Admin                  | L'admin Django et `/api-auth/login/` sont **inaccessibles** (`AUTHENTICATION_BACKENDS` n'accepte que `email=`)             | [R11](docs/quality/refactoring-backlog.md)                                 |
+| Sujet                  | Piège                                                                                                                                   | Où                                                                         |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Appartenance           | Le code existant écrit `is not` sur des `pk` : **c'est un bug**, écrire `!=`                                                            | [R1](docs/quality/refactoring-backlog.md)                                  |
+| Réponse d'écriture     | Un POST/PATCH répond avec **un autre sérialiseur** que ses champs d'entrée (`to_representation`)                                        | [docs/architecture/serializers.md](docs/architecture/serializers.md)       |
+| Archivage              | Un projet/collection archivé fige son contenu — garde à écrire **à chaque écriture** : création, modification, suppression, déplacement | [docs/patterns/archive-guards.md](docs/patterns/archive-guards.md)         |
+| `limit_choices_to`     | **Ne protège rien** hors admin et `ModelForm`. Ne jamais s'y fier                                                                       | [docs/architecture/data-model.md](docs/architecture/data-model.md)         |
+| Sérialiseur de lecture | `ReadOnlyModelSerializer` neutralise `create`/`update` — un `save()` échoue **en silence**                                              | [docs/architecture/serializers.md](docs/architecture/serializers.md)       |
+| Fuseau                 | `timezone.localdate()` suit `TIME_ZONE` (Europe/Paris), **un seul fuseau pour tout le serveur** — pas par utilisateur                   | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)                   |
+| Daily task             | Cocher un daily ne clôt la tâche source que si l'action est vide ou `FI`                                                                | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)                   |
+| Événements             | `takesWholeDay: true` **efface silencieusement** heures et date de fin ; un projet lié ne peut plus être changé ni détaché              | [docs/domain/events.md](docs/domain/events.md)                             |
+| Pagination             | `size=0` renvoie **tout**. `event/` et `daily-task/summary/` ne sont **pas** paginés                                                    | [docs/architecture/api-surface.md](docs/architecture/api-surface.md)       |
+| Requêtes               | Un `SerializerMethodField` ne fait **jamais** de requête : compter et précharger depuis la vue                                          | [docs/patterns/query-optimization.md](docs/patterns/query-optimization.md) |
+| Admin                  | L'admin Django et `/api-auth/login/` sont **inaccessibles** (`AUTHENTICATION_BACKENDS` n'accepte que `email=`)                          | [R11](docs/quality/refactoring-backlog.md)                                 |
 
 ## Documentation
 

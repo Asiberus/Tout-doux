@@ -4,13 +4,13 @@ services:
     build:
       context: .
       dockerfile: ./.conf/development/frontend/Dockerfile
-      args:
-        ARG_VERSION: ${VERSION}
-        ARG_API_URL: http://${BACKEND_HOST}:${BACKEND_PORT}/
+    environment:
+      FRONTEND_PORT: ${FRONTEND_PORT}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     volumes:
       - ./frontend:/frontend
+      - /frontend/node_modules
   backend:
     container_name: ${BACKEND_NAME}
     build:
@@ -53,7 +53,7 @@ services:
       - td_db:/var/lib/postgresql/data
   adminer:
     container_name: ${DB_ADMINER_NAME}
-    image: adminer
+    image: adminer:5
     ports:
       - ${DB_ADMINER_PORT}:8080
 volumes:

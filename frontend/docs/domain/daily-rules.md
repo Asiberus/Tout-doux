@@ -61,9 +61,13 @@ Aucune de ces règles n'est vérifiable par le typage. **Les respecter en écriv
 crée ou modifie des DailyTasks.**
 
 1. **Une seule origine par DailyTask** (voir ci-dessus).
-2. **Aujourd'hui et les jours à venir peuvent être préparés, le passé non.** `dailyUpdateGuard`
-   réécrit vers le jour courant toute date illisible, passée, ou au-delà de
-   `MAX_PLANNING_HORIZON_DAYS`. **Ce n'est plus lui qui empêche l'écran et les données de
+2. **Aujourd'hui et les jours à venir peuvent être préparés, le passé se consulte en lecture
+   seule.** `dailyUpdateGuard` réécrit vers le jour courant toute date illisible ou au-delà de
+   `MAX_PLANNING_HORIZON_DAYS`, et laisse passer le passé. Sur un jour passé, `DailyUpdate`
+   transmet `readonly` aux deux étapes : ajout, création, édition, action, suppression,
+   réordonnancement et CRUD d'événements disparaissent ; seule la navigation reste (onglets,
+   ouverture d'un projet ou d'une collection, chips de retour à la source, description d'un
+   événement). **Ce n'est plus lui qui empêche l'écran et les données de
    diverger** : `DailyTaskPost.date` est **requise**, donc l'écran qui poste doit dire sur quel
    jour il écrit, et le compilateur le vérifie. Le guard ne fait plus qu'appliquer les bornes.
    ⚠️ Il ne rejoue **pas** sur un changement de param — voir
@@ -99,6 +103,11 @@ Deux étapes non linéaires (`v-stepper non-linear`, les deux items `editable`) 
 **event**. Le param de route `:step(task|event)` pilote l'étape ; la regex de route rejette toute
 autre valeur.
 
+- **Ordre.** Une tâche créée depuis le wizard est placée **en fin** de la liste affichée, après la
+  dernière tâche à faire, par le serveur ; si la liste a changé ailleurs, la création est refusée
+  et le projet ou la collection est rechargé. Une ligne du jour, créée ou reportée, va **en fin**.
+  Le déplacement d'une ligne, terminée ou non, passe par `useDailyTaskMove` : au moindre échec,
+  le jour est rechargé.
 - La synchronisation est **unidirectionnelle** : le stepper écrit dans la route
   (`router.replace`), mais aucun watcher ne surveille la prop `step`. **Les boutons
   précédent/suivant du navigateur ne déplacent donc pas le stepper.**
@@ -111,9 +120,14 @@ autre valeur.
   liste tout événement qui, après édition, ne couvre plus la journée (`isEventRelatedToDate`).
 - **Navigation jour à jour** — deux flèches dans l'en-tête (`router.replace`, pas `push` : les
   clics n'empilent pas l'historique), plus un bouton « today » dès qu'on a quitté le jour
-  courant. La flèche gauche est désactivée sur aujourd'hui, la droite à
-  `MAX_PLANNING_HORIZON_DAYS` : **ces deux `disabled` sont la seule borne**, `dailyUpdateGuard`
-  ne rejouant pas sur un changement de param.
+  courant. La flèche gauche n'a pas de borne — le passé s'ouvre en lecture seule ; la droite se
+  désactive à `MAX_PLANNING_HORIZON_DAYS` : **ce `disabled` est la seule borne**,
+  `dailyUpdateGuard` ne rejouant pas sur un changement de param.
+- **Signal d'état** — `DailyDayStatusChip`, à côté des titres « Tasks of the day » et « Events of
+  the day » : « Past day » avec un cadenas sur un jour passé, « Upcoming » en `accent` tonal avec
+  l'icône `mdi-calendar-arrow-right` du résumé sur un jour à venir, rien sur le jour courant. Sur
+  un jour passé, les boutons d'ajout disparaissent et les états vides disent qu'il n'y avait rien
+  ce jour-là.
 - **Les deux étapes rechargent au changement de date**, par un `watch` sur la prop et non par un
   `:key` — un remontage relancerait aussi les listes de projets, collections et tâches
   récurrentes, qui ne dépendent pas du jour. Chacune **vide sa liste et remet son compteur à

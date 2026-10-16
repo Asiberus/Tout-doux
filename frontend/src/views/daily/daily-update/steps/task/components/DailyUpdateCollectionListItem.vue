@@ -15,6 +15,7 @@ const selected = defineModel<boolean>('selected')
 const props = defineProps<{
   collection: CollectionDetail
   dailyTaskList: DailyTask[]
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{
@@ -48,8 +49,12 @@ function unselectCollection(): void {
   selected.value = false
 }
 
+function isTaskSelectable(task: Task): boolean {
+  return !props.readonly && !isTaskSelected(task)
+}
+
 function selectTask(task: Task): void {
-  if (isTaskSelected(task)) return
+  if (!isTaskSelectable(task)) return
 
   emit('select-task', { taskId: task.id })
 }
@@ -116,15 +121,21 @@ function createTask(data: TaskPost): void {
               :key="`task-${task.id}`"
               :task
               :selected="isTaskSelected(task)"
-              :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+              :class="{ 'cursor-pointer': isTaskSelectable(task) }"
               :small="true"
               :completable="false"
+              :show-completed-at="false"
               :display-options="false"
               color="surface-container-high"
               @click="selectTask(task)">
             </TaskCard>
 
-            <v-card variant="outlined" ripple class="create-task-card" @click="taskDialog = true">
+            <v-card
+              v-if="!readonly"
+              variant="outlined"
+              ripple
+              class="create-task-card"
+              @click="taskDialog = true">
               <v-card-text class="d-flex align-center justify-center gap-2">
                 <span class="text-body-medium text-sm-body-large font-weight-medium">
                   Create a {{ collection.itemName }}

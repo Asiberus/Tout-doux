@@ -9,6 +9,8 @@ export interface TaskPost {
   projectId?: number
   sectionId?: number
   collectionId?: number
+  afterId?: number | null
+  beforeId?: number | null
 }
 
 export interface TaskPatch {
@@ -24,6 +26,7 @@ export interface Task {
   tags: Tag[]
   createdAt: string
   completedAt: string
+  position: string
 }
 
 export interface TaskExtended extends Task {

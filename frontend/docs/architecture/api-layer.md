@@ -43,6 +43,10 @@ Recette complète pour ajouter un endpoint :
 
 ## Contraintes non évidentes
 
+- **`moveTask` et `moveDailyTask` répondent `{ id, position }`**, pas la tâche. Le corps porte
+  les voisins **affichés** (`afterId`, `beforeId`, `null` en tête ou en fin) ; le serveur répond
+  403, 404 ou 409 quand la liste a changé ailleurs. `createTask` accepte les mêmes ancres,
+  facultatives. Voir `utils/ordering.utils.ts`.
 - **Enveloppe de pagination** — `Pagination<Data>` (`src/models/pagination.model.ts:1`) =
   `{ count, page, size, first, last, content }`. 9 endpoints de liste la renvoient, **3 non**
   (`getDailySummary`, `getEvents` et `getCarryOverCandidates` renvoient un tableau nu, comme la

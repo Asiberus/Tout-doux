@@ -166,13 +166,14 @@ de liste et de ne biaiser que le premier résultat de l'autocomplete — celui q
 
 Liste maintenue à la main.
 
-| Emplacement           | Ce qui y est appliqué                                                                                                                                                                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `queries.py`          | `scalar_count`, `daily_summary_counts`, `daily_carry_over_candidates`                                                                                                                                        |
-| `views/project.py`    | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`                                                                                                                       |
-| `views/collection.py` | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                                                                                                                                  |
-| `views/daily_task.py` | 4 `select_related`, 5 `prefetch_related`, hors `destroy` ; `daily_summary_counts` dans `summary()` ; `bulk_create` sur la table et sur la liaison des tags, puis relecture par `pk__in`, dans `carry_over()` |
-| `views/event.py`      | `select_related('project')`, `prefetch_related('project__tags')`                                                                                                                                             |
+| Emplacement            | Ce qui y est appliqué                                                                                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `queries.py`           | `scalar_count`, `daily_summary_counts`, `daily_carry_over_candidates`                                                                                                                                                  |
+| `views/project.py`     | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`                                                                                                                                 |
+| `views/collection.py`  | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                                                                                                                                            |
+| `views/daily_task.py`  | 4 `select_related`, 5 `prefetch_related`, hors `destroy` et `move` ; `daily_summary_counts` dans `summary()` ; `bulk_create` sur la table et sur la liaison des tags, puis relecture par `pk__in`, dans `carry_over()` |
+| `services/ordering.py` | une agrégation `Min` (borne droite et voisin attendu) ; verrou `select_for_update` posé par l'appelant                                                                                                                 |
+| `views/event.py`       | `select_related('project')`, `prefetch_related('project__tags')`                                                                                                                                                       |
 
 ## Comment on le vérifie
 
@@ -181,15 +182,17 @@ propriété qui compte — **le nombre de requêtes ne croît pas avec les donn�
 magique, et `tout_doux/test_api_contract.py` gèle en parallèle la forme et les valeurs des
 réponses.
 
-| Endpoint                    | Avant | Croissance                   | Après |
-| --------------------------- | ----- | ---------------------------- | ----- |
-| `GET /project/`             | 58    | +4 par projet                | 3     |
-| `GET /project/detailed/`    | 131   | +10 par projet, +1 par tâche | 9     |
-| `GET /collection/`          | 26    | +2 par collection            | 2     |
-| `GET /collection/detailed/` | 59    | +1 par tâche                 | 4     |
-| `GET /daily-task/`          | 74    | +6 par daily task            | 5     |
-| `GET /daily-task/summary/`  | 126   | +3 par jour affiché          | 2     |
-| `GET /event/`               | 27    | +2 par événement             | 2     |
+| Endpoint                      | Avant | Croissance                   | Après |
+| ----------------------------- | ----- | ---------------------------- | ----- |
+| `GET /project/`               | 58    | +4 par projet                | 3     |
+| `GET /project/detailed/`      | 131   | +10 par projet, +1 par tâche | 9     |
+| `GET /collection/`            | 26    | +2 par collection            | 2     |
+| `GET /collection/detailed/`   | 59    | +1 par tâche                 | 4     |
+| `GET /daily-task/`            | 74    | +6 par daily task            | 5     |
+| `GET /daily-task/summary/`    | 126   | +3 par jour affiché          | 2     |
+| `GET /event/`                 | 27    | +2 par événement             | 2     |
+| `POST /daily-task/{pk}/move/` | —     | aucune                       | 5     |
+| `POST /task/{pk}/move/`       | —     | aucune                       | 5     |
 
 ⚠️ `CaptureQueriesContext` force le curseur de debug et fonctionne donc avec `DEBUG=False` ;
 `connection.queries` à la main, non.

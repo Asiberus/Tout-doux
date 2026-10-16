@@ -3,7 +3,10 @@ import { Task, TaskPatch } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import SortableHandle from '@/components/sortable/SortableHandle.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { SetHandle } from '@/utils/sortable.utils'
+import { dateFormat } from '@/pipes'
 import { computed, ref } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
@@ -19,8 +22,17 @@ const props = withDefaults(
     elevation?: number
     color?: string
     itemName?: string
+    setHandle?: SetHandle
+    atTop?: boolean
+    showCompletedAt?: boolean
   }>(),
-  { displayOptions: true, completable: true, elevation: 2, itemName: 'task' }
+  {
+    displayOptions: true,
+    completable: true,
+    elevation: 2,
+    itemName: 'task',
+    showCompletedAt: true,
+  }
 )
 
 const emit = defineEmits<{
@@ -28,6 +40,7 @@ const emit = defineEmits<{
   'toggle-state': [id: number, value: boolean]
   update: [id: number, data: TaskPatch]
   delete: [id: number]
+  'move-to-top': [id: number]
 }>()
 
 const taskMenu = ref(false)
@@ -37,6 +50,9 @@ const deleteConfirmDialog = ref(false)
 
 const cardColor = computed<string | undefined>(() =>
   props.task.completed || props.selected ? 'green-darken-2' : props.color
+)
+const displayCompletedAt = computed<boolean>(
+  () => props.showCompletedAt && props.task.completed && !!props.task.completedAt
 )
 
 function openEditDialog(): void {
@@ -53,6 +69,10 @@ function openUncompleteDialog(): void {
 
 function emitAddToDailyEvent(): void {
   emit('add-to-daily', props.task.id)
+}
+
+function emitMoveToTopEvent(): void {
+  emit('move-to-top', props.task.id)
 }
 
 function emitToggleStateEvent(): void {
@@ -77,7 +97,11 @@ function emitDeleteEvent(): void {
       :ripple="false"
       :elevation
       class="task-card rounded-lg"
-      :class="{ 'pl-3 pt-3': !completable, 'cursor-pointer': !displayOptions, small }">
+      :class="{
+        'task-card--not-completable': !completable,
+        'task-card--sortable': setHandle,
+        small,
+      }">
       <template v-if="displayOptions">
         <div class="task-card__actions">
           <v-menu v-model="taskMenu">
@@ -99,6 +123,12 @@ function emitDeleteEvent(): void {
                   Add to daily
                 </v-list-item-title>
               </v-list-item>
+              <v-list-item v-if="setHandle && !atTop" @click="emitMoveToTopEvent()">
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-arrow-collapse-up" size="small" start />
+                  Move to top
+                </v-list-item-title>
+              </v-list-item>
               <v-list-item @click="openEditDialog()">
                 <v-list-item-title class="d-flex align-center">
                   <v-icon icon="mdi-pencil" size="small" start />
@@ -116,7 +146,9 @@ function emitDeleteEvent(): void {
         </div>
       </template>
 
-      <div class="task-card__content" :class="{ 'mb-1': small }">
+      <SortableHandle v-if="setHandle" :set-handle :label="`Reorder ${task.name}`" />
+
+      <div class="task-card__content">
         <template v-if="completable">
           <template v-if="task.completed">
             <v-btn icon variant="text" density="comfortable" @click="openUncompleteDialog()">
@@ -138,14 +170,24 @@ function emitDeleteEvent(): void {
         </div>
       </div>
 
-      <template v-if="task.tags.length">
-        <TagGroup
-          :tag-list="task.tags"
-          :small="small"
-          :max-tag="3"
-          :class="{ 'pl-10': completable }">
-        </TagGroup>
-      </template>
+      <TagGroup
+        v-if="task.tags.length"
+        :tag-list="task.tags"
+        :small="small"
+        :max-tag="3"
+        class="task-card__tags"
+        :class="{
+          'pl-10': completable,
+          'task-card__tags--with-completed-at': displayCompletedAt,
+        }" />
+
+      <div
+        v-if="displayCompletedAt"
+        class="task-card__completed-at text-body-small text-white"
+        :title="`Completed on ${dateFormat(task.completedAt, 'D MMMM Y')}`">
+        <v-icon icon="mdi-calendar-check" size="x-small" />
+        {{ dateFormat(task.completedAt, 'D MMM Y') }}
+      </div>
     </v-card>
 
     <v-dialog v-model="taskDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
@@ -188,6 +230,17 @@ function emitDeleteEvent(): void {
 
   &.small {
     min-height: 62px;
+    row-gap: 4px;
+  }
+
+  &.task-card--not-completable {
+    padding-left: 12px;
+  }
+
+  &.task-card--sortable {
+    @media (hover: hover) {
+      padding-left: var(--sortable-gutter-width);
+    }
   }
 
   &__actions {
@@ -205,11 +258,29 @@ function emitDeleteEvent(): void {
     align-items: center;
     column-gap: 4px;
   }
+
+  &__tags--with-completed-at {
+    margin-right: 86px; // size of completed at text
+  }
+
+  &__completed-at {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+    opacity: 0.87;
+  }
 }
 
 @media #{map.get(variables.$display-breakpoints, 'sm-and-up')} {
   .task-card {
     padding: 8px 24px 8px 8px;
+
+    &.task-card--not-completable {
+      padding-left: 16px;
+    }
   }
 }
 </style>

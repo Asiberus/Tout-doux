@@ -29,6 +29,8 @@ Une ligne du plan vient de l'une des trois, **jamais de deux** :
 | Ni appartenir à un projet ou une collection archivé         | 74, 77 | voir [archive-guards](../patterns/archive-guards.md)                              |
 | La tâche / tâche récurrente doit appartenir à l'utilisateur | 67, 84 | `Invalid pk …`                                                                    |
 
+La ligne est placée **en fin** de son jour (`DailyTask.save()`).
+
 **`date` est saisissable, et facultative.** Le champ porte `default=datetime.date.today` :
 l'omettre crée la ligne pour « aujourd'hui », comme avant. La fournir permet de **planifier à
 l'avance**, jusqu'à `MAX_PLANNING_HORIZON` — un an, constante du module. Le passé reste fermé
@@ -82,6 +84,16 @@ en amont, dans `validate()`. Aucune garde n'est donc posée dans `update()`.
 Dans le sens inverse, il n'y a **aucune** propagation : terminer une tâche via `task/{pk}/`
 laisse ses daily tasks inchangés.
 
+## L'ordre du jour — `daily-task/{pk}/move/`
+
+Chaque jour a son propre ordre. Une ligne créée va **en fin** de son jour ; le report ajoute les
+copies après les lignes existantes, dans l'ordre de la veille.
+
+Une ligne se déplace, **terminée ou non**, sur un jour présent ou futur. Un jour passé est figé
+(403, comme la suppression). Le client envoie les voisins qu'il voit, terminées comprises
+puisqu'elles restent affichées ; si ce ne sont plus des voisins, le serveur répond 409 et le
+client recharge le jour.
+
 ## La suppression
 
 - **Un daily task ne peut être supprimé que le jour même ou sur un jour à venir**
@@ -116,10 +128,11 @@ revanche les lignes libres en double. Le client s'en prémunit en verrouillant s
 pendant la requête, rien côté serveur ne le fait.
 
 L'`action` du jour (`TH` / `WO` / `FI`) est recopiée telle quelle. Les copies conservent l'ordre
-de la veille (`Meta.ordering = ('pk',)`).
+de la veille et prennent place **après** les lignes déjà planifiées aujourd'hui. Le report
+verrouille le jour avant de lire les candidats.
 
-⚠️ La veille est calculée comme `date.today() - 1 jour`, donc en UTC — voir la section sur les
-fuseaux en fin de fichier.
+La veille est calculée comme `timezone.localdate() - 1 jour`, donc dans `TIME_ZONE`
+(`Europe/Paris`) — voir la section sur les fuseaux en fin de fichier.
 
 ## Le résumé — `daily-task/summary/`
 
@@ -129,19 +142,19 @@ start date and an end date` / `Date not valid.`). L'intervalle est inclusif et
 `totalTask`, `totalTaskCompleted`, `totalEvent`. Réponse **non paginée** ; aucune borne n'est
 imposée à l'étendue demandée — voir [../quality/watched-risks.md](../quality/watched-risks.md) W8.
 
-## ⚠️ « Aujourd'hui » est calculé en UTC
+## « Aujourd'hui » suit le fuseau du serveur, pas celui de l'utilisateur
 
-`date.today()` — gardes de suppression et de modification, validation de `date`, `default` du
-champ — s'appuie sur l'horloge du conteneur, qui est en **UTC**, alors que `TIME_ZONE` vaut
-`Europe/Paris`. Entre minuit et 2 h du matin heure de Paris (1 h en hiver), le serveur est
-encore la veille. Une ligne créée sans `date` explicite y est datée de la veille.
+`timezone.localdate()` — gardes de suppression et de modification, validation de `date`,
+`default` du champ, calcul de la veille — respecte `TIME_ZONE` (`Europe/Paris`), et non plus
+l'horloge UTC du conteneur (ancien R4 du backlog de refactoring, corrigé).
 
-Depuis l'ouverture de la planification, le **sens** de l'écart compte : la date UTC étant
-toujours ≤ la date parisienne, une `date` envoyée par le client n'est jamais refusée à tort. Le
-défaut est devenu permissif — pendant cette fenêtre, **la veille passe encore pour un jour non
-passé** : elle peut être créée, modifiée en entier et supprimée. Le blocage du passé a un trou
-de 1 à 2 h par nuit, assumé tant que R4 n'est pas traité.
-[../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R4.
+⚠️ Ce fuseau reste **unique pour tout le serveur**, pas par utilisateur. Pour un compte ouvert
+depuis un autre fuseau (ex. un utilisateur en Asie), le calendrier du serveur peut différer de
+plusieurs heures du calendrier local de cet utilisateur, exactement comme le faisait l'ancien
+écart UTC/Paris — simplement plus large et déplacé sur l'horaire de connexion plutôt que sur la
+nuit. Assumé : cette application est à usage personnel, sur un seul fuseau connu. Un vrai
+support multi-fuseau demanderait un fuseau par utilisateur (stocké sur le profil, activé par
+requête via `timezone.activate()`), pas seulement `TIME_ZONE` en config globale.
 
 ## Voir aussi
 

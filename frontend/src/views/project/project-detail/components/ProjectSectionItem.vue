@@ -2,6 +2,8 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressWheel from '@/components/ProgressWheel.vue'
+import SortableList from '@/components/sortable/SortableList.vue'
+import { MoveAnchors } from '@/models/ordering.model'
 import { SectionPatch, SectionTask } from '@/models/section.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
@@ -77,6 +79,10 @@ function updateTask(id: number, data: TaskPatch): void {
 function deleteTask(id: number): void {
   projectStore.deleteTask(id, props.section.id)
 }
+
+function moveTask(id: number, anchors: MoveAnchors): void {
+  projectStore.moveTask(id, anchors, props.section.id)
+}
 </script>
 
 <template>
@@ -149,16 +155,25 @@ function deleteTask(id: number): void {
 
         <template v-if="!displayCompletedTask">
           <template v-if="uncompletedTasks.length > 0">
-            <TaskCard
-              v-for="task of uncompletedTasks"
-              :key="task.id"
-              :task
+            <SortableList
+              :items="uncompletedTasks"
               :disabled
-              class="mb-2"
-              @add-to-daily="addTaskToDaily($event)"
-              @toggle-state="toggleTaskState"
-              @update="updateTask"
-              @delete="deleteTask" />
+              :item-label="task => task.name"
+              class="d-flex flex-column gap-2 mb-2"
+              @move="moveTask">
+              <template #item="{ item: task, index, setHandle, moveToTop }">
+                <TaskCard
+                  :task
+                  :disabled
+                  :set-handle
+                  :at-top="index === 0"
+                  @add-to-daily="addTaskToDaily($event)"
+                  @toggle-state="toggleTaskState"
+                  @update="updateTask"
+                  @delete="deleteTask"
+                  @move-to-top="moveToTop?.()" />
+              </template>
+            </SortableList>
           </template>
           <template
             v-else-if="section.tasks.length > 0 && section.tasks.length === completedTasks.length">

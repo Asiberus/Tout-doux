@@ -39,6 +39,7 @@ export interface DailyTask {
   commonTask?: CommonTask
   action?: DailyTaskAction
   completed: boolean
+  position: string
 }
 
 // TODO : remove if not used

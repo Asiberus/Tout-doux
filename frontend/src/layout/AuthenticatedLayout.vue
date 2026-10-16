@@ -3,6 +3,7 @@ import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { useDisplay } from 'vuetify'
 import { ref } from 'vue'
+import { dragInProgress } from '@/components/sortable/dnd-kit'
 import { useNotificationStore, useUserStore } from '@/store'
 
 const { mobile, xs } = useDisplay()
@@ -13,14 +14,14 @@ const navbarDisplayed = ref(!mobile.value)
 const headerMenu = ref(false)
 
 function showNavbar(): void {
-  if (!mobile.value) return
+  if (!mobile.value || dragInProgress.value) return
 
   navbarDisplayed.value = true
   headerMenu.value = false
 }
 
 function hideNavbar(): void {
-  if (!mobile.value) return
+  if (!mobile.value || dragInProgress.value) return
 
   navbarDisplayed.value = false
 }

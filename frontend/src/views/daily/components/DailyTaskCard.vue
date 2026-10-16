@@ -30,8 +30,8 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
   <v-card
     :color="cardColor"
     class="daily-task-card rounded-lg pa-3 pa-sm-4"
+    :class="{ 'caret ps-5 ps-sm-6': caret }"
     :ripple="toggleable"
-    :class="{ caret }"
     v-on="toggleable ? { click: () => $emit('toggle') } : {}">
     <div class="daily-task-card__header">
       <div class="flex-grow-1 d-flex align-center gap-2">
@@ -89,6 +89,8 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/caret';
+
 .daily-task-card {
   display: flex;
   flex-direction: column;
@@ -112,18 +114,7 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
   }
 }
 
-.v-card.caret {
-  overflow: visible;
-}
-
-.caret::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -5px;
-  width: 14px;
-  height: 14px;
-  background-color: inherit;
-  transform: translateY(-50%) rotate(45deg);
+.caret {
+  @include caret.card;
 }
 </style>

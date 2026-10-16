@@ -5,14 +5,14 @@ export interface SortEventOptions {
   handlePassedEvent: boolean
 }
 
-export function isPassed(event: EventModel): boolean {
+export function isPassed(event: EventModel, now: Moment = moment()): boolean {
   const { startDate, startTime, endDate, endTime, takesWholeDay } = event
   const start = moment(`${startDate}${startTime ? `T${startTime}` : ''}`)
   const end = endDate ? moment(`${endDate}${endTime ? `T${endTime}` : ''}`) : null
 
-  if (end) return moment().isAfter(end, endTime ? 'minute' : 'day')
-  if (takesWholeDay) return moment().isAfter(start, 'day')
-  return moment().isAfter(start, startTime ? 'minute' : 'day')
+  if (end) return now.isAfter(end, endTime ? 'minute' : 'day')
+  if (takesWholeDay) return now.isAfter(start, 'day')
+  return now.isAfter(start, startTime ? 'minute' : 'day')
 }
 
 export function isEventRelatedToDate(event: EventModel, date: string | Date | Moment): boolean {
@@ -24,7 +24,8 @@ export function isEventRelatedToDate(event: EventModel, date: string | Date | Mo
 export function sortEvents(
   event1: EventModel,
   event2: EventModel,
-  options: SortEventOptions = { handlePassedEvent: false }
+  options: SortEventOptions = { handlePassedEvent: false },
+  now: Moment = moment()
 ): number {
   const { handlePassedEvent } = options
   const [start1, start2, end1, end2] = [
@@ -35,8 +36,8 @@ export function sortEvents(
   ]
 
   if (handlePassedEvent) {
-    if (isPassed(event1) && !isPassed(event2)) return -1
-    if (!isPassed(event1) && isPassed(event2)) return 1
+    if (isPassed(event1, now) && !isPassed(event2, now)) return -1
+    if (!isPassed(event1, now) && isPassed(event2, now)) return 1
   }
 
   if (start1.isSame(start2)) {

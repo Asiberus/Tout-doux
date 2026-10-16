@@ -2,6 +2,7 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { EventExtendedModel, EventPostOrPatch } from '@/models/event.model'
 import { isEventRelatedToDate, sortEvents } from '@/utils/event.utils'
+import DailyDayStatusChip from '@/views/daily/components/DailyDayStatusChip.vue'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
@@ -14,6 +15,7 @@ const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
 const props = defineProps<{
   date: string
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{
@@ -106,9 +108,14 @@ function deleteEvent(id: number): void {
           Events of the day
         </h5>
         <v-chip v-if="eventList.length > 0" size="small">{{ eventList.length }}</v-chip>
+        <DailyDayStatusChip :date />
       </div>
 
-      <v-dialog v-model="eventDialog" :width="dialogWidth" :fullscreen="dialogFullscreen">
+      <v-dialog
+        v-if="!readonly"
+        v-model="eventDialog"
+        :width="dialogWidth"
+        :fullscreen="dialogFullscreen">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps">
             <v-icon icon="mdi-plus" :start="smAndUp" />
@@ -132,7 +139,7 @@ function deleteEvent(id: number): void {
           :key="`event-${event.id}`"
           :event="event"
           :project="event.project"
-          :clickable="event.project ? !event.project.archived : true"
+          :clickable="!readonly && (event.project ? !event.project.archived : true)"
           color="event"
           :day-selected="true"
           :show-icon="true"
@@ -145,7 +152,9 @@ function deleteEvent(id: number): void {
       </div>
     </template>
     <template v-else>
-      <EmptyListDisplay message="No event for today!" class="empty-list-display">
+      <EmptyListDisplay
+        :message="readonly ? 'No event on this day.' : 'No event for today!'"
+        class="empty-list-display">
         <template #img>
           <img
             src="../../../../../assets/no_events.svg"

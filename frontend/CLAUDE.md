@@ -28,13 +28,17 @@ yarn build           # build prod — NE VÉRIFIE AUCUN TYPE
 yarn type-check      # vue-tsc --noEmit  (28 erreurs préexistantes)
 yarn lint            # eslint --fix
 yarn format          # prettier --write
+yarn test            # vitest en veille  ·  yarn test:ci pour un run unique avec couverture
+yarn lint:check      # eslint / prettier sans correction — ce que lance la CI
 ```
 
 Docker : `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
 
-**Aucun test n'existe** (pas de script `test`). Le seul garde-fou automatique est le hook
-`pre-commit` (eslint sans `--fix` + prettier) et `commit-msg` (commitlint conventionnel).
-Détail : [docs/workflows/verification.md](docs/workflows/verification.md).
+**62 tests Vitest** couvrent `utils/`, `pipes/`, `api/` et `axios/` ; composants, stores,
+composables et guards ne le sont pas encore ([R13](docs/quality/refactoring-backlog.md)). La CI
+(`.github/workflows/ci.yml`) lance eslint, prettier et les tests à chaque PR, en plus des hooks
+`pre-commit` et `commit-msg`. Détail :
+[docs/workflows/verification.md](docs/workflows/verification.md).
 
 ## Règles à respecter en écrivant du code
 

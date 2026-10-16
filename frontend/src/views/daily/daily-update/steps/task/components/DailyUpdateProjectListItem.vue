@@ -10,6 +10,7 @@ import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
 import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { computed, ref, watch } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
@@ -19,6 +20,7 @@ const props = withDefaults(
   defineProps<{
     project: ProjectDetail
     dailyTaskList: DailyTask[]
+    readonly: boolean
     sectionSelected?: number
   }>(),
   { sectionSelected: 0 }
@@ -58,6 +60,14 @@ const allTasksUncompleted = computed<Task[]>(() => filterUncompleted(allTasks.va
 const percentageOfTaskCompleted = computed<number>(
   () => (allTasksCompleted.value.length / allTasks.value.length) * 100
 )
+const projectLocation = computed<RouteLocationRaw>(() => {
+  const sectionId = taskBySection.value[sectionTab.value]?.id
+  if (!sectionId) return { name: 'project-detail', params: { id: props.project.id } }
+  return {
+    name: 'project-detail-section',
+    params: { id: `${props.project.id}`, sectionId: `${sectionId}` },
+  }
+})
 
 watch(
   () => props.sectionSelected,
@@ -81,8 +91,12 @@ function unselectProject(): void {
   selected.value = false
 }
 
+function isTaskSelectable(task: Task): boolean {
+  return !props.readonly && !isTaskSelected(task)
+}
+
 function selectTask(task: Task): void {
-  if (isTaskSelected(task)) return
+  if (!isTaskSelectable(task)) return
 
   emit('select-task', { taskId: task.id })
 }
@@ -142,7 +156,7 @@ function createTask(data: TaskPost): void {
           </template>
           <template v-if="selected">
             <v-btn
-              :to="{ name: 'project-detail', params: { id: project.id } }"
+              :to="projectLocation"
               icon
               variant="text"
               density="comfortable"
@@ -210,15 +224,17 @@ function createTask(data: TaskPost): void {
                   :key="`${section.name}-task-${task.id}`"
                   :task="task"
                   :selected="isTaskSelected(task)"
-                  :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+                  :class="{ 'cursor-pointer': isTaskSelectable(task) }"
                   :small="true"
                   :completable="false"
+                  :show-completed-at="false"
                   :display-options="false"
                   color="surface-container-high"
                   @click="selectTask(task)">
                 </TaskCard>
 
                 <v-card
+                  v-if="!readonly"
                   variant="outlined"
                   ripple
                   class="create-task-card"

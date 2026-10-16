@@ -58,7 +58,7 @@ valeur (`undefined` pour continuer, un objet de route pour rediriger), aucun n'a
 | `authGuard`        | global `beforeEach` **n°2** (`index.ts:62`)   | non authentifié + route hors liste blanche → `login` avec `?next=`        |
 | `loginGuard`       | `beforeEnter` sur 3 routes                    | déjà authentifié → `home`                                                 |
 | `adminGuard`       | `beforeEnter` sur le parent `/administration` | `!user.isStaff` → `home`                                                  |
-| `dailyUpdateGuard` | `beforeEnter` sur `daily-update`              | date illisible, passée, ou > 1 an → même route avec la date du jour       |
+| `dailyUpdateGuard` | `beforeEnter` sur `daily-update`              | date illisible ou > 1 an → même route avec la date du jour                |
 
 **L'ordre des deux guards globaux est porteur.** Le n°1 est le seul endroit où `userStore.user`
 est peuplé au chargement à froid, et il **`await`**. Or `adminGuard` lit `userStore.user` : il

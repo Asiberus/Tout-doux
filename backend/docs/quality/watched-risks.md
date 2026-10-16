@@ -10,48 +10,35 @@ raison est indiquée pour chaque item.
 > **Cycle de vie** : si un déclencheur est atteint, **déplacer l'item vers le backlog**. Si un
 > item est résolu, **supprimer sa ligne et sa section**.
 
-| ID  | Titre                                                         | Nature      | Déclencheur                                                 |
-| --- | ------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
-| W1  | Aucun test automatisé                                         | Fiabilité   | > 1 développeur, ou 2 régressions sur un même endpoint      |
-| W2  | Aucun linter, formateur ni CI sur le backend                  | Fiabilité   | Une contribution à relire par un tiers                      |
-| W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour |
-| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh` |
-| W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/` |
-| W6  | Ports backend et base publiés sur l'hôte en production        | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte              |
-| W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base          |
-| W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`       |
-| W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                        |
-| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle    | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                |
+| ID  | Titre                                                         | Nature      | Déclencheur                                                   |
+| --- | ------------------------------------------------------------- | ----------- | ------------------------------------------------------------- |
+| W2  | Aucun linter ni formateur sur le backend                      | Fiabilité   | Une contribution à relire par un tiers                        |
+| W3  | E-mails envoyés sans reprise ni trace                         | Robustesse  | Un signalement d'e-mail non reçu, ou > 50 inscriptions/jour   |
+| W4  | `SECRET_KEY` retombe sur `'secret'` si la variable manque     | Sécurité    | Tout déploiement dont la conf n'est pas générée par `td.sh`   |
+| W5  | Pas de limitation de débit, et énumération d'e-mails possible | Sécurité    | Trafic anormal sur `auth/login/` ou `user/is-email-unique/`   |
+| W6  | Ports backend et base publiés sur l'hôte en production        | Sécurité    | Hébergement sans pare-feu, ou migration d'hôte                |
+| W7  | Utilisateur `anonymous` créé automatiquement                  | Intégrité   | Une ligne rattachée à `anonymous` apparaît en base            |
+| W9  | Mot de passe en clair dans `validated_data` à l'inscription   | Sécurité    | Toute modification de `UserRegisterSerializer.create`         |
+| W11 | `event/` renvoie tous les événements sans pagination          | Performance | > 500 événements pour un utilisateur                          |
+| W13 | `daily-task/summary/` n'impose aucune borne à l'intervalle    | Robustesse  | Un appel dont l'intervalle dépasse 400 jours                  |
+| W14 | Clés d'ordre limitées à 255 caractères                        | Robustesse  | Une `position` de plus de 100 caractères en base              |
+| W15 | Double planification simultanée d'une même tâche : 500        | Robustesse  | Une `IntegrityError` sur `unique_task_for_date` dans les logs |
 
 ---
 
-## W1 — Aucun test automatisé
-
-- **Origine** : `tout_doux/tests.py` — squelette de `startapp`, jamais rempli. Aucun autre
-  fichier de test dans `backend/`.
-- **Contexte** : la logique métier est concentrée dans les sérialiseurs, sous forme de
-  conditions croisées (47 lignes pour `event_post_or_patch.validate`, 4 conditions simultanées
-  pour la propagation d'achèvement d'un daily task). C'est exactement ce qu'un test unitaire
-  couvre bien et qu'une vérification manuelle couvre mal.
-- **Décision** : ne pas agir. Un développeur unique, qui est aussi l'utilisateur, détecte les
-  régressions à l'usage. Le coût d'écriture d'une base de tests dépasse aujourd'hui le coût des
-  régressions constatées.
-- **Déclencheur** : un second contributeur, ou deux régressions successives sur le même
-  endpoint. Le premier test à écrire est celui de la propagation d'achèvement
-  ([../domain/daily-rules.md](../domain/daily-rules.md)) — c'est la règle la plus subtile et la
-  plus coûteuse à vérifier à la main.
-
-## W2 — Aucun linter, formateur ni CI sur le backend
+## W2 — Aucun linter ni formateur sur le backend
 
 - **Origine** : absence de `setup.cfg`, `pyproject.toml`, `.flake8`, `tox.ini` ;
-  `.github/workflows/deployment.yml` ne fait que construire et relancer les images.
+  `.github/workflows/ci.yml` lance les tests mais n'exécute aucun linter.
 - **Contexte** : rien ne relit le code. C'est ce qui a laissé passer R1 (`is not` au lieu de
   `!=`, que `ruff` signale en `F632`), R2 (`print` résiduel) et R9 (configuration morte). Trois
   des dix items du backlog seraient détectés par un linter standard, sans configuration
   particulière.
 - **Décision** : ne pas agir **en tant que tel** — mais noter que le rapport coût/bénéfice est
-  ici bien meilleur que pour W1 : un `ruff check` en hook `pre-commit` coûte une ligne de
-  configuration. C'est le premier outillage à poser si l'on ne devait en poser qu'un.
+  excellent : un `ruff check` coûte une ligne de configuration, en hook `pre-commit` ou comme
+  étape de `ci.yml`. C'est le prochain outillage à poser. Il n'a pas été ajouté en même temps
+  que la CI pour ne pas cumuler deux chantiers : mettre `ruff` au vert sur tout le dépôt est un
+  travail en soi.
 - **Déclencheur** : une contribution externe à relire, ou la correction de R1 (poser le linter
   au même moment évite la 14ᵉ occurrence).
 
@@ -179,3 +166,26 @@ where u.username = 'anonymous';`).
 - **Déclencheur** : un appel dont l'intervalle dépasse 400 jours, quelle qu'en soit l'origine.
   Le remède est un plafond dans `summary()`, avec un `ParseError` explicite — et sa mise à jour
   dans [../architecture/api-surface.md](../architecture/api-surface.md).
+
+## W14 — Clés d'ordre limitées à 255 caractères
+
+- **Origine** : `models/task.py`, `models/daily_task.py` — `position = CharField(max_length=255)`.
+- **Contexte** : chaque insertion au même endroit coupe l'intervalle en deux ; un caractère base
+  62 porte environ 6 bits, soit un caractère de plus toutes les six insertions consécutives au
+  même point. Au-delà de 255 caractères, l'écriture lève une `DataError` (500).
+- **Décision** : ne pas agir — il faut plus d'un millier d'insertions consécutives au même point.
+  Le remède, régénérer les clés d'une liste avec `generate_n_keys_between`, tient en quelques
+  lignes.
+- **Déclencheur** : `SELECT max(length(position)) FROM tout_doux_task` (ou `tout_doux_dailytask`)
+  dépasse 100.
+
+## W15 — Double planification simultanée d'une même tâche
+
+- **Origine** : `serializers/daily_task/daily_task_post.py`, garde `exists()` de `validate()`.
+- **Contexte** : la garde anti-doublon lit la base **avant** que `DailyTask.save()` ne prenne le
+  verrou du jour. Deux onglets qui planifient la même tâche au même instant passent tous deux la
+  garde ; le second bute sur `unique_task_for_date` et répond 500 au lieu de 409.
+- **Décision** : ne pas agir — il faut deux clics simultanés sur la même tâche, et aucune donnée
+  n'est abîmée.
+- **Déclencheur** : une `IntegrityError` sur `unique_task_for_date` ou
+  `unique_common_task_for_date` dans les logs.

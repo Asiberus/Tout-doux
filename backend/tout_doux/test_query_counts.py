@@ -34,6 +34,12 @@ BUDGETS = {
 }
 
 
+WRITE_BUDGETS = {
+    'task-move': 7,
+    'daily_task-move': 7,
+}
+
+
 class QueryCountTestCase(DataFixtureTestCase):
     def count_queries(self, route, params=None):
         url = reverse(route)
@@ -48,6 +54,12 @@ class QueryCountTestCase(DataFixtureTestCase):
         self.assertLessEqual(
             count, budget, f'{route} : {count} requêtes SQL (budget {budget})'
         )
+
+    def count_write_queries(self, route, payload, args=()):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.post(reverse(route, args=args), payload, format='json')
+            self.assertIn(response.status_code, (200, 201), response.data)
+        return len(captured)
 
     def add_projects(self, how_many, tasks_each=5):
         for index in range(how_many):
@@ -206,3 +218,58 @@ class DailySummaryQueryCountTest(QueryCountTestCase):
 
     def test_stays_within_budget(self):
         self.assert_within_budget('daily_task-summary', self.range_of(42))
+
+
+class WriteQueryCountTest(QueryCountTestCase):
+    def test_task_creation_does_not_grow_with_the_list(self):
+        payload = {'name': 'N', 'sectionId': self.section.pk}
+        before = self.count_write_queries('task-list', payload)
+        self.make_tasks(20, completed=5, section=self.section)
+        self.assertEqual(self.count_write_queries('task-list', payload), before)
+
+    def test_task_creation_at_the_end_does_not_grow_with_the_list(self):
+        def create_last():
+            last = Task.objects.filter(section=self.section, completed=False).last()
+            return self.count_write_queries(
+                'task-list', {'name': 'N', 'sectionId': self.section.pk, 'afterId': last.pk}
+            )
+
+        before = create_last()
+        self.make_tasks(20, completed=5, section=self.section)
+        self.assertEqual(create_last(), before)
+
+    def move_last_to_top(self):
+        open_ids = list(
+            Task.objects.filter(section=self.section, completed=False).values_list('pk', flat=True)
+        )
+        return self.count_write_queries(
+            'task-move', {'afterId': None, 'beforeId': open_ids[0]}, args=[open_ids[-1]]
+        )
+
+    def test_task_move_stays_within_budget_whatever_the_list_size(self):
+        before = self.move_last_to_top()
+        self.assertLessEqual(before, WRITE_BUDGETS['task-move'])
+        self.make_tasks(20, completed=5, section=self.section)
+        self.assertEqual(self.move_last_to_top(), before)
+
+    def swap_the_last_two_lines(self):
+        penultimate, last = [
+            self.client.post(reverse('daily_task-list'), {'name': f'L{index}'}, format='json').data['id']
+            for index in range(2)
+        ]
+        return self.count_write_queries(
+            'daily_task-move', {'afterId': last, 'beforeId': None}, args=[penultimate]
+        )
+
+    def test_daily_task_move_stays_within_budget_whatever_the_day_size(self):
+        before = self.swap_the_last_two_lines()
+        self.assertLessEqual(before, WRITE_BUDGETS['daily_task-move'])
+        for index in range(20):
+            self.client.post(reverse('daily_task-list'), {'name': f'M{index}'}, format='json')
+        self.assertEqual(self.swap_the_last_two_lines(), before)
+
+    def test_daily_task_creation_does_not_grow_with_the_day(self):
+        before = self.count_write_queries('daily_task-list', {'name': 'libre'})
+        for index in range(20):
+            self.count_write_queries('daily_task-list', {'name': f'L{index}'})
+        self.assertEqual(self.count_write_queries('daily_task-list', {'name': 'fin'}), before)

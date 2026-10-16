@@ -2,23 +2,24 @@
 
 **Quand** — avant chaque commit sur `backend/`.
 
-## Le garde-fou est minimal
+## Le garde-fou
 
-C'est un fait, pas une omission de cette doc :
+| Outil                 | État                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **81 tests de non-régression** : `test_api_contract.py` (60, forme, valeurs et **ordre** des réponses) et `test_query_counts.py` (21, nombre de requêtes SQL, en lecture et en écriture) + **48 tests métier** : `test_ordering.py` (43, tri manuel) et `test_migrations.py` (5, reprise des positions) |
+| CI                    | `.github/workflows/ci.yml`, à chaque PR vers `master` ou `develop` : `check`, `makemigrations --check`, les 93 tests, le rapport de couverture. Runner `ubuntu-latest`, Postgres 16 en service, Python 3.14 natif — voir [../adr/0006-ci-python-natif.md](../adr/0006-ci-python-natif.md)                                                                                                                                                                             |
+| Couverture            | mesurée à chaque run (`.coveragerc`, `branch = True`). **Pas encore de `fail_under`** — voir [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R14                                                                                                                                                                                                                                                                                               |
+| Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                                                                                                                                                                                                                                                                                                                                                                             |
+| Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                                                                                                                                                                                                                                                                                                                                                                                  |
 
-| Outil                 | État                                                                                                                                                                                                                                                                                                                                                        |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tests                 | **17 tests de fumée** dans `tout_doux/tests.py` (résolution d'URL, knox, DRF, pagination, django-filter, CORS, templates d'e-mail, connexions persistantes) + **62 tests de non-régression** : `test_api_contract.py` (46, forme, valeurs et **ordre** des réponses) et `test_query_counts.py` (16, nombre de requêtes SQL). **Toujours aucun test métier** |
-| Linter / formateur    | **aucun**. Pas de `flake8`, `ruff`, `black`, `isort`, ni de configuration                                                                                                                                                                                                                                                                                   |
-| Vérification de types | **aucune**. Pas d'annotation, pas de `mypy`                                                                                                                                                                                                                                                                                                                 |
-| Hook git              | **aucun** pour le backend. `frontend/.husky/` ne couvre que le front                                                                                                                                                                                                                                                                                        |
-| CI                    | **aucune**. `.github/workflows/deployment.yml` déploie, ne vérifie rien, et n'est déclenché qu'à la main                                                                                                                                                                                                                                                    |
+⚠️ **La CI ne bloque un merge que si la protection de branche l'exige.** Elle se règle dans
+Settings → Branches sur GitHub, pas dans ce dépôt. Sans elle une PR rouge reste mergeable — et
+depuis que `release.yml` publie `latest` au merge, une release rouge se déploie seule dans les
+dix minutes ([../../../docs/deploiement-continu.md](../../../docs/deploiement-continu.md)).
 
-Conséquence pratique : **rien n'empêche un commit qui ne démarre même pas.** La seule
-protection est la procédure manuelle ci-dessous.
-
-Suivi de cette absence : [../quality/watched-risks.md](../quality/watched-risks.md) W1 et W2 —
-avec les conditions qui rouvriraient le sujet.
+La procédure manuelle ci-dessous reste utile avant de pousser : elle donne le même verdict sans
+attendre le run.
 
 ## Procédure manuelle
 
@@ -84,6 +85,60 @@ Pour tout changement touchant un sérialiseur d'écriture, vérifier expliciteme
    [../patterns/archive-guards.md](../patterns/archive-guards.md).
 3. **La forme de la réponse** — un POST/PATCH ne répond pas avec ses champs d'entrée, il répond
    avec la forme de lecture. Voir [../architecture/serializers.md](../architecture/serializers.md).
+
+## Répéter une migration sur les données de production
+
+Pour une migration qui réécrit des données (0011, reprise des positions), la jouer d'abord sur
+une copie de la dernière sauvegarde, dans une base jetable. La sauvegarde contient des données
+personnelles : elle ne passe jamais par le dépôt.
+
+```bash
+# Valeurs de DB_HOST et DB_USER : .conf/development/conf.env
+docker exec "$DB_HOST" createdb -U "$DB_USER" tout_doux_rehearsal
+docker cp sauvegarde.json tout_doux_backend:/tmp/rehearsal.json
+# `docker cp` garde le propriétaire et le mode de l'hôte : une sauvegarde en 600 serait illisible
+docker exec -u root tout_doux_backend chown backend /tmp/rehearsal.json
+
+# 0010 et non 0009 : le code actuel écrit `position` à chaque insertion, la colonne doit exister
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate tout_doux 0010
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate admin
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py loaddata /tmp/rehearsal.json
+
+# Avant 0012 : aucune tâche sans exactement un conteneur. Doit afficher 0.
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py shell -c "
+from django.db.models import Q
+from tout_doux.models import Task
+one = (Q(project__isnull=False, section__isnull=True, collection__isnull=True)
+       | Q(project__isnull=True, section__isnull=False, collection__isnull=True)
+       | Q(project__isnull=True, section__isnull=True, collection__isnull=False))
+print(Task.objects.exclude(one).count())"
+
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate
+
+# L'ordre repris est l'ordre d'avant. Doit afficher 0.
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py shell -c "
+from itertools import groupby
+from tout_doux.models import DailyTask, Task
+tasks = Task.objects.filter(completed=False).order_by('project_id', 'section_id', 'collection_id', 'position')
+days = DailyTask.objects.order_by('user_id', 'date', 'position')
+bad = sum(1 for _, rows in groupby(tasks, lambda t: (t.project_id, t.section_id, t.collection_id))
+          if (ids := [t.pk for t in rows]) != sorted(ids, reverse=True))
+bad += sum(1 for _, rows in groupby(days, lambda d: (d.user_id, d.date))
+           if (ids := [d.pk for d in rows]) != sorted(ids))
+print(bad)"
+
+# Aller-retour
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate tout_doux 0009
+docker exec -e DB_NAME=tout_doux_rehearsal tout_doux_backend python manage.py migrate
+
+docker exec tout_doux_backend rm /tmp/rehearsal.json
+docker exec "$DB_HOST" dropdb -U "$DB_USER" tout_doux_rehearsal
+```
+
+**Retour arrière après une migration réussie en production** : d'abord
+`migrate tout_doux 0009` avec la **nouvelle** image, puis `./td.sh rollback prod <version>`. Un
+rollback d'image seul laisse `position` en `NOT NULL`, et l'ancien code ne sait plus créer de
+tâche.
 
 ## `check --deploy`
 

@@ -78,6 +78,9 @@ _Maintenue à la main. Ajouter une ligne à chaque nouveau viewset ou sérialise
 | `serializers/section/section_post.py`          | 27             | project                            |
 | `serializers/common_task/common_task.py`       | 33             | tags                               |
 
+**Ancres d'un déplacement** — `services/ordering.py`, `move` : elles sont cherchées dans la liste
+**et** parmi les lignes de l'utilisateur ; une ancre d'un autre utilisateur donne un 409.
+
 ## Écarts assumés
 
 | Endroit                                  | Écart                                                            | Statut                                                                                                 |

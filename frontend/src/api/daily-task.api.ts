@@ -3,6 +3,7 @@ import { DailyTask, DailyTaskPatch, DailyTaskPost } from '@/models/daily-task.mo
 import { http } from '@/axios/http'
 import { DailySummary } from '@/models/daily-summary.model'
 import { Pagination } from '@/models/pagination.model'
+import { MoveAnchors, OrderPosition } from '@/models/ordering.model'
 
 export function getDailySummary(startDate: string, endDate: string): Promise<DailySummary[]> {
   const params = { start_date: startDate, end_date: endDate }
@@ -37,4 +38,9 @@ export function updateDailyTask(
 export function deleteDailyTask(dailyTaskId: number): Promise<void> {
   const url = apiRoutes.dailyTaskById.replace(':dailyTaskId', dailyTaskId.toString())
   return http.delete(url)
+}
+
+export function moveDailyTask(dailyTaskId: number, anchors: MoveAnchors): Promise<OrderPosition> {
+  const url = apiRoutes.dailyTaskMove.replace(':dailyTaskId', dailyTaskId.toString())
+  return http.post<OrderPosition>(url, anchors)
 }

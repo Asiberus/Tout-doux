@@ -10,7 +10,8 @@ import {
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import { ProjectDetail } from '@/models/project.model'
-import { TaskPost } from '@/models/task.model'
+import { Task, TaskPost } from '@/models/task.model'
+import { insertByPosition, isStaleListError, moveFailureMessage } from '@/utils/ordering.utils'
 import DailyUpdateCollectionListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue'
 import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue'
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
@@ -19,7 +20,8 @@ import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/compone
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { useNotificationStore } from '@/store'
-import moment from 'moment'
+import { useDailyTaskMove } from '@/composables/useDailyTaskMove'
+import { useToday } from '@/composables/useToday'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -35,6 +37,7 @@ const notificationStore = useNotificationStore()
 
 const props = defineProps<{
   date: string
+  readonly: boolean
 }>()
 
 const emit = defineEmits<{
@@ -54,12 +57,14 @@ const collectionList = ref<DailyTaskDisplayWrapper<CollectionDetail>[]>([])
 const commonTaskList = ref<CommonTask[]>([])
 const carryOverCandidates = ref<DailyTask[]>([])
 const carryOverInProgress = ref(false)
+const { moveDailyTask } = useDailyTaskMove(dailyTaskList, retrieveDailyTaskList)
 
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
 
 const taskSheetDetent = ref<DailyTaskSheetDetent>(DailyTaskSheetDetent.Collapsed)
 const createTaskDisplayed = ref(false)
+const editedTaskId = ref<number | null>(null)
 
 watch(createTaskDisplayed, value => {
   if (!value || taskSheetDetent.value !== DailyTaskSheetDetent.Collapsed) return
@@ -71,10 +76,14 @@ watch(createTaskDisplayed, value => {
 })
 
 watch(taskSheetDetent, value => {
-  if (smAndDown.value && value === DailyTaskSheetDetent.Collapsed) createTaskDisplayed.value = false
+  if (!smAndDown.value || value !== DailyTaskSheetDetent.Collapsed) return
+
+  createTaskDisplayed.value = false
+  editedTaskId.value = null
 })
 
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
 const areSomeProjectSelected = computed<boolean>(() =>
   projectList.value.some(({ selected }) => selected)
 )
@@ -192,32 +201,55 @@ function createDailyTask(data: DailyTaskDraft): void {
     .catch(error => console.error(error))
 }
 
+function lastOpenTaskId(tasks: Task[]): number | null {
+  return tasks.findLast(({ completed }) => !completed)?.id ?? null
+}
+
+function notifyStaleList(error: unknown): void {
+  notificationStore.notifyError(moveFailureMessage(error))
+}
+
 function createProjectTask(event: { task: TaskPost; projectId: number }): void {
   const { task, projectId } = event
+  const project = projectList.value.find(({ content }) => content.id === projectId)
+  if (!project) return
 
-  taskApi.createTask(task).then(
-    response => {
-      const project = projectList.value.find(({ content }) => content.id === projectId)
-      if (!project) return
+  const tasks = task.sectionId
+    ? project.content.sections.find(({ id }) => id === task.sectionId)?.tasks
+    : project.content.tasks
+  if (!tasks) return
 
-      if (task.sectionId) {
-        const section = project.content.sections.find(({ id }) => id === task.sectionId)
-        if (section) section.tasks.push(response)
-      } else project.content.tasks.push(response)
-    },
-    error => console.error(error)
+  taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
+    response => insertByPosition(tasks, response),
+    error => {
+      console.error(error)
+      if (!isStaleListError(error)) return
+      notifyStaleList(error)
+      projectApi.getProjectById(projectId).then(
+        response => (project.content = response),
+        reloadError => console.error(reloadError)
+      )
+    }
   )
 }
 
 function createCollectionTask(event: { task: TaskPost; collectionId: number }): void {
   const { task, collectionId } = event
+  const collection = collectionList.value.find(({ content }) => content.id === collectionId)
+  if (!collection) return
 
-  taskApi.createTask(task).then(
-    response => {
-      const collection = collectionList.value.find(({ content }) => content.id === collectionId)
-      if (collection) collection.content.tasks.push(response)
-    },
-    error => console.error(error)
+  const { tasks } = collection.content
+  taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
+    response => insertByPosition(tasks, response),
+    error => {
+      console.error(error)
+      if (!isStaleListError(error)) return
+      notifyStaleList(error)
+      collectionApi.getCollectionById(collectionId).then(
+        response => (collection.content = response),
+        reloadError => console.error(reloadError)
+      )
+    }
   )
 }
 
@@ -345,6 +377,7 @@ function resetSelectedItem(): void {
                 v-model:selected="project.selected"
                 :project="project.content"
                 :daily-task-list="dailyTaskList"
+                :readonly
                 :section-selected="projectSectionSelected"
                 @select-task="createDailyTask($event)"
                 @create-task="createProjectTask($event)" />
@@ -392,6 +425,7 @@ function resetSelectedItem(): void {
                 v-model:selected="collection.selected"
                 :collection="collection.content"
                 :daily-task-list="dailyTaskList"
+                :readonly
                 @select-task="createDailyTask($event)"
                 @create-task="createCollectionTask($event)" />
             </div>
@@ -431,6 +465,7 @@ function resetSelectedItem(): void {
           <DailyUpdateCommonTask
             :common-task-list="commonTaskList"
             :daily-task-list="dailyTaskList"
+            :readonly
             @select-common-task="createDailyTask($event)"
             @create-common-task="createCommonTask($event)" />
         </div>
@@ -456,8 +491,10 @@ function resetSelectedItem(): void {
     <DailyTaskBottomSheet v-model="taskSheetDetent">
       <DailyUpdateTaskList
         v-model:create-displayed="createTaskDisplayed"
+        v-model:edited-task-id="editedTaskId"
         :date
         :daily-task-list="dailyTaskList"
+        :readonly
         :carry-over-candidates="carryOverCandidates"
         :carry-over-in-progress="carryOverInProgress"
         class="daily-update-task__list"
@@ -465,7 +502,8 @@ function resetSelectedItem(): void {
         @update="updateDailyTask($event)"
         @delete="deleteDailyTask($event)"
         @select="select($event)"
-        @carry-over="carryOverPreviousDay()" />
+        @carry-over="carryOverPreviousDay()"
+        @move="moveDailyTask($event.id, $event.anchors)" />
     </DailyTaskBottomSheet>
   </div>
 </template>

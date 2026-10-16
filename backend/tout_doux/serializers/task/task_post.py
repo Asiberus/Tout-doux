@@ -30,6 +30,12 @@ class TaskPostSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    afterId = serializers.IntegerField(
+        source='after_id', write_only=True, required=False, allow_null=True
+    )
+    beforeId = serializers.IntegerField(
+        source='before_id', write_only=True, required=False, allow_null=True
+    )
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
@@ -40,11 +46,23 @@ class TaskPostSerializer(serializers.ModelSerializer):
             'projectId',
             'sectionId',
             'collectionId',
+            'afterId',
+            'beforeId',
             'user',
         )
 
     def to_representation(self, instance):
         return TaskSerializer(instance).data
+
+    def create(self, validated_data):
+        after_id = validated_data.pop('after_id', None)
+        before_id = validated_data.pop('before_id', None)
+        tags = validated_data.pop('tags', [])
+
+        task = Task(**validated_data)
+        task.save(after_id=after_id, before_id=before_id)
+        task.tags.set(tags)
+        return task
 
     def validate_tagIds(self, tags):
         current_user = self.context.get('request').user
@@ -92,5 +110,9 @@ class TaskPostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('You must link a task to either a project, a section or a collection')
         elif relation_keys > 1:
             raise serializers.ValidationError('You can\'t create a task related to a project, a section and collection')
+
+        after_id, before_id = data.get('after_id'), data.get('before_id')
+        if after_id is not None and after_id == before_id:
+            raise serializers.ValidationError('afterId and beforeId must differ')
 
         return data

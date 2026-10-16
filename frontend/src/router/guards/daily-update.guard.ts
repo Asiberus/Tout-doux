@@ -9,12 +9,9 @@ export const dailyUpdateGuard: NavigationGuard = to => {
   // illisible franchirait donc le guard sans ce contrôle.
   const target = moment(date as string, 'YYYY-MM-DD', true)
 
-  const isPlannable =
-    target.isValid() &&
-    !target.isBefore(today) &&
-    target.diff(today, 'days') <= MAX_PLANNING_HORIZON_DAYS
+  const isReachable = target.isValid() && target.diff(today, 'days') <= MAX_PLANNING_HORIZON_DAYS
 
-  if (!isPlannable)
+  if (!isReachable)
     return { name: 'daily-update', params: { date: today.format('YYYY-MM-DD'), step } }
 
   return undefined

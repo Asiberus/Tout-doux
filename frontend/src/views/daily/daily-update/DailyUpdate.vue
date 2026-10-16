@@ -3,6 +3,7 @@ import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
 import SecondaryTitle from '@/components/SecondaryTitle.vue'
+import { useToday } from '@/composables/useToday'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
 import { computed, onBeforeMount, ref, watch } from 'vue'
@@ -27,11 +28,13 @@ const dailyTaskCount = ref(0)
 const dailyEventCount = ref(0)
 
 // `dailyUpdateGuard` ne rejoue pas sur un changement de param (voir
-// docs/architecture/routing.md) : ces deux bornes sont la seule chose qui empêche d'atteindre
-// un jour passé ou au-delà de l'horizon.
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
+// docs/architecture/routing.md) : cette borne est la seule chose qui empêche de dépasser l'horizon.
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
+const isPassed = computed<boolean>(() => moment(props.date).isBefore(today.value, 'day'))
 const canGoForward = computed<boolean>(
-  () => moment(props.date).diff(moment().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+  () =>
+    moment(props.date).diff(today.value.clone().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
 )
 
 function goToDate(date: string): void {
@@ -93,7 +96,6 @@ watch(dailyStepper, index => {
           variant="text"
           density="comfortable"
           :size="xs ? 'small' : 'default'"
-          :disabled="isToday"
           title="Previous day"
           class="previous-day-btn"
           @click="shiftDay(-1)">
@@ -166,14 +168,17 @@ watch(dailyStepper, index => {
           eager
           transition="v-window-crossfade-transition"
           reverse-transition="v-window-crossfade-transition">
-          <DailyUpdateTask :date @daily-task-count="dailyTaskCount = $event" />
+          <DailyUpdateTask :date :readonly="isPassed" @daily-task-count="dailyTaskCount = $event" />
         </v-stepper-window-item>
         <v-stepper-window-item
           :value="2"
           eager
           transition="v-window-crossfade-transition"
           reverse-transition="v-window-crossfade-transition">
-          <DailyUpdateEvent :date @daily-event-count="dailyEventCount = $event" />
+          <DailyUpdateEvent
+            :date
+            :readonly="isPassed"
+            @daily-event-count="dailyEventCount = $event" />
         </v-stepper-window-item>
       </v-stepper-window>
     </v-stepper>

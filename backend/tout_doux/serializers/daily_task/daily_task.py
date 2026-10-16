@@ -21,4 +21,5 @@ class DailyTaskSerializer(ReadOnlyModelSerializer):
             'tags',
             'action',
             'completed',
+            'position',
         )
