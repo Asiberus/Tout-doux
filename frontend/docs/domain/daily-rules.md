@@ -79,9 +79,13 @@ crée ou modifie des DailyTasks.**
    la carte inerte. ⚠️ **Le context menu de `TaskCard` n'a pas cet état** : il ne connaît pas le
    daily du jour. Il poste, et un **409** du serveur signifie « déjà présente » — traité comme
    un succès par `useAddTaskToDaily`, le résultat étant le même pour l'utilisateur.
-4. **Seules les tâches non complétées sont planifiables**, et seuls les projets/collections non
-   archivés apparaissent (filtres serveur `archived: false`, `has_uncompleted_task: true`, plus
-   des filtres locaux).
+4. **Seules les tâches non complétées sont planifiables.** Le wizard liste les projets/collections
+   renvoyés par le filtre serveur `daily_task_date` : non archivés avec une tâche ouverte, plus
+   ceux — archivés compris — dont une tâche est liée à une daily task du jour affiché. Une
+   tâche terminée, ou d'un conteneur archivé, n'est montrée que si elle est liée au jour,
+   marquée sélectionnée ; un conteneur archivé garde sa couleur des listes et n'offre pas
+   « Create a task ». Les listes sont rechargées à chaque changement de jour, la précédente
+   requête annulée.
 5. **`section.id === 0` = « General tasks »** — sentinelle pour les tâches rattachées
    directement au projet, sans section. Une section synthétique `{ id: 0, name: 'General tasks' }`
    est fabriquée côté UI. ⚠️ Conséquence : plusieurs branchements testent la vérité d'un

@@ -12,8 +12,11 @@ type EventReturn<T extends EventPostOrPatchOptions> = T['extended'] extends true
   ? EventExtendedModel
   : EventModel
 
-export function getEvents(params: EventQueryOptions = {}): Promise<EventExtendedModel[]> {
-  return http.get<EventExtendedModel[]>(apiRoutes.event, { params })
+export function getEvents(
+  params: EventQueryOptions = {},
+  signal?: AbortSignal
+): Promise<EventExtendedModel[]> {
+  return http.get<EventExtendedModel[]>(apiRoutes.event, { params, signal })
 }
 
 export function createEvent<Params extends EventPostOrPatchOptions>(

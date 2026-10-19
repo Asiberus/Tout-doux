@@ -43,10 +43,10 @@ Sauf mention contraire : accès **connecté**, réponse de liste **paginée** (v
 
 | Endpoint                            | Méthodes                | Sérialiseurs (par action)                    | Filtres                                                      | Notes                                                                                                                                        |
 | ----------------------------------- | ----------------------- | -------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `project/`                          | GET, POST               | `ProjectList` / `ProjectPostOrPatch`         | `archived`, `has_uncompleted_task`                           |                                                                                                                                              |
+| `project/`                          | GET, POST               | `ProjectList` / `ProjectPostOrPatch`         | `archived`, `has_uncompleted_task`, `daily_task_date`        |                                                                                                                                              |
 | `project/detailed/`                 | GET                     | `ProjectDetail`                              | idem                                                         | délègue à `list()`                                                                                                                           |
 | `project/{pk}/`                     | GET, PUT, PATCH, DELETE | `ProjectDetail` / `ProjectPostOrPatch`       |                                                              |                                                                                                                                              |
-| `collection/`                       | GET, POST               | `CollectionList` / `CollectionPostOrPatch`   | `archived`, `has_uncompleted_task`                           |                                                                                                                                              |
+| `collection/`                       | GET, POST               | `CollectionList` / `CollectionPostOrPatch`   | `archived`, `has_uncompleted_task`, `daily_task_date`        |                                                                                                                                              |
 | `collection/detailed/`              | GET                     | `CollectionDetail`                           | idem                                                         | délègue à `list()`                                                                                                                           |
 | `collection/{pk}/`                  | GET, PUT, PATCH, DELETE | `CollectionDetail` / `CollectionPostOrPatch` |                                                              |                                                                                                                                              |
 | `task/`                             | **POST seul**           | `TaskPost`                                   |                                                              | pas de liste ni de détail ; `afterId` / `beforeId` facultatifs placent la tâche entre ces voisins (absents : en tête), **409** liste périmée |
@@ -135,6 +135,10 @@ ils **sont** paginés, comme les listes ordinaires.
   lus à la main dans `get_queryset()` / `to_representation()` ; une faute de frappe ne produit
   aucune erreur, juste un filtre non appliqué. Seul `sort` de `tag/` fait exception : une valeur
   hors de `TagViewSet.SORTS` renvoie un 400.
+- **`daily_task_date` (`project/`, `collection/`) est autonome.** Il renvoie les conteneurs non
+  archivés ayant une tâche ouverte, plus ceux — archivés compris — dont une tâche est liée à une
+  daily task de ce jour. Combiné à `archived`, les deux filtres s'additionnent (ET). Une date hors
+  du format `YYYY-MM-DD` renvoie un 400.
 - **`FeedbackViewSet` déclare `SearchFilter` sans `search_fields`** (`views/feedback.py:15`) :
   configuration morte, `?search=` n'a aucun effet —
   [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R9.

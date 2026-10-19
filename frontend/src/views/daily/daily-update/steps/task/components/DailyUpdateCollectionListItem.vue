@@ -6,7 +6,7 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
@@ -29,20 +29,27 @@ const tasksCompleted = computed<Task[]>(() =>
   props.collection.tasks.filter(({ completed }) => completed)
 )
 
-const tasksUncompleted = computed<Task[]>(() =>
-  props.collection.tasks.filter(({ completed }) => !completed)
-)
+const tasksAvailable = computed<Task[]>(() => props.collection.tasks.filter(isTaskAvailable))
 
 const percentageOfTaskCompleted = computed<number>(
   () => (tasksCompleted.value.length / props.collection.tasks.length) * 100
 )
 
+watch(tasksAvailable, tasks => {
+  if (tasks.length === 0) selected.value = false
+})
+
 function isTaskSelected(task: Task): boolean {
   return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
 }
 
+function isTaskAvailable(task: Task): boolean {
+  if (props.collection.archived) return isTaskSelected(task)
+  return !task.completed || isTaskSelected(task)
+}
+
 function selectCollection(): void {
-  if (tasksUncompleted.value.length !== 0 && !selected.value) selected.value = true
+  if (tasksAvailable.value.length !== 0 && !selected.value) selected.value = true
 }
 
 function unselectCollection(): void {
@@ -71,7 +78,8 @@ function createTask(data: TaskPost): void {
 <template>
   <div class="collection-card-wrapper" :class="{ selected }" @click="selectCollection()">
     <v-card
-      :disabled="tasksUncompleted.length === 0"
+      :color="collection.archived ? 'collectionArchived' : undefined"
+      :disabled="tasksAvailable.length === 0"
       :class="{ 'cursor-pointer': !selected }"
       class="rounded-lg">
       <v-progress-linear
@@ -96,6 +104,14 @@ function createTask(data: TaskPost): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
+            <v-chip
+              v-if="collection.archived"
+              color="accent"
+              size="small"
+              class="flex-shrink-0 ml-2">
+              <v-icon icon="mdi-archive" size="small" class="mr-1" />
+              Archived
+            </v-chip>
             <v-btn
               :to="{ name: 'collection-detail', params: { id: collection.id } }"
               icon
@@ -117,7 +133,7 @@ function createTask(data: TaskPost): void {
           <v-divider class="mt-2" />
           <div class="task-wrapper">
             <TaskCard
-              v-for="task of tasksUncompleted"
+              v-for="task of tasksAvailable"
               :key="`task-${task.id}`"
               :task
               :selected="isTaskSelected(task)"
@@ -131,7 +147,7 @@ function createTask(data: TaskPost): void {
             </TaskCard>
 
             <v-card
-              v-if="!readonly"
+              v-if="!readonly && !collection.archived"
               variant="outlined"
               ripple
               class="create-task-card"

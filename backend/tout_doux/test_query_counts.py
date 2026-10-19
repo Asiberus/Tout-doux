@@ -102,6 +102,12 @@ class ProjectQueryCountTest(QueryCountTestCase):
         self.add_projects(10)
         self.assertEqual(before, self.count_queries('project-list', params))
 
+    def test_daily_task_date_does_not_grow(self):
+        params = {'size': 0, 'daily_task_date': '2026-10-19'}
+        before = self.count_queries('project-list', params)
+        self.add_projects(10)
+        self.assertEqual(before, self.count_queries('project-list', params))
+
 
 class CollectionQueryCountTest(QueryCountTestCase):
     def add_collection_tasks(self, how_many):

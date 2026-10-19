@@ -10,13 +10,16 @@ export function getDailySummary(startDate: string, endDate: string): Promise<Dai
   return http.get<DailySummary[]>(apiRoutes.dailyTaskSummary, { params })
 }
 
-export function getDailyTasksByDate(date: string): Promise<Pagination<DailyTask[]>> {
+export function getDailyTasksByDate(
+  date: string,
+  signal?: AbortSignal
+): Promise<Pagination<DailyTask[]>> {
   const params = { date, size: 0 }
-  return http.get<Pagination<DailyTask[]>>(apiRoutes.dailyTask, { params })
+  return http.get<Pagination<DailyTask[]>>(apiRoutes.dailyTask, { params, signal })
 }
 
-export function getCarryOverCandidates(): Promise<DailyTask[]> {
-  return http.get<DailyTask[]>(apiRoutes.dailyTaskCarryOverCandidates)
+export function getCarryOverCandidates(signal?: AbortSignal): Promise<DailyTask[]> {
+  return http.get<DailyTask[]>(apiRoutes.dailyTaskCarryOverCandidates, { signal })
 }
 
 export function carryOverPreviousDay(): Promise<DailyTask[]> {

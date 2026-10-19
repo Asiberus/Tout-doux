@@ -15,9 +15,13 @@ export function getCollectionList(params = {}): Promise<Pagination<CollectionLis
   })
 }
 
-export function getCollectionListDetailed(params = {}): Promise<Pagination<CollectionDetail[]>> {
+export function getCollectionListDetailed(
+  params = {},
+  signal?: AbortSignal
+): Promise<Pagination<CollectionDetail[]>> {
   return http.get<Pagination<CollectionDetail[]>>(apiRoutes.collectionDetailed, {
     params: { size: 0, ...params },
+    signal,
   })
 }
 

@@ -17,7 +17,7 @@ axiosInstance.interceptors.request.use(requestConfig => {
 axiosInstance.interceptors.response.use(
   response => response,
   error => {
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       authService.removeToken()
       authService.resetStore()
       router.push({ name: 'login' })

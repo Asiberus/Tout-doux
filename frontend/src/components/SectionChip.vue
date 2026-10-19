@@ -34,7 +34,6 @@ const detailLocation = computed<RouteLocationRaw | undefined>(() => {
 })
 
 function click(): void {
-  if (section.project.archived) return
   emit('click')
 }
 </script>
@@ -48,7 +47,6 @@ function click(): void {
     :size="small ? 'small' : 'default'"
     :title
     variant="flat"
-    :class="{ 'cursor-default': section.project.archived && !detailLocation }"
     class="section-chip px-0"
     @click.stop="click()">
     <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />

@@ -6,6 +6,8 @@ import DailyDayStatusChip from '@/views/daily/components/DailyDayStatusChip.vue'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import EventItemCard from '@/views/components/event/EventItemCard.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { useRequestScope } from '@/composables/useRequestScope'
+import { isCancel } from 'axios'
 import { onBeforeMount, ref, watch } from 'vue'
 import { eventApi } from '@/api'
 import { useDisplay } from 'vuetify'
@@ -24,12 +26,14 @@ const emit = defineEmits<{
 
 const eventList = ref<EventExtendedModel[]>([])
 const eventDialog = ref(false)
+const dayRequests = useRequestScope()
 
 onBeforeMount(() => retrieveEventList())
 
 watch(
   () => props.date,
   () => {
+    dayRequests.renew()
     eventList.value = []
     emit('daily-event-count', 0)
     retrieveEventList()
@@ -38,13 +42,15 @@ watch(
 
 function retrieveEventList(): void {
   eventApi
-    .getEvents({ date: props.date })
+    .getEvents({ date: props.date }, dayRequests.signal())
     .then(response => {
       eventList.value = response
       sortEventList()
       emit('daily-event-count', eventList.value.length)
     })
-    .catch(error => console.error(error))
+    .catch(error => {
+      if (!isCancel(error)) console.error(error)
+    })
 }
 
 function sortEventList(): void {

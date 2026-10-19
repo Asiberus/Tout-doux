@@ -1,9 +1,10 @@
 from collections import Counter
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.db.models import Count, IntegerField, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from rest_framework.exceptions import ParseError
 
 from tout_doux.models import DailyTask, Event
 
@@ -26,6 +27,17 @@ def scalar_count(queryset, group_by):
         ),
         0,
     )
+
+
+
+def daily_task_date_param(request):
+    value = request.query_params.get('daily_task_date')
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        raise ParseError('Date not valid.')
 
 
 def daily_summary_counts(user, dates):

@@ -21,7 +21,9 @@ import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
 import { useNotificationStore } from '@/store'
 import { useDailyTaskMove } from '@/composables/useDailyTaskMove'
+import { useRequestScope } from '@/composables/useRequestScope'
 import { useToday } from '@/composables/useToday'
+import { isCancel } from 'axios'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -58,6 +60,7 @@ const commonTaskList = ref<CommonTask[]>([])
 const carryOverCandidates = ref<DailyTask[]>([])
 const carryOverInProgress = ref(false)
 const { moveDailyTask } = useDailyTaskMove(dailyTaskList, retrieveDailyTaskList)
+const dayRequests = useRequestScope()
 
 const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
 const projectSectionSelected = ref(0)
@@ -94,6 +97,7 @@ const areSomeCollectionSelected = computed<boolean>(() =>
 watch(
   () => props.date,
   () => {
+    dayRequests.renew()
     // Les listes sont vidées avant le fetch : sans ça celles de la veille resteraient affichées
     // sous l'en-tête du nouveau jour le temps de l'aller-retour.
     dailyTaskList.value = []
@@ -102,12 +106,18 @@ watch(
     projectSectionSelected.value = 0
     resetSelectedItem()
     retrieveDailyTaskList()
+    retrieveProjectList()
+    retrieveCollectionList()
   }
 )
 
+function logUnlessCanceled(error: unknown): void {
+  if (!isCancel(error)) console.error(error)
+}
+
 function retrieveDailyTaskList(): void {
   dailyTaskApi
-    .getDailyTasksByDate(props.date) // TODO : test the date format
+    .getDailyTasksByDate(props.date, dayRequests.signal()) // TODO : test the date format
     .then(response => {
       dailyTaskList.value = response.content
       emit('daily-task-count', dailyTaskList.value.length)
@@ -116,24 +126,27 @@ function retrieveDailyTaskList(): void {
       // sur un jour à venir, où il écrirait dans aujourd'hui sans le dire.
       if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
     })
-    .catch(error => console.error(error))
+    .catch(logUnlessCanceled)
 }
 
 function retrieveCarryOverCandidates(): void {
   dailyTaskApi
-    .getCarryOverCandidates()
+    .getCarryOverCandidates(dayRequests.signal())
     .then(response => (carryOverCandidates.value = response))
-    .catch(error => console.error(error))
+    .catch(logUnlessCanceled)
 }
 
 function carryOverPreviousDay(): void {
   if (carryOverInProgress.value) return
 
   carryOverInProgress.value = true
+  const { date } = props
 
   dailyTaskApi
     .carryOverPreviousDay()
     .then(response => {
+      if (date !== props.date) return
+
       carryOverCandidates.value = []
 
       if (response.length === 0) {
@@ -162,26 +175,26 @@ function carryOverPreviousDay(): void {
 
 function retrieveProjectList(): void {
   projectApi
-    .getProjectListDetailed({ archived: false, has_uncompleted_task: true })
+    .getProjectListDetailed({ daily_task_date: props.date }, dayRequests.signal())
     .then(response => {
       projectList.value = response.content.map((project: ProjectDetail) => ({
         content: project,
         selected: false,
       }))
     })
-    .catch(error => console.error(error))
+    .catch(logUnlessCanceled)
 }
 
 function retrieveCollectionList(): void {
   collectionApi
-    .getCollectionListDetailed({ archived: false, has_uncompleted_task: true })
+    .getCollectionListDetailed({ daily_task_date: props.date }, dayRequests.signal())
     .then(response => {
       collectionList.value = response.content.map((collection: CollectionDetail) => ({
         content: collection,
         selected: false,
       }))
     })
-    .catch(error => console.error(error))
+    .catch(logUnlessCanceled)
 }
 
 function fetchCommonTaskList(): void {
@@ -192,9 +205,12 @@ function fetchCommonTaskList(): void {
 }
 
 function createDailyTask(data: DailyTaskDraft): void {
+  const { date } = props
   dailyTaskApi
-    .createDailyTask({ ...data, date: props.date })
+    .createDailyTask({ ...data, date })
     .then(response => {
+      if (date !== props.date) return
+
       dailyTaskList.value.push(response)
       emit('daily-task-count', dailyTaskList.value.length)
     })

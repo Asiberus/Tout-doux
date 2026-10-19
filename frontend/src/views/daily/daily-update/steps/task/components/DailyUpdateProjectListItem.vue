@@ -8,7 +8,7 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
+import { filterCompleted, flattenProjectTasks } from '@/utils/task.utils'
 import { computed, ref, watch } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
 
@@ -37,14 +37,14 @@ const taskDialogSectionId = ref(0)
 
 const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(() => {
   const sections = props.project.sections
-    .filter(({ tasks }) => tasks.some(({ completed }) => !completed))
+    .filter(({ tasks }) => tasks.some(isTaskAvailable))
     .map(section => ({
       id: section.id,
       name: section.name,
       tasks: section.tasks,
     }))
 
-  if (props.project.tasks.some(({ completed }) => !completed))
+  if (props.project.tasks.some(isTaskAvailable))
     sections.unshift({
       id: 0,
       name: 'General tasks',
@@ -56,7 +56,7 @@ const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(()
 
 const allTasks = computed<Task[]>(() => flattenProjectTasks(props.project))
 const allTasksCompleted = computed<Task[]>(() => filterCompleted(allTasks.value))
-const allTasksUncompleted = computed<Task[]>(() => filterUncompleted(allTasks.value))
+const allTasksAvailable = computed<Task[]>(() => allTasks.value.filter(isTaskAvailable))
 const percentageOfTaskCompleted = computed<number>(
   () => (allTasksCompleted.value.length / allTasks.value.length) * 100
 )
@@ -76,12 +76,21 @@ watch(
   }
 )
 
+watch(allTasksAvailable, tasks => {
+  if (tasks.length === 0) selected.value = false
+})
+
 function isTaskSelected(task: Task): boolean {
   return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
 }
 
+function isTaskAvailable(task: Task): boolean {
+  if (props.project.archived) return isTaskSelected(task)
+  return !task.completed || isTaskSelected(task)
+}
+
 function selectProject(): void {
-  if (allTasksUncompleted.value.length === 0 || selected.value) return
+  if (allTasksAvailable.value.length === 0 || selected.value) return
 
   sectionTab.value = 0
   selected.value = true
@@ -121,7 +130,8 @@ function createTask(data: TaskPost): void {
 <template>
   <div :class="{ selected }" @click="selectProject()">
     <v-card
-      :disabled="allTasksUncompleted.length === 0"
+      :color="project.archived ? 'projectArchivedCard' : undefined"
+      :disabled="allTasksAvailable.length === 0"
       :class="{ 'cursor-pointer': !selected }"
       class="project-card rounded-lg">
       <v-progress-linear
@@ -155,6 +165,10 @@ function createTask(data: TaskPost): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
+            <v-chip v-if="project.archived" color="accent" size="small" class="flex-shrink-0 ml-2">
+              <v-icon icon="mdi-archive" size="small" class="mr-1" />
+              Archived
+            </v-chip>
             <v-btn
               :to="projectLocation"
               icon
@@ -220,7 +234,7 @@ function createTask(data: TaskPost): void {
               :value="index">
               <div class="task-wrapper">
                 <TaskCard
-                  v-for="task of section.tasks.filter(({ completed }) => !completed)"
+                  v-for="task of section.tasks.filter(isTaskAvailable)"
                   :key="`${section.name}-task-${task.id}`"
                   :task="task"
                   :selected="isTaskSelected(task)"
@@ -234,7 +248,7 @@ function createTask(data: TaskPost): void {
                 </TaskCard>
 
                 <v-card
-                  v-if="!readonly"
+                  v-if="!readonly && !project.archived"
                   variant="outlined"
                   ripple
                   class="create-task-card"

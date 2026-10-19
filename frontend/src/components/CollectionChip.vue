@@ -31,8 +31,6 @@ const detailLocation = computed<RouteLocationRaw | undefined>(() => {
 })
 
 function click(): void {
-  if (collection.archived) return
-
   emit('click')
 }
 </script>
@@ -47,7 +45,6 @@ function click(): void {
     :title
     variant="flat"
     class="collection-chip px-0"
-    :class="{ 'cursor-default': collection.archived && !detailLocation }"
     @click.stop="click()">
     <v-icon icon="mdi-list-box" size="small" class="ml-2 mr-1" />
     <div class="text-truncate mr-2">

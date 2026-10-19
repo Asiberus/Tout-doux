@@ -1,10 +1,10 @@
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
 from tout_doux.models import Task
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.queries import scalar_count
+from tout_doux.queries import daily_task_date_param, scalar_count
 from tout_doux.serializers.collection import CollectionListSerializer, CollectionDetailSerializer, CollectionSerializer, \
     CollectionPostOrPatchSerializer
 
@@ -32,6 +32,14 @@ class CollectionViewSet(viewsets.ModelViewSet):
         if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
             queryset = queryset.filter(
                 Exists(Task.objects.filter(collection=OuterRef('pk'), completed=False))
+            )
+
+        daily_task_date = daily_task_date_param(self.request)
+        if daily_task_date:
+            tasks = Task.objects.filter(collection=OuterRef('pk'))
+            queryset = queryset.filter(
+                (Q(archived=False) & Exists(tasks.filter(completed=False)))
+                | Exists(tasks.filter(daily_tasks__date=daily_task_date))
             )
 
         return queryset
