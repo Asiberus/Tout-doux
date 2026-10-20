@@ -116,7 +116,11 @@ const dueGroups = computed<DueGroups>(() =>
   )
 )
 const dueCount = computed<number>(() => dueEntryCount(dueGroups.value))
-const hasOverdue = computed<boolean>(() => dueGroups.value.overdue.length > 0)
+const dueBadgeColor = computed<string>(() => {
+  if (dueGroups.value.overdue.length > 0) return 'red-accent-2'
+  if (dueGroups.value.today.length > 0) return 'orange'
+  return 'amber'
+})
 
 const dayLoaded = computed<boolean>(
   () => dailyTasksLoaded.value && projectsLoaded.value && collectionsLoaded.value
@@ -360,6 +364,11 @@ function rescheduleTask(event: { taskId: number; dueDate: string | null }): void
     response => {
       const task = findLoadedTask(taskId)
       if (task) Object.assign(task, response)
+      dailyTaskList.value
+        .filter(dailyTask => dailyTask.task?.id === taskId)
+        .forEach(dailyTask => {
+          if (dailyTask.task) dailyTask.task.dueDate = response.dueDate
+        })
       dueStore.refresh({ force: true })
       notificationStore.notifySuccess(dueDateChangeMessage(response.dueDate))
     },
@@ -445,10 +454,7 @@ function resetSelectedItem(): void {
       class="daily-update-task__tabs"
       @update:model-value="resetSelectedItem()">
       <v-tab v-if="!readonly" :value="DailyUpdateTaskTab.Due" title="Due tasks">
-        <v-badge
-          :model-value="dayLoaded && dueCount > 0"
-          :content="dueCount"
-          :color="hasOverdue ? 'red-accent-2' : 'orange'">
+        <v-badge :model-value="dayLoaded && dueCount > 0" dot :color="dueBadgeColor">
           <v-icon icon="mdi-calendar-alert" size="x-large" />
         </v-badge>
       </v-tab>

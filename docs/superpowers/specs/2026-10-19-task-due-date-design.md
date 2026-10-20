@@ -132,9 +132,7 @@ affiché.
    sur la ligne de son nom sa pastille puis le chip de son conteneur (projet, section ou collection), comme une `DailyTaskCard`. Un clic sur le chip ouvre le conteneur dans son onglet, comme depuis une daily task, même sur une tâche déjà planifiée. Une tâche planifiée sur `J` reste à sa place, en `TaskCard` sélectionnée
    (fond vert, inerte), comme dans les cartes projet. L'en-tête de chaque groupe donne le
    nombre de ses tâches dans une chip, comme le compteur de « Tasks of the day », sans animation.
-5. **Pastille** sur l'icône de l'onglet : le nombre total de tâches de l'onglet, planifiées
-   comprises — elle ne baisse pas à la sélection. Rouge s'il y a une tâche en retard, orange
-   sinon.
+5. **Pastille** sur l'icône de l'onglet : un point, sans nombre, dès que l'onglet contient une tâche, planifiée ou non — il ne disparaît pas à la sélection. Rouge s'il y a une tâche en retard, orange s'il y en a une du jour, jaune s'il n'y a que des tâches « Soon ».
 
 S'il n'y a aucune tâche dans la fenêtre, l'onglet affiche un état vide « Nothing due ».
 
