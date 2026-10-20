@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { CollectionList } from '@/models/collection.model'
 import TaskCounter from '@/components/TaskCounter.vue'
+import { useDueStore } from '@/store'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
 import { computed } from 'vue'
 
 const { collection } = defineProps<{
   collection: CollectionList
 }>()
+
+const dueStore = useDueStore()
+
+const due = computed(() => dueStore.containerDue('collection', collection.id))
 
 const percentageOfCompletedTask = computed<number>(
   () => (collection.completedTaskCount / collection.taskCount) * 100
@@ -36,11 +42,17 @@ const percentageOfCompletedTask = computed<number>(
         </p>
       </div>
 
-      <TaskCounter
-        v-if="collection.taskCount > 0"
-        :value="collection.completedTaskCount"
-        :max="collection.taskCount">
-      </TaskCounter>
+      <div class="d-flex flex-column gap-2 align-end">
+        <DueCountChip
+          v-if="!collection.archived && due.count > 0"
+          :count="due.count"
+          :late="due.late" />
+        <TaskCounter
+          v-if="collection.taskCount > 0"
+          :value="collection.completedTaskCount"
+          :max="collection.taskCount">
+        </TaskCounter>
+      </div>
     </v-card-text>
   </v-card>
 </template>

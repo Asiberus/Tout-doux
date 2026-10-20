@@ -1,14 +1,18 @@
 import { dailyTaskApi } from '@/api'
-import { useNotificationStore } from '@/store'
+import { useDueStore, useNotificationStore } from '@/store'
 import { isAxiosError } from 'axios'
 import moment from 'moment'
 
 export function useAddTaskToDaily(): { addTaskToDaily: (taskId: number) => void } {
   const notificationStore = useNotificationStore()
+  const dueStore = useDueStore()
 
   function addTaskToDaily(taskId: number): void {
     dailyTaskApi.createDailyTask({ taskId, date: moment().format('YYYY-MM-DD') }).then(
-      () => notificationStore.notifySuccess("Task added to today's daily"),
+      () => {
+        dueStore.refresh({ force: true })
+        notificationStore.notifySuccess("Task added to today's daily")
+      },
       error => {
         // 409 : la task y est déjà. Du point de vue de l'utilisateur le résultat est le même.
         if (isAxiosError(error) && error.response?.status === 409)

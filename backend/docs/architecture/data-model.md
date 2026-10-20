@@ -50,6 +50,9 @@ base (`task_exactly_one_container`), vérifiée à la fin de chaque instruction 
 conteneur doit poser la nouvelle FK et vider l'ancienne dans le même `UPDATE`.
 Voir [../domain/glossary.md](../domain/glossary.md).
 
+`Task.due_date` (`DateField`, nullable) porte l'échéance : un jour sans heure, passé autorisé,
+aucune contrainte ni validation au-delà du format.
+
 ## Contraintes et invariants réellement en base
 
 | Modèle            | Contrainte                                                                                           | Fichier                         |
@@ -135,7 +138,7 @@ l'historique du daily : la ligne devient une tâche « libre » portant l'ancien
 - **Pas d'index explicite** au-delà de ceux créés par les FK et les contraintes d'unicité.
   Justifié par le volume — voir [../quality/watched-risks.md](../quality/watched-risks.md) W8.
 - **Pas de table d'audit ni d'horodatage systématique.** Seuls `Task` (`created_at`,
-  `completed_at`), `Project`/`Collection` (`created_on`) et `Feedback`/`DailyTask` (`date`)
+  `completed_at`, `due_date`), `Project`/`Collection` (`created_on`) et `Feedback`/`DailyTask` (`date`)
   datent quoi que ce soit.
 
 ## Voir aussi

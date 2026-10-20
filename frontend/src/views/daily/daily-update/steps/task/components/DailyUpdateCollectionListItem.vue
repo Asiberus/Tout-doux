@@ -6,6 +6,9 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { isTaskAvailable as isTaskAvailableForDay, isTaskPlanned } from '@/utils/task.utils'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
+import { containerDueCount } from '@/utils/daily-due.utils'
 import { computed, ref, watch } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
@@ -16,6 +19,7 @@ const props = defineProps<{
   collection: CollectionDetail
   dailyTaskList: DailyTask[]
   readonly: boolean
+  date: string
 }>()
 
 const emit = defineEmits<{
@@ -39,13 +43,19 @@ watch(tasksAvailable, tasks => {
   if (tasks.length === 0) selected.value = false
 })
 
+const dueCount = computed<{ count: number; overdue: boolean }>(() =>
+  containerDueCount(props.collection.tasks, props.date)
+)
+const dueCountDisplayed = computed<boolean>(
+  () => !props.readonly && !props.collection.archived && dueCount.value.count > 0
+)
+
 function isTaskSelected(task: Task): boolean {
-  return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
+  return isTaskPlanned(task, props.dailyTaskList)
 }
 
 function isTaskAvailable(task: Task): boolean {
-  if (props.collection.archived) return isTaskSelected(task)
-  return !task.completed || isTaskSelected(task)
+  return isTaskAvailableForDay(task, props.collection.archived, props.dailyTaskList)
 }
 
 function selectCollection(): void {
@@ -97,6 +107,11 @@ function createTask(data: TaskPost): void {
           </h3>
           <template v-if="!selected">
             <v-spacer />
+            <DueCountChip
+              v-if="dueCountDisplayed"
+              :count="dueCount.count"
+              :late="dueCount.overdue"
+              class="ml-2" />
             <TaskCounter
               :value="tasksCompleted.length"
               :max="collection.tasks.length"
@@ -142,7 +157,8 @@ function createTask(data: TaskPost): void {
               :completable="false"
               :show-completed-at="false"
               :display-options="false"
-              color="surface-container-high"
+              :reference-day="date"
+              :level="2"
               @click="selectTask(task)">
             </TaskCard>
 

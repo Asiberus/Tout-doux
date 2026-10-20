@@ -1,4 +1,5 @@
 import { AxiosError, AxiosHeaders } from 'axios'
+import { CollectionDetail } from '@/models/collection.model'
 import { DailyTask } from '@/models/daily-task.model'
 import { EventModel } from '@/models/event.model'
 import { ProjectDetail } from '@/models/project.model'
@@ -13,6 +14,7 @@ export function makeTask(overrides: Partial<Task> = {}): Task {
     tags: [],
     createdAt: '2026-01-01T09:00:00',
     completedAt: '',
+    dueDate: null,
     position: 'a0',
     ...overrides,
   }
@@ -37,6 +39,19 @@ export function makeProjectDetail(overrides: Partial<ProjectDetail> = {}): Proje
     sections: [],
     tasks: [],
     events: [],
+    ...overrides,
+  }
+}
+
+export function makeCollectionDetail(overrides: Partial<CollectionDetail> = {}): CollectionDetail {
+  return {
+    id: 1,
+    name: 'Collection',
+    description: '',
+    itemName: 'task',
+    archived: false,
+    createdOn: '2026-01-01',
+    tasks: [],
     ...overrides,
   }
 }

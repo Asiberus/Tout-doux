@@ -1,5 +1,5 @@
 import { apiRoutes } from '@/api-routes'
-import { Task, TaskPatch, TaskPost } from '@/models/task.model'
+import { DueSummary, Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { http } from '@/axios/http'
 import { MoveAnchors, OrderPosition } from '@/models/ordering.model'
 
@@ -17,4 +17,8 @@ export function deleteTaskById(taskId: number): Promise<void> {
 
 export function moveTask(taskId: number, anchors: MoveAnchors): Promise<OrderPosition> {
   return http.post<OrderPosition>(apiRoutes.taskMove.replace(':taskId', taskId.toString()), anchors)
+}
+
+export function getDueSummary(date: string): Promise<DueSummary> {
+  return http.get<DueSummary>(apiRoutes.taskDueSummary, { params: { date } })
 }

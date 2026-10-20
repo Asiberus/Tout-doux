@@ -2,11 +2,17 @@
 import { ProjectList } from '@/models/project.model'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
+import { useDueStore } from '@/store'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
   project: ProjectList
 }>()
+
+const dueStore = useDueStore()
+
+const due = computed(() => dueStore.containerDue('project', props.project.id))
 
 const percentageOfCompletedTask = computed<number>(
   () => (props.project.completedTaskCount / props.project.taskCount) * 100
@@ -38,6 +44,10 @@ const percentageOfCompletedTask = computed<number>(
       </div>
 
       <div class="d-flex flex-column gap-2 align-end">
+        <DueCountChip
+          v-if="!project.archived && due.count > 0"
+          :count="due.count"
+          :late="due.late" />
         <TaskCounter
           v-if="project.taskCount > 0"
           :value="project.completedTaskCount"

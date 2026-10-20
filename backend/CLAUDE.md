@@ -10,7 +10,7 @@ ce fichier.
 
 `backend` est l'API de **Tout-Doux** (organisation personnelle : projets, collections,
 planification journalière). **Django 6.1 + DRF 3.18 + Knox 5**, PostgreSQL, une seule application
-`tout_doux` (12 modèles, 42 sérialiseurs, 17 tests de fumée, 81 tests de non-régression, 48 tests
+`tout_doux` (12 modèles, 42 sérialiseurs, 17 tests de fumée, 81 tests de non-régression, 65 tests
 métier). Monorepo :
 `../frontend` (SPA Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)),
 `../docker-compose.yml`, `../td.sh`.
@@ -38,9 +38,10 @@ volume : pas de rebuild sauf si `requirements.txt` change.
 **17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **81 tests de
 non-régression** gèlent le contrat d'API et le nombre de requêtes SQL (`test_api_contract.py`,
 `test_query_counts.py` — voir
-[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)). Les **48 premiers
-tests métier** couvrent le tri manuel des listes (`test_ordering.py`) et la reprise des positions
-par la migration 0011 (`test_migrations.py`).
+[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)). Les **65 premiers
+tests métier** couvrent le tri manuel des listes (`test_ordering.py`), la reprise des positions
+par la migration 0011 (`test_migrations.py`), l'échéance des tâches (`test_task_due_date.py`) et
+le résumé des échéances (`test_task_due_summary.py`).
 **Toujours aucun linter, aucun formateur.** Une CI les lance à chaque PR
 (`.github/workflows/ci.yml`) ; le reste passe par la procédure manuelle de
 [docs/workflows/verification.md](docs/workflows/verification.md).

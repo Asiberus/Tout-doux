@@ -2,6 +2,7 @@ import { CollectionDetail, CollectionPatch } from '@/models/collection.model'
 import { Task, TaskPatch, TaskPost } from '@/models/task.model'
 import { filterCompleted, filterUncompleted } from '@/utils/task.utils'
 import { MoveAnchors } from '@/models/ordering.model'
+import { useDueStore } from '@/store/due.store'
 import { useNotificationStore } from '@/store/notification.store'
 import {
   applyMove,
@@ -96,6 +97,7 @@ export const useCollectionStore = defineStore<
     async addTask(task: TaskPost): Promise<void> {
       await taskApi.createTask(task).then(
         response => {
+          useDueStore().refresh({ force: true })
           if (!this.currentCollection) return
 
           this.currentCollection.tasks.unshift(response)
@@ -107,6 +109,7 @@ export const useCollectionStore = defineStore<
     async editTask(id: number, data: TaskPatch): Promise<void> {
       await taskApi.updateTaskById(id, data).then(
         (updatedTask: Task) => {
+          useDueStore().refresh({ force: true })
           if (!this.currentCollection) return
 
           const { tasks } = this.currentCollection
@@ -135,6 +138,7 @@ export const useCollectionStore = defineStore<
     async deleteTask(id: number): Promise<void> {
       await taskApi.deleteTaskById(id).then(
         () => {
+          useDueStore().refresh({ force: true })
           if (!this.currentCollection) return
           const index = this.currentCollection.tasks.findIndex(t => t.id === id)
           if (index !== -1) this.currentCollection.tasks.splice(index, 1)

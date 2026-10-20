@@ -15,6 +15,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 | R6  | `src/store/auth.store.ts` : code mort dupliquant le service d'auth | moyenne   | Deux implémentations d'auth, risque de confusion                       |
 | R13 | Couverture partielle : composants, stores, composables, guards     | moyenne   | Les règles daily ne vivent que dans l'UI et ne sont couvertes par rien |
 | R10 | `README.md` du dossier `frontend/` obsolète                        | basse     | Traité en même temps que R5                                            |
+| R14 | Uniformiser le fond des cartes avec l'échelle des niveaux          | basse     | Chaque carte choisit sa couleur à sa façon, sans règle commune         |
 
 > **Items transférés au tracker de migration.** Sept items relevant du chantier Vuetify 4 ont été
 > déplacés vers [../workflows/vuetify-4-migration.md](../workflows/vuetify-4-migration.md), qui est
@@ -89,7 +90,7 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 ## R13 — Couverture partielle : composants, stores, composables, guards
 
 - **Origine** : suite Vitest installée au même commit que `ci.yml`. `yarn test:ci` publie le taux.
-- **Contexte** : 93 tests couvrent `utils/`, `pipes/`, la couche `api/` (substitution des routes
+- **Contexte** : 149 tests couvrent `utils/`, `pipes/`, la couche `api/` (substitution des routes
   à paramètre, params par défaut) et `axios/` (intercepteurs, comportement du 401). Taux de
   départ : **22,88 %** des instructions. Restent découverts, par ordre de risque décroissant :
   le domaine daily, dont les règles métier sont appliquées **par l'UI seulement**
@@ -105,6 +106,20 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Hors périmètre assumé** : `views/`, `layout/`, les barrels `index.ts`, et le markup rendu.
   Aucun snapshot de DOM — le rendu d'un composant Vuetify est à 90 % la structure de Vuetify, un
   snapshot casserait à chaque montée de version sans jamais signaler de régression.
+
+## R14 — Uniformiser le fond des cartes avec l'échelle des niveaux
+
+- **Origine** : l'onglet Due du daily update posait des `TaskCard` en `surface-container-high`
+  directement sur la page, plus claires que les tâches d'un projet.
+- **Contexte** : `TaskCard` porte désormais une prop `level` (1 à 3) qui lit `SURFACE_LEVELS`
+  (`utils/surface.utils.ts`) selon l'échelle tonale de
+  [../architecture/ui-layer.md](../architecture/ui-layer.md). Les autres cartes choisissent
+  encore leur fond chacune à sa façon : `DailyTaskCard` et `DailyTaskFormCard` (couleur en dur,
+  cas de la bottom sheet sous `sm-and-down`), les cartes projet et collection du daily update,
+  `CommonTaskCard`, et tout `v-card` qui passe un `color="surface-container-*"`.
+- **Décision** : faire passer toutes ces cartes par la même prop `level` et la même règle — une
+  carte posée sur la page est au niveau 1, une carte imbriquée prend le niveau de son parent
+  - 1 — puis supprimer les `color="surface-container-*"` en dur.
 
 ## R10 — `README.md` obsolète
 

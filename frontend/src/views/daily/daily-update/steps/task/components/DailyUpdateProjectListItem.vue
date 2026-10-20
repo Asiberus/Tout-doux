@@ -8,7 +8,14 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { filterCompleted, flattenProjectTasks } from '@/utils/task.utils'
+import {
+  filterCompleted,
+  flattenProjectTasks,
+  isTaskAvailable as isTaskAvailableForDay,
+  isTaskPlanned,
+} from '@/utils/task.utils'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
+import { containerDueCount } from '@/utils/daily-due.utils'
 import { computed, ref, watch } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
 
@@ -21,6 +28,7 @@ const props = withDefaults(
     project: ProjectDetail
     dailyTaskList: DailyTask[]
     readonly: boolean
+    date: string
     sectionSelected?: number
   }>(),
   { sectionSelected: 0 }
@@ -80,13 +88,19 @@ watch(allTasksAvailable, tasks => {
   if (tasks.length === 0) selected.value = false
 })
 
+const dueCount = computed<{ count: number; overdue: boolean }>(() =>
+  containerDueCount(allTasks.value, props.date)
+)
+const dueCountDisplayed = computed<boolean>(
+  () => !props.readonly && !props.project.archived && dueCount.value.count > 0
+)
+
 function isTaskSelected(task: Task): boolean {
-  return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
+  return isTaskPlanned(task, props.dailyTaskList)
 }
 
 function isTaskAvailable(task: Task): boolean {
-  if (props.project.archived) return isTaskSelected(task)
-  return !task.completed || isTaskSelected(task)
+  return isTaskAvailableForDay(task, props.project.archived, props.dailyTaskList)
 }
 
 function selectProject(): void {
@@ -158,6 +172,11 @@ function createTask(data: TaskPost): void {
 
           <template v-if="!selected">
             <v-spacer />
+            <DueCountChip
+              v-if="dueCountDisplayed"
+              :count="dueCount.count"
+              :late="dueCount.overdue"
+              class="ml-2" />
             <TaskCounter
               :value="allTasksCompleted.length"
               :max="allTasks.length"
@@ -243,7 +262,8 @@ function createTask(data: TaskPost): void {
                   :completable="false"
                   :show-completed-at="false"
                   :display-options="false"
-                  color="surface-container-high"
+                  :reference-day="date"
+                  :level="2"
                   @click="selectTask(task)">
                 </TaskCard>
 

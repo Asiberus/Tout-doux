@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 vi.mock('@/api', () => ({
-  taskApi: { moveTask: vi.fn(), updateTaskById: vi.fn() },
+  taskApi: {
+    moveTask: vi.fn(),
+    updateTaskById: vi.fn(),
+    getDueSummary: vi.fn().mockResolvedValue({ late: 0, today: 0, containers: [] }),
+  },
   collectionApi: { getCollectionById: vi.fn() },
 }))
 

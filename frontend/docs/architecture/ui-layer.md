@@ -75,6 +75,14 @@ presque invisible sur `#121212`.
 | 2      | `surface-container-high` `#2e2e2e`    | lignes de tâche dans une carte, bottom sheet |
 | 3      | `surface-container-highest` `#3a3a3a` | carte de tâche dans la bottom sheet          |
 
+`TaskCard` choisit son fond par une prop `level` (1 par défaut, 2 ou 3), lue dans
+`SURFACE_LEVELS` (`utils/surface.utils.ts`) : une carte posée sur la page est au niveau 1, une
+carte imbriquée prend le niveau de son parent + 1. Terminée ou sélectionnée, elle passe en vert
+quel que soit son niveau. Les autres cartes n'ont pas encore suivi
+([R14](../quality/refactoring-backlog.md)). Rien n'y est en position absolue : le bouton d'options
+(`displayOptions`) et le slot `actions` — un menu propre à l'écran, comme le report d'échéance de
+l'onglet Due — se placent en fin de ligne du nom, hors du bloc qui passe à la ligne.
+
 Ces deux tokens sont nommés en kebab-case, contrairement aux couleurs métier en camelCase, pour se
 ranger avec les surfaces livrées par Vuetify (`surface-bright`, `surface-variant`).
 
@@ -280,6 +288,11 @@ Où écrire un style : [../patterns/styling.md](../patterns/styling.md).
   Corollaire du même piège : un `min-height: 100%` sur un élément de grille se résout **à zéro**
   (piste de hauteur indéfinie), ce qui écrasait les cartes « Create a task » à 2px ; elles portent
   désormais le `min-height: 62px` d'une `TaskCard` `small`.
+- **`TaskCard` a un slot `meta`**, rendu sur la ligne du nom, dont il reprend le gabarit de
+  l'en-tête de `DailyTaskCard` (`flex-wrap: wrap-reverse`, `gap: 8px`). La pastille
+  d'échéance ou de complétion est toujours sur la ligne du nom, jamais en position absolue :
+  avant le contenu du slot quand il est fourni, sinon à droite du nom, et elle passe à la ligne
+  (alignée à droite) plutôt que de recouvrir un nom long.
 
 ## Notifier l'utilisateur
 
@@ -314,8 +327,7 @@ qu'il vient d'afficher.
 - **Pas de design system formalisé** (pas de Storybook, pas de tokens exportés) : la référence
   est le code des composants partagés.
 - **Pas de feature flags** (0 occurrence). Les fonctionnalités non finies sont des éléments
-  `disabled` en dur : entrée « Dashboard » du drawer, onglet « Historic » de `ProjectDetail`,
-  onglets « Weekly task » / « Monthly task » du wizard daily.
+  `disabled` en dur : entrée « Dashboard » du drawer, onglet « Historic » de `ProjectDetail`.
 
 ## Voir aussi
 

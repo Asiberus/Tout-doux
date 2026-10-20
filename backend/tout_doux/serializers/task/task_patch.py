@@ -13,6 +13,7 @@ class TaskPatchSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    dueDate = serializers.DateField(source='due_date', required=False, allow_null=True)
 
     class Meta:
         model = Task
@@ -20,6 +21,7 @@ class TaskPatchSerializer(serializers.ModelSerializer):
             'name',
             'tagIds',
             'completed',
+            'dueDate',
         )
 
     def to_representation(self, instance):

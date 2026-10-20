@@ -168,7 +168,7 @@ Liste maintenue à la main.
 
 | Emplacement            | Ce qui y est appliqué                                                                                                                                                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `queries.py`           | `scalar_count`, `daily_summary_counts`, `daily_carry_over_candidates`                                                                                                                                                  |
+| `queries.py`           | `scalar_count`, `daily_summary_counts`, `daily_carry_over_candidates` ; `task_due_summary` : un seul `values().annotate()` groupé par conteneur et par `Exists` de planification, avec deux `Count` filtrés            |
 | `views/project.py`     | 5 `scalar_count` ; `Exists` ; `tags`, `tasks__tags`, `sections__tasks__tags`, `events`                                                                                                                                 |
 | `views/collection.py`  | 2 `scalar_count` ; `Exists` ; `tasks__tags`                                                                                                                                                                            |
 | `views/daily_task.py`  | 4 `select_related`, 5 `prefetch_related`, hors `destroy` et `move` ; `daily_summary_counts` dans `summary()` ; `bulk_create` sur la table et sur la liaison des tags, puis relecture par `pk__in`, dans `carry_over()` |
@@ -190,6 +190,7 @@ réponses.
 | `GET /collection/detailed/`   | 59    | +1 par tâche                 | 4     |
 | `GET /daily-task/`            | 74    | +6 par daily task            | 5     |
 | `GET /daily-task/summary/`    | 126   | +3 par jour affiché          | 2     |
+| `GET /task/due-summary/`      | —     | aucune                       | 1     |
 | `GET /event/`                 | 27    | +2 par événement             | 2     |
 | `POST /daily-task/{pk}/move/` | —     | aucune                       | 5     |
 | `POST /task/{pk}/move/`       | —     | aucune                       | 5     |

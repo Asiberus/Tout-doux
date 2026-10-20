@@ -115,9 +115,33 @@ autre valeur.
 - La synchronisation est **unidirectionnelle** : le stepper écrit dans la route
   (`router.replace`), mais aucun watcher ne surveille la prop `step`. **Les boutons
   précédent/suivant du navigateur ne déplacent donc pas le stepper.**
-- L'étape « task » offre 5 onglets sources : Project, Collection, Common task, puis
-  « Weekly task » et « Monthly task » **désactivés** (fonctionnalités annoncées, non
-  implémentées). L'énumération `DailyUpdateTaskTab` ne couvre que les 3 premiers.
+- L'étape « task » offre 4 onglets sources, ceux de l'énumération `DailyUpdateTaskTab` : Due, Project, Collection, Common task.
+- **Onglet « Due »** — absent sur un jour passé. Il liste, calculées côté client
+  (`collectDueEntries`) depuis les projets et collections chargés, les tâches dont l'échéance
+  tombe au plus tard 5 jours après le jour affiché, groupées, dans cet ordre, Today / Late /
+  Soon, chaque titre précédé de l'icône et de la couleur de la pastille correspondante et suivi
+  du nombre de ses tâches en chip. Sur un autre jour qu'aujourd'hui, Today devient This day,
+  avec un sous-texte qui nomme le jour planifié. Le sous-texte de Soon rappelle la fenêtre de
+  5 jours : « Due in the next 5 days » aujourd'hui, « Due in the 5 days after Thursday 22
+  October » sinon. Les conteneurs archivés en sont exclus ; une tâche planifiée sur le jour
+  reste à sa place, en vert, terminée ou non. Chaque tâche occupe toute la ligne et porte, sur
+  la ligne de son nom, sa pastille d'échéance puis le chip de son projet, de sa section ou de sa collection, comme une daily task (slot `meta` de `TaskCard`). Un clic sur la carte planifie la
+  tâche ; son menu ⋮ reporte l'échéance en un geste (Today, Tomorrow, Next Friday, Next week, End of month, calculés depuis aujourd'hui, sans celui qui correspond déjà à l'échéance) ou la retire, puis confirme par une notification ; le bouton plan tasks du groupe Today (ou This day) planifie d'un coup, une à une et dans l'ordre, toutes ses tâches pas encore planifiées ; un clic sur le chip ouvre son conteneur dans l'onglet Project ou Collection, comme depuis une daily task, y compris sur une tâche déjà planifiée. La pastille de l'onglet compte **toutes** les tâches de l'onglet,
+  planifiées comprises — elle ne baisse pas à la sélection —, rouge s'il y en a une en retard,
+  et n'apparaît qu'une fois le jour chargé. Les cartes projet et collection repliées comptent de
+  même les tâches en retard ou du jour, **planifiées ou non**.
+- Dans la liste des tâches du jour (`DailyTaskFormCard`), une tâche porte dans l'ordre le chip de son conteneur, sa pastille d'échéance, puis ses tags. `DailyTaskCard` et l'onglet Due placent la pastille avant le chip.
+- **Signal des échéances hors du daily update** — le store `due` lit
+  `GET task/due-summary/?date=<aujourd'hui>` : les tâches ouvertes en retard ou dues aujourd'hui,
+  conteneur non archivé. L'entrée Daily du menu porte le nombre de celles **pas encore
+  planifiées aujourd'hui**, rouge s'il y en a une en retard, orange sinon ; le bouton ☰ de
+  l'en-tête porte un point de même couleur quand le menu est fermé ; la page Daily Summary affiche un bandeau jaune (« 2 late tasks · 1 task due today, not planned yet ») avec, à droite, un bouton Plan them vers le daily update du jour. Les cartes de la liste des projets et des collections portent, comme dans
+  le daily update, le nombre de leurs tâches en retard ou du jour **planifiées ou non**
+  (`DueCountChip`).
+- **Onglet à l'arrivée** — aucun tant que les tâches du jour, les projets et les collections ne
+  sont pas chargés (`mandatory` de `v-tabs` est coupé jusque-là). Puis « Due » s'il reste une
+  tâche à planifier, « Project » sinon ou sur un jour passé. Le choix est refait à chaque
+  changement de jour, jamais en cours de route.
 - Depuis un DailyTask déjà planifié, cliquer sur son chip projet/section/collection **ramène le
   panneau de gauche sur la source correspondante** (navigation inverse).
 - L'étape « event » fait du CRUD sur les événements du jour via `EventDialog`, et retire de la

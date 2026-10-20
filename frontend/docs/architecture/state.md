@@ -1,20 +1,21 @@
 # État partagé (Pinia)
 
-Six stores, **tous en style options** (`state` / `getters` / `actions`) — aucun setup store. Le
+Sept stores, **tous en style options** (`state` / `getters` / `actions`) — aucun setup store. Le
 store n'est **pas** la voie par défaut d'accès aux données : la majorité des écrans appelle
 `@/api` directement. Le critère de choix est ci-dessous.
 
 ## Inventaire
 
-| Store          | Fichier                           | État                                   | Rôle                                                                                                                                      |
-| -------------- | --------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `app`          | `src/store/app.store.ts`          | — (sans état)                          | Orchestration : `init()` / `exit()`                                                                                                       |
-| `user`         | `src/store/user.store.ts`         | `user?: User`                          | Utilisateur connecté                                                                                                                      |
-| `preferences`  | `src/store/preferences.store.ts`  | `preferences?: Preferences`            | Préférences UI                                                                                                                            |
-| `project`      | `src/store/project.store.ts`      | `currentProject?: ProjectDetail`       | Agrégat de la page détail projet (8 getters dérivés)                                                                                      |
-| `collection`   | `src/store/collection.store.ts`   | `currentCollection?: CollectionDetail` | Idem pour une collection                                                                                                                  |
-| `notification` | `src/store/notification.store.ts` | `queue: Notification[]`                | File du `VSnackbarQueue` unique — voir [../adr/0005-notifications-via-snackbar-queue.md](../adr/0005-notifications-via-snackbar-queue.md) |
-| `auth`         | `src/store/auth.store.ts`         | —                                      | **CODE MORT** — voir ci-dessous                                                                                                           |
+| Store          | Fichier                           | État                                   | Rôle                                                                                                                                                       |
+| -------------- | --------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app`          | `src/store/app.store.ts`          | — (sans état)                          | Orchestration : `init()` / `exit()`                                                                                                                        |
+| `user`         | `src/store/user.store.ts`         | `user?: User`                          | Utilisateur connecté                                                                                                                                       |
+| `preferences`  | `src/store/preferences.store.ts`  | `preferences?: Preferences`            | Préférences UI                                                                                                                                             |
+| `project`      | `src/store/project.store.ts`      | `currentProject?: ProjectDetail`       | Agrégat de la page détail projet (8 getters dérivés)                                                                                                       |
+| `collection`   | `src/store/collection.store.ts`   | `currentCollection?: CollectionDetail` | Idem pour une collection                                                                                                                                   |
+| `due`          | `src/store/due.store.ts`          | `summary`, `date`, `loadedAt`          | Résumé des échéances (en retard, du jour) pour les pastilles — voir [../adr/0009-due-store-first-data-store.md](../adr/0009-due-store-first-data-store.md) |
+| `notification` | `src/store/notification.store.ts` | `queue: Notification[]`                | File du `VSnackbarQueue` unique — voir [../adr/0005-notifications-via-snackbar-queue.md](../adr/0005-notifications-via-snackbar-queue.md)                  |
+| `auth`         | `src/store/auth.store.ts`         | —                                      | **CODE MORT** — voir ci-dessous                                                                                                                            |
 
 ## Règle : store ou appel direct ?
 
@@ -27,7 +28,11 @@ Règle de fait, dérivée du code (27 composants appellent `@/api` en direct) :
    sections, événements depuis des sous-composants) ;
 2. les **singletons applicatifs** chargés une fois au boot (`user`, `preferences`) ;
 3. l'**état d'UI transverse**, écrit depuis n'importe quel composant et lu par un seul point
-   de montage (`notification`) — sans aucun lien avec l'API.
+   de montage (`notification`) — sans aucun lien avec l'API ;
+4. les **données applicatives lues partout et changées par des mutations dispersées** (`due`),
+   première brique d'une gestion des données par les stores
+   ([0009](../adr/0009-due-store-first-data-store.md)). Un tel store se rafraîchit lui-même ;
+   chaque site de mutation qui change sa donnée appelle `refresh({ force: true })`.
 
 **Tout le reste appelle `@/api` directement depuis le composant** : listes, données éphémères,
 back-office, écrans non authentifiés. C'est le cas pour `commonTaskApi`, `dailyTaskApi`,

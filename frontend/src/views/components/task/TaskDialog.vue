@@ -4,7 +4,11 @@ import { Form } from '@/models/common.model'
 import { Tag } from '@/models/tag.model'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
-import { onBeforeMount, ref, useTemplateRef, watch } from 'vue'
+import { useToday } from '@/composables/useToday'
+import { dateFormat } from '@/pipes'
+import { DueDateShortcut, dueDateShortcuts } from '@/utils/due-date.utils'
+import moment from 'moment'
+import { computed, onBeforeMount, ref, useTemplateRef, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -22,6 +26,8 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const { today } = useToday()
+
 const formRef = useTemplateRef('form')
 const inputNameRef = useTemplateRef('name')
 
@@ -30,11 +36,13 @@ onBeforeMount(() => {
 })
 
 const tagList = ref<Tag[]>([])
+const dueDatePicker = ref(false)
 const taskForm = ref<Form<TaskPost>>({
   valid: false,
   data: {
     name: '',
     tagIds: [],
+    dueDate: null,
   },
   rules: {
     name: [
@@ -55,6 +63,10 @@ watch(
   }
 )
 
+const shortcuts = computed<DueDateShortcut[]>(() =>
+  dueDateShortcuts(today.value.format('YYYY-MM-DD'))
+)
+
 watch(tagList, (value: Tag[]) => {
   taskForm.value.data.tagIds = value.map(({ id }) => id)
 })
@@ -63,12 +75,23 @@ function populateForm(task?: Task): void {
   if (task) {
     taskForm.value.data.name = task.name
     taskForm.value.data.tagIds = task.tags.map(({ id }) => id)
+    taskForm.value.data.dueDate = task.dueDate ?? null
     tagList.value = [...task.tags]
   } else {
     taskForm.value.data.name = ''
     taskForm.value.data.tagIds = []
+    taskForm.value.data.dueDate = null
     tagList.value = []
   }
+}
+
+function setDueDate(value: string | null): void {
+  taskForm.value.data.dueDate = value
+  dueDatePicker.value = false
+}
+
+function onDueDateSelected(value: unknown): void {
+  setDueDate(value ? moment(value as Date).format('YYYY-MM-DD') : null)
 }
 
 function removeTag(id: number): void {
@@ -105,16 +128,63 @@ function emitCloseEvent(): void {
         <v-text-field
           ref="name"
           v-model="taskForm.data.name"
-          label="Name"
           counter="150"
           required
           :rules="taskForm.rules?.name"
           :autofocus="!task"
-          class="flex-grow-0 mb-2" />
+          class="flex-grow-0 mb-2">
+          <template #label>Name <span class="text-error">*</span></template>
+        </v-text-field>
 
-        <h6 class="text-title-large text-grey-lighten-2">
+        <v-menu
+          v-model="dueDatePicker"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          min-width="290">
+          <template #activator="{ props: menuProps }">
+            <v-text-field
+              v-bind="menuProps"
+              :model-value="
+                taskForm.data.dueDate ? dateFormat(taskForm.data.dueDate, 'D MMMM Y') : ''
+              "
+              label="Due date (optional)"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+              clearable
+              persistent-clear
+              hide-details
+              class="flex-grow-0"
+              @click:clear="setDueDate(null)" />
+          </template>
+          <v-date-picker
+            :model-value="
+              taskForm.data.dueDate ? moment(taskForm.data.dueDate).toDate() : undefined
+            "
+            show-adjacent-months
+            hide-title
+            hide-header
+            :first-day-of-week="1"
+            @update:model-value="onDueDateSelected" />
+        </v-menu>
+        <div class="due-date-shortcuts mt-2 mb-5">
+          <v-chip
+            v-for="shortcut of shortcuts"
+            :key="shortcut.label"
+            size="small"
+            :variant="taskForm.data.dueDate === shortcut.value ? 'flat' : 'tonal'"
+            :color="taskForm.data.dueDate === shortcut.value ? 'accent' : undefined"
+            @click="setDueDate(shortcut.value)">
+            {{ shortcut.label }}
+            <span v-if="shortcut.detail" class="due-date-shortcuts__detail">
+              · {{ shortcut.detail }}
+            </span>
+          </v-chip>
+        </div>
+
+        <h6 class="text-title-large text-grey-lighten-2 form-section-title">
           <v-icon icon="mdi-tag" size="x-small" />
           Tags
+          <span class="form-section-title__optional">optional</span>
         </h6>
         <TagSearch v-model="tagList" type="task" class="mb-5" />
 
@@ -148,6 +218,28 @@ function emitCloseEvent(): void {
 </template>
 
 <style scoped lang="scss">
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &__optional {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.due-date-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  &__detail {
+    margin-left: 4px;
+    opacity: 0.7;
+  }
+}
+
 .tag-wrapper {
   min-height: 32px;
   display: flex;

@@ -10,7 +10,7 @@
 | `prettier --write`                               | hook `pre-commit` → `pretty-quick --staged` + `lint-staged` | ✅ oui (reformate)                                                |
 | Message de commit conventionnel                  | hook `commit-msg` → `commitlint`                            | ✅ oui                                                            |
 | `yarn lint:check` + `yarn format:check`          | CI, job `Frontend`, à chaque PR                             | ✅ oui — rattrape un `commit --no-verify`                         |
-| `yarn test:ci` (105 tests Vitest)                | CI, job `Frontend` + `yarn test` en local                   | ✅ oui                                                            |
+| `yarn test:ci` (149 tests Vitest)                | CI, job `Frontend` + `yarn test` en local                   | ✅ oui                                                            |
 | `vue-tsc` (`yarn type-check`)                    | —                                                           | ❌ **non** — 2 erreurs préexistantes (`api/api.spec.ts`), hors CI |
 
 Le hook `pre-commit` reste le garde-fou **local** ; la CI est le garde-fou **partagé**. Le hook

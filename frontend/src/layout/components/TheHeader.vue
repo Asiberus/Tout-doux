@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { config } from '@/config'
 import { authService } from '@/services'
-import { useUserStore } from '@/store'
+import { useDueStore, useUserStore } from '@/store'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 const router = useRouter()
 const { mobile } = useDisplay()
 const userStore = useUserStore()
+const dueStore = useDueStore()
 
 const navbarDisplayed = defineModel<boolean>('navbarDisplayed')
 const headerMenu = defineModel<boolean>('headerMenu')
@@ -22,7 +23,14 @@ function logout(): void {
 <template>
   <v-app-bar density="compact" class="pr-4">
     <template v-if="mobile" #prepend>
-      <v-app-bar-nav-icon @click="navbarDisplayed = !navbarDisplayed" />
+      <v-badge
+        :model-value="!navbarDisplayed && dueStore.toPlanCount > 0"
+        :color="dueStore.hasLate ? 'red-accent-2' : 'orange'"
+        dot
+        offset-x="10"
+        offset-y="10">
+        <v-app-bar-nav-icon @click="navbarDisplayed = !navbarDisplayed" />
+      </v-badge>
     </template>
 
     <v-spacer />

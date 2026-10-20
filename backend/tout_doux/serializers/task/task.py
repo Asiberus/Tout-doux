@@ -9,6 +9,7 @@ class TaskSerializer(ReadOnlyModelSerializer):
     tags = TagSerializer(many=True)
     createdAt = serializers.DateTimeField(source='created_at')
     completedAt = serializers.DateTimeField(source='completed_at')
+    dueDate = serializers.DateField(source='due_date')
 
     class Meta:
         model = Task
@@ -19,5 +20,6 @@ class TaskSerializer(ReadOnlyModelSerializer):
             'completed',
             'createdAt',
             'completedAt',
+            'dueDate',
             'position',
         )

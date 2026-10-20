@@ -54,6 +54,7 @@ export interface DailyTaskDisplayWrapper<T> {
 }
 
 export enum DailyUpdateTaskTab {
+  'Due',
   'Project',
   'Collection',
   'CommonTask',

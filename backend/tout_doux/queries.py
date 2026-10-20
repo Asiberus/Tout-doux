@@ -1,7 +1,7 @@
 from collections import Counter
 from datetime import date, timedelta
 
-from django.db.models import Count, IntegerField, Q, Subquery
+from django.db.models import Count, Exists, IntegerField, OuterRef, Q, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from rest_framework.exceptions import ParseError
@@ -129,3 +129,62 @@ def daily_carry_over_candidates(queryset):
         for daily_task in queryset.filter(date=today - timedelta(days=1))
         if is_candidate(daily_task)
     ]
+
+
+def required_date_param(request, name='date'):
+    try:
+        return date.fromisoformat(request.query_params.get(name))
+    except TypeError:
+        raise ParseError(f'You must provide a {name}')
+    except ValueError:
+        raise ParseError('Date not valid.')
+
+
+def task_due_summary(user, day):
+    """Tâches ouvertes en retard ou dues le jour `day`, en une seule requête groupée.
+
+    Les totaux ne comptent que les tâches pas encore planifiées sur `day` ; chaque conteneur
+    compte toutes les siennes et dit combien sont planifiées. Une tâche de section compte pour
+    son projet.
+
+    Les gardes d'archivage s'écrivent en `filter()` sur `isnull | archived=False` : un
+    `exclude()` à travers une relation nulle ne s'exécute pas comme il se lit.
+    """
+    rows = (
+        user.tasks.filter(completed=False, due_date__lte=day)
+        .filter(Q(project__isnull=True) | Q(project__archived=False))
+        .filter(Q(section__isnull=True) | Q(section__project__archived=False))
+        .filter(Q(collection__isnull=True) | Q(collection__archived=False))
+        .annotate(
+            project_key=Coalesce('project_id', 'section__project_id'),
+            planned=Exists(DailyTask.objects.filter(task=OuterRef('pk'), date=day)),
+        )
+        .order_by()
+        .values('project_key', 'collection_id', 'planned')
+        .annotate(
+            late=Count('pk', filter=Q(due_date__lt=day)),
+            today=Count('pk', filter=Q(due_date=day)),
+        )
+    )
+
+    summary = {'late': 0, 'today': 0, 'containers': []}
+    containers = {}
+    for row in rows:
+        if not row['planned']:
+            summary['late'] += row['late']
+            summary['today'] += row['today']
+
+        if row['project_key']:
+            key = ('project', row['project_key'])
+        else:
+            key = ('collection', row['collection_id'])
+        container = containers.setdefault(
+            key, {'type': key[0], 'id': key[1], 'late': 0, 'today': 0, 'planned': 0}
+        )
+        container['late'] += row['late']
+        container['today'] += row['today']
+        if row['planned']:
+            container['planned'] += row['late'] + row['today']
+
+    summary['containers'] = list(containers.values())
+    return summary

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from tout_doux.exceptions import StaleListError
 from tout_doux.models import Section
+from tout_doux.queries import required_date_param, task_due_summary
 from tout_doux.serializers.move import MoveSerializer
 from tout_doux.serializers.task import TaskSerializer, TaskPostSerializer, TaskPatchSerializer
 from tout_doux.services import ordering
@@ -62,3 +63,7 @@ class TaskViewSet(mixins.CreateModelMixin,
             ordering.move(task, after_id, before_id, anchor_filter=Q(completed=False))
 
         return Response({'id': task.pk, 'position': task.position})
+
+    @action(detail=False, url_path='due-summary')
+    def due_summary(self, request):
+        return Response(task_due_summary(request.user, required_date_param(request)))

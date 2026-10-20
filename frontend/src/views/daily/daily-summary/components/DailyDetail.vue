@@ -13,9 +13,11 @@ import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { dailyTaskApi, eventApi } from '@/api'
+import { useDueStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp, mdAndDown } = useDisplay()
+const dueStore = useDueStore()
 
 const show = defineModel<boolean>()
 
@@ -128,6 +130,7 @@ function setDialogStateTo(value: boolean): void {
 function toggleDailyTask(dailyTask: DailyTask): void {
   dailyTaskApi.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
     response => {
+      dueStore.refresh({ force: true })
       dailyTask.completed = response.completed // TODO : unused ??
       emitDailyTaskCompletedEvent()
     },
@@ -138,6 +141,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
 function createDailyTask(data: DailyTaskDraft): void {
   dailyTaskApi.createDailyTask({ ...data, date: props.date }).then(
     response => {
+      dueStore.refresh({ force: true })
       dailyTaskList.value.push(response)
       emit('daily-task-created', props.date)
     },

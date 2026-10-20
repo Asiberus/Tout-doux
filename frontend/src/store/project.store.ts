@@ -8,6 +8,7 @@ import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils
 import { defineStore } from 'pinia'
 import { eventApi, projectApi, sectionApi, taskApi } from '@/api'
 import { MoveAnchors } from '@/models/ordering.model'
+import { useDueStore } from '@/store/due.store'
 import { useNotificationStore } from '@/store/notification.store'
 import {
   applyMove,
@@ -187,6 +188,7 @@ export const useProjectStore = defineStore<
     async addTask(task: TaskPost): Promise<void> {
       await taskApi.createTask(task).then(
         response => {
+          useDueStore().refresh({ force: true })
           if (!this.currentProject) return
 
           if (task.sectionId) {
@@ -203,6 +205,7 @@ export const useProjectStore = defineStore<
     async editTask(taskId: number, data: TaskPatch, sectionId?: number): Promise<void> {
       await taskApi.updateTaskById(taskId, data).then(
         (updatedTask: Task) => {
+          useDueStore().refresh({ force: true })
           if (!this.currentProject) return
 
           const tasks = tasksOf(this.currentProject, sectionId)
@@ -233,6 +236,7 @@ export const useProjectStore = defineStore<
     async deleteTask(id: number, sectionId?: number): Promise<void> {
       await taskApi.deleteTaskById(id).then(
         () => {
+          useDueStore().refresh({ force: true })
           if (!this.currentProject) return
 
           if (sectionId) {

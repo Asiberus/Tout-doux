@@ -5,6 +5,7 @@ import SectionChip from '@/components/SectionChip.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
+import TaskDateBadge from '@/views/components/task/TaskDateBadge.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -47,6 +48,11 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
       </div>
 
       <template v-if="dailyTask.task">
+        <TaskDateBadge
+          v-if="!dailyTask.task.completed && dailyTask.task.dueDate"
+          :date="dailyTask.task.dueDate"
+          :reference-day="dailyTask.date"
+          class="flex-shrink-0" />
         <template v-if="dailyTask.task.project">
           <ProjectChip
             v-if="dailyTask.task.project"

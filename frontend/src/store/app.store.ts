@@ -3,6 +3,7 @@ import { useUserStore } from '@/store/user.store'
 import { usePreferencesStore } from '@/store/preferences.store'
 import { useProjectStore } from '@/store/project.store'
 import { useCollectionStore } from '@/store/collection.store'
+import { useDueStore } from '@/store/due.store'
 
 interface AppStoreActions {
   init(): Promise<[void, void]>
@@ -27,11 +28,13 @@ export const useAppStore = defineStore<
       const preferencesStore = usePreferencesStore()
       const projectStore = useProjectStore()
       const collectionStore = useCollectionStore()
+      const dueStore = useDueStore()
 
       userStore.removeUser()
       preferencesStore.removePreferences()
       projectStore.removeCurrentProject()
       collectionStore.removeCurrentCollection()
+      dueStore.reset()
     },
   },
 })

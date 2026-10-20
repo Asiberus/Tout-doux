@@ -30,6 +30,7 @@ class TaskPostSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    dueDate = serializers.DateField(source='due_date', required=False, allow_null=True)
     afterId = serializers.IntegerField(
         source='after_id', write_only=True, required=False, allow_null=True
     )
@@ -46,6 +47,7 @@ class TaskPostSerializer(serializers.ModelSerializer):
             'projectId',
             'sectionId',
             'collectionId',
+            'dueDate',
             'afterId',
             'beforeId',
             'user',

@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useDueStore } from '@/store'
 import { useDisplay } from 'vuetify'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 
 const { mobile } = useDisplay()
 const route = useRoute()
 const router = useRouter()
+const dueStore = useDueStore()
 
 const navbarDisplayed = defineModel<boolean>()
 
@@ -12,11 +14,12 @@ interface MenuItem {
   name: string
   icon: string
   link?: RouteLocationRaw
+  showDue?: boolean
 }
 
 const menu: MenuItem[] = [
   { name: 'Dashboard', icon: 'mdi-view-dashboard' },
-  { name: 'Daily', link: { name: 'daily-summary' }, icon: 'mdi-trophy' },
+  { name: 'Daily', link: { name: 'daily-summary' }, icon: 'mdi-trophy', showDue: true },
   { name: 'Projects', link: { name: 'project-list' }, icon: 'mdi-briefcase-variant' },
   { name: 'Collections', link: { name: 'collection-list' }, icon: 'mdi-list-box' },
   { name: 'Agenda', link: { name: 'agenda' }, icon: 'mdi-calendar-month' },
@@ -60,6 +63,14 @@ function isItemActive(item: MenuItem): boolean {
             class="my-4 mr-3"
             :class="{ disabled: !item.link }" />
           {{ item.name }}
+          <v-chip
+            v-if="item.showDue && dueStore.toPlanCount > 0"
+            :color="dueStore.hasLate ? 'red-accent-2' : 'orange'"
+            size="small"
+            class="ms-auto"
+            :title="`${dueStore.toPlanCount} late or due today, not planned yet`">
+            {{ dueStore.toPlanCount }}
+          </v-chip>
         </v-list-item-title>
       </v-list-item>
     </v-list>

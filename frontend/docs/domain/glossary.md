@@ -48,13 +48,14 @@ Tag ──n-n──► Project | Task | CommonTask | DailyTask
 
 ### Task vs CommonTask vs DailyTask
 
-|                         | Task                           | CommonTask                | DailyTask                     |
-| ----------------------- | ------------------------------ | ------------------------- | ----------------------------- |
-| Nature                  | to-do réel                     | **gabarit** réutilisable  | **planification** d'un jour   |
-| Rattachée à             | projet / section / collection  | rien (niveau utilisateur) | une date                      |
-| A un état d'achèvement  | ✅ `completed` + `completedAt` | ❌ aucun                  | ✅ `completed` (pour ce jour) |
-| Achever fait progresser | le projet / la collection      | rien                      | rien globalement              |
-| Gérée depuis            | détail projet / collection     | Réglages → Common tasks   | wizard daily                  |
+|                         | Task                                                         | CommonTask                | DailyTask                      |
+| ----------------------- | ------------------------------------------------------------ | ------------------------- | ------------------------------ |
+| Nature                  | to-do réel                                                   | **gabarit** réutilisable  | **planification** d'un jour    |
+| Rattachée à             | projet / section / collection                                | rien (niveau utilisateur) | une date                       |
+| A un état d'achèvement  | ✅ `completed` + `completedAt`                               | ❌ aucun                  | ✅ `completed` (pour ce jour)  |
+| Achever fait progresser | le projet / la collection                                    | rien                      | rien globalement               |
+| Échéance                | `dueDate` facultative, jour seul ; masquée une fois terminée | ❌ aucune                 | ❌ aucune (celle de sa `Task`) |
+| Gérée depuis            | détail projet / collection                                   | Réglages → Common tasks   | wizard daily                   |
 
 Un **CommonTask** est une corvée récurrente (« sortir le chien », « faire les courses »), décrite
 comme telle dans l'UI (`SettingsCommonTasks.vue:61`). Il n'a pas d'état : le « faire » un jour

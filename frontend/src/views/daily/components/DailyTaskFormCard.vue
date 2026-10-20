@@ -2,6 +2,7 @@
 import { DailyTask, DailyTaskPatch, DailyUpdateTaskTab } from '@/models/daily-task.model'
 import CollectionChip from '@/components/CollectionChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
+import TaskDateBadge from '@/views/components/task/TaskDateBadge.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
@@ -150,6 +151,11 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
                 :navigate-to-detail="false"
                 class="daily-task-form-card__content__footer__chip"
                 @click="select(DailyUpdateTaskTab.Collection, dailyTask.task.collection.id)" />
+              <TaskDateBadge
+                v-if="!dailyTask.task.completed && dailyTask.task.dueDate"
+                :date="dailyTask.task.dueDate"
+                :reference-day="dailyTask.date"
+                class="flex-shrink-0" />
             </template>
 
             <template v-if="dailyTask.tags.length > 0">

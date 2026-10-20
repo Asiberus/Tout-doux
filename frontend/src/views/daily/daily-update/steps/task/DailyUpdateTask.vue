@@ -17,14 +17,24 @@ import DailyUpdateProjectListItem from '@/views/daily/daily-update/steps/task/co
 import DailyUpdateTaskList from '@/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue'
 import DailyTaskBottomSheet from '@/views/daily/daily-update/steps/task/components/DailyTaskBottomSheet.vue'
 import DailyUpdateCommonTask from '@/views/daily/daily-update/steps/task/components/DailyUpdateCommonTask.vue'
+import DailyUpdateDue from '@/views/daily/daily-update/steps/task/components/DailyUpdateDue.vue'
 import { CommonTask, CommonTaskForm } from '@/models/common-task.model'
 import { collectionApi, commonTaskApi, dailyTaskApi, projectApi, taskApi } from '@/api'
-import { useNotificationStore } from '@/store'
+import { dueDateChangeMessage } from '@/utils/due-date.utils'
+import { flattenProjectTasks } from '@/utils/task.utils'
+import { useDueStore, useNotificationStore } from '@/store'
 import { useDailyTaskMove } from '@/composables/useDailyTaskMove'
 import { useRequestScope } from '@/composables/useRequestScope'
 import { useToday } from '@/composables/useToday'
 import { isCancel } from 'axios'
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import {
+  collectDueEntries,
+  DueGroups,
+  dueEntryCount,
+  initialDailyUpdateTab,
+  unplannedCount,
+} from '@/utils/daily-due.utils'
+import { computed, onBeforeMount, Ref, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
 // Todo : add btn to create project in no project svg
@@ -36,6 +46,7 @@ const SHEET_FULL_TASK_COUNT = 5
 
 const { mdAndUp, smAndDown } = useDisplay()
 const notificationStore = useNotificationStore()
+const dueStore = useDueStore()
 
 const props = defineProps<{
   date: string
@@ -62,7 +73,10 @@ const carryOverInProgress = ref(false)
 const { moveDailyTask } = useDailyTaskMove(dailyTaskList, retrieveDailyTaskList)
 const dayRequests = useRequestScope()
 
-const taskTab = ref<DailyUpdateTaskTab>(DailyUpdateTaskTab.Project)
+const taskTab = ref<DailyUpdateTaskTab | null>(null)
+const dailyTasksLoaded = ref(false)
+const projectsLoaded = ref(false)
+const collectionsLoaded = ref(false)
 const projectSectionSelected = ref(0)
 
 const taskSheetDetent = ref<DailyTaskSheetDetent>(DailyTaskSheetDetent.Collapsed)
@@ -93,11 +107,38 @@ const areSomeProjectSelected = computed<boolean>(() =>
 const areSomeCollectionSelected = computed<boolean>(() =>
   collectionList.value.some(({ selected }) => selected)
 )
+const dueGroups = computed<DueGroups>(() =>
+  collectDueEntries(
+    projectList.value.map(({ content }) => content),
+    collectionList.value.map(({ content }) => content),
+    dailyTaskList.value,
+    props.date
+  )
+)
+const dueCount = computed<number>(() => dueEntryCount(dueGroups.value))
+const hasOverdue = computed<boolean>(() => dueGroups.value.overdue.length > 0)
+
+const dayLoaded = computed<boolean>(
+  () => dailyTasksLoaded.value && projectsLoaded.value && collectionsLoaded.value
+)
+
+watch([dayLoaded, (): boolean => props.readonly], chooseInitialTab, { immediate: true })
+watch(
+  () => props.readonly,
+  readonly => {
+    if (readonly && taskTab.value === DailyUpdateTaskTab.Due)
+      taskTab.value = DailyUpdateTaskTab.Project
+  }
+)
 
 watch(
   () => props.date,
   () => {
     dayRequests.renew()
+    taskTab.value = null
+    dailyTasksLoaded.value = false
+    projectsLoaded.value = false
+    collectionsLoaded.value = false
     // Les listes sont vidées avant le fetch : sans ça celles de la veille resteraient affichées
     // sous l'en-tête du nouveau jour le temps de l'aller-retour.
     dailyTaskList.value = []
@@ -115,18 +156,36 @@ function logUnlessCanceled(error: unknown): void {
   if (!isCancel(error)) console.error(error)
 }
 
+function markLoadedUnlessCanceled(loaded: Ref<boolean>): (error: unknown) => void {
+  return error => {
+    if (isCancel(error)) return
+    console.error(error)
+    loaded.value = true
+  }
+}
+
+function chooseInitialTab(): void {
+  if (taskTab.value !== null) return
+  taskTab.value = initialDailyUpdateTab(
+    props.readonly,
+    dayLoaded.value,
+    unplannedCount(dueGroups.value)
+  )
+}
+
 function retrieveDailyTaskList(): void {
   dailyTaskApi
     .getDailyTasksByDate(props.date, dayRequests.signal()) // TODO : test the date format
     .then(response => {
       dailyTaskList.value = response.content
+      dailyTasksLoaded.value = true
       emit('daily-task-count', dailyTaskList.value.length)
       // Les deux endpoints de report sont codés « veille → aujourd'hui », sans paramètre. Ne pas
       // interroger les candidats hors du jour courant est ce qui empêche le bouton d'apparaître
       // sur un jour à venir, où il écrirait dans aujourd'hui sans le dire.
       if (isToday.value && dailyTaskList.value.length === 0) retrieveCarryOverCandidates()
     })
-    .catch(logUnlessCanceled)
+    .catch(markLoadedUnlessCanceled(dailyTasksLoaded))
 }
 
 function retrieveCarryOverCandidates(): void {
@@ -145,6 +204,7 @@ function carryOverPreviousDay(): void {
   dailyTaskApi
     .carryOverPreviousDay()
     .then(response => {
+      dueStore.refresh({ force: true })
       if (date !== props.date) return
 
       carryOverCandidates.value = []
@@ -181,8 +241,9 @@ function retrieveProjectList(): void {
         content: project,
         selected: false,
       }))
+      projectsLoaded.value = true
     })
-    .catch(logUnlessCanceled)
+    .catch(markLoadedUnlessCanceled(projectsLoaded))
 }
 
 function retrieveCollectionList(): void {
@@ -193,8 +254,9 @@ function retrieveCollectionList(): void {
         content: collection,
         selected: false,
       }))
+      collectionsLoaded.value = true
     })
-    .catch(logUnlessCanceled)
+    .catch(markLoadedUnlessCanceled(collectionsLoaded))
 }
 
 function fetchCommonTaskList(): void {
@@ -204,11 +266,12 @@ function fetchCommonTaskList(): void {
     .catch(error => console.error(error))
 }
 
-function createDailyTask(data: DailyTaskDraft): void {
+function createDailyTask(data: DailyTaskDraft): Promise<void> {
   const { date } = props
-  dailyTaskApi
+  return dailyTaskApi
     .createDailyTask({ ...data, date })
     .then(response => {
+      dueStore.refresh({ force: true })
       if (date !== props.date) return
 
       dailyTaskList.value.push(response)
@@ -236,7 +299,10 @@ function createProjectTask(event: { task: TaskPost; projectId: number }): void {
   if (!tasks) return
 
   taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
-    response => insertByPosition(tasks, response),
+    response => {
+      dueStore.refresh({ force: true })
+      insertByPosition(tasks, response)
+    },
     error => {
       console.error(error)
       if (!isStaleListError(error)) return
@@ -256,7 +322,10 @@ function createCollectionTask(event: { task: TaskPost; collectionId: number }): 
 
   const { tasks } = collection.content
   taskApi.createTask({ ...task, afterId: lastOpenTaskId(tasks), beforeId: null }).then(
-    response => insertByPosition(tasks, response),
+    response => {
+      dueStore.refresh({ force: true })
+      insertByPosition(tasks, response)
+    },
     error => {
       console.error(error)
       if (!isStaleListError(error)) return
@@ -266,6 +335,35 @@ function createCollectionTask(event: { task: TaskPost; collectionId: number }): 
         reloadError => console.error(reloadError)
       )
     }
+  )
+}
+
+function planTasks(taskIds: number[]): Promise<void> {
+  // Une à une, pour que la liste du jour garde l'ordre de la section
+  return taskIds.reduce<Promise<void>>(
+    (previous, taskId) => previous.then(() => createDailyTask({ taskId })),
+    Promise.resolve()
+  )
+}
+
+function findLoadedTask(taskId: number): Task | undefined {
+  const tasks = [
+    ...projectList.value.flatMap(({ content }) => flattenProjectTasks(content)),
+    ...collectionList.value.flatMap(({ content }) => content.tasks),
+  ]
+  return tasks.find(({ id }) => id === taskId)
+}
+
+function rescheduleTask(event: { taskId: number; dueDate: string | null }): void {
+  const { taskId, dueDate } = event
+  taskApi.updateTaskById(taskId, { dueDate }).then(
+    response => {
+      const task = findLoadedTask(taskId)
+      if (task) Object.assign(task, response)
+      dueStore.refresh({ force: true })
+      notificationStore.notifySuccess(dueDateChangeMessage(response.dueDate))
+    },
+    error => console.error(error)
   )
 }
 
@@ -282,6 +380,7 @@ function updateDailyTask(event: { id: number; data: DailyTaskPatch }): void {
   dailyTaskApi
     .updateDailyTask(id, data)
     .then(response => {
+      dueStore.refresh({ force: true })
       const dailyTask = dailyTaskList.value.find(d => d.id === response.id)
       if (dailyTask) Object.assign(dailyTask, response)
     })
@@ -292,6 +391,7 @@ function deleteDailyTask(id: number): void {
   dailyTaskApi
     .deleteDailyTask(id)
     .then(() => {
+      dueStore.refresh({ force: true })
       const index = dailyTaskList.value.findIndex(dailyTask => dailyTask.id === id)
       if (index !== -1) {
         dailyTaskList.value.splice(index, 1)
@@ -333,29 +433,33 @@ function resetSelectedItem(): void {
 
 <template>
   <div class="daily-update-task">
+    <!-- `mandatory` forcé sélectionnerait le premier onglet avant que le jour soit chargé -->
     <v-tabs
       v-model="taskTab"
       bg-color="transparent"
       color="accent"
       :direction="mdAndUp ? 'vertical' : 'horizontal'"
       :grow="smAndDown"
+      :mandatory="taskTab === null ? false : 'force'"
       show-arrows
       class="daily-update-task__tabs"
       @update:model-value="resetSelectedItem()">
-      <v-tab :value="0">
+      <v-tab v-if="!readonly" :value="DailyUpdateTaskTab.Due" title="Due tasks">
+        <v-badge
+          :model-value="dayLoaded && dueCount > 0"
+          :content="dueCount"
+          :color="hasOverdue ? 'red-accent-2' : 'orange'">
+          <v-icon icon="mdi-calendar-alert" size="x-large" />
+        </v-badge>
+      </v-tab>
+      <v-tab :value="DailyUpdateTaskTab.Project">
         <v-icon icon="mdi-briefcase-variant" size="x-large" />
       </v-tab>
-      <v-tab :value="1">
+      <v-tab :value="DailyUpdateTaskTab.Collection">
         <v-icon icon="mdi-list-box" size="x-large" />
       </v-tab>
-      <v-tab :value="2">
+      <v-tab :value="DailyUpdateTaskTab.CommonTask">
         <v-icon icon="mdi-timeline" size="x-large" />
-      </v-tab>
-      <v-tab :value="3" disabled>
-        <v-icon icon="mdi-calendar-range" size="x-large" />
-      </v-tab>
-      <v-tab :value="4" disabled>
-        <v-icon icon="mdi-calendar-month" size="x-large" />
       </v-tab>
     </v-tabs>
 
@@ -364,7 +468,27 @@ function resetSelectedItem(): void {
       :touch="false"
       class="daily-update-task__tabs-items bg-transparent">
       <v-tabs-window-item
-        :value="0"
+        v-if="!readonly"
+        :value="DailyUpdateTaskTab.Due"
+        transition="v-window-crossfade-transition"
+        reverse-transition="v-window-crossfade-transition">
+        <div class="d-flex align-center mb-3">
+          <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
+            Due
+          </h5>
+        </div>
+        <div class="daily-update-task__tabs-items__content overflow">
+          <DailyUpdateDue
+            :groups="dueGroups"
+            :date
+            @select-task="createDailyTask($event)"
+            @select="select($event)"
+            @reschedule="rescheduleTask($event)"
+            @plan-tasks="planTasks($event)" />
+        </div>
+      </v-tabs-window-item>
+      <v-tabs-window-item
+        :value="DailyUpdateTaskTab.Project"
         transition="v-window-crossfade-transition"
         reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
@@ -394,6 +518,7 @@ function resetSelectedItem(): void {
                 :project="project.content"
                 :daily-task-list="dailyTaskList"
                 :readonly
+                :date
                 :section-selected="projectSectionSelected"
                 @select-task="createDailyTask($event)"
                 @create-task="createProjectTask($event)" />
@@ -412,7 +537,7 @@ function resetSelectedItem(): void {
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item
-        :value="1"
+        :value="DailyUpdateTaskTab.Collection"
         transition="v-window-crossfade-transition"
         reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
@@ -442,6 +567,7 @@ function resetSelectedItem(): void {
                 :collection="collection.content"
                 :daily-task-list="dailyTaskList"
                 :readonly
+                :date
                 @select-task="createDailyTask($event)"
                 @create-task="createCollectionTask($event)" />
             </div>
@@ -459,7 +585,7 @@ function resetSelectedItem(): void {
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item
-        :value="2"
+        :value="DailyUpdateTaskTab.CommonTask"
         transition="v-window-crossfade-transition"
         reverse-transition="v-window-crossfade-transition">
         <div class="d-flex align-center mb-3">
@@ -485,22 +611,6 @@ function resetSelectedItem(): void {
             @select-common-task="createDailyTask($event)"
             @create-common-task="createCommonTask($event)" />
         </div>
-      </v-tabs-window-item>
-      <v-tabs-window-item
-        :value="3"
-        transition="v-window-crossfade-transition"
-        reverse-transition="v-window-crossfade-transition">
-        <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mb-3">
-          Weekly task
-        </h5>
-      </v-tabs-window-item>
-      <v-tabs-window-item
-        :value="4"
-        transition="v-window-crossfade-transition"
-        reverse-transition="v-window-crossfade-transition">
-        <h5 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mb-3">
-          Monthly task
-        </h5>
       </v-tabs-window-item>
     </v-tabs-window>
 

@@ -18,6 +18,7 @@ export const apiRoutes = {
   task: 'task/',
   taskById: 'task/:taskId/',
   taskMove: 'task/:taskId/move/',
+  taskDueSummary: 'task/due-summary/',
   event: 'event/',
   eventById: 'event/:eventId/',
   collection: 'collection/',
