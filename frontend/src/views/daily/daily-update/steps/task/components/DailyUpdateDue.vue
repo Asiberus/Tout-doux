@@ -220,8 +220,8 @@ function selectContainer(tab: DailyUpdateTaskTab, id: number, sectionId?: number
 }
 
 .due-chip {
-  flex-shrink: 1;
-  max-width: 12rem;
+  flex: 1 1 8rem;
+  max-width: max-content;
 }
 
 .due-section-icon {

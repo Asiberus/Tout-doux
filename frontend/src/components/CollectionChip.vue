@@ -2,6 +2,7 @@
 import { Collection } from '@/models/collection.model'
 import { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
+import TruncatedText from '@/components/TruncatedText.vue'
 
 const {
   collection,
@@ -18,12 +19,6 @@ const {
 const emit = defineEmits<{
   click: []
 }>()
-
-const title = computed<string>(() => {
-  let str = `Go to : ${collection.name}`
-  if (collection.archived) str += ' (Archived)'
-  return str
-})
 
 const detailLocation = computed<RouteLocationRaw | undefined>(() => {
   if (!navigateToDetail) return undefined
@@ -42,19 +37,21 @@ function click(): void {
     :color="collection.archived ? 'projectArchived' : 'collection'"
     :ripple
     :size="small ? 'small' : 'default'"
-    :title
     variant="flat"
     class="collection-chip px-0"
     @click.stop="click()">
     <v-icon icon="mdi-list-box" size="small" class="ml-2 mr-1" />
-    <div class="text-truncate mr-2">
-      {{ collection.name }}
-    </div>
+    <TruncatedText :text="collection.name" class="mr-2" />
   </v-chip>
 </template>
 
 <style scoped lang="scss">
 .collection-chip {
   min-width: 32px;
+
+  :deep(.v-chip__content) {
+    min-width: 0;
+    max-width: 300px;
+  }
 }
 </style>

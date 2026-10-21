@@ -180,6 +180,9 @@ $rail-period: 6px;
 
 .v-timeline {
   padding-top: 0;
+  // En `auto`, Vuetify laisse la colonne s'élargir à la taille naturelle des cartes, si bien que
+  // les chips ne se tronquent jamais et que la timeline déborde de l'écran
+  grid-template-columns: 0 min-content minmax(0, 1fr);
 
   --bar-left: 48px;
   --divider-width: 96px;

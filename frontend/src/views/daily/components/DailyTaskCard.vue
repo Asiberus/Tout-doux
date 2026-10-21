@@ -35,7 +35,7 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
     :ripple="toggleable"
     v-on="toggleable ? { click: () => $emit('toggle') } : {}">
     <div class="daily-task-card__header">
-      <div class="flex-grow-1 d-flex align-center gap-2">
+      <div class="daily-task-card__header__title d-flex align-center gap-2">
         <DailyTaskActionChip
           v-if="dailyTask.action"
           :action="dailyTask.action"
@@ -113,9 +113,13 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
       align-self: flex-start;
     }
 
+    &__title {
+      margin-inline-end: auto;
+    }
+
     &__link {
-      flex-shrink: 1;
-      max-width: 12rem;
+      flex: 1 1 8rem;
+      max-width: max-content;
     }
   }
 }

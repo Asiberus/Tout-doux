@@ -137,7 +137,7 @@ function emitDeleteEvent(): void {
           </template>
 
           <div
-            class="flex-grow-1 font-weight-medium text-white"
+            class="task-card__name flex-grow-1 font-weight-medium text-white"
             :class="{ 'text-body-medium': small, 'text-body-large': !small }"
             :title="task.name">
             {{ task.name }}
@@ -287,6 +287,11 @@ function emitDeleteEvent(): void {
   &__content--meta {
     flex-wrap: wrap-reverse;
     gap: 8px;
+
+    .task-card__name {
+      flex-grow: 0;
+      margin-inline-end: auto;
+    }
   }
 
   &__content--badge {

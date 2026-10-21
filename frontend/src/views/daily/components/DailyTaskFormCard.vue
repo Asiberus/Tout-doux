@@ -231,7 +231,6 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
       &__chip {
         flex-shrink: 1;
-        max-width: 10rem;
         cursor: pointer;
       }
     }
