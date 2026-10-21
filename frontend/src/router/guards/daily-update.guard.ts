@@ -12,7 +12,11 @@ export const dailyUpdateGuard: NavigationGuard = to => {
   const isReachable = target.isValid() && target.diff(today, 'days') <= MAX_PLANNING_HORIZON_DAYS
 
   if (!isReachable)
-    return { name: 'daily-update', params: { date: today.format('YYYY-MM-DD'), step } }
+    return {
+      name: 'daily-update',
+      params: { date: today.format('YYYY-MM-DD'), step },
+      query: to.query,
+    }
 
   return undefined
 }

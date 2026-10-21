@@ -53,16 +53,19 @@ un comportement responsive et un scroll incohérents.
    Exemple réel : `src/views/administration/tabs/AdministrationFeedback.vue:83`.
 
 4. **Neutraliser le scroll du fond** si le dialog est plein écran : `hideScroll()` /
-   `showScroll()` de `@/utils/document.utils`. `HalfDialog` le fait déjà ; `DailyDetail.vue:44`
-   le fait à la main, et `DailySummary.vue` le restaure défensivement à l'`onUnmounted`.
+   `showScroll()` de `@/utils/document.utils`. `HalfDialog` le fait déjà ; `DailyDetail.vue:75`
+   le fait à la main, et `DailySummary.vue` comme `DailyUpdate.vue` le restaurent défensivement à
+   l'`onUnmounted`.
 
 ## Variantes légitimes
 
 - **Dialog piloté par l'URL** — quand l'état ouvert doit survivre au rafraîchissement et que le
-  bouton « retour » du navigateur doit le fermer. Un seul cas :
-  `src/views/daily/daily-summary/DailySummary.vue` pousse/retire le param `:date` de la route,
-  et `DailyDetail` s'ouvre/se ferme d'après ce param. À réserver aux dialogs de « détail
-  d'entité » qui méritent une URL propre.
+  bouton « retour » du navigateur doit le fermer. Deux cas, tous deux sur
+  `src/views/daily/components/DailyDetail.vue` : `DailySummary.vue` pousse/retire le param
+  `:date` de la route, `DailyUpdate.vue` pousse le query `?detail=true` et le retire en
+  `replace`. Le dialog s'ouvre/se ferme d'après ce param, et ses watchers sont `immediate` pour
+  s'ouvrir sur une URL chargée à froid. À réserver aux dialogs de « détail d'entité » qui
+  méritent une URL propre.
 - **`ConfirmDialog` avec ou sans activator** — le slot est optionnel ; on peut aussi le piloter
   par `v-model` depuis le parent (`src/views/components/task/TaskCard.vue`).
 

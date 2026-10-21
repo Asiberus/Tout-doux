@@ -3,8 +3,8 @@ import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
 import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
-import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue'
-import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
+import DailyDetailTaskTimeline from '@/views/daily/components/DailyDetailTaskTimeline.vue'
+import DailyDetailEventTimeline from '@/views/daily/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import { useToday } from '@/composables/useToday'
@@ -12,11 +12,13 @@ import { useNow } from '@/composables/useNow'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
 import { computed, ref, useTemplateRef, watch } from 'vue'
+import { RouteLocationRaw, useRoute } from 'vue-router'
 import { dailyTaskApi, eventApi } from '@/api'
 import { useDueStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp, mdAndDown } = useDisplay()
+const route = useRoute()
 const dueStore = useDueStore()
 
 const show = defineModel<boolean>()
@@ -57,29 +59,39 @@ const canGoForward = computed<boolean>(
   () =>
     moment(props.date).diff(today.value.clone().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
 )
+// Déjà sur le Daily Update, la cible serait la page courante : on se contente de refermer.
+const editLocation = computed<RouteLocationRaw | undefined>(() =>
+  route.name === 'daily-update'
+    ? undefined
+    : { name: 'daily-update', params: { date: props.date, step: 'task' } }
+)
 const actionBtnSize = computed<'large' | 'small' | 'default'>(() => {
   if (smAndUp.value) return 'large'
   else if (xs.value) return 'default'
   else return 'default'
 })
 
-watch(show, value => {
-  dialogState.value = !!value
-  tab.value = 'task'
-  createTaskFormDisplayed.value = false
+watch(
+  show,
+  value => {
+    dialogState.value = !!value
+    tab.value = 'task'
+    createTaskFormDisplayed.value = false
 
-  if (value) hideScroll()
-  else showScroll()
-})
+    if (value) hideScroll()
+    else showScroll()
+  },
+  { immediate: true }
+)
 
 watch(
-  () => props.date,
-  () => {
+  [show, (): string => props.date],
+  ([visible]) => {
+    if (!visible) return
     retrieveDailyTaskList()
     retrieveTodayEvents()
-  }
-  // TODO (vue3) : see if immediate was needed
-  // { immediate: false }
+  },
+  { immediate: true }
 )
 
 function retrieveDailyTaskList(): void {
@@ -223,15 +235,15 @@ function emitDailyTaskCompletedEvent(): void {
           </v-btn>
 
           <v-btn
-            :to="{ name: 'daily-update', params: { date, step: 'task' } }"
-            :disabled="isPassed"
+            :to="editLocation"
             icon
             variant="text"
             density="comfortable"
             :size="actionBtnSize"
-            title="Edit day"
-            class="edit-btn">
-            <v-icon icon="mdi-pencil" />
+            :title="isPassed ? 'See day' : 'Edit day'"
+            class="edit-btn"
+            @click="!editLocation && setDialogStateTo(false)">
+            <v-icon :icon="isPassed ? 'mdi-eye' : 'mdi-pencil'" />
           </v-btn>
         </div>
       </div>
@@ -242,12 +254,12 @@ function emitDailyTaskCompletedEvent(): void {
           class="empty-list-display">
           <template #img>
             <img
-              src="../../../../assets/empty-daily-detail.svg"
+              src="@/assets/empty-daily-detail.svg"
               alt="empty daily detail"
               class="empty-list-display__img" />
           </template>
           <template v-if="!isPassed" #action>
-            <v-btn :to="{ name: 'daily-update', params: { date, step: 'task' } }">
+            <v-btn :to="editLocation" @click="!editLocation && setDialogStateTo(false)">
               <v-icon icon="mdi-calendar-edit" start />
               Prepare the day
             </v-btn>

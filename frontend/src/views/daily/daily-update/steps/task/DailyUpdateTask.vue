@@ -57,6 +57,8 @@ const emit = defineEmits<{
   'daily-task-count': [count: number]
 }>()
 
+defineExpose({ refresh: retrieveDailyTaskList })
+
 onBeforeMount(() => {
   retrieveDailyTaskList()
   retrieveProjectList()

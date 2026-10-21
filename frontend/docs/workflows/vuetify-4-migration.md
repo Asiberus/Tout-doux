@@ -225,7 +225,7 @@ Ces fichiers utilisent `display.x` dans du code JS → **toujours _truthy_**. Ap
 | `src/components/MainTitle.vue`                                       | 5             | 12 (`sm`), 13 (`mdAndUp`)                                           | —                                                                                        | `sm, mdAndUp`                                  |
 | `src/views/settings/tabs/SettingsPreferences.vue`                    | 9             | 13 (`xs`), 14 (`smAndDown`), 15 (`width`)                           | —                                                                                        | `xs, smAndDown, width`                         |
 | `src/views/collection/collection-detail/tabs/CollectionGeneral.vue`  | 15            | 21, 36 (`xs`), 37 (`smAndDown`), 38 (`mdAndDown`), 39 (`lgAndDown`) | 78 (`smAndDown`), 82, 83 (`xs`)                                                          | `xs, smAndDown, mdAndDown, lgAndDown`          |
-| `src/views/daily/daily-summary/components/DailyDetail.vue`           | 15            | 39 (`smAndUp`), 40 (`xs`), 95 (`mdAndDown`)                         | 173 (`mdAndDown`)                                                                        | `xs, smAndUp, mdAndDown`                       |
+| `src/views/daily/components/DailyDetail.vue`                         | 15            | 39 (`smAndUp`), 40 (`xs`), 95 (`mdAndDown`)                         | 173 (`mdAndDown`)                                                                        | `xs, smAndUp, mdAndDown`                       |
 | `src/views/project/project-detail/tabs/ProjectDescription.vue`       | 16            | 23, 48 (`xs`), 49 (`smAndDown`), 50 (`mdAndDown`), 51 (`lgAndDown`) | 121, 152 (`xs`), 122/148 (`smAndDown`), 147 (`smAndUp`)                                  | `xs, smAndUp, smAndDown, mdAndDown, lgAndDown` |
 | `src/views/project/project-detail/components/ProjectSectionItem.vue` | 15            | 46 (`smAndDown`), 47 (`mdAndDown`), 48 (`lgAndDown`)                | 85, 126 (`xs`), 97/141 (`smAndDown`), 102/119 (`mdAndDown`), 117/127/212/217 (`smAndUp`) | `xs, smAndUp, smAndDown, mdAndDown, lgAndDown` |
 | `src/views/components/event/EventDayDialog.vue`                      | 10            | 35, 36 (`width`), 38 (`xs`)                                         | 60, 61 (`xs`), 65 (`smAndUp`)                                                            | `xs, smAndUp, width`                           |
@@ -236,33 +236,33 @@ Ces fichiers utilisent `display.x` dans du code JS → **toujours _truthy_**. Ap
 
 Appliquer la règle (déstructurer + template sans `.value`). Aucune ligne de script à modifier ici.
 
-| Fichier                                                                 | Ligne `const` | Lignes template                                               | Clés                     |
-| ----------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | ------------------------ |
-| `src/components/ConfirmDialog.vue`                                      | 6             | 38                                                            | `xs`                     |
-| `src/components/HalfDialog.vue`                                         | 6             | 23                                                            | `width`                  |
-| `src/components/ConfirmPasswordDialog.vue`                              | 9             | 77                                                            | `xs`                     |
-| `src/views/settings/Settings.vue`                                       | 5             | 15                                                            | `mdAndUp`                |
-| `src/views/settings/components/SettingsTagList.vue`                     | 11            | 95                                                            | `smAndDown`              |
-| `src/views/collection/collection-list/CollectionList.vue`               | 15            | 67                                                            | `smAndDown`              |
-| `src/views/collection/collection-detail/CollectionDetail.vue`           | 7             | 21 (`xs`), 24 (`smAndUp`)                                     | `xs, smAndUp`            |
-| `src/views/collection/collection-detail/tabs/CollectionSettings.vue`    | 12            | 85, 107, 168                                                  | `xs`                     |
-| `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue`           | 24            | 164 (`mdAndUp`), 165 (`smAndDown`)                            | `mdAndUp, smAndDown`     |
-| `src/views/daily/daily-update/steps/event/DailyUpdateEvent.vue`         | 12            | 99 (`smAndDown`), 102/103 (`smAndUp`)                         | `smAndUp, smAndDown`     |
-| `src/views/daily/daily-summary/components/DailyDetailEventTimeline.vue` | 9             | 38                                                            | `xs`                     |
-| `src/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue`  | 8             | 65, 69, 72                                                    | `xs`                     |
-| `src/views/feedback/Feedback.vue`                                       | 9             | 45 (`smAndUp`), 80 (`xs`)                                     | `xs, smAndUp`            |
-| `src/views/project/project-detail/ProjectDetail.vue`                    | 7             | 26 (`xs`), 29 (`smAndUp`)                                     | `xs, smAndUp`            |
-| `src/views/project/project-detail/tabs/ProjectSection.vue`              | 15            | 100, 109 (`smAndDown`)                                        | `smAndDown`              |
-| `src/views/project/project-detail/tabs/ProjectSettings.vue`             | 16            | 110, 132, 204                                                 | `xs`                     |
-| `src/views/project/project-detail/tabs/ProjectEvent.vue`                | 13            | 58 (`smAndDown`), 63 (`xs`)                                   | `xs, smAndDown`          |
-| `src/views/project/project-detail/components/SectionDialog.vue`         | 6             | 87                                                            | `xs`                     |
-| `src/views/project/project-list/ProjectList.vue`                        | 15            | 69                                                            | `smAndDown`              |
-| `src/views/components/common-task/CommonTaskDialog.vue`                 | 13            | 126                                                           | `smAndDown`              |
-| `src/views/components/task/TaskCard.vue`                                | 10            | 135                                                           | `smAndDown`              |
-| `src/views/components/tag/TagCard.vue`                                  | 8             | 41                                                            | `smAndDown`              |
-| `src/views/profile/Profile.vue`                                         | 6             | 18                                                            | `mdAndUp`                |
-| `src/views/agenga/Agenda.vue`                                           | 15            | 175, 178, 185, 193 (`xs`), 195 (`smAndUp`), 280 (`smAndDown`) | `xs, smAndUp, smAndDown` |
-| `src/views/administration/Administration.vue`                           | 5             | 15                                                            | `mdAndUp`                |
+| Fichier                                                              | Ligne `const` | Lignes template                                               | Clés                     |
+| -------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | ------------------------ |
+| `src/components/ConfirmDialog.vue`                                   | 6             | 38                                                            | `xs`                     |
+| `src/components/HalfDialog.vue`                                      | 6             | 23                                                            | `width`                  |
+| `src/components/ConfirmPasswordDialog.vue`                           | 9             | 77                                                            | `xs`                     |
+| `src/views/settings/Settings.vue`                                    | 5             | 15                                                            | `mdAndUp`                |
+| `src/views/settings/components/SettingsTagList.vue`                  | 11            | 95                                                            | `smAndDown`              |
+| `src/views/collection/collection-list/CollectionList.vue`            | 15            | 67                                                            | `smAndDown`              |
+| `src/views/collection/collection-detail/CollectionDetail.vue`        | 7             | 21 (`xs`), 24 (`smAndUp`)                                     | `xs, smAndUp`            |
+| `src/views/collection/collection-detail/tabs/CollectionSettings.vue` | 12            | 85, 107, 168                                                  | `xs`                     |
+| `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue`        | 24            | 164 (`mdAndUp`), 165 (`smAndDown`)                            | `mdAndUp, smAndDown`     |
+| `src/views/daily/daily-update/steps/event/DailyUpdateEvent.vue`      | 12            | 99 (`smAndDown`), 102/103 (`smAndUp`)                         | `smAndUp, smAndDown`     |
+| `src/views/daily/components/DailyDetailEventTimeline.vue`            | 9             | 38                                                            | `xs`                     |
+| `src/views/daily/components/DailyDetailTaskTimeline.vue`             | 8             | 65, 69, 72                                                    | `xs`                     |
+| `src/views/feedback/Feedback.vue`                                    | 9             | 45 (`smAndUp`), 80 (`xs`)                                     | `xs, smAndUp`            |
+| `src/views/project/project-detail/ProjectDetail.vue`                 | 7             | 26 (`xs`), 29 (`smAndUp`)                                     | `xs, smAndUp`            |
+| `src/views/project/project-detail/tabs/ProjectSection.vue`           | 15            | 100, 109 (`smAndDown`)                                        | `smAndDown`              |
+| `src/views/project/project-detail/tabs/ProjectSettings.vue`          | 16            | 110, 132, 204                                                 | `xs`                     |
+| `src/views/project/project-detail/tabs/ProjectEvent.vue`             | 13            | 58 (`smAndDown`), 63 (`xs`)                                   | `xs, smAndDown`          |
+| `src/views/project/project-detail/components/SectionDialog.vue`      | 6             | 87                                                            | `xs`                     |
+| `src/views/project/project-list/ProjectList.vue`                     | 15            | 69                                                            | `smAndDown`              |
+| `src/views/components/common-task/CommonTaskDialog.vue`              | 13            | 126                                                           | `smAndDown`              |
+| `src/views/components/task/TaskCard.vue`                             | 10            | 135                                                           | `smAndDown`              |
+| `src/views/components/tag/TagCard.vue`                               | 8             | 41                                                            | `smAndDown`              |
+| `src/views/profile/Profile.vue`                                      | 6             | 18                                                            | `mdAndUp`                |
+| `src/views/agenga/Agenda.vue`                                        | 15            | 175, 178, 185, 193 (`xs`), 195 (`smAndUp`), 280 (`smAndDown`) | `xs, smAndUp, smAndDown` |
+| `src/views/administration/Administration.vue`                        | 5             | 15                                                            | `mdAndUp`                |
 
 #### 1.1.d — Déjà corrects (ne rien changer)
 
@@ -429,7 +429,7 @@ Règle générale : `<v-tabs-items>` → `<v-tabs-window>` ; `<v-tab-item>` → 
 - L.181 `<v-tabs-items v-model="sectionTab" touchless …>` → `<v-tabs-window …>` ; fermeture L.199.
 - L.182 `<v-tab-item v-for="section of taskBySection" :key="…">` → `<v-tabs-window-item :key="…" :value="…">` (ajouter un `value` = id de section, cohérent avec les `v-tab` de la barre au-dessus).
 
-**`src/views/daily/daily-summary/components/DailyDetail.vue`** (L.176-191) :
+**`src/views/daily/components/DailyDetail.vue`** (L.176-191) :
 
 - Les `<v-tab tab-value="task">` / `tab-value="event"` (L.177-178) : **`tab-value` → `value`** en V3.
 - L.181 `<v-tabs-items v-model="tab" touchless …>` → `<v-tabs-window …>` ; fermeture L.191.
@@ -691,7 +691,7 @@ En Vuetify 3, le slot par défaut de `<v-hover>` expose **`{ isHovering }`** (et
 | `src/views/daily/daily-update/steps/task/DailyUpdateTask.vue` | 193, 234, 274 |
 | `src/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue` | 79 |
 | `src/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue` | 126 |
-| `src/views/daily/daily-summary/components/DailyDetail.vue` | 144 |
+| `src/views/daily/components/DailyDetail.vue` | 144 |
 | `src/views/project/project-detail/components/SectionDialog.vue` | 84 |
 | `src/views/components/tag/TagDialog.vue` | 141 |
 | `src/views/components/event/EventDialog.vue` | 209 |
@@ -899,8 +899,8 @@ Trois formes distinctes à traiter, avec des conséquences différentes :
 | `src/views/daily/daily-update/steps/task/components/DailyUpdateCollectionListItem.vue` | 86                                                                       |
 | `src/views/daily/daily-update/steps/task/components/DailyUpdateProjectListItem.vue`    | 133                                                                      |
 | `src/views/daily/components/DailyTaskCard.vue`                                         | 25 (`'green darken-2'`)                                                  |
-| `src/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue`                 | 66 (`'green darken-2'`)                                                  |
-| `src/views/daily/daily-summary/components/DailyDetail.vue`                             | 151 (`'grey lighten-1'` / `'grey darken-3'`)                             |
+| `src/views/daily/components/DailyDetailTaskTimeline.vue`                               | 66 (`'green darken-2'`)                                                  |
+| `src/views/daily/components/DailyDetail.vue`                                           | 151 (`'grey lighten-1'` / `'grey darken-3'`)                             |
 | `src/components/FilterChip.vue`                                                        | 10 (`'grey darken-4'`)                                                   |
 | `src/views/daily/daily-summary/components/DailySummaryCard.vue`                        | 17 (rampe `'green darken-4'`…)                                           |
 | `src/utils/daily-task.utils.ts`                                                        | 20, 22, 24 (`'teal lighten-3'`, `'purple lighten-3'`, `'red lighten-3'`) |
@@ -1072,7 +1072,7 @@ Aucune occurrence de `v-list-item-icon` : migration vers `v-list-item` + slots `
 
 Des props (couleur/taille) reçoivent `string | null` alors que Vuetify attend `string | undefined` (`vue-tsc` : `Type 'null' is not assignable to type 'string | undefined'`). Aligner le type **source** (computed/prop) sur `string | undefined`, ou passer `?? undefined`.
 
-- ✅ `src/views/daily/daily-summary/components/DailyDetailEventTimeline.vue:35` — corrigé en même temps que le bug de couleur du dot de timeline (`isPassed(event) ? 'passedEvent' : 'event'` au lieu de `null`).
+- ✅ `src/views/daily/components/DailyDetailEventTimeline.vue:35` — corrigé en même temps que le bug de couleur du dot de timeline (`isPassed(event) ? 'passedEvent' : 'event'` au lieu de `null`).
 - Restent ouverts (vérifié via `yarn type-check`, toujours en erreur) : `src/views/project/components/ProjectCard.vue:19`, `src/views/feedback/Feedback.vue:45`, `src/views/project/project-detail/components/SectionDialog.vue:86`, `src/views/daily/daily-update/steps/task/components/DailyUpdateTaskList.vue:64`, `src/views/daily/daily-summary/DailySummary.vue:145`, `src/views/daily/daily-summary/components/DailySummaryCard.vue:39`.
 
 ### 3.9 Dette de type : Vue Router 5 — ✅ FAIT

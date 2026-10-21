@@ -2,20 +2,24 @@
 import { dateFormat } from '@/pipes'
 import DailyUpdateEvent from '@/views/daily/daily-update/steps/event/DailyUpdateEvent.vue'
 import DailyUpdateTask from '@/views/daily/daily-update/steps/task/DailyUpdateTask.vue'
+import DailyDetail from '@/views/daily/components/DailyDetail.vue'
 import SecondaryTitle from '@/components/SecondaryTitle.vue'
 import { useToday } from '@/composables/useToday'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
+import { showScroll } from '@/utils/document.utils'
 import moment from 'moment'
-import { computed, onBeforeMount, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeMount, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 const { xs, mdAndDown } = useDisplay()
+const route = useRoute()
 const router = useRouter()
 
 const props = defineProps<{
   date: string
   step: 'task' | 'event'
+  detail: boolean
 }>()
 
 onBeforeMount(() => {
@@ -23,9 +27,12 @@ onBeforeMount(() => {
   else if (props.step === 'event') dailyStepper.value = 2
 })
 
+onUnmounted(() => showScroll())
+
 const dailyStepper = ref(1)
 const dailyTaskCount = ref(0)
 const dailyEventCount = ref(0)
+const taskStep = useTemplateRef<InstanceType<typeof DailyUpdateTask>>('taskStep')
 
 // `dailyUpdateGuard` ne rejoue pas sur un changement de param (voir
 // docs/architecture/routing.md) : cette borne est la seule chose qui empêche de dépasser l'horizon.
@@ -40,7 +47,7 @@ const canGoForward = computed<boolean>(
 function goToDate(date: string): void {
   // `replace` et non `push` : une navigation jour à jour n'a pas à empiler autant d'entrées
   // d'historique qu'on a cliqué de flèches.
-  router.replace({ name: 'daily-update', params: { date, step: props.step } })
+  router.replace({ name: 'daily-update', params: { date, step: props.step }, query: route.query })
 }
 
 function shiftDay(offset: number): void {
@@ -51,8 +58,14 @@ function goToToday(): void {
   goToDate(moment().format('YYYY-MM-DD'))
 }
 
-function goToDailyDetail(): void {
-  router.push({ name: 'daily-summary', params: { date: props.date } })
+function openDailyDetail(): void {
+  router.push({ query: { ...route.query, detail: 'true' } })
+}
+
+function closeDailyDetail(): void {
+  const query = { ...route.query }
+  delete query.detail
+  router.replace({ query })
 }
 
 watch(dailyStepper, index => {
@@ -73,7 +86,7 @@ watch(dailyStepper, index => {
         color="accent"
         rounded
         class="daily-detail-btn align-self-center order-2 order-sm-3"
-        @click="goToDailyDetail()">
+        @click="openDailyDetail()">
         {{ isToday ? 'Start the day' : 'See the day' }}
         <v-icon icon="mdi-arrow-right" end />
       </v-btn>
@@ -168,7 +181,11 @@ watch(dailyStepper, index => {
           eager
           transition="v-window-crossfade-transition"
           reverse-transition="v-window-crossfade-transition">
-          <DailyUpdateTask :date :readonly="isPassed" @daily-task-count="dailyTaskCount = $event" />
+          <DailyUpdateTask
+            ref="taskStep"
+            :date
+            :readonly="isPassed"
+            @daily-task-count="dailyTaskCount = $event" />
         </v-stepper-window-item>
         <v-stepper-window-item
           :value="2"
@@ -182,6 +199,13 @@ watch(dailyStepper, index => {
         </v-stepper-window-item>
       </v-stepper-window>
     </v-stepper>
+
+    <DailyDetail
+      :model-value="detail"
+      :date
+      @update:model-value="!$event && closeDailyDetail()"
+      @daily-task-created="taskStep?.refresh()"
+      @navigate="goToDate($event)" />
   </div>
 </template>
 

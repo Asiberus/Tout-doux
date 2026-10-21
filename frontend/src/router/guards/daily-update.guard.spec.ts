@@ -6,8 +6,11 @@ import moment from 'moment'
 
 const TODAY = '2026-10-15'
 
-function navigateTo(date: string): ReturnType<typeof dailyUpdateGuard> {
-  const to = { params: { date, step: 'task' } } as unknown as RouteLocationNormalized
+function navigateTo(
+  date: string,
+  query?: Record<string, string>
+): ReturnType<typeof dailyUpdateGuard> {
+  const to = { params: { date, step: 'task' }, query } as unknown as RouteLocationNormalized
   return dailyUpdateGuard.call(undefined, to, to, () => undefined)
 }
 
@@ -46,6 +49,14 @@ describe('dailyUpdateGuard', () => {
     expect(navigateTo('2026-13-45')).toEqual({
       name: 'daily-update',
       params: { date: TODAY, step: 'task' },
+    })
+  })
+
+  it('keeps the query when redirecting', () => {
+    expect(navigateTo('2026-13-45', { detail: 'true' })).toEqual({
+      name: 'daily-update',
+      params: { date: TODAY, step: 'task' },
+      query: { detail: 'true' },
     })
   })
 })
