@@ -17,3 +17,8 @@ class ReadOnlyModelSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return
+
+
+class OwnedPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.context['request'].user)

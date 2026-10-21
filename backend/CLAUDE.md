@@ -10,7 +10,7 @@ ce fichier.
 
 `backend` est l'API de **Tout-Doux** (organisation personnelle : projets, collections,
 planification journalière). **Django 6.1 + DRF 3.18 + Knox 5**, PostgreSQL, une seule application
-`tout_doux` (12 modèles, 42 sérialiseurs, 17 tests de fumée, 81 tests de non-régression, 65 tests
+`tout_doux` (12 modèles, 42 sérialiseurs, 17 tests de fumée, 90 tests de non-régression, 68 tests
 métier). Monorepo :
 `../frontend` (SPA Vue 3, doc propre dans [`../frontend/docs/`](../frontend/docs/)),
 `../docker-compose.yml`, `../td.sh`.
@@ -35,13 +35,14 @@ docker exec tout_doux_backend python manage.py show_urls      # django_extension
 Les migrations sont jouées **automatiquement** au démarrage du conteneur. Le code est monté en
 volume : pas de rebuild sauf si `requirements.txt` change.
 
-**17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **81 tests de
+**17 tests de fumée** couvrent la plomberie (`tout_doux/tests.py`), et **90 tests de
 non-régression** gèlent le contrat d'API et le nombre de requêtes SQL (`test_api_contract.py`,
 `test_query_counts.py` — voir
-[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)). Les **65 premiers
+[docs/patterns/query-optimization.md](docs/patterns/query-optimization.md)). Les **68 premiers
 tests métier** couvrent le tri manuel des listes (`test_ordering.py`), la reprise des positions
-par la migration 0011 (`test_migrations.py`), l'échéance des tâches (`test_task_due_date.py`) et
-le résumé des échéances (`test_task_due_summary.py`).
+par la migration 0011 (`test_migrations.py`), l'échéance des tâches (`test_task_due_date.py`), le
+résumé des échéances (`test_task_due_summary.py`) et le cloisonnement des relations entrantes
+(`test_ownership.py`).
 **Toujours aucun linter, aucun formateur.** Une CI les lance à chaque PR
 (`.github/workflows/ci.yml`) ; le reste passe par la procédure manuelle de
 [docs/workflows/verification.md](docs/workflows/verification.md).
@@ -50,8 +51,8 @@ le résumé des échéances (`test_task_due_summary.py`).
 
 **Trois gestes obligatoires pour toute écriture** (en oublier un ouvre une fuite entre comptes) :
 `get_queryset()` restreint à `self.request.user.<related_name>` · `user =
-HiddenField(default=CurrentUserDefault())` dans `Meta.fields` · un `validate_<champ>` par
-relation entrante. Détail : [docs/patterns/ownership-and-scoping.md](docs/patterns/ownership-and-scoping.md).
+HiddenField(default=CurrentUserDefault())` dans `Meta.fields` · `OwnedPrimaryKeyRelatedField`
+pour chaque relation entrante. Détail : [docs/patterns/ownership-and-scoping.md](docs/patterns/ownership-and-scoping.md).
 
 **Imports** — `models/` s'importe entre eux **par module concret**, tout le reste passe par les
 **barrels** `tout_doux.models`, `tout_doux.serializers.<x>`, `tout_doux.views`. ⚠️ **Ne pas
@@ -69,7 +70,7 @@ par ligne en texte brut, sans tiret ni puce.
 
 | Sujet                  | Piège                                                                                                                                   | Où                                                                         |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Appartenance           | Le code existant écrit `is not` sur des `pk` : **c'est un bug**, écrire `!=`                                                            | [R1](docs/quality/refactoring-backlog.md)                                  |
+| Appartenance           | Un `PrimaryKeyRelatedField` nu accepte l'`id` d'un autre compte : toujours `OwnedPrimaryKeyRelatedField`                                | [ownership-and-scoping.md](docs/patterns/ownership-and-scoping.md)         |
 | Réponse d'écriture     | Un POST/PATCH répond avec **un autre sérialiseur** que ses champs d'entrée (`to_representation`)                                        | [docs/architecture/serializers.md](docs/architecture/serializers.md)       |
 | Archivage              | Un projet/collection archivé fige son contenu — garde à écrire **à chaque écriture** : création, modification, suppression, déplacement | [docs/patterns/archive-guards.md](docs/patterns/archive-guards.md)         |
 | `limit_choices_to`     | **Ne protège rien** hors admin et `ModelForm`. Ne jamais s'y fier                                                                       | [docs/architecture/data-model.md](docs/architecture/data-model.md)         |

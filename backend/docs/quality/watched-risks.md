@@ -30,17 +30,16 @@ raison est indiquée pour chaque item.
 
 - **Origine** : absence de `setup.cfg`, `pyproject.toml`, `.flake8`, `tox.ini` ;
   `.github/workflows/ci.yml` lance les tests mais n'exécute aucun linter.
-- **Contexte** : rien ne relit le code. C'est ce qui a laissé passer R1 (`is not` au lieu de
-  `!=`, que `ruff` signale en `F632`), R2 (`print` résiduel) et R9 (configuration morte). Trois
-  des dix items du backlog seraient détectés par un linter standard, sans configuration
-  particulière.
+- **Contexte** : rien ne relit le code. C'est ce qui a laissé passer un `is not` sur des `pk`
+  (au lieu de `!=`, que `ruff` signale en `F632` ; corrigé depuis), R2 (`print` résiduel) et R9
+  (configuration morte). Deux items du backlog seraient encore détectés par un linter standard,
+  sans configuration particulière.
 - **Décision** : ne pas agir **en tant que tel** — mais noter que le rapport coût/bénéfice est
   excellent : un `ruff check` coûte une ligne de configuration, en hook `pre-commit` ou comme
   étape de `ci.yml`. C'est le prochain outillage à poser. Il n'a pas été ajouté en même temps
   que la CI pour ne pas cumuler deux chantiers : mettre `ruff` au vert sur tout le dépôt est un
   travail en soi.
-- **Déclencheur** : une contribution externe à relire, ou la correction de R1 (poser le linter
-  au même moment évite la 14ᵉ occurrence).
+- **Déclencheur** : une contribution externe à relire.
 
 ## W3 — E-mails envoyés sans reprise ni trace
 

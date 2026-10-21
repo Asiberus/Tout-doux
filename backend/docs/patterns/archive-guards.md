@@ -31,10 +31,10 @@ code.
 
 Deux emplacements selon le moment :
 
-**À la création** — dans le `validate_<champ>` qui contrôle déjà l'appartenance, juste après :
+**À la création** — dans le `validate_<champ>` de la relation :
 
 ```python
-# serializers/task/task_post.py:62
+# serializers/task/task_post.py:71
 if project.archived:
     raise serializers.ValidationError("You can't create a task to an archived project")
 ```

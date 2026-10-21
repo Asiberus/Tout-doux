@@ -1,7 +1,7 @@
 # Événements — dates, heures et rattachement
 
 Un `Event` a quatre champs temporels dont trois facultatifs, plus un drapeau « journée
-entière ». Leur validation croisée (`serializers/event/event_post_or_patch.py:73`, 47 lignes)
+entière ». Leur validation croisée (`serializers/event/event_post_or_patch.py:70`, 47 lignes)
 est la plus dense du projet, et elle **corrige silencieusement** les données autant qu'elle les
 refuse.
 
@@ -44,7 +44,7 @@ est rejeté par la règle du même jour.
 
 ## Le rattachement à un projet est à sens unique
 
-`event_post_or_patch.py:87` : dès que l'événement **a déjà** un projet, toute requête contenant
+`event_post_or_patch.py:84` : dès que l'événement **a déjà** un projet, toute requête contenant
 `projectId` est rejetée par `This event is already link to a project`.
 
 Trois conséquences, toutes vérifiables en lisant la condition `if 'project' in data` :
@@ -87,7 +87,7 @@ La branche `takes_whole_day` de la modification s'appuie sur
 `data.get('takes_whole_day') is not False`. En PATCH (`partial=True`), DRF n'applique pas les
 valeurs par défaut, donc l'absence du champ vaut `None` et le garde s'applique. **En PUT**, le
 défaut `False` du sérialiseur serait appliqué et le garde tomberait. Aucun client n'utilise PUT
-et ce cas n'a pas été testé — lire `event_post_or_patch.py:95` avant de s'y fier.
+et ce cas n'a pas été testé — lire `event_post_or_patch.py:92` avant de s'y fier.
 
 ## Voir aussi
 

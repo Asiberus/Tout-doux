@@ -7,20 +7,19 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 > **Cycle de vie** : quand un item est résolu, **supprimer sa ligne et sa section**. Ne pas le
 > marquer « Fait » — `git log` est déjà le registre du corrigé.
 
-| ID  | Titre                                                                   | Priorité  | Raison de la priorité                                         |
-| --- | ----------------------------------------------------------------------- | --------- | ------------------------------------------------------------- |
-| R1  | Contrôle d'appartenance écrit avec `is not` (13 occurrences)            | **haute** | Rend l'application inutilisable pour tout compte d'`id` > 256 |
-| R14 | Aucun test métier ; couverture à porter à 100 %                         | **haute** | Le cloisonnement entre comptes n'est vérifié par rien         |
-| R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`  | **haute** | Atteint tout compte créé hors inscription, dont le superuser  |
-| R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`) | **haute** | Deux surfaces d'administration mortes, et une doc qui ment    |
-| R8  | Cycle d'imports entre les barrels de `serializers/`                     | moyenne   | Un réordonnancement anodin casse le démarrage                 |
-| R10 | Dérive doc↔code des références du monorepo                             | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige    |
-| R2  | `print(request.method)` résiduel dans `CreateOrAdmin`                   | basse     | Correction d'une ligne                                        |
-| R7  | `openapi.yaml` : stub mort à la racine du monorepo                      | basse     | Laisse croire à un contrat maintenu                           |
-| R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`               | basse     | Configuration morte                                           |
-| R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé         | basse     | Doublons ou lignes omises entre deux pages de `tag/`          |
-| R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API  | basse     | Mensonge de type ; toute lecture renverrait `undefined`       |
-| R15 | Relation à `null` explicite : 500 au lieu de 400 sur 6 champs           | basse     | Aucun corps envoyé par le front n'emprunte ce chemin          |
+| ID  | Titre                                                                   | Priorité  | Raison de la priorité                                        |
+| --- | ----------------------------------------------------------------------- | --------- | ------------------------------------------------------------ |
+| R14 | Aucun test métier ; couverture à porter à 100 %                         | **haute** | Le cloisonnement entre comptes n'est vérifié par rien        |
+| R3  | `preferences/` incohérent pour un utilisateur sans ligne `Preferences`  | **haute** | Atteint tout compte créé hors inscription, dont le superuser |
+| R11 | Admin Django et API browsable inaccessibles (`AUTHENTICATION_BACKENDS`) | **haute** | Deux surfaces d'administration mortes, et une doc qui ment   |
+| R8  | Cycle d'imports entre les barrels de `serializers/`                     | moyenne   | Un réordonnancement anodin casse le démarrage                |
+| R10 | Dérive doc↔code des références du monorepo                             | moyenne   | Cause de code erroné généré ; c'est ce que `docs/` corrige   |
+| R2  | `print(request.method)` résiduel dans `CreateOrAdmin`                   | basse     | Correction d'une ligne                                       |
+| R7  | `openapi.yaml` : stub mort à la racine du monorepo                      | basse     | Laisse croire à un contrat maintenu                          |
+| R9  | `SearchFilter` sans `search_fields` sur `FeedbackViewSet`               | basse     | Configuration morte                                          |
+| R12 | `Tag` est le seul modèle sans `Meta.ordering`, et il est paginé         | basse     | Doublons ou lignes omises entre deux pages de `tag/`         |
+| R13 | `itemName` déclaré par le type front `CollectionList`, absent de l'API  | basse     | Mensonge de type ; toute lecture renverrait `undefined`      |
+| R15 | Relation à `null` explicite : 500 au lieu de 400 sur 5 champs           | basse     | Aucun corps envoyé par le front n'emprunte ce chemin         |
 
 ---
 
@@ -47,23 +46,6 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 - **Note** : la couverture prouve l'**exécution**, pas l'**assertion**. On peut atteindre 100 %
   sans aucun test de fuite entre comptes. Le taux est la carte de ce qui n'est pas visité, pas le
   critère de qualité.
-
-## R1 — Contrôle d'appartenance écrit avec `is not`
-
-- **Origine** : `serializers/task/task_post.py:52` et 12 autres — liste complète dans
-  [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md).
-- **Contexte** : `if tag.user.pk is not current_user.pk` compare des **identités d'objets**, pas
-  des valeurs. Ça ne fonctionne que grâce au cache des petits entiers de CPython (−5 à 256).
-  Vérifié dans le conteneur : `int('257') is int('257')` → `False`. Dès qu'un utilisateur a un
-  `id` supérieur à 256, tous ses contrôles d'appartenance échouent et il se voit refuser **ses
-  propres** tags, projets, sections, collections et tâches, avec le message
-  `Invalid pk "…" - object does not exist.`
-- **Décision** : agir. Remplacer les 13 occurrences par `!=`. La cause racine est la duplication
-  (voir [../adr/0001-serializer-per-action.md](../adr/0001-serializer-per-action.md)) : la
-  correction devrait poser un mixin ou une fonction partagée, sinon la 14ᵉ occurrence
-  réintroduira le bug.
-- **Note** : l'échec est **fermé** (refus, jamais autorisation abusive) — ce n'est donc pas une
-  faille de sécurité, mais une panne fonctionnelle totale pour les comptes concernés.
 
 ## R3 — `preferences/` incohérent sans ligne `Preferences`
 
@@ -197,18 +179,18 @@ prendre comme modèle. Les faiblesses qu'on assume sans agir sont dans
 
 ## R15 — Relation à `null` explicite : 500 au lieu de 400
 
-- **Origine** : trouvé en concevant le tri des tâches. `serializers/task/task_post.py:57`, `:67`,
-  `:77` ; `serializers/daily_task/daily_task_post.py:65`, `:82` ;
-  `serializers/event/event_post_or_patch.py:63`.
-- **Contexte** : ces six champs sont des `PrimaryKeyRelatedField(required=False,
+- **Origine** : trouvé en concevant le tri des tâches. `serializers/task/task_post.py:70`, `:76`,
+  `:82` ; `serializers/daily_task/daily_task_post.py:66` ;
+  `serializers/event/event_post_or_patch.py:64`.
+- **Contexte** : ces cinq champs sont des `OwnedPrimaryKeyRelatedField(required=False,
 allow_null=True)`. DRF appelle `validate_<champ>` **même quand la valeur est `None`**, et chaque
-  méthode lit aussitôt `<objet>.user.pk`. Un corps comme `POST task/ {"name": "x", "projectId":
-null}` lève donc `AttributeError: 'NoneType' object has no attribute 'user'`, qui remonte en 500. Vérifié en validant ces corps via chaque sérialiseur, sans écriture : 500 pour `projectId`,
-  `sectionId`, `collectionId` (tâche), `taskId`, `commonTaskId` (daily task) et `projectId`
+  méthode lit aussitôt un attribut de l'objet (`archived`, `completed`). Un corps comme `POST task/ {"name": "x", "projectId":
+null}` lève donc `AttributeError: 'NoneType' object has no attribute 'archived'`, qui remonte en 500. Vérifié en validant ces corps via chaque sérialiseur, sans écriture : 500 pour `projectId`,
+  `sectionId`, `collectionId` (tâche), `taskId` (daily task) et `projectId`
   (événement). `tagIds: null` n'est pas concerné : sur un champ `many=True`, DRF refuse le `null`
   proprement (400). Aucune ligne n'est écrite, la requête échoue avant.
 - **Décision** : agir, priorité basse — le front n'envoie jamais ces corps. Deux corrections
   possibles : retirer `allow_null=True` là où `required=False` suffit à dire « facultatif », ou
   faire retourner chaque `validate_<champ>` dès qu'il reçoit `None`. La première est préférable si
   aucun client n'envoie `null` ; à vérifier pour `EventPostOrPatchSerializer`, qui sert aussi au
-  PATCH. Les mêmes méthodes portent l'occurrence R1 (`is not`) : les corriger ensemble.
+  PATCH.

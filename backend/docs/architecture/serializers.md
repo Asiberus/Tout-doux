@@ -59,7 +59,7 @@ Trois cas particuliers :
 
 - `SectionPost` et `SectionPatch` répondent avec `SectionTasksSerializer` (donc avec la liste
   des tâches), pas avec `SectionSerializer`.
-- `EventPostOrPatchSerializer.to_representation` (`serializers/event/event_post_or_patch.py:54`)
+- `EventPostOrPatchSerializer.to_representation` (`serializers/event/event_post_or_patch.py:55`)
   **lit un query param** pour choisir sa forme de sortie : `?extended=true` renvoie
   `EventExtended`, sinon `EventSerializer`. Un sérialiseur qui dépend de la requête HTTP est
   une exception unique dans le projet — ne pas la généraliser.
@@ -84,9 +84,9 @@ params, eux, n'ont pas été uniformisés : `start_date`, `has_uncompleted_task`
 
 | Type de règle                          | Emplacement                                                  | Exemple                     |
 | -------------------------------------- | ------------------------------------------------------------ | --------------------------- |
-| L'objet référencé m'appartient-il ?    | `validate_<champ>`                                           | `task_post.py:57`           |
+| L'objet référencé m'appartient-il ?    | `OwnedPrimaryKeyRelatedField`                                | `common.py:22`              |
 | La cible est-elle archivée ?           | `validate_<champ>` (création) et `validate()` (modification) | `task_patch.py:46`          |
-| Cohérence entre champs                 | `validate()`                                                 | `event_post_or_patch.py:73` |
+| Cohérence entre champs                 | `validate()`                                                 | `event_post_or_patch.py:70` |
 | Effet de bord sur une **autre** entité | `update()` / `save()`                                        | `daily_task_patch.py:31`    |
 | Force du mot de passe                  | `validate_password()` de Django, appelé à la main            | `user_register.py:32`       |
 
@@ -134,10 +134,10 @@ Les deux premières lignes sont des patterns à part entière :
   est qu'aucun champ d'écriture ne fuit jamais en lecture et inversement —
   [adr/0001](../adr/0001-serializer-per-action.md).
 - **Pas de sérialiseur imbriqué en écriture.** Les relations s'écrivent toujours par
-  `PrimaryKeyRelatedField` (`tagIds`, `projectId`). Aucun `create()` n'écrit dans deux tables.
-- **Pas de mixin partagé pour les contrôles répétés.** Les 13 contrôles d'appartenance et les 12
-  gardes d'archivage sont copiés-collés. C'est ce qui a laissé passer le bug R1 —
-  [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+  `OwnedPrimaryKeyRelatedField` (`tagIds`, `projectId`). Aucun `create()` n'écrit dans deux tables.
+- **Pas de mixin partagé pour les gardes d'archivage.** Les 12 gardes sont copiés-collés. Seul
+  le contrôle d'appartenance est factorisé, dans `OwnedPrimaryKeyRelatedField`
+  (`serializers/common.py`).
 
 ## Voir aussi
 

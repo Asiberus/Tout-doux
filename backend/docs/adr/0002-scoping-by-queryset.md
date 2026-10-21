@@ -19,8 +19,8 @@ et `UserRelatedModel` (`models/user.py:20`) fabrique ce `related_name` automatiq
 11 modèles concernés.
 
 Deux compléments obligatoires, faute de quoi la protection est incomplète :
-`HiddenField(CurrentUserDefault())` à la création, et un `validate_<champ>` par relation
-entrante. La recette complète est dans
+`HiddenField(CurrentUserDefault())` à la création, et `OwnedPrimaryKeyRelatedField` pour chaque
+relation entrante. La recette complète est dans
 [../patterns/ownership-and-scoping.md](../patterns/ownership-and-scoping.md).
 
 **Aucun `has_object_permission` n'existe dans le projet.**
@@ -38,12 +38,11 @@ entrante. La recette complète est dans
 ## Conséquences
 
 - **Un `pk` étranger renvoie 404, pas 403.** C'est voulu : l'existence même de l'objet n'est pas
-  révélée. Les messages d'erreur des `validate_<champ>` imitent d'ailleurs l'erreur DRF « objet
-  inexistant » plutôt que d'avouer un refus.
-- **Le contrôle des relations entrantes est manuel et répété 13 fois.** C'est le point faible
-  assumé du choix, et c'est là que s'est logé le bug
-  [R1](../quality/refactoring-backlog.md) : il aurait été écrit une seule fois dans une
-  permission d'objet.
+  révélée. Une relation entrante étrangère reçoit de même l'erreur DRF native « objet
+  inexistant » : `OwnedPrimaryKeyRelatedField` restreint son queryset à l'utilisateur courant.
+- **Le contrôle des relations entrantes tient dans un champ partagé**, déclaré sur chacune des
+  13 relations. Le déclarer reste un geste manuel : un `PrimaryKeyRelatedField` nu accepte
+  l'`id` d'un autre compte sans erreur.
 - **`default=get_anonymous_user`** sur le champ `user` fait qu'un oubli de `HiddenField`
   n'échoue pas : la ligne est rattachée à un utilisateur fantôme. Surveillé en
   [W7](../quality/watched-risks.md).

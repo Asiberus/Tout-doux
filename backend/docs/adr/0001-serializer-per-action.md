@@ -47,8 +47,8 @@ utilisé par erreur.
   [../architecture/api-surface.md](../architecture/api-surface.md) et
   [0004](0004-no-openapi-schema.md).
 - Les règles métier sont dupliquées entre `*Post` et `*Patch` quand elles sont proches : c'est
-  l'origine des 13 contrôles d'appartenance copiés-collés, dont le bug
-  [R1](../quality/refactoring-backlog.md).
+  l'origine des 13 contrôles d'appartenance copiés-collés, factorisés depuis dans
+  `OwnedPrimaryKeyRelatedField`.
 - L'héritage entre sérialiseurs de ressources différentes crée un cycle d'imports réel —
   voir [../architecture/overview.md](../architecture/overview.md).
 

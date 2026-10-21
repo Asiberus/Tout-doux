@@ -2,11 +2,12 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from tout_doux.models import DailyTask, Tag
+from tout_doux.serializers.common import OwnedPrimaryKeyRelatedField
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 
 
 class DailyTaskPatchSerializer(serializers.ModelSerializer):
-    tagIds = serializers.PrimaryKeyRelatedField(
+    tagIds = OwnedPrimaryKeyRelatedField(
         source='tags',
         queryset=Tag.objects.filter(type=Tag.Type.TASK),
         many=True,
@@ -41,14 +42,6 @@ class DailyTaskPatchSerializer(serializers.ModelSerializer):
         instance_updated = super().update(instance, validated_data)
 
         return instance_updated
-
-    def validate_tagIds(self, tags):
-        current_user = self.context.get('request').user
-        for tag in tags:
-            if tag.user.pk is not current_user.pk:
-                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
-
-        return tags
 
     def validate(self, data):
         # This serializer is only used in a PATCH context, self.instance is always defined

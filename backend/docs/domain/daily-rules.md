@@ -18,16 +18,16 @@ Une ligne du plan vient de l'une des trois, **jamais de deux** :
 
 ## À la création — `serializers/daily_task/daily_task_post.py`
 
-| Règle                                                       | Ligne  | Message                                                                           |
-| ----------------------------------------------------------- | ------ | --------------------------------------------------------------------------------- |
-| `date` ne peut pas être dans le passé                       | 57     | `You can't plan a daily task on a past day`                                       |
-| `date` ne peut pas dépasser l'horizon d'un an               | 60     | `You can't plan a daily task more than a year ahead`                              |
-| Pas de `taskId` **et** de `commonTaskId` ensemble           | 98     | `You can't create a daily task related to a task and a common task`               |
-| Une origine liée interdit `name` et `tags`                  | 101    | `You can't create a daily task related to a task/common task with a name or tags` |
-| Il faut au moins une origine                                | 105    | `You must provide a name or a task id or a common task id to create a daily task` |
-| La tâche source ne doit pas être déjà terminée              | 71     | `You can't link a completed task to a daily task`                                 |
-| Ni appartenir à un projet ou une collection archivé         | 74, 77 | voir [archive-guards](../patterns/archive-guards.md)                              |
-| La tâche / tâche récurrente doit appartenir à l'utilisateur | 67, 84 | `Invalid pk …`                                                                    |
+| Règle                                                                               | Ligne                                  | Message                                                                           |
+| ----------------------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------- |
+| `date` ne peut pas être dans le passé                                               | 58                                     | `You can't plan a daily task on a past day`                                       |
+| `date` ne peut pas dépasser l'horizon d'un an                                       | 60                                     | `You can't plan a daily task more than a year ahead`                              |
+| Pas de `taskId` **et** de `commonTaskId` ensemble                                   | 80                                     | `You can't create a daily task related to a task and a common task`               |
+| Une origine liée interdit `name` et `tags`                                          | 82                                     | `You can't create a daily task related to a task/common task with a name or tags` |
+| Il faut au moins une origine non vide (un `null` ou un `name` vide ne comptent pas) | 86                                     | `You must provide a name or a task id or a common task id to create a daily task` |
+| La tâche source ne doit pas être déjà terminée                                      | 68                                     | `You can't link a completed task to a daily task`                                 |
+| Ni appartenir à un projet ou une collection archivé                                 | 70, 73                                 | voir [archive-guards](../patterns/archive-guards.md)                              |
+| La tâche / tâche récurrente doit appartenir à l'utilisateur                         | `OwnedPrimaryKeyRelatedField` (15, 21) | `Invalid pk …`                                                                    |
 
 La ligne est placée **en fin** de son jour (`DailyTask.save()`).
 
