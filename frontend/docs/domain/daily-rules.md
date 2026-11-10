@@ -36,6 +36,26 @@ Logique dupliquée à l'identique dans `DailyTaskCard.vue:19` et `DailyTaskFormC
 | `name`, `tagIds` | ✅ mais **seulement pour un DailyTask libre** | wizard, menu « Edit »                                                 |
 | `date`           | ❌                                            | absent de `DailyTaskPatch` — un DailyTask ne peut pas changer de jour |
 
+**Une Task planifiée sur plusieurs jours** — cocher sa ligne d'un jour, sans action ou en
+`FI`, termine la Task mais ne touche pas aux lignes des autres jours : elles restent
+planifiées et non cochées. Le jour venu, cocher l'une d'elles termine à nouveau la Task et
+**écrase `completed_at`** : la date de fin retenue est celle de la dernière ligne cochée.
+Dé-cocher n'importe laquelle de ces lignes rouvre la Task. Terminer la Task depuis son
+projet ne coche aucune ligne.
+
+⚠️ **En étude** — ce comportement laisse les jours suivants afficher une ligne non cochée
+pour une tâche déjà terminée. Pistes envisagées, aucune retenue :
+
+- **Retirer la tâche des jours à venir** quand elle est terminée. Simple, mais la
+  planification est perdue sans prévenir, et dé-cocher ne la rétablit pas.
+- **Cocher les lignes des jours à venir.** Fabrique un faux historique sur des jours pas
+  encore vécus, et contredit le refus de cocher un jour à venir.
+- **Garder les lignes avec un état « déjà terminée »**, dérivé de `task.completed`. Rien
+  n'est perdu, mais il faut toucher la carte, la timeline, les compteurs du résumé et le
+  wizard.
+- **Masquer les lignes dont la Task a été terminée avant leur jour.** Réversible et limité
+  au back, mais peu lisible : une ligne disparaît sans geste de l'utilisateur.
+
 **Règle de séparation des écrans** : on **prépare** dans le wizard, on **exécute** dans le
 résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wizard. La seule brèche
 dans l'autre sens est la création d'un DailyTask libre depuis le résumé, ouverte au jour courant
