@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
 from tout_doux.models import CommonTask, Tag
+from tout_doux.serializers.common import OwnedPrimaryKeyRelatedField
 from tout_doux.serializers.tag import TagSerializer
 
 
 class CommonTaskSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
-    tagIds = serializers.PrimaryKeyRelatedField(
+    tagIds = OwnedPrimaryKeyRelatedField(
         write_only=True,
         source='tags',
         queryset=Tag.objects.filter(type=Tag.Type.TASK),
@@ -25,12 +26,3 @@ class CommonTaskSerializer(serializers.ModelSerializer):
             'tagIds',
             'user',
         )
-
-    def validate_tagIds(self, tags):
-        current_user = self.context.get('request').user
-
-        for tag in tags:
-            if tag.user.pk is not current_user.pk:
-                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
-
-        return tags

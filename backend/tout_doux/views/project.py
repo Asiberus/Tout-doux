@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 
 from tout_doux.models import Event, Task
 from tout_doux.pagination import ExtendedPageNumberPagination
-from tout_doux.queries import scalar_count
+from tout_doux.queries import daily_task_date_param, scalar_count
 from tout_doux.serializers.project import ProjectListSerializer, ProjectDetailSerializer, ProjectPostOrPatchSerializer, \
     ProjectSerializer
 
@@ -70,6 +70,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         if self.request.query_params.get('has_uncompleted_task') in ['true', 'True']:
             queryset = queryset.filter(Exists(project_tasks(completed=False)))
+
+        daily_task_date = daily_task_date_param(self.request)
+        if daily_task_date:
+            queryset = queryset.filter(
+                (Q(archived=False) & Exists(project_tasks(completed=False)))
+                | Exists(project_tasks(daily_tasks__date=daily_task_date))
+            )
 
         return queryset
 

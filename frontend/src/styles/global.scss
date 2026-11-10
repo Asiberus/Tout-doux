@@ -133,15 +133,8 @@ input:-webkit-autofill:active {
   right: 0;
   height: 100% !important;
   max-height: 100% !important;
-  width: 100% !important;
-  left: 0 !important;
   border-radius: 0 !important;
   margin: 0 !important;
-
-  @media only screen and (400px < width < 600px) {
-    width: 90% !important;
-    left: 10% !important;
-  }
 
   @media #{map.get(variables.$display-breakpoints, 'sm')} {
     width: 80% !important;

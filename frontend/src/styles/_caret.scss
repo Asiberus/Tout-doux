@@ -1,0 +1,78 @@
+@use 'sass:list';
+@use 'sass:math';
+
+$depth: 8px;
+$card-radius: 8px;
+$corner-steps: 4;
+
+// `polygon()` n'accepte pas d'arc : les coins arrondis côté caret sont approchés par segments,
+// avec moins de 0,2 px d'écart sur un rayon de 8 px
+@function -corner-point($index, $from-bottom) {
+  $angle: math.div(90deg * $index, $corner-steps);
+  $x: $depth + $card-radius * (1 - math.sin($angle));
+  $y: $card-radius * (1 - math.cos($angle));
+  @if $from-bottom {
+    @return $x calc(100% - #{$y});
+  }
+  @return $x $y;
+}
+
+@function -shape() {
+  $points: (100% 0, 100% 100%);
+  @for $i from 0 through $corner-steps {
+    $points: list.append($points, -corner-point($i, true), comma);
+  }
+  $points: list.append($points, $depth calc(50% + #{$depth}), comma);
+  $points: list.append($points, 0 50%, comma);
+  $points: list.append($points, $depth calc(50% - #{$depth}), comma);
+  @for $i from $corner-steps through 0 {
+    $points: list.append($points, -corner-point($i, false), comma);
+  }
+  @return polygon($points);
+}
+
+// Le caret est découpé dans la carte plutôt que posé à côté : le fond, le voile de survol et le
+// ripple de Vuetify, calculés sur la boîte de la carte, le couvrent ainsi comme le reste. Le
+// contenu doit compenser `$depth` dans son padding gauche
+@mixin card {
+  margin-left: -$depth;
+  clip-path: -shape();
+}
+
+// Une bordure ne suit pas un `clip-path` : le contour est retracé par les pseudo-éléments, en
+// `currentColor`
+@mixin dashed-outline {
+  border-width: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    border: 0 dashed currentColor;
+    transition: inherit;
+  }
+
+  // Le rectangle, privé du tronçon de bordure que traverse le caret
+  &::before {
+    inset: 0 0 0 $depth;
+    border-width: thin;
+    border-radius: inherit;
+    mask:
+      linear-gradient(#000 0 0) 1px 0 / calc(100% - 1px) 100% no-repeat,
+      linear-gradient(#000 calc(50% - #{$depth}), transparent 0 calc(50% + #{$depth}), #000 0) 0 0 /
+        1px 100% no-repeat;
+  }
+
+  // Un carré tourné de 45° dont seuls les deux côtés extérieurs sont tracés
+  &::after {
+    $side: $depth * math.sqrt(2);
+    left: $depth - math.div($side, 2);
+    top: calc(50% - #{math.div($side, 2)});
+    width: $side;
+    height: $side;
+    border-left-width: thin;
+    border-bottom-width: thin;
+    transform: rotate(45deg);
+  }
+}

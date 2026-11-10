@@ -13,7 +13,7 @@ Ils utilisent force_authenticate : knox est en AUTO_REFRESH, donc une requête a
 écrire en base. Ce n'est pas gênant ici, mais test_query_counts.py en dépend, et les deux
 fichiers partagent cette classe de base.
 """
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.urls import reverse
 from django.test import TestCase
@@ -82,8 +82,8 @@ class DataFixtureTestCase(TestCase):
 
     def make_tasks(self, total, completed, **owner):
         """`completed_at` n'est posé que par TaskPatchSerializer.update(). Une tâche créée
-        directement par l'ORM avec completed=True le laisserait à None, et le tri
-        ('-completed_at', '-pk') du modèle ne testerait plus rien."""
+        directement par l'ORM avec completed=True le laisserait à None, et le tri des
+        terminées par date du modèle ne testerait plus rien."""
         now = timezone.now()
         created = []
         for index in range(total):
@@ -304,6 +304,68 @@ class HasUncompletedTaskFilterTest(DataFixtureTestCase):
         self.assertNotIn(self.empty_collection.pk, ids)
 
 
+class DailyTaskDateFilterTest(DataFixtureTestCase):
+    DAY = '2026-10-19'
+
+    def ids(self, route, day=DAY, **params):
+        response = self.client.get(reverse(route), {'size': 0, 'daily_task_date': day, **params})
+        self.assertEqual(response.status_code, 200)
+        return [item['id'] for item in response.data['content']]
+
+    def plan(self, task, day=DAY):
+        DailyTask.objects.create(user=task.user, task=task, date=day)
+
+    def complete_project(self, project):
+        Task.objects.filter(project=project).update(completed=True)
+        Task.objects.filter(section__project=project).update(completed=True)
+
+    def test_an_open_project_is_kept(self):
+        self.assertIn(self.project.pk, self.ids('project-list'))
+
+    def test_a_completed_project_planned_that_day_is_kept(self):
+        self.complete_project(self.project)
+        self.plan(Task.objects.filter(section=self.section).first())
+        ids = self.ids('project-list')
+        self.assertIn(self.project.pk, ids)
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_a_completed_project_planned_another_day_is_excluded(self):
+        self.complete_project(self.project)
+        self.plan(Task.objects.filter(project=self.project).first(), day='2026-10-18')
+        self.assertNotIn(self.project.pk, self.ids('project-list'))
+
+    def test_an_archived_project_planned_that_day_is_kept(self):
+        self.plan(Task.objects.filter(project=self.direct_only).first())
+        Project.objects.filter(pk=self.direct_only.pk).update(archived=True)
+        self.assertIn(self.direct_only.pk, self.ids('project-list'))
+
+    def test_an_archived_project_with_open_tasks_is_excluded(self):
+        Project.objects.filter(pk=self.direct_only.pk).update(archived=True)
+        self.assertNotIn(self.direct_only.pk, self.ids('project-list'))
+
+    def test_another_users_planning_is_ignored(self):
+        foreign = Project.objects.create(user=self.other, name='X', description='')
+        task = Task.objects.create(user=self.other, name='T', project=foreign, completed=True)
+        self.plan(task)
+        self.assertNotIn(foreign.pk, self.ids('project-list'))
+
+    def test_collections_behave_the_same(self):
+        Task.objects.filter(collection=self.collection).update(completed=True)
+        self.plan(Task.objects.filter(collection=self.collection).first())
+        archived = Collection.objects.create(
+            user=self.user, name='Archivée', description='', archived=True
+        )
+        self.plan(Task.objects.create(user=self.user, name='T', collection=archived))
+        ids = self.ids('list-list')
+        self.assertIn(self.collection.pk, ids)
+        self.assertIn(archived.pk, ids)
+        self.assertNotIn(self.empty_collection.pk, ids)
+
+    def test_an_invalid_date_is_a_400(self):
+        response = self.client.get(reverse('project-list'), {'daily_task_date': '2026-02-31'})
+        self.assertEqual(response.status_code, 400)
+
+
 class CollectionContractTest(DataFixtureTestCase):
     def test_list_response_keys_are_unchanged(self):
         """`itemName` est ABSENT aujourd'hui alors que le type front CollectionList le déclare.
@@ -375,7 +437,7 @@ class DailyTaskContractTest(DataFixtureTestCase):
     def test_response_keys_are_unchanged(self):
         self.assertEqual(
             set(self.payload()),
-            {'id', 'date', 'task', 'commonTask', 'name', 'tags', 'action', 'completed'},
+            {'id', 'date', 'task', 'commonTask', 'name', 'tags', 'action', 'completed', 'position'},
         )
 
     def test_the_nested_task_carries_its_whole_chain(self):
@@ -395,15 +457,13 @@ class DailyTaskContractTest(DataFixtureTestCase):
 class DailyTaskPlanningContractTest(DataFixtureTestCase):
     """Planification sur un jour futur, et fermeture des jours passés.
 
-    « Aujourd'hui » est ici `date.today()`, l'horloge du conteneur, et non `timezone.localdate()`
-    comme ailleurs dans ce fichier : c'est celle que lisent les gardes du sérialiseur et de la
-    vue. R4 n'étant pas corrigé, s'en remettre au fuseau rendrait ces tests instables entre
-    00 h et 02 h heure de Paris.
+    « Aujourd'hui » suit `timezone.localdate()`, comme les gardes du sérialiseur et de la vue
+    depuis la correction de R4.
     """
 
     def setUp(self):
         super().setUp()
-        self.today = date.today()
+        self.today = timezone.localdate()
         self.plannable = list(Task.objects.filter(user=self.user, completed=False).order_by('pk'))
 
     def day(self, offset):

@@ -1,28 +1,30 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from tout_doux.exceptions import AlreadyInDailyError
 from tout_doux.models import CommonTask, DailyTask, Tag, Task
+from tout_doux.serializers.common import OwnedPrimaryKeyRelatedField
 from tout_doux.serializers.daily_task.daily_task import DailyTaskSerializer
 
 MAX_PLANNING_HORIZON = timedelta(days=365)
 
 
 class DailyTaskPostSerializer(serializers.ModelSerializer):
-    taskId = serializers.PrimaryKeyRelatedField(
+    taskId = OwnedPrimaryKeyRelatedField(
         source='task',
         queryset=Task.objects.all(),
         required=False,
         allow_null=True
     )
-    commonTaskId = serializers.PrimaryKeyRelatedField(
+    commonTaskId = OwnedPrimaryKeyRelatedField(
         source='common_task',
         queryset=CommonTask.objects.all(),
         required=False,
         allow_null=True
     )
-    tagIds = serializers.PrimaryKeyRelatedField(
+    tagIds = OwnedPrimaryKeyRelatedField(
         source='tags',
         queryset=Tag.objects.filter(type=Tag.Type.TASK),
         many=True,
@@ -52,7 +54,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         return DailyTaskSerializer(instance).data
 
     def validate_date(self, value):
-        today = date.today()
+        today = timezone.localdate()
         if value < today:
             raise serializers.ValidationError('You can\'t plan a daily task on a past day')
         if value > today + MAX_PLANNING_HORIZON:
@@ -62,10 +64,6 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         return value
 
     def validate_taskId(self, task):
-        current_user = self.context.get('request').user
-        if task.user.pk is not current_user.pk:
-            raise serializers.ValidationError(f'Invalid pk \"{task.pk}\" - object does not exist.')
-
         # Test that the task is not completed or related to an archived project/collection
         if task.completed:
             raise serializers.ValidationError('You can\'t link a completed task to a daily task')
@@ -78,21 +76,6 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
 
         return task
 
-    def validate_commonTaskId(self, common_task):
-        current_user = self.context.get('request').user
-        if common_task.user.pk is not current_user.pk:
-            raise serializers.ValidationError(f'Invalid pk \"{common_task.pk}\" - object does not exist.')
-
-        return common_task
-
-    def validate_tagIds(self, tags):
-        current_user = self.context.get('request').user
-        for tag in tags:
-            if tag.user.pk is not current_user.pk:
-                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
-
-        return tags
-
     def validate(self, data):
         if 'task' in data and 'common_task' in data:
             raise serializers.ValidationError('You can\'t create a daily task related to a task and a common task')
@@ -100,7 +83,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'You can\'t create a daily task related to a task/common task with a name or tags')
 
-        if not any([key in ['task', 'common_task', 'name'] for key in list(data)]):
+        if not any(data.get(key) for key in ('task', 'common_task', 'name')):
             raise serializers.ValidationError(
                 'You must provide a name or a task id or a common task id to create a daily task')
 
@@ -108,7 +91,7 @@ class DailyTaskPostSerializer(serializers.ModelSerializer):
         # cette garde les remplace. Sans elle le doublon remonte en IntegrityError, soit un 500.
         # Un 409 plutôt qu'un 400 pour que le client distingue « déjà planifié » d'un refus de
         # validation sans lire le message.
-        target_date = data.get('date', date.today())
+        target_date = data.get('date', timezone.localdate())
         if data.get('task') and DailyTask.objects.filter(
                 date=target_date, task=data['task']).exists():
             raise AlreadyInDailyError()

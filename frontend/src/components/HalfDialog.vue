@@ -3,7 +3,7 @@ import { hideScroll, showScroll } from '@/utils/document.utils'
 import { onUnmounted, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 
-const { width } = useDisplay()
+const { xs } = useDisplay()
 
 const show = defineModel<boolean>()
 
@@ -21,7 +21,8 @@ onUnmounted(() => {
   <v-dialog
     v-model="show"
     content-class="half-dialog"
-    :transition="width < 400 ? 'dialog-bottom-transition' : 'slide-x-reverse-transition'">
+    :fullscreen="xs"
+    :transition="xs ? 'dialog-bottom-transition' : 'slide-x-reverse-transition'">
     <slot></slot>
   </v-dialog>
 </template>

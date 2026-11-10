@@ -2,6 +2,7 @@
 import { Section } from '@/models/section.model'
 import { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
+import TruncatedText from '@/components/TruncatedText.vue'
 
 const {
   section,
@@ -19,12 +20,6 @@ const emit = defineEmits<{
   click: []
 }>()
 
-const title = computed<string>(() => {
-  let str = `Go to : ${section.project.name} • ${section.name}`
-  if (section.project.archived) str += ' (Archived)'
-  return str
-})
-
 const detailLocation = computed<RouteLocationRaw | undefined>(() => {
   if (!navigateToDetail) return undefined
   return {
@@ -34,7 +29,6 @@ const detailLocation = computed<RouteLocationRaw | undefined>(() => {
 })
 
 function click(): void {
-  if (section.project.archived) return
   emit('click')
 }
 </script>
@@ -46,16 +40,14 @@ function click(): void {
     :color="section.project.archived ? 'projectArchived' : 'project'"
     :ripple
     :size="small ? 'small' : 'default'"
-    :title
     variant="flat"
-    :class="{ 'cursor-default': section.project.archived && !detailLocation }"
     class="section-chip px-0"
     @click.stop="click()">
     <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
     <div class="name-wrapper">
-      <span class="project-name text-truncate">{{ section.project.name }}</span>
-      <span class="mx-1">•</span>
-      <span class="section-name text-truncate">{{ section.name }}</span>
+      <TruncatedText :text="section.project.name" class="project-name" />
+      <span class="separator mx-1">•</span>
+      <TruncatedText :text="section.name" class="section-name" />
     </div>
   </v-chip>
 </template>
@@ -64,6 +56,11 @@ function click(): void {
 .section-chip {
   min-width: 32px;
 
+  :deep(.v-chip__content) {
+    min-width: 0;
+    max-width: 300px;
+  }
+
   .name-wrapper {
     display: flex;
     overflow: hidden;
@@ -71,8 +68,18 @@ function click(): void {
 
     .project-name,
     .section-name {
-      flex: 1 1 auto;
-      min-width: 1ch;
+      flex: 1 1 0;
+      min-width: 6ch;
+      max-width: max-content;
+    }
+
+    .project-name {
+      opacity: 0.8;
+    }
+
+    .separator {
+      flex-shrink: 0;
+      opacity: 0.6;
     }
   }
 }

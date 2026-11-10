@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { dragInProgress } from '@/components/sortable/dnd-kit'
 import { DailyTaskSheetDetent } from '@/models/daily-task.model'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
@@ -179,6 +180,14 @@ function drag(event: TouchEvent): void {
 
   const touch = trackedTouch(event.touches)
   if (!touch) return
+
+  // L'appui long a soulevé une carte : le geste appartient désormais à la liste, la feuille
+  // revient à son cran sans en changer
+  if (dragInProgress.value) {
+    dragTouchId = null
+    settle(detent.value)
+    return
+  }
 
   const [collapsedOffset] = dragOffsets
   // Le drapeau se mesure sur le doigt, pas sur la traînée bornée : en butée le panneau ne bouge

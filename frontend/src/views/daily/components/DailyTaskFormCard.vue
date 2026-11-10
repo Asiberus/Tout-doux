@@ -2,10 +2,14 @@
 import { DailyTask, DailyTaskPatch, DailyUpdateTaskTab } from '@/models/daily-task.model'
 import CollectionChip from '@/components/CollectionChip.vue'
 import SectionChip from '@/components/SectionChip.vue'
+import TaskDateBadge from '@/views/components/task/TaskDateBadge.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
+import SortableHandle from '@/components/sortable/SortableHandle.vue'
+import { dailyTaskName } from '@/utils/daily-task.utils'
+import { SetHandle } from '@/utils/sortable.utils'
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 
@@ -14,6 +18,9 @@ const { smAndDown } = useDisplay()
 const props = defineProps<{
   dailyTask: DailyTask
   editMode: boolean
+  setHandle?: SetHandle
+  atTop?: boolean
+  readonly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -22,13 +29,10 @@ const emit = defineEmits<{
   update: [data: DailyTaskPatch]
   delete: []
   select: [data: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }]
+  'move-to-top': []
 }>()
 
-const name = computed<string>(() => {
-  if (props.dailyTask.task) return props.dailyTask.task.name
-  else if (props.dailyTask.commonTask) return props.dailyTask.commonTask.name
-  else return props.dailyTask.name as string // We know name is defined
-})
+const name = computed<string>(() => dailyTaskName(props.dailyTask))
 
 function showEditMode(): void {
   emit('show-edit-mode')
@@ -46,6 +50,10 @@ function deleteDailyTask(): void {
   emit('delete')
 }
 
+function moveToTop(): void {
+  emit('move-to-top')
+}
+
 function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
   emit('select', { tab, id, sectionId })
 }
@@ -54,10 +62,12 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 <template>
   <v-card
     :color="smAndDown ? 'surface-container-highest' : undefined"
-    class="daily-task-form-card rounded-lg">
+    class="daily-task-form-card rounded-lg"
+    :class="{ 'daily-task-form-card--sortable': setHandle }">
     <template v-if="!editMode && dailyTask">
+      <SortableHandle v-if="setHandle" :set-handle :label="`Reorder ${name}`" />
       <div class="daily-task-form-card__content">
-        <div class="daily-task-form-card__actions">
+        <div v-if="!readonly" class="daily-task-form-card__actions">
           <v-menu>
             <template #activator="{ props: menuProps }">
               <v-btn
@@ -71,6 +81,12 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
               </v-btn>
             </template>
             <v-list density="compact">
+              <v-list-item v-if="setHandle && !atTop" @click="moveToTop()">
+                <v-list-item-title class="d-flex align-center">
+                  <v-icon icon="mdi-arrow-collapse-up" size="small" start />
+                  Move to top
+                </v-list-item-title>
+              </v-list-item>
               <v-list-item v-if="!dailyTask.task && !dailyTask.commonTask" @click="showEditMode()">
                 <v-list-item-title class="d-flex align-center">
                   <v-icon icon="mdi-pencil" size="small" start />
@@ -89,8 +105,9 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
         <div class="daily-task-form-card__content__header">
           <DailyTaskActionChip
+            v-if="!readonly || dailyTask.action"
             :action="dailyTask.action"
-            editable
+            :editable="!readonly"
             class="flex-shrink-0"
             @update="updateDailyTask({ action: $event })">
           </DailyTaskActionChip>
@@ -134,6 +151,11 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
                 :navigate-to-detail="false"
                 class="daily-task-form-card__content__footer__chip"
                 @click="select(DailyUpdateTaskTab.Collection, dailyTask.task.collection.id)" />
+              <TaskDateBadge
+                v-if="!dailyTask.task.completed && dailyTask.task.dueDate"
+                :date="dailyTask.task.dueDate"
+                :reference-day="dailyTask.date"
+                class="flex-shrink-0" />
             </template>
 
             <template v-if="dailyTask.tags.length > 0">
@@ -170,6 +192,12 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
   gap: 8px;
   padding: 12px 20px 12px 12px;
 
+  &.daily-task-form-card--sortable {
+    @media (hover: hover) {
+      padding-left: calc(var(--sortable-gutter-width) + 2px);
+    }
+  }
+
   &__actions {
     position: absolute;
     top: 4px;
@@ -203,7 +231,6 @@ function select(tab: DailyUpdateTaskTab, id: number, sectionId?: number): void {
 
       &__chip {
         flex-shrink: 1;
-        max-width: 10rem;
         cursor: pointer;
       }
     }

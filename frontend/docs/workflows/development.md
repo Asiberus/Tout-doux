@@ -11,15 +11,19 @@
 
 ## Commandes
 
-| Commande          | Effet                                    | Remarque                                                |
-| ----------------- | ---------------------------------------- | ------------------------------------------------------- |
-| `yarn`            | Installe les dépendances                 |                                                         |
-| `yarn dev`        | Serveur Vite, port **3000**, host exposé |                                                         |
-| `yarn build`      | Build de production dans `dist/`         | **ne vérifie aucun type**                               |
-| `yarn type-check` | `vue-tsc --noEmit`                       | ne bloque rien, voir [verification.md](verification.md) |
-| `yarn lint`       | `eslint --fix`                           |                                                         |
-| `yarn format`     | `prettier --write`                       |                                                         |
-| `yarn serve`      | Prévisualise le build                    | ⚠️ pas le serveur de dev                                |
+| Commande            | Effet                                    | Remarque                                                |
+| ------------------- | ---------------------------------------- | ------------------------------------------------------- |
+| `yarn`              | Installe les dépendances                 |                                                         |
+| `yarn dev`          | Serveur Vite, port **3000**, host exposé |                                                         |
+| `yarn build`        | Build de production dans `dist/`         | **ne vérifie aucun type**                               |
+| `yarn type-check`   | `vue-tsc --noEmit`                       | ne bloque rien, voir [verification.md](verification.md) |
+| `yarn lint`         | `eslint --fix`                           |                                                         |
+| `yarn format`       | `prettier --write`                       |                                                         |
+| `yarn test`         | Vitest en mode veille                    |                                                         |
+| `yarn test:ci`      | `vitest run --coverage`                  | ce que lance la CI                                      |
+| `yarn lint:check`   | `eslint` sans `--fix`                    | constate au lieu de corriger ; utilisé par la CI        |
+| `yarn format:check` | `prettier --check`                       | idem                                                    |
+| `yarn serve`        | Prévisualise le build                    | ⚠️ pas le serveur de dev                                |
 
 Docker (depuis `frontend/`, utilise les fichiers du monorepo parent) :
 `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
@@ -56,8 +60,8 @@ démarrage du conteneur. Le pourquoi :
   [../adr/0006-version-from-git-tag.md](../adr/0006-version-from-git-tag.md).
 - **`yarn build` ne typecheck pas** (`vite build` transpile via esbuild). Lancer
   `yarn type-check` séparément.
-- **Aucun test** n'est configuré (pas de script `test`), malgré ce que suggèrent
-  `tsconfig.json:include` (qui référence un dossier `tests/` inexistant) et l'ancien README.
+- **Les tests vivent à côté de leur source** (`src/**/*.spec.ts`), pas dans un dossier dédié.
+  Les helpers partagés sont dans `src/test/` (`setup.ts` épingle `TZ=UTC`, `fixtures.ts`).
 - **Le cache de pré-bundling Vite peut devenir périmé** après une montée de version d'une
   dépendance : le code servi ne correspond alors plus à `node_modules`, avec des symptômes
   incompréhensibles (une prop de slot qui reste `undefined`, par exemple). Remède :

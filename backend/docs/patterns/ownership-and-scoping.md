@@ -29,30 +29,26 @@ Obligatoire dans `Meta.fields`. `UserRelatedModel.user` étant `editable=False`,
 `ModelSerializer` ne le verra jamais tout seul ; sans cette ligne, la ligne créée est rattachée
 à l'utilisateur `anonymous` **sans aucune erreur**.
 
-### 3. Vérifier l'appartenance de **chaque** relation entrante
+### 3. Déclarer chaque relation entrante en `OwnedPrimaryKeyRelatedField`
 
-Les `PrimaryKeyRelatedField` portent un `queryset` **global** (`Project.objects.all()`,
-`Tag.objects.filter(type=…)`) : DRF accepte donc l'`id` d'un objet appartenant à quelqu'un
-d'autre. Le contrôle est manuel, un `validate_<champ>` par relation :
+Un `PrimaryKeyRelatedField` nu cherche dans un `queryset` **global** (`Project.objects.all()`,
+`Tag.objects.filter(type=…)`) : il accepte donc l'`id` d'un objet appartenant à quelqu'un
+d'autre. `OwnedPrimaryKeyRelatedField` (`serializers/common.py`) restreint ce queryset à
+l'utilisateur de la requête :
 
 ```python
-# serializers/task/task_post.py:57
-def validate_projectId(self, project):
-    current_user = self.context.get('request').user
-    if project.user.pk is not current_user.pk:
-        raise serializers.ValidationError(f'Invalid pk "{project.pk}" - object does not exist.')
-    return project
+# serializers/task/task_post.py:16
+projectId = OwnedPrimaryKeyRelatedField(
+    source='project',
+    queryset=Project.objects.all(),
+    required=False,
+    allow_null=True
+)
 ```
 
-Le message imite volontairement l'erreur DRF « objet inexistant » plutôt que d'avouer un refus
-d'accès.
-
-> ⚠️ **Ce code contient un bug.** `is not` compare des identités d'objets, pas des valeurs. Il
-> ne fonctionne que grâce au cache des petits entiers de CPython et **casse dès que l'`id` de
-> l'utilisateur dépasse 256** : l'utilisateur se voit alors refuser ses propres objets. Échec
-> fermé, donc pas une faille — mais l'application devient inutilisable pour ces comptes.
-> [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md) R1. **Écrire `!=` dans
-> tout nouveau code.**
+Un `id` étranger reçoit l'erreur DRF native `Invalid pk "…" - object does not exist.` : le refus
+d'accès n'est pas avoué. Le `validate_<champ>` ne sert plus qu'aux gardes d'archivage et d'état
+([archive-guards.md](archive-guards.md)).
 
 ## Sites d'application
 
@@ -65,28 +61,30 @@ _Maintenue à la main. Ajouter une ligne à chaque nouveau viewset ou sérialise
 `collection_post_or_patch`, `section_post`, `task_post`, `daily_task_post`,
 `event_post_or_patch`, `tag/tag`, `common_task/common_task`.
 
-**Contrôles d'appartenance (13)** — tous écrits avec le `is not` fautif :
+**Relations déclarées en `OwnedPrimaryKeyRelatedField` (13)** :
 
-| Fichier                                        | Lignes         | Relations contrôlées               |
-| ---------------------------------------------- | -------------- | ---------------------------------- |
-| `serializers/task/task_post.py`                | 52, 59, 69, 79 | tags, project, section, collection |
-| `serializers/daily_task/daily_task_post.py`    | 45, 62, 70     | task, common_task, tags            |
-| `serializers/task/task_patch.py`               | 41             | tags                               |
-| `serializers/daily_task/daily_task_patch.py`   | 50             | tags                               |
-| `serializers/project/project_post_or_patch.py` | 33             | tags                               |
-| `serializers/event/event_post_or_patch.py`     | 65             | project                            |
-| `serializers/section/section_post.py`          | 27             | project                            |
-| `serializers/common_task/common_task.py`       | 33             | tags                               |
+| Fichier                                        | Relations                                  |
+| ---------------------------------------------- | ------------------------------------------ |
+| `serializers/task/task_post.py`                | tagIds, projectId, sectionId, collectionId |
+| `serializers/daily_task/daily_task_post.py`    | taskId, commonTaskId, tagIds               |
+| `serializers/task/task_patch.py`               | tagIds                                     |
+| `serializers/daily_task/daily_task_patch.py`   | tagIds                                     |
+| `serializers/project/project_post_or_patch.py` | tagIds                                     |
+| `serializers/event/event_post_or_patch.py`     | projectId                                  |
+| `serializers/section/section_post.py`          | projectId                                  |
+| `serializers/common_task/common_task.py`       | tagIds                                     |
+
+**Ancres d'un déplacement** — `services/ordering.py`, `move` : elles sont cherchées dans la liste
+**et** parmi les lignes de l'utilisateur ; une ancre d'un autre utilisateur donne un 409.
 
 ## Écarts assumés
 
-| Endroit                                  | Écart                                                            | Statut                                                                                                 |
-| ---------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `views/feedback.py:11`                   | `queryset = Feedback.objects.all()` — pas de restriction         | **Voulu** : la lecture est réservée au staff par `CreateOrAdmin`, et un feedback est destiné à l'admin |
-| `serializers/feedback/feedback.py:22`    | injecte l'utilisateur dans `create()` au lieu d'un `HiddenField` | Équivalent fonctionnel, seule occurrence. Ne pas imiter                                                |
-| `views/user.py:15`                       | `queryset` = tous les utilisateurs                               | **Voulu** : `IsAdminUser` au niveau classe, et les actions `me/…` ignorent le queryset                 |
-| `views/preferences.py:11`                | `self.request.user.preferencess.first()`                         | Restreint, mais renvoie `None` si la ligne n'existe pas — [R3](../quality/refactoring-backlog.md)      |
-| `serializers/section/section_post.py:10` | `queryset=Project.objects.all()` puis contrôle manuel            | Conforme à la recette, juste plus visible ici                                                          |
+| Endroit                               | Écart                                                            | Statut                                                                                                 |
+| ------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `views/feedback.py:11`                | `queryset = Feedback.objects.all()` — pas de restriction         | **Voulu** : la lecture est réservée au staff par `CreateOrAdmin`, et un feedback est destiné à l'admin |
+| `serializers/feedback/feedback.py:22` | injecte l'utilisateur dans `create()` au lieu d'un `HiddenField` | Équivalent fonctionnel, seule occurrence. Ne pas imiter                                                |
+| `views/user.py:15`                    | `queryset` = tous les utilisateurs                               | **Voulu** : `IsAdminUser` au niveau classe, et les actions `me/…` ignorent le queryset                 |
+| `views/preferences.py:11`             | `self.request.user.preferencess.first()`                         | Restreint, mais renvoie `None` si la ligne n'existe pas — [R3](../quality/refactoring-backlog.md)      |
 
 ## Ce qui ne protège **pas**
 

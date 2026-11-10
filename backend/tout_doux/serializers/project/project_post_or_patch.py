@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
 from tout_doux.models import Project, Tag
+from tout_doux.serializers.common import OwnedPrimaryKeyRelatedField
 from tout_doux.serializers.project.project import ProjectSerializer
 
 
 class ProjectPostOrPatchSerializer(serializers.ModelSerializer):
-    tagIds = serializers.PrimaryKeyRelatedField(
+    tagIds = OwnedPrimaryKeyRelatedField(
         source='tags',
         queryset=Tag.objects.filter(type=Tag.Type.PROJECT),
         many=True,
@@ -26,14 +27,6 @@ class ProjectPostOrPatchSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return ProjectSerializer(instance).data
-
-    def validate_tagIds(self, tags):
-        current_user = self.context.get('request').user
-        for tag in tags:
-            if tag.user.pk is not current_user.pk:
-                raise serializers.ValidationError(f'Invalid pk \"{tag.pk}\" - object does not exist.')
-
-        return tags
 
     def validate(self, data):
         if not self.instance and data.get('archived'):

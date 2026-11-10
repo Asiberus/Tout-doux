@@ -8,8 +8,16 @@ import TagGroup from '@/views/components/tag/TagGroup.vue'
 import ProgressDisk from '@/components/ProgressDisk.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { filterCompleted, filterUncompleted, flattenProjectTasks } from '@/utils/task.utils'
+import {
+  filterCompleted,
+  flattenProjectTasks,
+  isTaskAvailable as isTaskAvailableForDay,
+  isTaskPlanned,
+} from '@/utils/task.utils'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
+import { containerDueCount } from '@/utils/daily-due.utils'
 import { computed, ref, watch } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
@@ -19,6 +27,8 @@ const props = withDefaults(
   defineProps<{
     project: ProjectDetail
     dailyTaskList: DailyTask[]
+    readonly: boolean
+    date: string
     sectionSelected?: number
   }>(),
   { sectionSelected: 0 }
@@ -35,14 +45,14 @@ const taskDialogSectionId = ref(0)
 
 const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(() => {
   const sections = props.project.sections
-    .filter(({ tasks }) => tasks.some(({ completed }) => !completed))
+    .filter(({ tasks }) => tasks.some(isTaskAvailable))
     .map(section => ({
       id: section.id,
       name: section.name,
       tasks: section.tasks,
     }))
 
-  if (props.project.tasks.some(({ completed }) => !completed))
+  if (props.project.tasks.some(isTaskAvailable))
     sections.unshift({
       id: 0,
       name: 'General tasks',
@@ -54,10 +64,18 @@ const taskBySection = computed<{ id: number; name: string; tasks: Task[] }[]>(()
 
 const allTasks = computed<Task[]>(() => flattenProjectTasks(props.project))
 const allTasksCompleted = computed<Task[]>(() => filterCompleted(allTasks.value))
-const allTasksUncompleted = computed<Task[]>(() => filterUncompleted(allTasks.value))
+const allTasksAvailable = computed<Task[]>(() => allTasks.value.filter(isTaskAvailable))
 const percentageOfTaskCompleted = computed<number>(
   () => (allTasksCompleted.value.length / allTasks.value.length) * 100
 )
+const projectLocation = computed<RouteLocationRaw>(() => {
+  const sectionId = taskBySection.value[sectionTab.value]?.id
+  if (!sectionId) return { name: 'project-detail', params: { id: props.project.id } }
+  return {
+    name: 'project-detail-section',
+    params: { id: `${props.project.id}`, sectionId: `${sectionId}` },
+  }
+})
 
 watch(
   () => props.sectionSelected,
@@ -66,12 +84,27 @@ watch(
   }
 )
 
+watch(allTasksAvailable, tasks => {
+  if (tasks.length === 0) selected.value = false
+})
+
+const dueCount = computed<{ count: number; overdue: boolean }>(() =>
+  containerDueCount(allTasks.value, props.date)
+)
+const dueCountDisplayed = computed<boolean>(
+  () => !props.readonly && !props.project.archived && dueCount.value.count > 0
+)
+
 function isTaskSelected(task: Task): boolean {
-  return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
+  return isTaskPlanned(task, props.dailyTaskList)
+}
+
+function isTaskAvailable(task: Task): boolean {
+  return isTaskAvailableForDay(task, props.project.archived, props.dailyTaskList)
 }
 
 function selectProject(): void {
-  if (allTasksUncompleted.value.length === 0 || selected.value) return
+  if (allTasksAvailable.value.length === 0 || selected.value) return
 
   sectionTab.value = 0
   selected.value = true
@@ -81,8 +114,12 @@ function unselectProject(): void {
   selected.value = false
 }
 
+function isTaskSelectable(task: Task): boolean {
+  return !props.readonly && !isTaskSelected(task)
+}
+
 function selectTask(task: Task): void {
-  if (isTaskSelected(task)) return
+  if (!isTaskSelectable(task)) return
 
   emit('select-task', { taskId: task.id })
 }
@@ -107,7 +144,8 @@ function createTask(data: TaskPost): void {
 <template>
   <div :class="{ selected }" @click="selectProject()">
     <v-card
-      :disabled="allTasksUncompleted.length === 0"
+      :color="project.archived ? 'projectArchivedCard' : undefined"
+      :disabled="allTasksAvailable.length === 0"
       :class="{ 'cursor-pointer': !selected }"
       class="project-card rounded-lg">
       <v-progress-linear
@@ -134,6 +172,11 @@ function createTask(data: TaskPost): void {
 
           <template v-if="!selected">
             <v-spacer />
+            <DueCountChip
+              v-if="dueCountDisplayed"
+              :count="dueCount.count"
+              :late="dueCount.overdue"
+              class="ml-2" />
             <TaskCounter
               :value="allTasksCompleted.length"
               :max="allTasks.length"
@@ -141,8 +184,12 @@ function createTask(data: TaskPost): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
+            <v-chip v-if="project.archived" color="accent" size="small" class="flex-shrink-0 ml-2">
+              <v-icon icon="mdi-archive" size="small" class="mr-1" />
+              Archived
+            </v-chip>
             <v-btn
-              :to="{ name: 'project-detail', params: { id: project.id } }"
+              :to="projectLocation"
               icon
               variant="text"
               density="comfortable"
@@ -206,19 +253,22 @@ function createTask(data: TaskPost): void {
               :value="index">
               <div class="task-wrapper">
                 <TaskCard
-                  v-for="task of section.tasks.filter(({ completed }) => !completed)"
+                  v-for="task of section.tasks.filter(isTaskAvailable)"
                   :key="`${section.name}-task-${task.id}`"
                   :task="task"
                   :selected="isTaskSelected(task)"
-                  :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+                  :class="{ 'cursor-pointer': isTaskSelectable(task) }"
                   :small="true"
                   :completable="false"
+                  :show-completed-at="false"
                   :display-options="false"
-                  color="surface-container-high"
+                  :reference-day="date"
+                  :level="2"
                   @click="selectTask(task)">
                 </TaskCard>
 
                 <v-card
+                  v-if="!readonly && !project.archived"
                   variant="outlined"
                   ripple
                   class="create-task-card"

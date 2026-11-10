@@ -13,9 +13,13 @@ export function getProjectList(params = {}): Promise<Pagination<ProjectList[]>> 
   return http.get<Pagination<ProjectList[]>>(apiRoutes.project, { params: { size: 0, ...params } })
 }
 
-export function getProjectListDetailed(params = {}): Promise<Pagination<ProjectDetail[]>> {
+export function getProjectListDetailed(
+  params = {},
+  signal?: AbortSignal
+): Promise<Pagination<ProjectDetail[]>> {
   return http.get<Pagination<ProjectDetail[]>>(apiRoutes.projectDetailed, {
     params: { size: 0, ...params },
+    signal,
   })
 }
 

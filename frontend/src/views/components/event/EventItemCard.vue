@@ -7,11 +7,13 @@ import { isPassed } from '@/utils/event.utils'
 import EventDialog from '@/views/components/event/EventDialog.vue'
 import moment from 'moment'
 import { useDialogWidth } from '@/composables/useDialogWidth'
+import { useNow } from '@/composables/useNow'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp } = useDisplay()
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
+const { now } = useNow()
 
 const props = withDefaults(
   defineProps<{
@@ -50,7 +52,7 @@ const isDescriptionOverflowing = ref(false)
 
 const cardColor = computed(() => {
   if (props.color) return props.color
-  if (isPassed(props.event)) return 'passedEvent'
+  if (isPassed(props.event, now.value)) return 'passedEvent'
 
   return 'event'
 })
@@ -84,7 +86,7 @@ function getTextColor(section: 'icon' | 'date' | 'name' | 'description'): string
   }
 
   let color: string
-  if (isPassed(props.event) && props.changePassedTextColor) color = 'text-grey'
+  if (isPassed(props.event, now.value) && props.changePassedTextColor) color = 'text-grey'
   else color = colorConfig[section]
 
   if (props.project?.archived) color += ' opacity-60'
@@ -112,7 +114,7 @@ function isDateEqual(date1: string, date2: string): boolean {
           'no-hover-bg': !hoverBackground,
         }"
         @click="onEventCardClick()">
-        <v-card-text class="d-flex align-center pa-3 pa-sm-4">
+        <v-card-text class="d-flex align-center pa-3 pa-sm-4" :class="{ 'ps-5 ps-sm-6': caret }">
           <v-icon
             v-if="showIcon"
             icon="mdi-calendar-clock"
@@ -219,20 +221,10 @@ function isDateEqual(date1: string, date2: string): boolean {
 <style scoped lang="scss">
 @use 'sass:map';
 @use '@/styles/breakpoints' as variables;
+@use '@/styles/caret';
 
-.v-card.caret {
-  overflow: visible;
-}
-
-.caret::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -5px;
-  width: 14px;
-  height: 14px;
-  background-color: inherit;
-  transform: translateY(-50%) rotate(45deg);
+.caret {
+  @include caret.card;
 }
 
 .no-hover-bg :deep(.v-card__overlay) {

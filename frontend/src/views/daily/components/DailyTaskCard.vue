@@ -5,6 +5,7 @@ import SectionChip from '@/components/SectionChip.vue'
 import ProjectChip from '@/components/ProjectChip.vue'
 import TagGroup from '@/views/components/tag/TagGroup.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
+import TaskDateBadge from '@/views/components/task/TaskDateBadge.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -30,11 +31,11 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
   <v-card
     :color="cardColor"
     class="daily-task-card rounded-lg pa-3 pa-sm-4"
+    :class="{ 'caret ps-5 ps-sm-6': caret }"
     :ripple="toggleable"
-    :class="{ caret }"
     v-on="toggleable ? { click: () => $emit('toggle') } : {}">
     <div class="daily-task-card__header">
-      <div class="flex-grow-1 d-flex align-center gap-2">
+      <div class="daily-task-card__header__title d-flex align-center gap-2">
         <DailyTaskActionChip
           v-if="dailyTask.action"
           :action="dailyTask.action"
@@ -47,6 +48,11 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
       </div>
 
       <template v-if="dailyTask.task">
+        <TaskDateBadge
+          v-if="!dailyTask.task.completed && dailyTask.task.dueDate"
+          :date="dailyTask.task.dueDate"
+          :reference-day="dailyTask.date"
+          class="flex-shrink-0" />
         <template v-if="dailyTask.task.project">
           <ProjectChip
             v-if="dailyTask.task.project"
@@ -89,6 +95,8 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
 </template>
 
 <style scoped lang="scss">
+@use '@/styles/caret';
+
 .daily-task-card {
   display: flex;
   flex-direction: column;
@@ -105,25 +113,18 @@ const cardColor = computed(() => (props.dailyTask.completed ? 'green-darken-2' :
       align-self: flex-start;
     }
 
+    &__title {
+      margin-inline-end: auto;
+    }
+
     &__link {
-      flex-shrink: 1;
-      max-width: 12rem;
+      flex: 1 1 8rem;
+      max-width: max-content;
     }
   }
 }
 
-.v-card.caret {
-  overflow: visible;
-}
-
-.caret::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -5px;
-  width: 14px;
-  height: 14px;
-  background-color: inherit;
-  transform: translateY(-50%) rotate(45deg);
+.caret {
+  @include caret.card;
 }
 </style>

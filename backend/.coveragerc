@@ -1,0 +1,14 @@
+[run]
+branch = True
+source = tout_doux
+omit =
+    */migrations/*
+    */tests.py
+    */test_*.py
+
+[report]
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    raise NotImplementedError

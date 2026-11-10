@@ -2,6 +2,7 @@
 import { RouteLocationRaw } from 'vue-router'
 import { computed } from 'vue'
 import { Project } from '@/models/project.model'
+import TruncatedText from '@/components/TruncatedText.vue'
 
 const {
   project,
@@ -19,20 +20,12 @@ const emit = defineEmits<{
   click: []
 }>()
 
-const title = computed<string>(() => {
-  let str = `Go to : ${project.name}`
-  if (project.archived) str += ' (Archived)'
-  return str
-})
-
 const detailLocation = computed<RouteLocationRaw | undefined>(() => {
   if (!navigateToDetail) return undefined
   return { name: 'project-detail', params: { id: `${project.id}` } }
 })
 
 function click(): void {
-  if (project.archived) return
-
   emit('click')
 }
 </script>
@@ -44,20 +37,21 @@ function click(): void {
     :color="project.archived ? 'projectArchived' : 'project'"
     :ripple
     :size="small ? 'small' : 'default'"
-    :title
     variant="flat"
     class="project-chip px-0"
-    :class="{ 'cursor-default': project.archived && !detailLocation }"
     @click.stop="click()">
     <v-icon icon="mdi-briefcase-variant" size="small" class="ml-2 mr-1" />
-    <div class="text-truncate mr-2">
-      {{ project.name }}
-    </div>
+    <TruncatedText :text="project.name" class="mr-2" />
   </v-chip>
 </template>
 
 <style scoped lang="scss">
 .project-chip {
   min-width: 32px;
+
+  :deep(.v-chip__content) {
+    min-width: 0;
+    max-width: 300px;
+  }
 }
 </style>

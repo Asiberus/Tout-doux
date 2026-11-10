@@ -17,6 +17,6 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["*.ts", "./**/*.js", "src/**/*.ts", "src/**/*.vue", "tests/**/*.ts"],
+  "include": ["*.ts", "./**/*.js", "src/**/*.ts", "src/**/*.vue"],
   "exclude": ["node_modules"]
 }

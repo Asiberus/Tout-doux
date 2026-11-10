@@ -2,6 +2,8 @@
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
 import FilterChip from '@/components/FilterChip.vue'
 import ProgressWheel from '@/components/ProgressWheel.vue'
+import SortableList from '@/components/sortable/SortableList.vue'
+import { MoveAnchors } from '@/models/ordering.model'
 import { ProjectDetail } from '@/models/project.model'
 import { TaskPatch, TaskPost } from '@/models/task.model'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
@@ -59,6 +61,10 @@ function updateTask(id: number, data: TaskPatch): void {
 
 function deleteTask(id: number): void {
   projectStore.deleteTask(id)
+}
+
+function moveTask(id: number, anchors: MoveAnchors): void {
+  projectStore.moveTask(id, anchors)
 }
 </script>
 
@@ -162,17 +168,25 @@ function deleteTask(id: number): void {
 
     <template v-if="!displayCompletedTask">
       <template v-if="projectStore.uncompletedTasks.length > 0">
-        <div class="task-wrapper">
-          <TaskCard
-            v-for="task of projectStore.uncompletedTasks"
-            :key="task.id"
-            :task="task"
-            :disabled="project.archived"
-            @add-to-daily="addTaskToDaily($event)"
-            @toggle-state="toggleTaskState"
-            @update="updateTask"
-            @delete="deleteTask" />
-        </div>
+        <SortableList
+          :items="projectStore.uncompletedTasks"
+          :disabled="project.archived"
+          :item-label="task => task.name"
+          class="task-wrapper"
+          @move="moveTask">
+          <template #item="{ item: task, index, setHandle, moveToTop }">
+            <TaskCard
+              :task="task"
+              :disabled="project.archived"
+              :set-handle
+              :at-top="index === 0"
+              @add-to-daily="addTaskToDaily($event)"
+              @toggle-state="toggleTaskState"
+              @update="updateTask"
+              @delete="deleteTask"
+              @move-to-top="moveToTop?.()" />
+          </template>
+        </SortableList>
       </template>
       <template
         v-else-if="

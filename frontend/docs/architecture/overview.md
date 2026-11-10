@@ -19,20 +19,20 @@ models ◄── utils ── axios ──► api ──► store ──► serv
                              composables ──► api, store
 ```
 
-| Couche         | Rôle                                                       | Importe                                 |
-| -------------- | ---------------------------------------------------------- | --------------------------------------- |
-| `config/`      | Lecture de la config runtime (balises `<meta>`)            | —                                       |
-| `models/`      | Interfaces du contrat d'API, écrites à la main             | —                                       |
-| `utils/`       | Fonctions pures de domaine (tri, prédicats temporels)      | `models`                                |
-| `axios/`       | Transport : instance + intercepteurs + wrapper `http` typé | `config`, `services`, `router`          |
-| `api/`         | Une fonction fine par endpoint                             | `axios`, `models`                       |
-| `store/`       | État partagé Pinia                                         | `api`, `models`, `services`, `utils`    |
-| `services/`    | Orchestration transverse — **`auth` uniquement**           | `api`, `models`, `store`                |
-| `router/`      | Routes, guards, points d'entrée                            | `layout`, `views`, `services`, `store`  |
-| `layout/`      | Coquilles applicatives (navbar, header)                    | `config`, `services`, `store`           |
-| `components/`  | Composants partagés globalement                            | `api`, `composables`, `models`, `utils` |
-| `views/`       | Features (9 zones) + composants partagés par domaine       | tout sauf `axios`, `config`, `router`   |
-| `composables/` | `useDialogWidth`, `useAddTaskToDaily`                      | `api`, `store`                          |
+| Couche         | Rôle                                                        | Importe                                 |
+| -------------- | ----------------------------------------------------------- | --------------------------------------- |
+| `config/`      | Lecture de la config runtime (balises `<meta>`)             | —                                       |
+| `models/`      | Interfaces du contrat d'API, écrites à la main              | —                                       |
+| `utils/`       | Fonctions pures de domaine (tri, prédicats temporels)       | `models`                                |
+| `axios/`       | Transport : instance + intercepteurs + wrapper `http` typé  | `config`, `services`, `router`          |
+| `api/`         | Une fonction fine par endpoint                              | `axios`, `models`                       |
+| `store/`       | État partagé Pinia                                          | `api`, `models`, `services`, `utils`    |
+| `services/`    | Orchestration transverse — **`auth` uniquement**            | `api`, `models`, `store`                |
+| `router/`      | Routes, guards, points d'entrée                             | `layout`, `views`, `services`, `store`  |
+| `layout/`      | Coquilles applicatives (navbar, header)                     | `config`, `services`, `store`           |
+| `components/`  | Composants partagés globalement                             | `api`, `composables`, `models`, `utils` |
+| `views/`       | Features (9 zones) + composants partagés par domaine        | tout sauf `axios`, `config`, `router`   |
+| `composables/` | `useDialogWidth`, `useAddTaskToDaily`, `useToday`, `useNow` | `api`, `store`                          |
 
 ## Règles
 

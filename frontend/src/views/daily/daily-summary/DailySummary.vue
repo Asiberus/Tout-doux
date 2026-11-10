@@ -3,18 +3,21 @@ import FilterChip from '@/components/FilterChip.vue'
 import { DailySummary } from '@/models/daily-summary.model'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import { showScroll } from '@/utils/document.utils'
-import DailyDetail from '@/views/daily/daily-summary/components/DailyDetail.vue'
+import DailyDetail from '@/views/daily/components/DailyDetail.vue'
 import DailySummaryCardComponent from '@/views/daily/daily-summary/components/DailySummaryCard.vue'
-import moment from 'moment'
+import { useToday } from '@/composables/useToday'
+import moment, { Moment } from 'moment'
 import MainTitle from '@/components/MainTitle.vue'
 import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import { dailyTaskApi } from '@/api'
+import { useDueStore } from '@/store'
 
 const display = useDisplay()
 const route = useRoute()
 const router = useRouter()
+const dueStore = useDueStore()
 
 const props = defineProps<{
   date?: string
@@ -28,10 +31,22 @@ const upcomingLoading = ref(false)
 const dailyDetailDialog = ref(false)
 const dateSelected = ref<string>('')
 
-const today = moment().format('YYYY-MM-DD')
-// Le plafond est figé au montage, comme `today` — même limite, suivie en R12.
-const upcomingCeiling = moment().startOf('day').add(MAX_PLANNING_HORIZON_DAYS, 'days')
+const { today: todayMoment } = useToday()
+const today = computed<string>(() => todayMoment.value.format('YYYY-MM-DD'))
+const upcomingCeiling = computed<Moment>(() =>
+  todayMoment.value.clone().startOf('day').add(MAX_PLANNING_HORIZON_DAYS, 'days')
+)
 let daysPerPage = 21
+
+const dueBannerText = computed<string>(() => {
+  const { summary } = dueStore
+  if (!summary) return ''
+  const parts = [
+    summary.late > 0 ? `${summary.late} late ${summary.late === 1 ? 'task' : 'tasks'}` : '',
+    summary.today > 0 ? `${summary.today} ${summary.today === 1 ? 'task' : 'tasks'} due today` : '',
+  ].filter(Boolean)
+  return `${parts.join(' · ')}, not planned yet`
+})
 
 const displayedSummaryList = computed<DailySummary[]>(() =>
   props.upcoming ? upcomingSummaryList.value : pastSummaryList.value
@@ -39,7 +54,7 @@ const displayedSummaryList = computed<DailySummary[]>(() =>
 
 const upcomingCeilingReached = computed<boolean>(() => {
   const furthest = upcomingSummaryList.value.at(-1)
-  return !!furthest && !moment(furthest.date).isBefore(upcomingCeiling)
+  return !!furthest && !moment(furthest.date).isBefore(upcomingCeiling.value)
 })
 
 onBeforeMount(() => {
@@ -83,6 +98,9 @@ watch(
   }
 )
 
+// Ne se déclenche que si le jour formaté change réellement, pas à chaque tick de `useToday()`.
+watch(today, newToday => refreshOnDayChange(newToday))
+
 function calculateDaysPerPage(): number {
   if (display.xs.value) return 10
   else if (display.smAndDown.value) return 14
@@ -102,6 +120,20 @@ function retrieveDailySummaryList(startDate: string, endDate: string): void {
 function loadMore(): void {
   if (props.upcoming) loadUpcomingPage()
   else loadPastPage()
+}
+
+function refreshOnDayChange(newToday: string): void {
+  // Le jour qui vient de basculer n'a pas encore de résumé chargé : on va chercher seulement
+  // celui-là, sans recharger les pages déjà affichées.
+  if (!pastSummaryList.value.some(d => d.date === newToday))
+    dailyTaskApi
+      .getDailySummary(newToday, newToday)
+      .then(response => pastSummaryList.value.unshift(...response))
+      .catch(error => console.error(error))
+
+  // Il sort mécaniquement de la liste des jours à venir : il n'y appartient plus.
+  const upcomingIndex = upcomingSummaryList.value.findIndex(d => d.date === newToday)
+  if (upcomingIndex !== -1) upcomingSummaryList.value.splice(upcomingIndex, 1)
 }
 
 function loadPastPage(): void {
@@ -127,7 +159,7 @@ function loadUpcomingPage(): void {
     // prête à être poussée en queue. L'appel du passé, juste au-dessus, fait l'inverse.
     .getDailySummary(
       from.clone().add(1, 'days').format('YYYY-MM-DD'),
-      moment.min(from.clone().add(daysPerPage, 'days'), upcomingCeiling).format('YYYY-MM-DD')
+      moment.min(from.clone().add(daysPerPage, 'days'), upcomingCeiling.value).format('YYYY-MM-DD')
     )
     .then(response => upcomingSummaryList.value.push(...response))
     .catch(error => console.error(error))
@@ -207,6 +239,27 @@ function removeDateParam(options: { push?: boolean } = {}): void {
         </v-btn>
       </div>
     </div>
+
+    <v-card
+      v-if="dueStore.toPlanCount > 0"
+      color="amber"
+      variant="tonal"
+      class="due-banner rounded-lg mb-3 mb-md-6">
+      <v-card-text class="d-flex align-center flex-wrap gap-3 pa-3 pa-sm-4">
+        <div class="d-flex align-center gap-3 flex-grow-1">
+          <v-icon :icon="dueStore.hasLate ? 'mdi-calendar-alert' : 'mdi-calendar-today'" />
+          <span class="text-body-large text-white">{{ dueBannerText }}</span>
+        </div>
+        <v-btn
+          :to="{ name: 'daily-update', params: { date: today, step: 'task' } }"
+          color="amber"
+          variant="flat"
+          rounded
+          class="ms-auto">
+          plan them
+        </v-btn>
+      </v-card-text>
+    </v-card>
 
     <div class="daily-wrapper">
       <DailySummaryCardComponent

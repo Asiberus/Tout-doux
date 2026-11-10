@@ -1,12 +1,14 @@
 # Analyse de l'infrastructure Docker, de `.conf/` et de `td.sh`
 
 Périmètre : `docker-compose.yml`, `docker-compose.prod.yml`, `.dockerignore`, l'arborescence
-`.conf/` (Dockerfiles dev et prod, `setup-config.sh` en dev, `set-meta-at-build.sh` et
-`set-meta-at-run.sh` en prod, `run.sh`, `default.conf.tpl`, `uwsgi_params`, templates
-d'environnement) et `td.sh`.
+`.conf/` (Dockerfiles dev et prod, `set-meta-at-build.sh` et `set-meta-at-run.sh` en prod,
+`run.sh`, `default.conf.tpl`, `uwsgi_params`, templates d'environnement) et `td.sh`.
 
 Version analysée : `0.4.1` — branche `develop`, commit `b3afec9`.
 Date : 2026-08-16.
+
+Dernière relecture : 2026-09-22, branche `develop`, commit `be43f60`. Les constats résolus
+depuis la rédaction initiale sont barrés et annotés ✅ en place.
 
 ## Méthode et niveaux de preuve
 
@@ -38,9 +40,9 @@ Quatre services :
 | `db`       | PostgreSQL                          | `postgres:${DB_POSTGRES_VERSION}`       |
 | `adminer`  | Console SQL                         | `adminer`                               |
 
-Le front appelle l'API en direct sur `http://localhost:8000/`, valeur injectée au build via
-`ARG_API_URL` (`docker-compose.yml:9`) puis écrite dans les balises `<meta>` de `index.html`
-par `setup-config.sh`. Aucun proxy en dev.
+Le front appelle l'API en direct sur `http://localhost:8000/`, valeur portée par les balises
+`<meta>` de `frontend/index.html:7-8`. Aucun proxy en dev. L'injection au build via
+`ARG_API_URL` et `setup-config.sh` a été retirée : le bind-mount la rendait inopérante (F4).
 
 Le démarrage du backend est séquencé dans la commande du service
 (`docker-compose.yml:19-22`) : `wait_for_db`, puis `migrate`, puis `runserver`. La commande
@@ -135,7 +137,7 @@ production sans le moindre changement de code.
 
 **Correctif** : supprimer la ligne 11 de `.dockerignore`.
 
-### B3 — Le port du frontend de développement est désynchronisé entre trois sources
+### B3 — ~~Le port du frontend de développement est désynchronisé entre trois sources~~ ✅ résolu
 
 **Fichiers** : `.conf/development/conf.tpl.env:5`, `td.sh:91`, `frontend/vite.config.ts:25`
 **Preuve** : **Exécuté**
@@ -157,26 +159,10 @@ Vite écoute sur `3000`. Le mapping devient `8080:8080` vers un port sur lequel 
 le front est injoignable. Le problème est nul pour le poste actuel, bloquant pour tout nouvel
 arrivant ou toute réinstallation.
 
-**Correctif** — faire de `FRONTEND_PORT` la source unique, en le propageant à Vite. Le service
-`frontend` n'ayant aujourd'hui aucun bloc `environment:`, la variable doit d'abord être injectée
-dans le conteneur :
-
-```yaml
-# docker-compose.yml, service frontend
-environment:
-  FRONTEND_PORT: ${FRONTEND_PORT}
-```
-
-```ts
-// frontend/vite.config.ts
-server: {
-  host: true,
-  port: Number(process.env.FRONTEND_PORT ?? 3000),
-}
-```
-
-et aligner `conf.tpl.env:5` ainsi que `td.sh:91` sur `3000`. À défaut, mapper
-`${FRONTEND_PORT}:3000` dans `docker-compose.yml:11` et documenter que le port interne est figé.
+**Correctif appliqué** — `FRONTEND_PORT` est devenu la source unique. Le service `frontend`
+reçoit `FRONTEND_PORT: ${FRONTEND_PORT}` dans un bloc `environment:`, `vite.config.ts` lit
+`Number(process.env.FRONTEND_PORT ?? 3000)`, et `conf.tpl.env` comme `td.sh:105` écrivent
+désormais `3000`. Une réinstallation via `./td.sh install dev` produit une stack joignable.
 
 ---
 
@@ -255,16 +241,16 @@ backendsecretkey=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))'
 `.conf/production/frontend/Dockerfile:27`
 **Preuve** : **Lu** (versions), **Déduit** (statut de support)
 
-| Composant | Version | Statut                                               |
-| --------- | ------- | ---------------------------------------------------- |
-| Python    | 3.9     | Fin de support sécurité en octobre 2025              |
-| Django    | 3.2     | Fin du support étendu LTS en avril 2024              |
-| nginx     | 1.24    | Branche stable de 2023, plusieurs branches de retard |
+| Composant    | Version                         | Statut                                               |
+| ------------ | ------------------------------- | ---------------------------------------------------- |
+| ~~Python~~   | ~~3.9~~ → 3.14                  | ✅ résolu (commit `bbaa36e`)                         |
+| ~~Django~~   | ~~3.2~~ → 6.1                   | ✅ résolu (commit `bbaa36e`)                         |
+| ~~Node dev~~ | ~~`22-bullseye`~~ → `22-alpine` | ✅ résolu — Debian 11 hors support standard          |
+| nginx        | 1.24                            | Branche stable de 2023, plusieurs branches de retard |
 
-Aucun correctif de sécurité n'est plus publié pour les deux premiers. La montée de version
-Django est le chantier le plus lourd (3.2 → 4.2 LTS → 5.x), et il faudra tenir compte de
-`CSRF_TRUSTED_ORIGINS`, devenu obligatoire à partir de Django 4.0 pour les requêtes non sûres —
-il n'est aujourd'hui défini nulle part.
+Reste **nginx 1.24** en production. Par ailleurs `CSRF_TRUSTED_ORIGINS`, obligatoire depuis
+Django 4.0 pour les requêtes non sûres, **n'est toujours défini nulle part** — point à vérifier
+maintenant que le backend est sur Django 6.1.
 
 ### S5 — Le fichier `conf.env` transite dans le contexte de build
 
@@ -338,7 +324,7 @@ service_healthy` en cascade — `frontend` attend `backend`, qui attend `db`. Pl
 ouvert. Contrepartie assumée — un backend qui ne devient jamais sain rend le site totalement
 indisponible, au lieu de le laisser debout avec une API cassée.
 
-### F4 — Le bind-mount masque le travail de l'image en développement
+### F4 — ~~Le bind-mount masque le travail de l'image en développement~~ ✅ résolu
 
 **Fichier** : `docker-compose.yml:13`
 **Preuve** : **Déduit**
@@ -359,13 +345,34 @@ qui a deux effets non évidents :
    repli `dev` : c'est donc `dev` qui s'affiche en développement conteneurisé, et non le numéro de
    version. `API_URL` reste juste, `http://localhost:8000/` coïncidant avec la configuration.
 
-**Correctif** : superposer un volume anonyme pour préserver les `node_modules` de l'image.
+**Correctif appliqué** : un volume anonyme superposé au bind-mount préserve les `node_modules`
+de l'image.
 
 ```yaml
 volumes:
   - ./frontend:/frontend
   - /frontend/node_modules
 ```
+
+> **Mise à jour du constat.** Entre-temps, Vite 8 a remplacé rollup par **rolldown**, qui embarque
+> un repli `@rolldown/binding-wasm32-wasi`. L'échec dur (`Cannot find module
+@rollup/rollup-linux-arm64-musl`) est donc devenu une **bascule silencieuse sur WebAssembly** :
+> la stack démarrait, mais dégradée. Mesuré sur la même machine, `node_modules` de l'hôte monté
+> dans le conteneur :
+>
+> ```
+> rolldown OK        ← avec 4 × "ExperimentalWarning: WASI"
+> lightningcss KO -> Cannot find module '../lightningcss.linux-arm64-gnu.node'
+> ```
+>
+> Après correctif, `rolldown OK` et `lightningcss OK` sur les bindings `linux-arm64-musl`, et
+> `vite ready in` passe de **1663 ms à 419 ms**.
+
+Le second effet — l'`index.html` patché au build puis recouvert — est traité par la suppression de
+`setup-config.sh` : les valeurs de développement sont celles commitées dans
+`frontend/index.html:7-8`. **Conséquence assumée** : `API_URL` est figé à `http://localhost:8000/`
+en développement conteneurisé ; changer `BACKEND_PORT` dans `conf.env` ne sera pas suivi par le
+front.
 
 ### F5 — Le chemin de production de `td.sh` appelle un binaire absent
 
@@ -454,7 +461,7 @@ automatisé interprète cela comme une réussite. De plus, la boucle de vérific
 
 **Correctif** : `exit 1`, et étendre la liste des commandes vérifiées.
 
-### Q5 — Le Dockerfile de développement du frontend accumule du code mort
+### Q5 — ~~Le Dockerfile de développement du frontend accumule du code mort~~ ✅ résolu
 
 **Fichier** : `.conf/development/frontend/Dockerfile`
 **Preuve** : **Exécuté** (ligne 16), **Lu** (le reste)
@@ -469,7 +476,13 @@ automatisé interprète cela comme une réussite. De plus, la boucle de vérific
 Le `# Todo` de la ligne 13 pose déjà la bonne question. La réponse est oui : les trois paquets
 peuvent être retirés.
 
-### Q6 — Règles obsolètes ou inopérantes dans `.dockerignore`
+**Correctif appliqué** — Dockerfile réécrit, 37 lignes → 15, sur `node:22-alpine` pour aligner
+développement et production. Le lockfile est copié et respecté (`yarn install --frozen-lockfile`),
+`yarn cache clean` est fusionné dans le même `RUN`, `apt install python3 make g++` est supprimé.
+**Vérifié** : le build aboutit en 14 s sans ces trois paquets. Le script `prepare` de husky
+affiche `.git can't be found` — attendu, `.git` est dans `.dockerignore`, yarn sort en 0.
+
+### Q6 — ~~Règles obsolètes ou inopérantes dans `.dockerignore`~~ ✅ résolu
 
 **Fichier** : `.dockerignore:10`, `18-21`
 **Preuve** : **Exécuté**
@@ -495,6 +508,11 @@ peuvent être retirés.
 
 en remplacement des lignes 18-21, et décider explicitement du sort de la ligne 10 (l'écrire
 `**/tests.py` si l'intention était bien d'exclure les tests, la supprimer sinon).
+
+**Correctif appliqué** — les quatre variantes `app/*/__pycache__/` sont remplacées par
+`**/__pycache__/` et `**/*.pyc`. La ligne `**/tests` est conservée telle quelle : elle n'exclut
+rien aujourd'hui, mais couvrirait un futur répertoire `tests/`. Les tests du frontend sont déjà
+exclus par `**/*.spec.ts`.
 
 ### Q7 — Portabilité de l'utilisateur non-root du backend en développement
 
@@ -523,17 +541,17 @@ développement se fera sous Linux, via un `ARG UID` passé au build.
 
 ### Q8 — Points mineurs
 
-| Constat                                                                                                                                                                                          | Emplacement                                 | Preuve  |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- | ------- |
-| `image: adminer` sans tag de version — seule image non épinglée, alors que `postgres`, `node` et `nginx` le sont.                                                                                | `docker-compose.yml:56`                     | Lu      |
-| `FROM … as …` en minuscules : BuildKit émet `FromAsCasing` aux lignes 1 et 27 (warnings observés pendant le build de vérification).                                                              | `.conf/production/frontend/Dockerfile:1,27` | Exécuté |
-| `python3 make g++` installés dans l'étape de build de production pour node-gyp ; probablement inutiles aujourd'hui, à valider par un build d'essai.                                              | `.conf/production/frontend/Dockerfile:16`   | Déduit  |
-| Pas de `SECURE_PROXY_SSL_HEADER` : nginx transmet la requête en clair à uwsgi, donc `request.is_secure()` est toujours faux derrière le proxy, alors que le trafic externe est en HTTPS.         | `backend/backend/settings.py`               | Lu      |
-| nginx tourne en root dans l'image de production (comportement par défaut de l'image officielle).                                                                                                 | `.conf/production/frontend/Dockerfile`      | Déduit  |
-| `td.sh` n'active ni `set -e` ni `set -u` ; plusieurs variables sont déréférencées sans guillemets (`td.sh:50,55,60,66`), ce qui provoque `too many arguments` si une saisie contient une espace. | `td.sh`                                     | Lu      |
-| Les `eval` autour des commandes docker (`td.sh:237,240,249,…`) sont inutiles : aucune expansion différée n'est nécessaire, et ils fragilisent le script si `${basedir}` contient une espace.     | `td.sh`                                     | Lu      |
-| `.conf/production/conf.env` n'existe pas sur cette machine : `./td.sh edit prod` ferait un `grep` sur un fichier absent, sans message clair (voir Q1, la condition ligne 214 masque l'erreur).   | —                                           | Exécuté |
-| `run.sh:3` — `BACKEND_PORT=${BACKEND_PORT}` est une réassignation sans effet ; `set -e` ligne 4 gagnerait à être placé en tête.                                                                  | `.conf/production/backend/run.sh`           | Lu      |
+| Constat                                                                                                                                                                                                                                                                                    | Emplacement                                 | Preuve  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- | ------- |
+| ~~`image: adminer` sans tag de version~~ ✅ résolu — épinglé sur `adminer:5`.                                                                                                                                                                                                              | `docker-compose.yml:56`                     | Lu      |
+| `FROM … as …` en minuscules : BuildKit émet `FromAsCasing` aux lignes 1 et 27 (warnings observés pendant le build de vérification).                                                                                                                                                        | `.conf/production/frontend/Dockerfile:1,27` | Exécuté |
+| `python3 make g++` installés dans l'étape de build de production pour node-gyp. Le build **de développement** aboutit sans eux sur la même base alpine et le même `yarn.lock` : leur retrait en production est très probablement sans risque, mais reste à confirmer par un build d'essai. | `.conf/production/frontend/Dockerfile:16`   | Déduit  |
+| Pas de `SECURE_PROXY_SSL_HEADER` : nginx transmet la requête en clair à uwsgi, donc `request.is_secure()` est toujours faux derrière le proxy, alors que le trafic externe est en HTTPS.                                                                                                   | `backend/backend/settings.py`               | Lu      |
+| nginx tourne en root dans l'image de production (comportement par défaut de l'image officielle).                                                                                                                                                                                           | `.conf/production/frontend/Dockerfile`      | Déduit  |
+| `td.sh` n'active ni `set -e` ni `set -u` ; plusieurs variables sont déréférencées sans guillemets (`td.sh:50,55,60,66`), ce qui provoque `too many arguments` si une saisie contient une espace.                                                                                           | `td.sh`                                     | Lu      |
+| Les `eval` autour des commandes docker (`td.sh:237,240,249,…`) sont inutiles : aucune expansion différée n'est nécessaire, et ils fragilisent le script si `${basedir}` contient une espace.                                                                                               | `td.sh`                                     | Lu      |
+| `.conf/production/conf.env` n'existe pas sur cette machine : `./td.sh edit prod` ferait un `grep` sur un fichier absent, sans message clair (voir Q1, la condition ligne 214 masque l'erreur).                                                                                             | —                                           | Exécuté |
+| `run.sh:3` — `BACKEND_PORT=${BACKEND_PORT}` est une réassignation sans effet ; `set -e` ligne 4 gagnerait à être placé en tête.                                                                                                                                                            | `.conf/production/backend/run.sh`           | Lu      |
 
 ### Q9 — ~~Le numéro de version est dupliqué à la main à quatre endroits~~ ✅ résolu
 
@@ -604,30 +622,34 @@ Points relevés comme solides, pour éviter qu'ils ne soient dégradés lors des
 3. ~~**F5**~~ ✅ fait — `td.sh` appelle `docker compose` partout, y compris en production
    (commit `df06f83`). **Q1** reste à faire (réparer `editConfFile`), sans quoi la configuration
    de production ne peut pas être modifiée depuis un serveur Linux.
-4. **B3** — aligner les trois sources du port frontend (`conf.tpl.env`, `td.sh`, `vite.config.ts`).
-   N'affecte que le développement conteneurisé : la production utilise `SERVER_PORT` de façon
-   cohérente sur les trois fichiers équivalents, donc **aucun impact en production**.
+4. ~~**B3**~~ ✅ fait — `FRONTEND_PORT` est la source unique, propagée à Vite par le bloc
+   `environment:` du service `frontend`. Aucun impact en production, qui utilisait déjà
+   `SERVER_PORT` de façon cohérente.
 5. **F1, F2** — arrêt propre d'uwsgi, journaux sur la sortie standard. ~~**F3**~~ ✅ fait —
    sondes de vitalité sur les trois services et `depends_on: condition: service_healthy`.
 6. ~~**S2, S3**~~ ✅ fait — CORS restreint à `SERVER_URL` (`CORS_ALLOWED_ORIGINS`), saisie des
    secrets masquée dans `td.sh` (`read -rs`).
 7. ~~**S5**~~ ✅ fait — `.conf/*/conf.env` ajouté à `.dockerignore` : les fichiers contenant les
    vrais secrets ne transitent plus dans le contexte de build Docker.
-8. **Q5, Q6** — nettoyage des Dockerfiles et de `.dockerignore`.
+8. ~~**F4, Q5, Q6**~~ ✅ fait — volume anonyme sur `/frontend/node_modules`, Dockerfile de
+   développement réécrit sur `node:22-alpine`, `setup-config.sh` supprimé, règles Python de
+   `.dockerignore` réparées, `adminer` épinglé, contournement `@rollup/rollup-*` retiré de
+   `package.json`.
 9. ~~**Q9**~~ ✅ fait — le tag git est devenu la source unique, et non `package.json` : la CI
    grave la version dans l'image, `td.sh autoupdate` écrit `VERSION=` dans le `conf.env` du
    serveur. L'édition manuelle SSH à chaque release disparaît. Voir
    [ADR 0006](../frontend/docs/adr/0006-version-from-git-tag.md).
-10. **S4** — montée de version Python et Django. Chantier à part entière, à planifier.
+10. ~~**S4**~~ partiellement fait — Python 3.14 et Django 6.1 en place. Restent **nginx 1.24**
+    et `CSRF_TRUSTED_ORIGINS`, toujours absent.
 
 ## 8. Points ouverts
 
-- Le conteneur `tout_doux_frontend` est en statut `Created` (jamais démarré), avec un code de
-  sortie `0`, aucune erreur enregistrée et des journaux vides. La cause n'a pas été établie et
-  aucune hypothèse n'est avancée ici. À investiguer par un `docker compose up frontend` en
-  premier plan.
-- La suppression de `python3 make g++` de l'étape de build de production (Q8) demande un build
-  d'essai pour confirmer qu'aucune dépendance ne réclame node-gyp.
+- ~~Le conteneur `tout_doux_frontend` reste en statut `Created`.~~ ✅ clos — après les correctifs
+  F4 et Q5, les quatre services sont `Up` ; le front répond HTTP 200 sur `/` et `/src/main.ts`,
+  le backend 401 sur `/` (authentification requise) et 302 sur `/admin/`. La cause initiale n'a
+  pas été établie et n'a pas été reproduite depuis.
+- La suppression de `python3 make g++` de l'étape de build de **production** (Q8) demande
+  toujours un build d'essai, même si le build de développement aboutit sans eux.
 - **La sauvegarde est un `dumpdata`, pas un `pg_dump` — à reprendre.** Le script appelé par
   `td.sh autoupdate` produit des _fixtures_ via `manage.py backupdb`. Les recharger suppose une
   base vide **au même état de migration**. Or ce script sert précisément de filet avant des

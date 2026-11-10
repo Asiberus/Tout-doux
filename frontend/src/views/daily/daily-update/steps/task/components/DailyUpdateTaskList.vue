@@ -6,6 +6,11 @@ import {
   DailyUpdateTaskTab,
 } from '@/models/daily-task.model'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import SortableList from '@/components/sortable/SortableList.vue'
+import { MoveAnchors } from '@/models/ordering.model'
+import { dailyTaskName } from '@/utils/daily-task.utils'
+import { scrollParent } from '@/utils/document.utils'
+import DailyDayStatusChip from '@/views/daily/components/DailyDayStatusChip.vue'
 import DailyTaskFormCard from '@/views/daily/components/DailyTaskFormCard.vue'
 import DailyTaskForm from '@/views/daily/components/DailyTaskForm.vue'
 import { ComponentPublicInstance, computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -18,6 +23,7 @@ const { smAndDown, mdAndDown, lgAndUp } = useDisplay()
 const props = defineProps<{
   date: string
   dailyTaskList: DailyTask[]
+  readonly: boolean
   carryOverCandidates: DailyTask[]
   carryOverInProgress: boolean
 }>()
@@ -28,9 +34,11 @@ const emit = defineEmits<{
   delete: [id: number]
   select: [event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }]
   'carry-over': []
+  move: [event: { id: number; anchors: MoveAnchors }]
 }>()
 
-const selectedDailyTask = ref<number | null>(null)
+// Exposé au parent, qui referme l'édition quand la feuille se replie
+const selectedDailyTask = defineModel<number | null>('editedTaskId', { default: null })
 // Exposé au parent : sur mobile l'en-tête reste visible quand la feuille est repliée, et le « + »
 // doit alors la dérouler sur le formulaire déjà ouvert
 const createDailyTaskDisplayed = defineModel<boolean>('createDisplayed', { default: false })
@@ -58,9 +66,11 @@ watch(createDailyTaskDisplayed, async (value: boolean) => {
 
   selectedDailyTask.value = null
 
-  // Le formulaire naît en fin de liste, donc sous le bord du défileur ; `end` l'aligne sur ce bord
+  // Le formulaire naît en fin de liste : descendre tout en bas du défileur montre aussi sa marge
+  // basse, que `scrollIntoView` laisserait sous le bord
   await nextTick()
-  createCard.value?.$el.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  const scroller = scrollParent(createCard.value?.$el)
+  scroller?.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' })
 })
 
 watch(selectedDailyTask, (value: number | null) => {
@@ -89,6 +99,10 @@ function deleteDailyTask(id: number): void {
   emit('delete', id)
 }
 
+function moveDailyTask(id: number, anchors: MoveAnchors): void {
+  emit('move', { id, anchors })
+}
+
 function select(event: { tab: DailyUpdateTaskTab; id: number; sectionId?: number }): void {
   emit('select', event)
 }
@@ -104,17 +118,19 @@ function carryOver(): void {
 <template>
   <div class="d-flex flex-column">
     <div class="daily-task-list__header task-sheet__drag-zone d-flex align-center">
-      <h2 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down mr-2">
-        Tasks of the day
-      </h2>
-      <v-chip
-        v-if="dailyTaskList.length > 0"
-        :key="dailyTaskList.length"
-        size="small"
-        class="daily-task-list__counter">
-        {{ dailyTaskList.length }}
-      </v-chip>
-      <v-spacer />
+      <div class="flex-grow-1 d-flex align-center gap-2">
+        <h2 class="text-title-medium text-sm-headline-small font-weight-bold-sm-and-down">
+          Tasks of the day
+        </h2>
+        <v-chip
+          v-if="dailyTaskList.length > 0"
+          :key="dailyTaskList.length"
+          size="small"
+          class="daily-task-list__counter">
+          {{ dailyTaskList.length }}
+        </v-chip>
+        <DailyDayStatusChip :date />
+      </div>
       <v-hover
         v-if="carryOverDisplayed"
         v-slot="{ props: hoverProps }"
@@ -134,6 +150,7 @@ function carryOver(): void {
         </v-btn>
       </v-hover>
       <v-btn
+        v-if="!readonly"
         icon
         density="comfortable"
         size="small"
@@ -146,16 +163,29 @@ function carryOver(): void {
 
     <template v-if="dailyTaskList.length > 0 || createDailyTaskDisplayed || previewDisplayed">
       <div class="daily-task-wrapper">
-        <template v-for="dailyTask of dailyTaskList" :key="dailyTask.id">
-          <DailyTaskFormCard
-            :daily-task="dailyTask"
-            :edit-mode="selectedDailyTask === dailyTask.id"
-            @show-edit-mode="selectedDailyTask = dailyTask.id"
-            @hide-edit-mode="selectedDailyTask = null"
-            @update="updateDailyTask(dailyTask.id, $event)"
-            @delete="deleteDailyTask(dailyTask.id)"
-            @select="select($event)" />
-        </template>
+        <SortableList
+          v-if="dailyTaskList.length > 0"
+          :items="dailyTaskList"
+          :disabled="readonly"
+          :locked-id="selectedDailyTask"
+          :item-label="dailyTaskName"
+          class="d-flex flex-column gap-2"
+          @move="moveDailyTask">
+          <template #item="{ item: dailyTask, index, setHandle, moveToTop }">
+            <DailyTaskFormCard
+              :daily-task="dailyTask"
+              :readonly
+              :edit-mode="selectedDailyTask === dailyTask.id"
+              :set-handle
+              :at-top="index === 0"
+              @show-edit-mode="selectedDailyTask = dailyTask.id"
+              @hide-edit-mode="selectedDailyTask = null"
+              @update="updateDailyTask(dailyTask.id, $event)"
+              @delete="deleteDailyTask(dailyTask.id)"
+              @select="select($event)"
+              @move-to-top="moveToTop?.()" />
+          </template>
+        </SortableList>
         <template v-if="previewDisplayed">
           <!-- `inert` sort ces cartes du parcours clavier et de l'arbre d'accessibilité : ce ne
                sont pas encore des tâches -->
@@ -181,7 +211,9 @@ function carryOver(): void {
     </template>
 
     <template v-else>
-      <EmptyListDisplay message="You didn't add any task yet!" class="empty-list-display">
+      <EmptyListDisplay
+        :message="readonly ? 'No task was planned for this day.' : 'You didn\'t add any task yet!'"
+        class="empty-list-display">
         <template #img>
           <img
             src="../../../../../../assets/no_tasks.svg"

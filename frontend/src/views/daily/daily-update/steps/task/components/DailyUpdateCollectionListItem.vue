@@ -6,7 +6,10 @@ import TaskCard from '@/views/components/task/TaskCard.vue'
 import TaskDialog from '@/views/components/task/TaskDialog.vue'
 import TaskCounter from '@/components/TaskCounter.vue'
 import { useDialogWidth } from '@/composables/useDialogWidth'
-import { computed, ref } from 'vue'
+import { isTaskAvailable as isTaskAvailableForDay, isTaskPlanned } from '@/utils/task.utils'
+import DueCountChip from '@/views/components/task/DueCountChip.vue'
+import { containerDueCount } from '@/utils/daily-due.utils'
+import { computed, ref, watch } from 'vue'
 
 const { dialogWidth, dialogFullscreen } = useDialogWidth()
 
@@ -15,6 +18,8 @@ const selected = defineModel<boolean>('selected')
 const props = defineProps<{
   collection: CollectionDetail
   dailyTaskList: DailyTask[]
+  readonly: boolean
+  date: string
 }>()
 
 const emit = defineEmits<{
@@ -28,28 +33,45 @@ const tasksCompleted = computed<Task[]>(() =>
   props.collection.tasks.filter(({ completed }) => completed)
 )
 
-const tasksUncompleted = computed<Task[]>(() =>
-  props.collection.tasks.filter(({ completed }) => !completed)
-)
+const tasksAvailable = computed<Task[]>(() => props.collection.tasks.filter(isTaskAvailable))
 
 const percentageOfTaskCompleted = computed<number>(
   () => (tasksCompleted.value.length / props.collection.tasks.length) * 100
 )
 
+watch(tasksAvailable, tasks => {
+  if (tasks.length === 0) selected.value = false
+})
+
+const dueCount = computed<{ count: number; overdue: boolean }>(() =>
+  containerDueCount(props.collection.tasks, props.date)
+)
+const dueCountDisplayed = computed<boolean>(
+  () => !props.readonly && !props.collection.archived && dueCount.value.count > 0
+)
+
 function isTaskSelected(task: Task): boolean {
-  return props.dailyTaskList.some((dailyTask: DailyTask) => task.id === dailyTask.task?.id)
+  return isTaskPlanned(task, props.dailyTaskList)
+}
+
+function isTaskAvailable(task: Task): boolean {
+  return isTaskAvailableForDay(task, props.collection.archived, props.dailyTaskList)
 }
 
 function selectCollection(): void {
-  if (tasksUncompleted.value.length !== 0 && !selected.value) selected.value = true
+  if (tasksAvailable.value.length !== 0 && !selected.value) selected.value = true
 }
 
 function unselectCollection(): void {
   selected.value = false
 }
 
+function isTaskSelectable(task: Task): boolean {
+  return !props.readonly && !isTaskSelected(task)
+}
+
 function selectTask(task: Task): void {
-  if (isTaskSelected(task)) return
+  if (!isTaskSelectable(task)) return
 
   emit('select-task', { taskId: task.id })
 }
@@ -66,7 +88,8 @@ function createTask(data: TaskPost): void {
 <template>
   <div class="collection-card-wrapper" :class="{ selected }" @click="selectCollection()">
     <v-card
-      :disabled="tasksUncompleted.length === 0"
+      :color="collection.archived ? 'collectionArchived' : undefined"
+      :disabled="tasksAvailable.length === 0"
       :class="{ 'cursor-pointer': !selected }"
       class="rounded-lg">
       <v-progress-linear
@@ -84,6 +107,11 @@ function createTask(data: TaskPost): void {
           </h3>
           <template v-if="!selected">
             <v-spacer />
+            <DueCountChip
+              v-if="dueCountDisplayed"
+              :count="dueCount.count"
+              :late="dueCount.overdue"
+              class="ml-2" />
             <TaskCounter
               :value="tasksCompleted.length"
               :max="collection.tasks.length"
@@ -91,6 +119,14 @@ function createTask(data: TaskPost): void {
               class="ml-2" />
           </template>
           <template v-if="selected">
+            <v-chip
+              v-if="collection.archived"
+              color="accent"
+              size="small"
+              class="flex-shrink-0 ml-2">
+              <v-icon icon="mdi-archive" size="small" class="mr-1" />
+              Archived
+            </v-chip>
             <v-btn
               :to="{ name: 'collection-detail', params: { id: collection.id } }"
               icon
@@ -112,19 +148,26 @@ function createTask(data: TaskPost): void {
           <v-divider class="mt-2" />
           <div class="task-wrapper">
             <TaskCard
-              v-for="task of tasksUncompleted"
+              v-for="task of tasksAvailable"
               :key="`task-${task.id}`"
               :task
               :selected="isTaskSelected(task)"
-              :class="{ 'cursor-pointer': !isTaskSelected(task) }"
+              :class="{ 'cursor-pointer': isTaskSelectable(task) }"
               :small="true"
               :completable="false"
+              :show-completed-at="false"
               :display-options="false"
-              color="surface-container-high"
+              :reference-day="date"
+              :level="2"
               @click="selectTask(task)">
             </TaskCard>
 
-            <v-card variant="outlined" ripple class="create-task-card" @click="taskDialog = true">
+            <v-card
+              v-if="!readonly && !collection.archived"
+              variant="outlined"
+              ripple
+              class="create-task-card"
+              @click="taskDialog = true">
               <v-card-text class="d-flex align-center justify-center gap-2">
                 <span class="text-body-medium text-sm-body-large font-weight-medium">
                   Create a {{ collection.itemName }}

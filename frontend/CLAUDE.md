@@ -28,13 +28,17 @@ yarn build           # build prod — NE VÉRIFIE AUCUN TYPE
 yarn type-check      # vue-tsc --noEmit  (28 erreurs préexistantes)
 yarn lint            # eslint --fix
 yarn format          # prettier --write
+yarn test            # vitest en veille  ·  yarn test:ci pour un run unique avec couverture
+yarn lint:check      # eslint / prettier sans correction — ce que lance la CI
 ```
 
 Docker : `yarn docker:build`, `yarn docker:up`, `yarn docker:prod:build`, `yarn docker:prod:up`.
 
-**Aucun test n'existe** (pas de script `test`). Le seul garde-fou automatique est le hook
-`pre-commit` (eslint sans `--fix` + prettier) et `commit-msg` (commitlint conventionnel).
-Détail : [docs/workflows/verification.md](docs/workflows/verification.md).
+**149 tests Vitest** couvrent `utils/`, `pipes/`, `api/` et `axios/` ; composants, stores,
+composables et guards ne le sont pas encore ([R13](docs/quality/refactoring-backlog.md)). La CI
+(`.github/workflows/ci.yml`) lance eslint, prettier et les tests à chaque PR, en plus des hooks
+`pre-commit` et `commit-msg`. Détail :
+[docs/workflows/verification.md](docs/workflows/verification.md).
 
 ## Règles à respecter en écrivant du code
 
@@ -51,17 +55,17 @@ sujet par ligne en texte brut, sans tiret ni puce.
 
 **Pièges à connaître avant d'écrire :**
 
-| Sujet          | Piège                                                                                                              | Où                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| Responsive     | `useDisplay()` renvoie des **refs** : `xs.value` en script, `xs` en template. `display.xs` est **toujours truthy** | [docs/patterns/responsive.md](docs/patterns/responsive.md)                     |
-| Styles         | Vuetify 4 impose les **CSS layers** : hors layer bat dans un layer. `:deep()` ne cible pas la racine du composant  | [docs/patterns/styling.md](docs/patterns/styling.md)                           |
-| Typographie    | Les classes `text-h1`…`text-h6`, `text-body-1                                                                      | 2`, `text-caption` **n'existent plus** (MD3)                                   | [docs/patterns/styling.md](docs/patterns/styling.md) |
-| Dialogs        | Slot activator = `{ props }` + `v-bind="props"`, sinon le clic n'ouvre rien. Largeur via `useDialogWidth()`        | [docs/patterns/dialogs.md](docs/patterns/dialogs.md)                           |
-| Formulaires    | `v-form.validate()` est **asynchrone** ; `useTemplateRef` renvoie un ref (`.value`)                                | [docs/patterns/forms.md](docs/patterns/forms.md)                               |
-| Store ou API ? | Store uniquement pour `currentProject`/`currentCollection` + `user`/`preferences` ; sinon appel direct à `@/api`   | [docs/architecture/state.md](docs/architecture/state.md)                       |
-| Config         | Lue depuis des balises `<meta>` de `index.html`, **pas** `import.meta.env`                                         | [docs/adr/0001-config-via-meta-tags.md](docs/adr/0001-config-via-meta-tags.md) |
-| Domaine daily  | Task ≠ CommonTask ≠ DailyTask ; règles métier appliquées **par l'UI seulement**                                    | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)                       |
-| Route publique | À ajouter à `nonAuthRoutes`, sinon elle est silencieusement protégée                                               | [docs/architecture/routing.md](docs/architecture/routing.md)                   |
+| Sujet          | Piège                                                                                                                   | Où                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| Responsive     | `useDisplay()` renvoie des **refs** : `xs.value` en script, `xs` en template. `display.xs` est **toujours truthy**      | [docs/patterns/responsive.md](docs/patterns/responsive.md)                     |
+| Styles         | Vuetify 4 impose les **CSS layers** : hors layer bat dans un layer. `:deep()` ne cible pas la racine du composant       | [docs/patterns/styling.md](docs/patterns/styling.md)                           |
+| Typographie    | Les classes `text-h1`…`text-h6`, `text-body-1                                                                           | 2`, `text-caption` **n'existent plus** (MD3)                                   | [docs/patterns/styling.md](docs/patterns/styling.md) |
+| Dialogs        | Slot activator = `{ props }` + `v-bind="props"`, sinon le clic n'ouvre rien. Largeur via `useDialogWidth()`             | [docs/patterns/dialogs.md](docs/patterns/dialogs.md)                           |
+| Formulaires    | `v-form.validate()` est **asynchrone** ; `useTemplateRef` renvoie un ref (`.value`)                                     | [docs/patterns/forms.md](docs/patterns/forms.md)                               |
+| Store ou API ? | Store pour `currentProject`/`currentCollection`, `user`/`preferences` et le résumé `due` ; sinon appel direct à `@/api` | [docs/architecture/state.md](docs/architecture/state.md)                       |
+| Config         | Lue depuis des balises `<meta>` de `index.html`, **pas** `import.meta.env`                                              | [docs/adr/0001-config-via-meta-tags.md](docs/adr/0001-config-via-meta-tags.md) |
+| Domaine daily  | Task ≠ CommonTask ≠ DailyTask ; règles métier appliquées **par l'UI seulement**                                         | [docs/domain/daily-rules.md](docs/domain/daily-rules.md)                       |
+| Route publique | À ajouter à `nonAuthRoutes`, sinon elle est silencieusement protégée                                                    | [docs/architecture/routing.md](docs/architecture/routing.md)                   |
 
 ## Documentation
 

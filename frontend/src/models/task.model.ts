@@ -9,12 +9,16 @@ export interface TaskPost {
   projectId?: number
   sectionId?: number
   collectionId?: number
+  afterId?: number | null
+  beforeId?: number | null
+  dueDate?: string | null
 }
 
 export interface TaskPatch {
   name?: string
   completed?: boolean
   tagIds?: number[]
+  dueDate?: string | null
 }
 
 export interface Task {
@@ -24,10 +28,26 @@ export interface Task {
   tags: Tag[]
   createdAt: string
   completedAt: string
+  dueDate: string | null
+  position: string
 }
 
 export interface TaskExtended extends Task {
   project?: Project
   section?: Section
   collection?: Collection
+}
+
+export interface DueContainerSummary {
+  type: 'project' | 'collection'
+  id: number
+  late: number
+  today: number
+  planned: number
+}
+
+export interface DueSummary {
+  late: number
+  today: number
+  containers: DueContainerSummary[]
 }

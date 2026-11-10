@@ -3,17 +3,23 @@ import { DailyTask, DailyTaskDraft } from '@/models/daily-task.model'
 import { EventExtendedModel } from '@/models/event.model'
 import { dateFormat } from '@/pipes'
 import { sortEvents } from '@/utils/event.utils'
-import DailyDetailTaskTimeline from '@/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue'
-import DailyDetailEventTimeline from '@/views/daily/daily-summary/components/DailyDetailEventTimeline.vue'
+import DailyDetailTaskTimeline from '@/views/daily/components/DailyDetailTaskTimeline.vue'
+import DailyDetailEventTimeline from '@/views/daily/components/DailyDetailEventTimeline.vue'
 import { hideScroll, showScroll } from '@/utils/document.utils'
 import EmptyListDisplay from '@/components/EmptyListDisplay.vue'
+import { useToday } from '@/composables/useToday'
+import { useNow } from '@/composables/useNow'
 import { MAX_PLANNING_HORIZON_DAYS } from '@/utils/constants'
 import moment from 'moment'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import { RouteLocationRaw, useRoute } from 'vue-router'
 import { dailyTaskApi, eventApi } from '@/api'
+import { useDueStore } from '@/store'
 import { useDisplay } from 'vuetify'
 
 const { xs, smAndUp, mdAndDown } = useDisplay()
+const route = useRoute()
+const dueStore = useDueStore()
 
 const show = defineModel<boolean>()
 
@@ -29,19 +35,35 @@ const emit = defineEmits<{
 
 const dialogState = ref(false)
 const dailyTaskList = ref<DailyTask[]>([])
-const events = ref<EventExtendedModel[]>([])
+const rawEvents = ref<EventExtendedModel[]>([])
+
+// Même `now` que `DailyDetailEventTimeline` (composable singleton) : l'ordre bascule au même
+// rythme que la couleur « passé » des cartes, jamais l'un sans l'autre.
+const { now } = useNow()
+const events = computed<EventExtendedModel[]>(() =>
+  [...rawEvents.value].sort((a, b) => sortEvents(a, b, { handlePassedEvent: true }, now.value))
+)
 
 const tab = ref<'task' | 'event'>('task')
+const createTaskFormDisplayed = ref(false)
 const isScrollingOnContent = ref(false)
 
 const numberOfDailyTaskCompleted = computed<number>(
   () => dailyTaskList.value.filter(({ completed }) => completed).length
 )
 // Pas de borne vers l'arrière : un jour passé sans rien affiche simplement l'état vide.
-const isToday = computed<boolean>(() => moment().isSame(props.date, 'day'))
-const isPassed = computed<boolean>(() => moment(props.date).isBefore(moment(), 'day'))
+const { today } = useToday()
+const isToday = computed<boolean>(() => today.value.isSame(props.date, 'day'))
+const isPassed = computed<boolean>(() => moment(props.date).isBefore(today.value, 'day'))
 const canGoForward = computed<boolean>(
-  () => moment(props.date).diff(moment().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+  () =>
+    moment(props.date).diff(today.value.clone().startOf('day'), 'days') < MAX_PLANNING_HORIZON_DAYS
+)
+// Déjà sur le Daily Update, la cible serait la page courante : on se contente de refermer.
+const editLocation = computed<RouteLocationRaw | undefined>(() =>
+  route.name === 'daily-update'
+    ? undefined
+    : { name: 'daily-update', params: { date: props.date, step: 'task' } }
 )
 const actionBtnSize = computed<'large' | 'small' | 'default'>(() => {
   if (smAndUp.value) return 'large'
@@ -49,22 +71,27 @@ const actionBtnSize = computed<'large' | 'small' | 'default'>(() => {
   else return 'default'
 })
 
-watch(show, value => {
-  dialogState.value = !!value
-  tab.value = 'task'
+watch(
+  show,
+  value => {
+    dialogState.value = !!value
+    tab.value = 'task'
+    createTaskFormDisplayed.value = false
 
-  if (value) hideScroll()
-  else showScroll()
-})
+    if (value) hideScroll()
+    else showScroll()
+  },
+  { immediate: true }
+)
 
 watch(
-  () => props.date,
-  () => {
+  [show, (): string => props.date],
+  ([visible]) => {
+    if (!visible) return
     retrieveDailyTaskList()
     retrieveTodayEvents()
-  }
-  // TODO (vue3) : see if immediate was needed
-  // { immediate: false }
+  },
+  { immediate: true }
 )
 
 function retrieveDailyTaskList(): void {
@@ -76,20 +103,16 @@ function retrieveDailyTaskList(): void {
 
 function retrieveTodayEvents(): void {
   eventApi.getEvents({ date: props.date }).then(
-    response =>
-      (events.value = response.sort((a: EventExtendedModel, b: EventExtendedModel) =>
-        sortEvents(a, b, { handlePassedEvent: true })
-      )),
+    response => (rawEvents.value = response),
     error => console.error(error)
   )
 }
 
-function touchStartEvent(): void {
-  // We detect if the touch-down is a scroll on the content
-  const scrollableElement = document.querySelector('.v-dialog')
-  if (!scrollableElement) return
+const content = useTemplateRef<HTMLElement>('content')
 
-  isScrollingOnContent.value = scrollableElement.scrollTop > 0
+function touchStartEvent(): void {
+  const scrollableElement = content.value?.closest('.v-overlay__content')
+  isScrollingOnContent.value = (scrollableElement?.scrollTop ?? 0) > 0
 }
 
 function scrollDownEvent(): void {
@@ -119,6 +142,7 @@ function setDialogStateTo(value: boolean): void {
 function toggleDailyTask(dailyTask: DailyTask): void {
   dailyTaskApi.updateDailyTask(dailyTask.id, { completed: !dailyTask.completed }).then(
     response => {
+      dueStore.refresh({ force: true })
       dailyTask.completed = response.completed // TODO : unused ??
       emitDailyTaskCompletedEvent()
     },
@@ -129,6 +153,7 @@ function toggleDailyTask(dailyTask: DailyTask): void {
 function createDailyTask(data: DailyTaskDraft): void {
   dailyTaskApi.createDailyTask({ ...data, date: props.date }).then(
     response => {
+      dueStore.refresh({ force: true })
       dailyTaskList.value.push(response)
       emit('daily-task-created', props.date)
     },
@@ -142,21 +167,25 @@ function emitDailyTaskCompletedEvent(): void {
 </script>
 
 <template>
+  <!-- `block` bloquerait le contenu lui-même à la réouverture, s'il déborde déjà ; le scroll de la
+  page est géré par hideScroll() -->
   <v-dialog
     :model-value="dialogState"
     fullscreen
     :scrim="false"
+    scroll-strategy="none"
     content-class="daily-detail-dialog"
     transition="dialog-bottom-transition"
     @update:model-value="setDialogStateTo($event)">
     <div
+      ref="content"
       v-touch="{
         start: touchStartEvent,
         left: () => switchTab('left'),
         right: () => switchTab('right'),
         down: scrollDownEvent,
       }"
-      class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-4 pr-sm-6 pr-md-8">
+      class="content pa-4 pa-sm-6 pt-6 pt-sm-8 pt-md-12 pr-4 pr-sm-6 pr-md-8 pb-12 pb-sm-12">
       <div class="actions-wrapper">
         <v-btn icon variant="text" density="comfortable" @click="setDialogStateTo(false)">
           <v-icon icon="mdi-close" />
@@ -206,15 +235,15 @@ function emitDailyTaskCompletedEvent(): void {
           </v-btn>
 
           <v-btn
-            :to="{ name: 'daily-update', params: { date, step: 'task' } }"
-            :disabled="isPassed"
+            :to="editLocation"
             icon
             variant="text"
             density="comfortable"
             :size="actionBtnSize"
-            title="Edit day"
-            class="edit-btn">
-            <v-icon icon="mdi-pencil" />
+            :title="isPassed ? 'See day' : 'Edit day'"
+            class="edit-btn"
+            @click="!editLocation && setDialogStateTo(false)">
+            <v-icon :icon="isPassed ? 'mdi-eye' : 'mdi-pencil'" />
           </v-btn>
         </div>
       </div>
@@ -225,12 +254,12 @@ function emitDailyTaskCompletedEvent(): void {
           class="empty-list-display">
           <template #img>
             <img
-              src="../../../../assets/empty-daily-detail.svg"
+              src="@/assets/empty-daily-detail.svg"
               alt="empty daily detail"
               class="empty-list-display__img" />
           </template>
           <template v-if="!isPassed" #action>
-            <v-btn>
+            <v-btn :to="editLocation" @click="!editLocation && setDialogStateTo(false)">
               <v-icon icon="mdi-calendar-edit" start />
               Prepare the day
             </v-btn>
@@ -280,6 +309,7 @@ function emitDailyTaskCompletedEvent(): void {
           <v-tabs-window v-model="tab" :touch="false" class="bg-transparent py-2 pa-sm-2 pa-md-4">
             <v-tabs-window-item value="task">
               <DailyDetailTaskTimeline
+                v-model:create-form-displayed="createTaskFormDisplayed"
                 :daily-task-list="dailyTaskList"
                 :date
                 @toggle-daily-task="toggleDailyTask($event)"
@@ -294,6 +324,7 @@ function emitDailyTaskCompletedEvent(): void {
           <!-- Only tasks -->
           <div class="overflow-auto">
             <DailyDetailTaskTimeline
+              v-model:create-form-displayed="createTaskFormDisplayed"
               :daily-task-list="dailyTaskList"
               :date
               @toggle-daily-task="toggleDailyTask($event)"
@@ -311,6 +342,7 @@ function emitDailyTaskCompletedEvent(): void {
           <v-row class="pl-4">
             <v-col v-if="dailyTaskList.length > 0" :cols="events.length > 0 ? 7 : 8">
               <DailyDetailTaskTimeline
+                v-model:create-form-displayed="createTaskFormDisplayed"
                 :daily-task-list="dailyTaskList"
                 :date
                 @toggle-daily-task="toggleDailyTask($event)"

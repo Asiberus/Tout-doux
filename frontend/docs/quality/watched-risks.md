@@ -12,9 +12,7 @@ raison est indiquée pour chaque item.
 
 | ID  | Titre                                          | Nature        | Déclencheur                                                      |
 | --- | ---------------------------------------------- | ------------- | ---------------------------------------------------------------- |
-| W1  | Aucun test automatisé                          | Fiabilité     | > 1 développeur, ou 2 régressions sur un même écran              |
 | W2  | Aucune règle de frontière outillée             | Architecture  | Une violation d'import atteint `master`                          |
-| W3  | Aucun garde-fou en CI                          | Fiabilité     | Un commit cassant `yarn build` atteint `master`                  |
 | W4  | Pas de timeout sur les requêtes                | Robustesse    | Un signalement d'écran figé                                      |
 | W5  | 401 global appliqué aux endpoints d'auth       | Sécurité / UX | Un signalement de déconnexion pendant un formulaire              |
 | W6  | Divergences modèle ↔ API                      | Fiabilité     | Voir [ADR 0003](../adr/0003-hand-written-api-models.md)          |
@@ -25,22 +23,9 @@ raison est indiquée pour chaque item.
 | W12 | Polices et icônes chargées depuis des CDN      | Robustesse    | Besoin de fonctionnement hors ligne ou d'un déploiement intranet |
 | W13 | Cycles d'imports entre axios, services, router | Architecture  | Une erreur d'initialisation de module                            |
 | W14 | `TagSearch` plafonne la liste des tags à 200   | UX            | > 150 tags pour un utilisateur                                   |
+| W15 | `@dnd-kit` en 0.x, internes utilisés           | Robustesse    | Toute montée de version de `@dnd-kit/*`                          |
 
 ---
-
-## W1 — Aucun test automatisé
-
-- **Origine** : `package.json` (aucun script de test), aucun fichier de test dans le dépôt.
-- **Contexte** : ni unitaire, ni composant, ni e2e, ni régression visuelle. La seule vérification
-  est le test manuel de l'écran modifié. Le `tsconfig.json` référence pourtant un dossier
-  `tests/**/*.ts` inexistant, et l'ancien README documentait `test:unit` / `test:e2e` — des
-  vestiges du template Vue CLI.
-- **Décision** : ne pas agir. Projet mono-développeur, itérations courtes, écrans testés à la
-  main au fil du développement. Le coût d'installation et de maintenance d'une suite serait
-  aujourd'hui supérieur au risque réel.
-- **Déclencheur** : un 2ᵉ développeur contributeur, **ou** deux régressions constatées sur le même
-  écran en moins de deux releases. Commencer alors par du test de composant sur le domaine daily,
-  qui concentre les invariants implicites (voir [../domain/daily-rules.md](../domain/daily-rules.md)).
 
 ## W2 — Aucune règle de frontière outillée
 
@@ -55,19 +40,6 @@ raison est indiquée pour chaque item.
   la configuration maintenant coûterait plus que ce qu'elle protège.
 - **Déclencheur** : une violation de frontière atteint `master` (import d'`axiosInstance` dans un
   composant, ou `api/` important un store). Ajouter alors `no-restricted-imports` par couche.
-
-## W3 — Aucun garde-fou en CI
-
-- **Origine** : `.github/workflows/deployment.yml`.
-- **Contexte** : le seul workflow est un déploiement Docker déclenché **manuellement**
-  (`workflow_dispatch` ; le trigger `push` est commenté). Aucun lint, type-check ni build en CI.
-  Le seul contrôle automatique du projet est le hook `pre-commit` (fonctionnel).
-- **Décision** : ne pas agir tant que W1 et le passage de `type-check` à 0 erreur
-  ([§3.13 du tracker de migration](../workflows/vuetify-4-migration.md)) sont ouverts — une CI qui
-  ne peut lancer ni tests ni `type-check` (non nul aujourd'hui) n'ajouterait qu'un `yarn build`,
-  déjà couvert de fait par le développement local.
-- **Déclencheur** : un commit cassant `yarn build` atteint `master`, **ou** `type-check` atteint
-  0 erreur (il devient alors gatable et la CI prend son sens).
 
 ## W4 — Pas de timeout sur les requêtes
 
@@ -116,7 +88,9 @@ raison est indiquée pour chaque item.
 - **Origine** : `src/router/` — zéro `() => import()`, toutes les vues importées statiquement.
 - **Contexte** : le visiteur anonyme de `/login` télécharge l'intégralité de l'application, y
   compris le back-office d'administration, `EventDialog` (462 lignes) et `DailyUpdateTask`
-  (412 lignes). Le code total de `src/` est d'environ 13 500 lignes — modeste.
+  (412 lignes). Le code total de `src/` est d'environ 13 500 lignes — modeste. `@dnd-kit` (~37 ko
+  gzip) y est entré avec les listes réordonnables
+  ([ADR 0008](../adr/0008-sortable-lists-with-dnd-kit.md)).
 - **Décision** : ne pas agir. À cette taille, le découpage apporterait peu et ajouterait des
   états de chargement à gérer.
 - **Déclencheur** : bundle initial **> 1,5 Mo** (non minifié-gzip mesuré sur `dist/assets/`),
@@ -207,3 +181,18 @@ initialization`, import résolvant `undefined`), typiquement après une montée 
   le `VVirtualScroll` étant `renderless`) : une sentinelle `v-intersect` y atteint réellement le
   bas du menu. ⚠️ Paginer impose de **revenir à la recherche serveur** avec `no-filter` — un
   filtre client ne filtre que les pages chargées. Les deux ne se cumulent pas.
+
+## W15 — `@dnd-kit` en 0.x, internes utilisés
+
+- **Origine** : `src/components/sortable/dnd-kit.ts`, versions exactes dans `package.json`.
+- **Contexte** : les listes réordonnables reposent sur `@dnd-kit` 0.5.0, dont l'API peut changer
+  à chaque version. `dnd-kit.ts` lit des internes non documentés (`registry.droppables`,
+  `sortable.index`, `sortable.initialIndex`, `sortable.group`) et appelle
+  `actions.setDropTarget` pour ramener l'emplacement à sa place d'origine. Les styles et
+  `SortableItem` reposent en outre sur les attributs `data-dnd-dragging`, `data-dnd-dropping` et
+  `data-dnd-placeholder`, et sur le déplacement de la carte dans le DOM pendant le glisser et au
+  dépôt.
+- **Décision** : ne pas agir. Versions épinglées, internes isolés dans un seul fichier, et
+  `dnd-kit.spec.ts` interroge le registre d'un vrai `DragDropManager`.
+- **Déclencheur** : toute montée de version de `@dnd-kit/*`. Relancer alors `dnd-kit.spec.ts` et
+  l'essai manuel de [verification.md](../workflows/verification.md#listes-réordonnables).

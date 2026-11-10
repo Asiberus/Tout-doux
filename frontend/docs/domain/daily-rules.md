@@ -36,6 +36,26 @@ Logique dupliquée à l'identique dans `DailyTaskCard.vue:19` et `DailyTaskFormC
 | `name`, `tagIds` | ✅ mais **seulement pour un DailyTask libre** | wizard, menu « Edit »                                                 |
 | `date`           | ❌                                            | absent de `DailyTaskPatch` — un DailyTask ne peut pas changer de jour |
 
+**Une Task planifiée sur plusieurs jours** — cocher sa ligne d'un jour, sans action ou en
+`FI`, termine la Task mais ne touche pas aux lignes des autres jours : elles restent
+planifiées et non cochées. Le jour venu, cocher l'une d'elles termine à nouveau la Task et
+**écrase `completed_at`** : la date de fin retenue est celle de la dernière ligne cochée.
+Dé-cocher n'importe laquelle de ces lignes rouvre la Task. Terminer la Task depuis son
+projet ne coche aucune ligne.
+
+⚠️ **En étude** — ce comportement laisse les jours suivants afficher une ligne non cochée
+pour une tâche déjà terminée. Pistes envisagées, aucune retenue :
+
+- **Retirer la tâche des jours à venir** quand elle est terminée. Simple, mais la
+  planification est perdue sans prévenir, et dé-cocher ne la rétablit pas.
+- **Cocher les lignes des jours à venir.** Fabrique un faux historique sur des jours pas
+  encore vécus, et contredit le refus de cocher un jour à venir.
+- **Garder les lignes avec un état « déjà terminée »**, dérivé de `task.completed`. Rien
+  n'est perdu, mais il faut toucher la carte, la timeline, les compteurs du résumé et le
+  wizard.
+- **Masquer les lignes dont la Task a été terminée avant leur jour.** Réversible et limité
+  au back, mais peu lisible : une ligne disparaît sans geste de l'utilisateur.
+
 **Règle de séparation des écrans** : on **prépare** dans le wizard, on **exécute** dans le
 résumé. Il n'y a délibérément aucun moyen de cocher une tâche depuis le wizard. La seule brèche
 dans l'autre sens est la création d'un DailyTask libre depuis le résumé, ouverte au jour courant
@@ -61,9 +81,13 @@ Aucune de ces règles n'est vérifiable par le typage. **Les respecter en écriv
 crée ou modifie des DailyTasks.**
 
 1. **Une seule origine par DailyTask** (voir ci-dessus).
-2. **Aujourd'hui et les jours à venir peuvent être préparés, le passé non.** `dailyUpdateGuard`
-   réécrit vers le jour courant toute date illisible, passée, ou au-delà de
-   `MAX_PLANNING_HORIZON_DAYS`. **Ce n'est plus lui qui empêche l'écran et les données de
+2. **Aujourd'hui et les jours à venir peuvent être préparés, le passé se consulte en lecture
+   seule.** `dailyUpdateGuard` réécrit vers le jour courant toute date illisible ou au-delà de
+   `MAX_PLANNING_HORIZON_DAYS`, et laisse passer le passé. Sur un jour passé, `DailyUpdate`
+   transmet `readonly` aux deux étapes : ajout, création, édition, action, suppression,
+   réordonnancement et CRUD d'événements disparaissent ; seule la navigation reste (onglets,
+   ouverture d'un projet ou d'une collection, chips de retour à la source, description d'un
+   événement). **Ce n'est plus lui qui empêche l'écran et les données de
    diverger** : `DailyTaskPost.date` est **requise**, donc l'écran qui poste doit dire sur quel
    jour il écrit, et le compilateur le vérifie. Le guard ne fait plus qu'appliquer les bornes.
    ⚠️ Il ne rejoue **pas** sur un changement de param — voir
@@ -75,9 +99,13 @@ crée ou modifie des DailyTasks.**
    la carte inerte. ⚠️ **Le context menu de `TaskCard` n'a pas cet état** : il ne connaît pas le
    daily du jour. Il poste, et un **409** du serveur signifie « déjà présente » — traité comme
    un succès par `useAddTaskToDaily`, le résultat étant le même pour l'utilisateur.
-4. **Seules les tâches non complétées sont planifiables**, et seuls les projets/collections non
-   archivés apparaissent (filtres serveur `archived: false`, `has_uncompleted_task: true`, plus
-   des filtres locaux).
+4. **Seules les tâches non complétées sont planifiables.** Le wizard liste les projets/collections
+   renvoyés par le filtre serveur `daily_task_date` : non archivés avec une tâche ouverte, plus
+   ceux — archivés compris — dont une tâche est liée à une daily task du jour affiché. Une
+   tâche terminée, ou d'un conteneur archivé, n'est montrée que si elle est liée au jour,
+   marquée sélectionnée ; un conteneur archivé garde sa couleur des listes et n'offre pas
+   « Create a task ». Les listes sont rechargées à chaque changement de jour, la précédente
+   requête annulée.
 5. **`section.id === 0` = « General tasks »** — sentinelle pour les tâches rattachées
    directement au projet, sans section. Une section synthétique `{ id: 0, name: 'General tasks' }`
    est fabriquée côté UI. ⚠️ Conséquence : plusieurs branchements testent la vérité d'un
@@ -99,21 +127,53 @@ Deux étapes non linéaires (`v-stepper non-linear`, les deux items `editable`) 
 **event**. Le param de route `:step(task|event)` pilote l'étape ; la regex de route rejette toute
 autre valeur.
 
+- **Ordre.** Une tâche créée depuis le wizard est placée **en fin** de la liste affichée, après la
+  dernière tâche à faire, par le serveur ; si la liste a changé ailleurs, la création est refusée
+  et le projet ou la collection est rechargé. Une ligne du jour, créée ou reportée, va **en fin**.
+  Le déplacement d'une ligne, terminée ou non, passe par `useDailyTaskMove` : au moindre échec,
+  le jour est rechargé.
 - La synchronisation est **unidirectionnelle** : le stepper écrit dans la route
   (`router.replace`), mais aucun watcher ne surveille la prop `step`. **Les boutons
   précédent/suivant du navigateur ne déplacent donc pas le stepper.**
-- L'étape « task » offre 5 onglets sources : Project, Collection, Common task, puis
-  « Weekly task » et « Monthly task » **désactivés** (fonctionnalités annoncées, non
-  implémentées). L'énumération `DailyUpdateTaskTab` ne couvre que les 3 premiers.
+- L'étape « task » offre 4 onglets sources, ceux de l'énumération `DailyUpdateTaskTab` : Due, Project, Collection, Common task.
+- **Onglet « Due »** — absent sur un jour passé. Il liste, calculées côté client
+  (`collectDueEntries`) depuis les projets et collections chargés, les tâches dont l'échéance
+  tombe au plus tard 5 jours après le jour affiché, groupées, dans cet ordre, Today / Late /
+  Soon, chaque titre précédé de l'icône et de la couleur de la pastille correspondante et suivi
+  du nombre de ses tâches en chip. Sur un autre jour qu'aujourd'hui, Today devient This day,
+  avec un sous-texte qui nomme le jour planifié. Le sous-texte de Soon rappelle la fenêtre de
+  5 jours : « Due in the next 5 days » aujourd'hui, « Due in the 5 days after Thursday 22
+  October » sinon. Les conteneurs archivés en sont exclus ; une tâche planifiée sur le jour
+  reste à sa place, en vert, terminée ou non. Chaque tâche occupe toute la ligne et porte, sur
+  la ligne de son nom, sa pastille d'échéance puis le chip de son projet, de sa section ou de sa collection, comme une daily task (slot `meta` de `TaskCard`). Un clic sur la carte planifie la
+  tâche ; son menu ⋮ reporte l'échéance en un geste (Today, Tomorrow, Next Friday, Next week, End of month, calculés depuis aujourd'hui, sans celui qui correspond déjà à l'échéance) ou la retire, puis confirme par une notification ; le bouton plan tasks du groupe Today (ou This day) planifie d'un coup, une à une et dans l'ordre, toutes ses tâches pas encore planifiées ; un clic sur le chip ouvre son conteneur dans l'onglet Project ou Collection, comme depuis une daily task, y compris sur une tâche déjà planifiée. L'icône de l'onglet porte un point, sans nombre, dès que l'onglet contient une tâche, planifiée ou non — il ne disparaît pas à la sélection : rouge s'il y en a une en retard, orange s'il y en a une du jour, jaune s'il n'y a que des tâches Soon. Il n'apparaît qu'une fois le jour chargé. Les cartes projet et collection repliées comptent de
+  même les tâches en retard ou du jour, **planifiées ou non**.
+- Dans la liste des tâches du jour (`DailyTaskFormCard`), une tâche porte dans l'ordre le chip de son conteneur, sa pastille d'échéance, puis ses tags. `DailyTaskCard` et l'onglet Due placent la pastille avant le chip.
+- **Signal des échéances hors du daily update** — le store `due` lit
+  `GET task/due-summary/?date=<aujourd'hui>` : les tâches ouvertes en retard ou dues aujourd'hui,
+  conteneur non archivé. L'entrée Daily du menu porte le nombre de celles **pas encore
+  planifiées aujourd'hui**, rouge s'il y en a une en retard, orange sinon ; le bouton ☰ de
+  l'en-tête porte un point de même couleur quand le menu est fermé ; la page Daily Summary affiche un bandeau jaune (« 2 late tasks · 1 task due today, not planned yet ») avec, à droite, un bouton Plan them vers le daily update du jour. Les cartes de la liste des projets et des collections portent, comme dans
+  le daily update, le nombre de leurs tâches en retard ou du jour **planifiées ou non**
+  (`DueCountChip`).
+- **Onglet à l'arrivée** — aucun tant que les tâches du jour, les projets et les collections ne
+  sont pas chargés (`mandatory` de `v-tabs` est coupé jusque-là). Puis « Due » s'il reste une
+  tâche à planifier, « Project » sinon ou sur un jour passé. Le choix est refait à chaque
+  changement de jour, jamais en cours de route.
 - Depuis un DailyTask déjà planifié, cliquer sur son chip projet/section/collection **ramène le
   panneau de gauche sur la source correspondante** (navigation inverse).
 - L'étape « event » fait du CRUD sur les événements du jour via `EventDialog`, et retire de la
   liste tout événement qui, après édition, ne couvre plus la journée (`isEventRelatedToDate`).
 - **Navigation jour à jour** — deux flèches dans l'en-tête (`router.replace`, pas `push` : les
   clics n'empilent pas l'historique), plus un bouton « today » dès qu'on a quitté le jour
-  courant. La flèche gauche est désactivée sur aujourd'hui, la droite à
-  `MAX_PLANNING_HORIZON_DAYS` : **ces deux `disabled` sont la seule borne**, `dailyUpdateGuard`
-  ne rejouant pas sur un changement de param.
+  courant. La flèche gauche n'a pas de borne — le passé s'ouvre en lecture seule ; la droite se
+  désactive à `MAX_PLANNING_HORIZON_DAYS` : **ce `disabled` est la seule borne**,
+  `dailyUpdateGuard` ne rejouant pas sur un changement de param.
+- **Signal d'état** — `DailyDayStatusChip`, à côté des titres « Tasks of the day » et « Events of
+  the day » : « Past day » avec un cadenas sur un jour passé, « Upcoming » en `accent` tonal avec
+  l'icône `mdi-calendar-arrow-right` du résumé sur un jour à venir, rien sur le jour courant. Sur
+  un jour passé, les boutons d'ajout disparaissent et les états vides disent qu'il n'y avait rien
+  ce jour-là.
 - **Les deux étapes rechargent au changement de date**, par un `watch` sur la prop et non par un
   `:key` — un remontage relancerait aussi les listes de projets, collections et tâches
   récurrentes, qui ne dépendent pas du jour. Chacune **vide sa liste et remet son compteur à

@@ -32,12 +32,11 @@ Un fichier par action. Le minimum est `<nom>.py` (lecture) + une forme d'écritu
 - **Lecture** : hériter de `ReadOnlyModelSerializer` (`serializers/common.py`).
 - **Écriture** : `ModelSerializer` nu + `to_representation()` qui délègue à la forme de lecture.
 - Redéclarer **chaque** champ multi-mot en camelCase avec `source=`.
-- Relations entrantes en `PrimaryKeyRelatedField(source='<relation>')`, nommées `<relation>Id`
-  ou `<relation>Ids`.
+- Relations entrantes en `OwnedPrimaryKeyRelatedField(source='<relation>')`, nommées
+  `<relation>Id` ou `<relation>Ids` : le champ restreint son queryset à l'utilisateur courant —
+  [ownership-and-scoping.md](ownership-and-scoping.md).
 - `user = serializers.HiddenField(default=serializers.CurrentUserDefault())` dans la forme
   d'écriture **et dans `Meta.fields`**.
-- Un `validate_<champ>` par relation entrante, avec le contrôle d'appartenance —
-  [ownership-and-scoping.md](ownership-and-scoping.md).
 - Si l'entité dépend d'un projet ou d'une collection : les trois gardes d'archivage —
   [archive-guards.md](archive-guards.md).
 - **Aucun `SerializerMethodField` ne fait de requête** : compteurs et relations imbriquées

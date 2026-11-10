@@ -18,6 +18,7 @@ par chemin : `task → project`, `task → section → project`, `task → colle
 | Créer une section, une tâche ou un événement dedans     | **refusé**                                              | `You can't create a task to an archived project`                               |
 | Modifier une section, une tâche ou un événement dedans  | **refusé**                                              | `You can't edit a task related to an archived project`                         |
 | Supprimer une section, une tâche ou un événement dedans | **refusé** (403)                                        | `This task is related to either an archived project or an archived collection` |
+| Déplacer une tâche dedans                               | **refusé** (403)                                        | `This task is related to either an archived project or an archived collection` |
 | Créer un daily task depuis une tâche archivée           | **refusé**                                              | `You can't create a daily task with a task related to an archived project`     |
 | Cocher un daily task dont la tâche est archivée         | **autorisé**, mais la tâche source **n'est pas** cochée | —                                                                              |
 
@@ -30,10 +31,10 @@ code.
 
 Deux emplacements selon le moment :
 
-**À la création** — dans le `validate_<champ>` qui contrôle déjà l'appartenance, juste après :
+**À la création** — dans le `validate_<champ>` de la relation :
 
 ```python
-# serializers/task/task_post.py:62
+# serializers/task/task_post.py:71
 if project.archived:
     raise serializers.ValidationError("You can't create a task to an archived project")
 ```
@@ -79,6 +80,7 @@ ici._
 | `serializers/daily_task/daily_task_post.py`          | 51, 54     | création                                |
 | `serializers/daily_task/daily_task_patch.py`         | 36         | propagation conditionnelle              |
 | `views/task.py`                                      | 24         | suppression                             |
+| `views/task.py`                                      | `move`     | déplacement                             |
 | `views/section.py`                                   | 24         | suppression                             |
 | `views/event.py`                                     | 54         | suppression                             |
 

@@ -5,7 +5,7 @@ import { DailyTask, DailyTaskPatch } from '@/models/daily-task.model'
 import TagSearch from '@/views/components/tag/TagSearch.vue'
 import TagChip from '@/views/components/tag/TagChip.vue'
 import DailyTaskActionChip from '@/views/daily/components/DailyTaskActionChip.vue'
-import { onBeforeMount, ref, watch } from 'vue'
+import { ComponentPublicInstance, onBeforeMount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 const props = defineProps<{
   dailyTask?: DailyTask
@@ -43,6 +43,12 @@ onBeforeMount(() => {
   }
 })
 
+const nameField = useTemplateRef<ComponentPublicInstance>('nameField')
+
+// L'`autofocus` de Vuetify fait défiler jusqu'au champ et casse le défilement animé que lance
+// l'écran parent pour montrer tout le formulaire
+onMounted(() => nameField.value?.$el.querySelector('input')?.focus({ preventScroll: true }))
+
 watch(tagList, (value: Tag[]): void => {
   dailyTaskForm.value.data.tagIds = value.map(({ id }) => id)
 })
@@ -70,12 +76,12 @@ function removeTag(id: number): void {
         @update="dailyTaskForm.data.action = $event" />
 
       <v-text-field
+        ref="nameField"
         v-model="dailyTaskForm.data.name"
         :rules="dailyTaskForm.rules?.name"
         label="Name"
         counter="150"
         required
-        autofocus
         class="mb-2" />
     </div>
 

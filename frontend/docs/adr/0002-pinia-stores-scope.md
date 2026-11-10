@@ -1,6 +1,6 @@
 # 0002 — Périmètre restreint des stores Pinia
 
-- **Statut** : accepté
+- **Statut** : accepté — étendu par [0009](0009-due-store-first-data-store.md)
 - **Date** : inconnue — décision matérialisée par le commit `e0b598e` « chore: rewrite all
   components in vue3 composition api », qui a converti les modules Vuex
   (`src/store/modules/*.store.ts`) en stores Pinia (`src/store/*.store.ts`)

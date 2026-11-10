@@ -10,20 +10,21 @@ d'archivage et effets de bord vivent ici, pas dans les vues.
 `get_serializer_class()` de chaque viewset choisit selon `self.action`. Les suffixes sont
 stables dans tout le projet :
 
-| Suffixe               | Rôle                                         | Base                         |
-| --------------------- | -------------------------------------------- | ---------------------------- |
-| _(aucun)_             | forme de lecture canonique                   | `ReadOnlyModelSerializer`    |
-| `List`                | lecture de liste, **enrichie d'agrégats**    | hérite de la forme canonique |
-| `Detail` / `Extended` | lecture enrichie de **relations imbriquées** | idem                         |
-| `Post`                | création                                     | `ModelSerializer` nu         |
-| `Patch`               | modification                                 | `ModelSerializer` nu         |
-| `PostOrPatch`         | les deux, quand les règles sont identiques   | `ModelSerializer` nu         |
+| Suffixe               | Rôle                                                      | Base                         |
+| --------------------- | --------------------------------------------------------- | ---------------------------- |
+| _(aucun)_             | forme de lecture canonique                                | `ReadOnlyModelSerializer`    |
+| `List`                | lecture de liste, **enrichie d'agrégats**                 | hérite de la forme canonique |
+| `Detail` / `Extended` | lecture enrichie de **relations imbriquées**              | idem                         |
+| `Post`                | création                                                  | `ModelSerializer` nu         |
+| `Patch`               | modification                                              | `ModelSerializer` nu         |
+| `PostOrPatch`         | les deux, quand les règles sont identiques                | `ModelSerializer` nu         |
+| `Move`                | corps d'un déplacement `{afterId, beforeId}`, sans modèle | `serializers.Serializer` nu  |
 
 | Ressource                              | Lecture                                     | Liste                                | Détail                                        | Écriture                                                                                                   |
 | -------------------------------------- | ------------------------------------------- | ------------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Project                                | `ProjectSerializer`                         | `ProjectList` — 3 compteurs calculés | `ProjectDetail` — sections, tasks, events     | `ProjectPostOrPatch`                                                                                       |
 | Collection                             | `CollectionSerializer`                      | `CollectionList` — 2 compteurs       | `CollectionDetail` — tasks                    | `CollectionPostOrPatch`                                                                                    |
-| Task                                   | `TaskSerializer`                            | —                                    | `TaskExtended` — project, section, collection | `TaskPost`, `TaskPatch`                                                                                    |
+| Task                                   | `TaskSerializer`                            | —                                    | `TaskExtended` — project, section, collection | `TaskPost`, `TaskPatch`, `Move`                                                                            |
 | Section                                | `SectionSerializer` — project               | —                                    | `SectionTasks` — tasks                        | `SectionPost`, `SectionPatch`                                                                              |
 | Event                                  | `EventSerializer`                           | —                                    | `EventExtended` — project                     | `EventPostOrPatch`                                                                                         |
 | DailyTask                              | `DailyTaskSerializer`                       | `DailySummary` — agrégats par jour   | —                                             | `DailyTaskPost`, `DailyTaskPatch`                                                                          |
@@ -54,14 +55,16 @@ Donc **la forme d'entrée et la forme de sortie d'un POST/PATCH n'ont rien à vo
 `tagIds`, `projectId` ; on reçoit `tags` (objets complets), sans `projectId`. Ne pas chercher
 un `fields` qui contiendrait les deux.
 
-Deux cas particuliers :
+Trois cas particuliers :
 
 - `SectionPost` et `SectionPatch` répondent avec `SectionTasksSerializer` (donc avec la liste
   des tâches), pas avec `SectionSerializer`.
-- `EventPostOrPatchSerializer.to_representation` (`serializers/event/event_post_or_patch.py:54`)
+- `EventPostOrPatchSerializer.to_representation` (`serializers/event/event_post_or_patch.py:55`)
   **lit un query param** pour choisir sa forme de sortie : `?extended=true` renvoie
   `EventExtended`, sinon `EventSerializer`. Un sérialiseur qui dépend de la requête HTTP est
   une exception unique dans le projet — ne pas la généraliser.
+- Les actions `move` répondent `{id, position}`, sans la forme de lecture : le client n'a besoin
+  que de la clé.
 
 ### 3. camelCase à la main, sur chaque champ
 
@@ -81,9 +84,9 @@ params, eux, n'ont pas été uniformisés : `start_date`, `has_uncompleted_task`
 
 | Type de règle                          | Emplacement                                                  | Exemple                     |
 | -------------------------------------- | ------------------------------------------------------------ | --------------------------- |
-| L'objet référencé m'appartient-il ?    | `validate_<champ>`                                           | `task_post.py:57`           |
+| L'objet référencé m'appartient-il ?    | `OwnedPrimaryKeyRelatedField`                                | `common.py:22`              |
 | La cible est-elle archivée ?           | `validate_<champ>` (création) et `validate()` (modification) | `task_patch.py:46`          |
-| Cohérence entre champs                 | `validate()`                                                 | `event_post_or_patch.py:73` |
+| Cohérence entre champs                 | `validate()`                                                 | `event_post_or_patch.py:70` |
 | Effet de bord sur une **autre** entité | `update()` / `save()`                                        | `daily_task_patch.py:31`    |
 | Force du mot de passe                  | `validate_password()` de Django, appelé à la main            | `user_register.py:32`       |
 
@@ -131,10 +134,10 @@ Les deux premières lignes sont des patterns à part entière :
   est qu'aucun champ d'écriture ne fuit jamais en lecture et inversement —
   [adr/0001](../adr/0001-serializer-per-action.md).
 - **Pas de sérialiseur imbriqué en écriture.** Les relations s'écrivent toujours par
-  `PrimaryKeyRelatedField` (`tagIds`, `projectId`). Aucun `create()` n'écrit dans deux tables.
-- **Pas de mixin partagé pour les contrôles répétés.** Les 13 contrôles d'appartenance et les 12
-  gardes d'archivage sont copiés-collés. C'est ce qui a laissé passer le bug R1 —
-  [../quality/refactoring-backlog.md](../quality/refactoring-backlog.md).
+  `OwnedPrimaryKeyRelatedField` (`tagIds`, `projectId`). Aucun `create()` n'écrit dans deux tables.
+- **Pas de mixin partagé pour les gardes d'archivage.** Les 12 gardes sont copiés-collés. Seul
+  le contrôle d'appartenance est factorisé, dans `OwnedPrimaryKeyRelatedField`
+  (`serializers/common.py`).
 
 ## Voir aussi
 

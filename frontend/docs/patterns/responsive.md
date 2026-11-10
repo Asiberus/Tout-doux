@@ -82,7 +82,7 @@ le `configFile` de `vite-plugin-vuetify` ne s'applique qu'aux styles de Vuetify,
 build passe, seules les media queries sont fausses. Les 46 SFC concernés utilisent le module du
 projet ; garder cette forme.
 
-Exemple réel : `src/views/daily/daily-summary/components/DailyDetailTaskTimeline.vue`.
+Exemple réel : `src/views/daily/components/DailyDetailTaskTimeline.vue`.
 
 ## Variantes légitimes
 

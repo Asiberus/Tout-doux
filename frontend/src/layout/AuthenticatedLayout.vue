@@ -2,25 +2,40 @@
 import TheNavbar from '@/layout/components/TheNavbar.vue'
 import TheHeader from '@/layout/components/TheHeader.vue'
 import { useDisplay } from 'vuetify'
-import { ref } from 'vue'
-import { useNotificationStore, useUserStore } from '@/store'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { dragInProgress } from '@/components/sortable/dnd-kit'
+import { useDueStore, useNotificationStore, useUserStore } from '@/store'
+import { useToday } from '@/composables/useToday'
 
 const { mobile, xs } = useDisplay()
 const userStore = useUserStore()
 const notificationStore = useNotificationStore()
+const dueStore = useDueStore()
+const { today } = useToday()
+
+const todayKey = computed<string>(() => today.value.format('YYYY-MM-DD'))
 
 const navbarDisplayed = ref(!mobile.value)
 const headerMenu = ref(false)
 
+watch(todayKey, () => dueStore.refresh({ force: true }), { immediate: true })
+
+function refreshDueOnReturn(): void {
+  if (document.visibilityState === 'visible') dueStore.refresh()
+}
+
+onMounted(() => document.addEventListener('visibilitychange', refreshDueOnReturn))
+onUnmounted(() => document.removeEventListener('visibilitychange', refreshDueOnReturn))
+
 function showNavbar(): void {
-  if (!mobile.value) return
+  if (!mobile.value || dragInProgress.value) return
 
   navbarDisplayed.value = true
   headerMenu.value = false
 }
 
 function hideNavbar(): void {
-  if (!mobile.value) return
+  if (!mobile.value || dragInProgress.value) return
 
   navbarDisplayed.value = false
 }

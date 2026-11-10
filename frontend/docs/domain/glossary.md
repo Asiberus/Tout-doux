@@ -48,13 +48,14 @@ Tag ──n-n──► Project | Task | CommonTask | DailyTask
 
 ### Task vs CommonTask vs DailyTask
 
-|                         | Task                           | CommonTask                | DailyTask                     |
-| ----------------------- | ------------------------------ | ------------------------- | ----------------------------- |
-| Nature                  | to-do réel                     | **gabarit** réutilisable  | **planification** d'un jour   |
-| Rattachée à             | projet / section / collection  | rien (niveau utilisateur) | une date                      |
-| A un état d'achèvement  | ✅ `completed` + `completedAt` | ❌ aucun                  | ✅ `completed` (pour ce jour) |
-| Achever fait progresser | le projet / la collection      | rien                      | rien globalement              |
-| Gérée depuis            | détail projet / collection     | Réglages → Common tasks   | wizard daily                  |
+|                         | Task                                                         | CommonTask                | DailyTask                      |
+| ----------------------- | ------------------------------------------------------------ | ------------------------- | ------------------------------ |
+| Nature                  | to-do réel                                                   | **gabarit** réutilisable  | **planification** d'un jour    |
+| Rattachée à             | projet / section / collection                                | rien (niveau utilisateur) | une date                       |
+| A un état d'achèvement  | ✅ `completed` + `completedAt`                               | ❌ aucun                  | ✅ `completed` (pour ce jour)  |
+| Achever fait progresser | le projet / la collection                                    | rien                      | rien globalement               |
+| Échéance                | `dueDate` facultative, jour seul ; masquée une fois terminée | ❌ aucune                 | ❌ aucune (celle de sa `Task`) |
+| Gérée depuis            | détail projet / collection                                   | Réglages → Common tasks   | wizard daily                   |
 
 Un **CommonTask** est une corvée récurrente (« sortir le chien », « faire les courses »), décrite
 comme telle dans l'UI (`SettingsCommonTasks.vue:61`). Il n'a pas d'état : le « faire » un jour
@@ -98,6 +99,22 @@ protégée par un `ConfirmDialog`.
   section réelle. Voir [daily-rules.md](daily-rules.md).
 - **`EventExtendedModel.project` est typé non-optionnel** mais un Event peut n'avoir aucun projet ;
   l'UI teste défensivement sa présence.
+- **`position` (`Task`, `DailyTask`) est une clé d'ordre calculée par le serveur.** Elle ne se
+  compare qu'avec `<` — `localeCompare` ignore la casse et placerait `a0` avant `Zz` — et ne se
+  fabrique jamais côté front.
+
+## Réordonner
+
+| Terme                | Sens                                                                                                                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Poignée**          | Bande `mdi-drag-vertical` au bord gauche d'une carte, visible au survol ou au focus : prise immédiate à la souris et au clavier. Au toucher, simple repère dans la marge : l'appui long prend la carte |
+| **Appui long**       | 250 ms au doigt ou au stylet, 150 ms à la souris, sur le corps d'une carte, hors de ses contrôles : même prise que la poignée. À la souris, tirer tout de suite sélectionne le texte                   |
+| **Hors de la liste** | Pointeur à plus de 50 px de la liste : elle se referme, et lâcher remet la carte à sa place                                                                                                            |
+| **Move to top**      | Entrée du menu ⋮ qui place la carte en tête de sa liste                                                                                                                                                |
+
+Se réordonnent les tâches à faire d'un projet, d'une section ou d'une collection, et les daily
+tasks d'un jour qui n'est pas passé. Un conteneur archivé, la vue « Completed » et une liste
+d'un seul élément n'ont pas de poignée.
 
 ## Rôles utilisateur
 
